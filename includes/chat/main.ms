@@ -75,6 +75,17 @@ bind('async_player_chat', null , null, @event) {
   @player = @event['player']
   @badge = ''
   @channel = 'general'
+
+  switch(@channel) {
+  case 'general':
+    break()
+  case 'local':
+    break()
+  case 'guild':
+    break()
+  case 'admin':
+    break()
+  }
   @color = '#fffcbe'
   @enko = true
   @name = array(
@@ -107,7 +118,7 @@ bind('async_player_chat', null , null, @event) {
   }
 
   bind('plugin_message_received', array('id': 'read_player_list.'.@player.'.'.time()), null, @event) {
-    broadcast(ba_get_string(@event['bytes']))
+    #broadcast(ba_get_string(@event['bytes']))
     #포리치, 플레이어의 길드 구하기, 본인 길드한테만 메시지 보내기
     unbind()
   }
