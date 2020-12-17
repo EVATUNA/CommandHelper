@@ -9,7 +9,9 @@ async_read('font_space.json', closure(@json) {
 })
 <<<
 
-
+/rc = >>>
+register_channel('BungeeCord')
+<<<
 
 /aaa $ = >>>
 @uuid = puuid()
