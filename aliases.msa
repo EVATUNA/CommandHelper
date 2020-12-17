@@ -9,36 +9,10 @@ async_read('font_space.json', closure(@json) {
 })
 <<<
 
-/a = >>>
-register_channel('BungeeCord')
-<<<
-/aa $ = >>>
-send_plugin_message(player(), test, $)
-<<<
 
-/abc $ = >>>
-    @ba = byte_array();
-    _writeUTF(@ba, 'Message')
-    _writeUTF(@ba, 'ALL)'
-    _writeUTF(@ba, $)
-    send_plugin_message(player(), 'BungeeCord', @ba)
-<<<
-
-
-/asdf $ = >>>
-    @ba = byte_array();
-    _writeUTF(@ba, 'PlayerList')
-    _writeUTF(@ba, $)
-    send_plugin_message(player(), 'BungeeCord', @ba)
-<<<
 
 /aaa $ = >>>
 @uuid = puuid()
 pogu_set('ch_data:shift_server_request.'.@uuid, $, closure(@connected, @result) {})
 <<<
  
-/sendall $world = >>>
-    foreach(@player in all_players()) {
-        _changeserver(@player, $world);
-    }
-<<<
