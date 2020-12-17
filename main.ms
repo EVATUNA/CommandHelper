@@ -50,14 +50,6 @@ async_read('font_space.json', closure(@json) {
 #################
 
 
-bind('async_player_chat', null , null, @event) {
-  broadcast(@event)
-}
-bind('plugin_message_received', null ,array('channel': 'BungeeCord'), @event) {
-  broadcast(ba_as_array(@event['bytes']))
-  broadcast(@event)
-}
-
 
 
 #포리치 부분은 실질적으로 사용될 일은 거의 없음 커헬 리로드 하지 않는 이상... <재접 귀찮은 테섭 용도!!!>
