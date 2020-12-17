@@ -1,3 +1,10 @@
+export('Cho', split(' ', 'ㄱ ㄲ ㄴ ㄷ ㄸ ㄹ ㅁ ㅂ ㅃ ㅅ ㅆ ㅇ ㅈ ㅉ ㅊ ㅋ ㅌ ㅍ ㅎ'))
+export('Cho.eng', split(' ', 'r R s e E f a q Q t T d w W c z x v g'))
+export('Jung', split(' ', 'ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ ㅣ'))
+export('Jung.eng', split(' ', 'k o i O j p u P h hk ho hl y n nj np nl b m ml l'))
+@temp = split(' ', 'ㄱ ㄲ ㄳ ㄴ ㄵ ㄶ ㄷ ㄹ ㄺ ㄻ ㄼ ㄽ ㄾ ㄿ ㅀ ㅁ ㅂ ㅄ ㅅ ㅆ ㅇ ㅈ ㅊ ㅋ ㅌ ㅍ ㅎ')
+array_insert(@temp, ' ', 0)
+export('Jong', @temp)
 
 proc _is_korean(string @txt) {
 	if(length(reg_match('[가-힣]', @txt)) <= 0) {
