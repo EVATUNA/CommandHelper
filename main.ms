@@ -8,7 +8,7 @@ foreach(@file in list_files('includes')) {
 }
 
 ## POGU UseTable
-pogu_use_table('ch_data')
+pogu_use_table('state')
 #pogu_use_table('ch-skill')
 #pogu_use_table('ch-setting')
 
