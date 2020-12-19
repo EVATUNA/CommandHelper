@@ -9,12 +9,6 @@ async_read('font_space.json', closure(@json) {
 })
 <<<
 
-/rc = >>>
-register_channel('BungeeCord')
+/c = >>>
+pogu_set('last_sender:'.player(), '*plugin_message', closure(@connected, @value) {})
 <<<
-
-/aaa $ = >>>
-@uuid = puuid()
-pogu_set('ch_data:shift_server_request.'.@uuid, $, closure(@connected, @result) {})
-<<<
- 

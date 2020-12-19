@@ -1,17 +1,25 @@
 ## Data Setting
 @players_data = array()
-
 @players_verifing_count = array()
-
-@void = '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n'
-
-@font = array()
-async_read('includes/data/font_space.json', closure(@value) {
-  @font['space_fonts'] = json_decode(@value)
+@text = array()
+@text['void'] =  '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n'
+async_read('files/font_space.json', closure(@value) {
+  @text['space_fonts'] = json_decode(@value)
 })
+async_read('files/general_emoji.json', closure(@value) {
+  @text['general_emoji'] = json_decode(@value)
+})
+
+## Channel Register
+if(!is_channel_registered('BungeeCord')) {
+register_channel('BungeeCord')
+}
 
 ## POGU UseTable
 pogu_use_table('state')
+pogu_use_table('last_sender')
+pogu_use_table('seeting_data')
+pogu_use_table('chating_data')
 
 ## Bind Event
 bind('player_join', null, null, @event, @players_verifing_count, @players_data) {
@@ -23,13 +31,10 @@ bind('player_join', null, null, @event, @players_verifing_count, @players_data) 
         if(@value == 'shifting') {
           pogu_set('state:'.@uuid, 'none', closure(@connected, @result) {
             export('state.'@uuid, 'none')
-            async_read('includes/chat/setting/'.@uuid.'.json', closure(@value) {
-              @players_data[@uuid]['chat_setting'] = json_decode(@value)
-            })
-            async_read('includes/data/option/'.@uuid.'.json', closure(@value) {
-              @players_data[@uuid]['option'] = json_decode(@value)
-            })
-            #read...
+            # Load Data
+            pogu_get('setting_data:'.@uuid, closure(@connected, @value) { @players_data[@uuid]['setting'] = json_decode(@value) })
+            pogu_get('chating_data:'.@uuid, closure(@connected, @value) { @players_data[@uuid]['chating'] = json_decode(@value) })
+            
           })
         } else {
           pogu_set('state:'.@uuid, 'verifing', closure(@connected, @result) {
@@ -47,17 +52,18 @@ bind('player_join', null, null, @event, @players_verifing_count, @players_data) 
   })
 }
 
-bind('player_quit', null, null, @event, @players_verifing_count, @players_data, @void) {
+bind('player_quit', null, null, @event, @players_verifing_count, @players_data) {
   @player = @event['player']
   @uuid = puuid(@player)
   if(array_index_exists(@players_verifing_count, @uuid)) {
     array_remove(@players_verifing_count, @uuid)
   }
   if(array_index_exists(@players_data, @uuid)) {
-    async_write_file('includes/chat/setting/'.@uuid.'.json', json_encode(@players_data[@uuid]['chat_setting']), 'OVERWRITE')
-    async_write_file('includes/data/option/'.@uuid.'.json', json_encode(@players_data[@uuid]['option']), 'OVERWRITE')
-    #save...
+    # Save & Unload Data
+    pogu_set('setting_data:'.@uuid, json_encode(@players_data[@uuid]['setting']), closure(@connected, @value) {})
+    pogu_set('chating_data:'.@uuid, json_encode(@players_data[@uuid]['chating']), closure(@connected, @value) {})
     array_remove(@players_data, @uuid)
+
     if(has_bind('mastery.dash.sneak_down.'.@player)) { unbind('mastery.dash.sneak_down.'.@player) }
     if(has_bind('mastery.dash.stand_up.'.@player)) { unbind('mastery.dash.stand_up.'.@player) }
     if(has_bind('mastery.dash.jump.'.@player)) { unbind('mastery.dash.jump.'.@player) }
@@ -65,7 +71,7 @@ bind('player_quit', null, null, @event, @players_verifing_count, @players_data, 
   }
 }
 
-bind('player_command', null, null, @event, @players_verifing_count, @players_data, @void) {
+bind('player_command', null, null, @event, @players_verifing_count, @players_data, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
   if(array_index_exists(@players_verifing_count, @uuid)) {
@@ -73,53 +79,50 @@ bind('player_command', null, null, @event, @players_verifing_count, @players_dat
     if(@event['command'] == '/resourcepackverify') {
       pogu_set('state:'.@uuid, 'none', closure(@connected, @result) {
         export('state.'@uuid, 'none')
-        async_read('includes/data/data_generated_players.json', closure(@value) {
-          if(array_contains(parse_args(@value), @uuid)) {
-            #로드
-            async_read('includes/chat/setting/'.@uuid.'.json', closure(@value) {
-              @players_data[@uuid]['chat_setting'] = json_decode(@value)
-            })
-            async_read('includes/data/option/'.@uuid.'.json', closure(@value) {
-              @players_data[@uuid]['option'] = json_decode(@value)
-            })
-            #read...
+        pogu_has('setting_data:'.@uuid, closure(@connected, @has) {
+          if(@has && false) { ## 수정해야함 무조건 new로 되어있음
+            # Load Data
+            pogu_get('setting_data:'.@uuid, closure(@connected, @value) { @players_data[@uuid]['setting'] = json_decode(@value) })
+            pogu_get('chating_data:'.@uuid, closure(@connected, @value) { @players_data[@uuid]['chating'] = json_decode(@value) })
+
           } else {
-            #new
-            async_write_file('includes/data/data_generated_players.json', @uuid'', 'APPEND')
-            @players_data[@uuid]['chat_setting'] = array(
+            #
+            pogu_set('last_sender:'.@player, 'none', closure(@connected, @value) {})
+
+            # New & Save Data
+            @players_data[@uuid]['chating'] = array(
               'channel': 'general',
               'en_ko': false,
               'selected_badge': '',
               'is_premium': false
             )
-            async_write_file('includes/chat/setting/'.@uuid.'.json', json_encode(@players_data[@uuid]['chat_setting']), 'OVERWRITE')
-            @players_data[@uuid]['option'] = array(
+            @players_data[@uuid]['setting'] = array(
               'resolution': 427
             )
-            async_write_file('includes/data/option/'.@uuid.'.json', json_encode(@players_data[@uuid]['option']), 'OVERWRITE')
-            #write
+            pogu_set('setting_data:'.@uuid, json_encode(@players_data[@uuid]['setting']), closure(@connected, @value) {})
+            pogu_set('chating_data:'.@uuid, json_encode(@players_data[@uuid]['chating']), closure(@connected, @value) {})
+
             #@players_data[@uuid]['emoji'] = array()
-            #write
+
             #@players_data[@uuid]['badge'] = array()
-            #write
+
             #@players_data[@uuid]['skill'] = array(
             #  'mastery': array()
             #)
-            #write
-            #...
+
           }
           array_remove(@players_verifing_count, @uuid)
-          tellraw(@player, array(@void.'인증이 완료되었습니다.'))
+          tellraw(@player, array(@text['void'].'인증이 완료되었습니다.'))
         })
       })
     }
   }
 }
 
-proc _action_msg(@player, @player_data, @font) {
-  switch(@player_data['chat_setting']['en_ko']) {
+proc _action_msg(@player, @player_data, @text) {
+  switch(@player_data['chating']['en_ko']) {
   case true:
-    switch(@player_data['chat_setting']['channel']) {
+    switch(@player_data['chating']['channel']) {
     case 'general':
       @channel = '\ue3fd'
     case 'guild':
@@ -132,7 +135,7 @@ proc _action_msg(@player, @player_data, @font) {
       @channel = '\ue3fd'
     }
   case false:
-  switch(@player_data['chat_setting']['channel']) {
+  switch(@player_data['chating']['channel']) {
     case 'general':
       @channel = '\ue3fe'
     case 'guild':
@@ -145,7 +148,7 @@ proc _action_msg(@player, @player_data, @font) {
       @channel = '\ue3fe'
     }
   }
-  action_msg(@player, @font['space_fonts']['space.5'].@channel.@font['space_fonts']['space.-65'].@font['space_fonts']['space.'.@player_data['option']['resolution']])
+  action_msg(@player, @text['space_fonts']['space.5'].@channel.@text['space_fonts']['space.-65'].@text['space_fonts']['space.'.@player_data['setting']['resolution']])
 }
 
 
@@ -156,7 +159,7 @@ proc _action_msg(@player, @player_data, @font) {
     @uuid = puuid(@player)
     if(array_index_exists(@players_data, @uuid)) {
       #데이터가 설정됨
-      _action_msg(@player, @players_data[@uuid], @font)
+      _action_msg(@player, @players_data[@uuid], @text)
     } else {
       #인증 받는 중
       if(array_index_exists(@players_verifing_count, @uuid)) {
@@ -166,7 +169,7 @@ proc _action_msg(@player, @player_data, @font) {
             'with': array(
               array(
                 array(
-                  'text': @void
+                  'text': @text['void']
                 ),
                 array(
                   'text': '설정된 에바참치 리소스팩을 찾을 수 없습니다!\n\n',
@@ -200,7 +203,7 @@ proc _action_msg(@player, @player_data, @font) {
                 'with': array(
                   array(
                     array(
-                      'text': @void
+                      'text': @text['void']
                     ),
                     array(
                       'text': '에바참치 리소스팩의 업데이트가 필요합니다!\n\n',
@@ -231,7 +234,7 @@ proc _action_msg(@player, @player_data, @font) {
                   ),
                   array(
                     array(
-                      'text': @void
+                      'text': @text['void']
                     ),
                     array(
                       'text': '최신 버전의 에바참치 리소스팩이 확인되었습니다\n\n',
@@ -277,8 +280,9 @@ proc _action_msg(@player, @player_data, @font) {
     @uuid = @player
     if(import('state.'@uuid) == 'none') {
       if(array_index_exists(@players_data, @uuid)) {
-        async_write_file('includes/chat/setting/'.@uuid.'.json', json_encode(@players_data[@uuid]['chat_setting']), 'OVERWRITE')
-        async_write_file('includes/data/option/'.@uuid.'.json', json_encode(@players_data[@uuid]['option']), 'OVERWRITE')
+        # Save Data
+        pogu_set('setting_data:'.@uuid, json_encode(@players_data[@uuid]['setting']), closure(@connected, @value) {})
+        pogu_set('chating_data:'.@uuid, json_encode(@players_data[@uuid]['chating']), closure(@connected, @value) {})
       }
     }
   }
@@ -495,8 +499,8 @@ if(is_null(import('interface.task')) && false) {
             @channel = '\ue3fe'
           }
         }
-        @fonts = @files_data['fonts']
-        action_msg(@player, @fonts['space.5'].@channel.@fonts['space.-65'].@fonts['space.'.@players_data[@uuid]['setting']['resolution']])
+        @texts = @files_data['fonts']
+        action_msg(@player, @texts['space.5'].@channel.@texts['space.-65'].@texts['space.'.@players_data[@uuid]['setting']['resolution']])
         #action_msg(@player, '대쉬 횟수:'@dash_count'(대기 시간:'@cooldown.')')
         #bossbar        
       }
