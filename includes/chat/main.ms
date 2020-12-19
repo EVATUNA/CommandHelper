@@ -70,64 +70,150 @@ proc _convert_message(@string, @color) {
   return(@messages)
 }
 
-bind('async_player_chat', null , null, @event) {
-	cancel()
+bind('async_player_chat', null , null, @event, @players_data) {
   @player = @event['player']
-  @badge = ''
-  @channel = 'general'
-
-  switch(@channel) {
-  case 'general':
-    break()
-  case 'local':
-    break()
-  case 'guild':
-    break()
-  case 'admin':
-    break()
-  }
-  @color = '#fffcbe'
-  @enko = true
-  @name = array(
-    array(
-      'text': ''@badge'',
-      'color': '#ffffff'
-    ),
-    array(
-      'text': @player,
-      'color': @color
-    ),
-    array(
-      'text': ': ',
-      'color': @color
+  @uuid = puuid(@player)
+  if(array_index_exists(@players_data, @uuid)) {
+    @badge = @players_data[@uuid]['chat_setting']['selected_badge']
+    @channel = @players_data[@uuid]['chat_setting']['channel']
+    switch(@channel) {
+    case 'local':
+      @color = '#ffd6bf'
+      break()
+    case 'guild':
+      @color = '#d5d0f4'
+      break()
+    case 'admin':
+      @color = '#fdc4d5'
+      break()
+    default:
+      @color = '#ffffff'
+      break()
+    }
+    @enko = @players_data[@uuid]['chat_setting']['en_ko']
+    #string_multiply('\uF824', 16 - length(@player))
+    @name = array(
+      array(
+        'text': ''@badge'',
+        'color': '#ffffff'
+      ),
+      array(
+        'text': @player.string_multiply('\uF824', 16 - length(@player)),
+        'color': @color
+      ),
+      array(
+        'text': ': ',
+        'color': @color
+      )
     )
-  )
-  if(@enko) {
-    @message = _convert_eng_to_kor(@event['message'])
-    if(@message){
-      @reg = reg_match_all('\\[([^\\]]*)\\]', @event['message'])
-      foreach(@arr in @reg){
-        @converted = _convert_eng_to_kor(@arr[0])
-        @message = replace(@message, @converted, @arr[1])
+    if(@enko) {
+      @message = _convert_eng_to_kor(@event['message'])
+      if(@message){
+        @reg = reg_match_all('\\[([^\\]]*)\\]', @event['message'])
+        foreach(@arr in @reg){
+          @converted = _convert_eng_to_kor(@arr[0])
+          @message = replace(@message, @converted, @arr[1])
+        }
+      } else {
+        @message = @event['message']
       }
     } else {
       @message = @event['message']
     }
-  } else {
-    @message = @event['message']
-  }
 
-  bind('plugin_message_received', array('id': 'read_player_list.'.@player.'.'.time()), null, @event) {
-    #broadcast(ba_get_string(@event['bytes']))
-    #포리치, 플레이어의 길드 구하기, 본인 길드한테만 메시지 보내기
-    unbind()
+    bind('plugin_message_received', array('id': 'read_player_list.'.@player.'.'.time()), null, @event) {
+      @list = ba_as_array(@event['bytes'])
+      #broadcast(ba_get_string(@event['bytes']))
+      #포리치, 플레이어의 길드 구하기, 본인 길드한테만 메시지 보내기
+      unbind()
+    }
+    _send_plugin_message(@player, array('PlayerList', 'ALL'))
+    @messages = _convert_message(@message, @color)
+    @chat = array_merge(@name, @messages)
+    #broadcast(time())
+    @channel_messages = array('MessageRaw', 'ALL', json_encode(@chat))
+    _send_plugin_message(@player, @channel_messages)
   }
-  _send_plugin_message(@player, array('PlayerList', 'ALL'))
-  @messages = _convert_message(@message, @color)
-  @chat = array_merge(@name, @messages)
-  #broadcast(time())
-  @channel_messages = array('MessageRaw', 'ALL', json_encode(@chat))
-  _send_plugin_message(@player, @channel_messages)
+  cancel()
 }
 
-##pogu set list 채널 enko 뱃지
+register_command('enko', array(
+  'description': 'can select chating type',
+  'usage': '/enko',
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    @uuid = puuid(@player)
+    if(array_index_exists(@players_data, @uuid)) {
+      if(@players_data[@uuid]['chat_setting']['en_ko']) {
+        @players_data[@uuid]['chat_setting']['en_ko'] = false
+        _action_msg(@player, @players_data[@uuid], @font)
+      } else {
+        @players_data[@uuid]['chat_setting']['en_ko'] = true
+        _action_msg(@player, @players_data[@uuid], @font)
+      }
+    }
+  }
+))
+
+register_command('ch', array(
+  'description': 'can select channel',
+  'usage': '/ch [channel]',
+  'tabcompleter': closure(@command, @player, @args) {
+    if(array_size(@args) == 0) {
+      @return = array('general', 'local', 'guild', 'admin')
+    } else {
+      @return = array()
+    }
+    return(@return)
+  },
+  'executor': closure(@command, @player, @args) {
+    @uuid = puuid(@player)
+    if(array_index_exists(@players_data, @uuid)) {
+      if(array_size(@args) == 0) {
+        switch(@players_data[@uuid]['chat_setting']['channel']) {
+        case 'local':
+          #길드가 있을시
+          @players_data[@uuid]['chat_setting']['channel'] = 'guild'
+          #길드가 없고 어드민일시
+          #길드도 없고 어드민도 아닐시
+          break()
+        case 'guild':
+          #어드민일시
+          @players_data[@uuid]['chat_setting']['channel'] = 'admin'
+          #어드민이 아닐시
+          break()
+        case 'admin':
+          @players_data[@uuid]['chat_setting']['channel'] = 'general'
+          break()
+        default:
+          @players_data[@uuid]['chat_setting']['channel'] = 'local'
+          break()
+        }
+        _action_msg(@player, @players_data[@uuid], @font)
+      } else if(array_size(@args) == 1) {
+        switch(@args[0]) {
+        case 'local':
+          #길드가 있을시
+          @players_data[@uuid]['chat_setting']['channel'] = 'local'
+          #길드가 없고 어드민일시
+          #길드도 없고 어드민도 아닐시
+          break()
+        case 'guild':
+          #어드민일시
+          @players_data[@uuid]['chat_setting']['channel'] = 'guild'
+          #어드민이 아닐시
+          break()
+        case 'admin':
+          @players_data[@uuid]['chat_setting']['channel'] = 'admin'
+          break()
+        default:
+          @players_data[@uuid]['chat_setting']['channel'] = 'default'
+          break()
+        }
+        _action_msg(@player, @players_data[@uuid], @font)
+      } else {
+
+      }
+    }
+  }
+))

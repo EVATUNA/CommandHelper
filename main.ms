@@ -1,75 +1,302 @@
-## main data
-export('server', 'spawn')
+## Data Setting
 @players_data = array()
 
-## Include
-foreach(@file in list_files('includes')) {
-  include('includes/'.@file.'/main.ms')
-}
+@players_verifing_count = array()
+
+@void = '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n'
+
+@font = array()
+async_read('includes/data/font_space.json', closure(@value) {
+  @font['space_fonts'] = json_decode(@value)
+})
 
 ## POGU UseTable
 pogu_use_table('state')
-#pogu_use_table('ch-skill')
-#pogu_use_table('ch-setting')
 
+## Bind Event
+bind('player_join', null, null, @event, @players_verifing_count, @players_data) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+  pogu_has('state:'.@uuid, closure(@connected, @has) {
+    if(@has) {
+      pogu_get('state:'.@uuid, closure(@connected, @value) {
+        if(@value == 'shifting') {
+          pogu_set('state:'.@uuid, 'none', closure(@connected, @result) {
+            export('state.'@uuid, 'none')
+            async_read('includes/chat/setting/'.@uuid.'.json', closure(@value) {
+              @players_data[@uuid]['chat_setting'] = json_decode(@value)
+            })
+            async_read('includes/data/option/'.@uuid.'.json', closure(@value) {
+              @players_data[@uuid]['option'] = json_decode(@value)
+            })
+            #read...
+          })
+        } else {
+          pogu_set('state:'.@uuid, 'verifing', closure(@connected, @result) {
+            export('state.'@uuid, 'verifing')
+            @players_verifing_count[@uuid] = 60
+          })
+        }
+      })
+    } else {
+      pogu_set('state:'.@uuid, 'verifing', closure(@connected, @result) {
+        export('state.'@uuid, 'verifing')
+        @players_verifing_count[@uuid] = 60
+      })
+    }
+  })
+}
 
-############################################
-### INTERFACE SYSTEM (인터페이스 시스템) ###
-############################################
-# 인터페이스 시스템에선 일부 시스템들도 함께 관리합니다.
-# ex) 스킬 카운트/쿨다운, 낚시
+bind('player_quit', null, null, @event, @players_verifing_count, @players_data, @void) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+  if(array_index_exists(@players_verifing_count, @uuid)) {
+    array_remove(@players_verifing_count, @uuid)
+  }
+  if(array_index_exists(@players_data, @uuid)) {
+    async_write_file('includes/chat/setting/'.@uuid.'.json', json_encode(@players_data[@uuid]['chat_setting']), 'OVERWRITE')
+    async_write_file('includes/data/option/'.@uuid.'.json', json_encode(@players_data[@uuid]['option']), 'OVERWRITE')
+    #save...
+    array_remove(@players_data, @uuid)
+    if(has_bind('mastery.dash.sneak_down.'.@player)) { unbind('mastery.dash.sneak_down.'.@player) }
+    if(has_bind('mastery.dash.stand_up.'.@player)) { unbind('mastery.dash.stand_up.'.@player) }
+    if(has_bind('mastery.dash.jump.'.@player)) { unbind('mastery.dash.jump.'.@player) }
+    if(has_bind('mastery.dash.fly.'.@player)) { unbind('mastery.dash.fly.'.@player) }
+  }
+}
 
+bind('player_command', null, null, @event, @players_verifing_count, @players_data, @void) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+  if(array_index_exists(@players_verifing_count, @uuid)) {
+    cancel()
+    if(@event['command'] == '/resourcepackverify') {
+      pogu_set('state:'.@uuid, 'none', closure(@connected, @result) {
+        export('state.'@uuid, 'none')
+        async_read('includes/data/data_generated_players.json', closure(@value) {
+          if(array_contains(parse_args(@value), @uuid)) {
+            #로드
+            async_read('includes/chat/setting/'.@uuid.'.json', closure(@value) {
+              @players_data[@uuid]['chat_setting'] = json_decode(@value)
+            })
+            async_read('includes/data/option/'.@uuid.'.json', closure(@value) {
+              @players_data[@uuid]['option'] = json_decode(@value)
+            })
+            #read...
+          } else {
+            #new
+            async_write_file('includes/data/data_generated_players.json', @uuid'', 'APPEND')
+            @players_data[@uuid]['chat_setting'] = array(
+              'channel': 'general',
+              'en_ko': false,
+              'selected_badge': '',
+              'is_premium': false
+            )
+            async_write_file('includes/chat/setting/'.@uuid.'.json', json_encode(@players_data[@uuid]['chat_setting']), 'OVERWRITE')
+            @players_data[@uuid]['option'] = array(
+              'resolution': 427
+            )
+            async_write_file('includes/data/option/'.@uuid.'.json', json_encode(@players_data[@uuid]['option']), 'OVERWRITE')
+            #write
+            #@players_data[@uuid]['emoji'] = array()
+            #write
+            #@players_data[@uuid]['badge'] = array()
+            #write
+            #@players_data[@uuid]['skill'] = array(
+            #  'mastery': array()
+            #)
+            #write
+            #...
+          }
+          array_remove(@players_verifing_count, @uuid)
+          tellraw(@player, array(@void.'인증이 완료되었습니다.'))
+        })
+      })
+    }
+  }
+}
 
-
-#상태 데이터?
-
-######################
-### INTERFACE TEXT ###
-######################
-@files_data = array()
-async_read('font_space.json', closure(@json) {
-  @files_data['fonts'] = json_decode(@json)
-})
-
-######################
-### INTERFACE DATA ###
-######################
-@players_data = array()
-###################
-### PLAYER DATA ###
-###################
-
-
-#################
-### PROCEDURE ###
-#################
-
-
-#################
-### MAIN CODE ###
-#################
-
-
-
-
-#포리치 부분은 실질적으로 사용될 일은 거의 없음 커헬 리로드 하지 않는 이상... <재접 귀찮은 테섭 용도!!!>
-@players = all_players()
-foreach(@player in @players) {
-  #_load_player_data(@player)
+proc _action_msg(@player, @player_data, @font) {
+  switch(@player_data['chat_setting']['en_ko']) {
+  case true:
+    switch(@player_data['chat_setting']['channel']) {
+    case 'general':
+      @channel = '\ue3fd'
+    case 'guild':
+      @channel = '\ue3ff'
+    case 'local':
+      @channel = '\ue401'
+    case 'admin':
+      @channel = '\ue403'
+    default:
+      @channel = '\ue3fd'
+    }
+  case false:
+  switch(@player_data['chat_setting']['channel']) {
+    case 'general':
+      @channel = '\ue3fe'
+    case 'guild':
+      @channel = '\ue400'
+    case 'local':
+      @channel = '\ue402'
+    case 'admin':
+      @channel = '\ue404'
+    default:
+      @channel = '\ue3fe'
+    }
+  }
+  action_msg(@player, @font['space_fonts']['space.5'].@channel.@font['space_fonts']['space.-65'].@font['space_fonts']['space.'.@player_data['option']['resolution']])
 }
 
 
+## Task
+@interval_task = set_interval(1000, closure() {
+  #broadcast(@players_data)
+  foreach(@player in all_players()) {
+    @uuid = puuid(@player)
+    if(array_index_exists(@players_data, @uuid)) {
+      #데이터가 설정됨
+      _action_msg(@player, @players_data[@uuid], @font)
+    } else {
+      #인증 받는 중
+      if(array_index_exists(@players_verifing_count, @uuid)) {
+        if(@players_verifing_count[@uuid] > 0) {
+          @message = array(
+            'translate': '%1$s%3$s',
+            'with': array(
+              array(
+                array(
+                  'text': @void
+                ),
+                array(
+                  'text': '설정된 에바참치 리소스팩을 찾을 수 없습니다!\n\n',
+                  'color': 'red'
+                ),
+                array(
+                  'translate': '인증을 완료하기 전까지 일부 시스템 사용이 제한되며\n%s초 후, 서버와 연결이 자동으로 종료됩니다.\n\n',
+                  'with': array(
+                    array(
+                      'text': @players_verifing_count[@uuid],
+                      'color': 'yellow'
+                    )
+                  ),
+                  'color': 'white'
+                ),
+                array(
+                  'text': '리소스팩을 설정한 후, 채팅메시지를 클릭해주세요.\n'
+                ),
+                array(
+                  'text': '리소스팩을 다운로드하려면 이 채팅메시지를 클릭해주세요.',
+                  'underlined': true,
+                  'color': 'gray',
+                  'clickEvent': array(
+                    'action': 'open_url',
+                    'value': 'https://evatuna.fish/'
+                  )
+                ),
+              ),
+              array(
+                'translate': '%1$s%4$s',
+                'with': array(
+                  array(
+                    array(
+                      'text': @void
+                    ),
+                    array(
+                      'text': '에바참치 리소스팩의 업데이트가 필요합니다!\n\n',
+                      'color': 'red'
+                    ),
+                    array(
+                      'translate': '인증을 완료하기 전까지 일부 시스템 사용이 제한되며\n%s초 후, 서버와 연결이 자동으로 종료됩니다.\n\n',
+                      'with': array(
+                        array(
+                          'text': @players_verifing_count[@uuid],
+                          'color': 'yellow'
+                        )
+                      ),
+                      'color': 'white'
+                    ),
+                    array(
+                      'text': '최신 버전으로 리소스팩을 설정한 후, 채팅메시지를 클릭해주세요.\n'
+                    ),
+                    array(
+                      'text': '최신 버전의 리소스팩을 다운로드하려면 이 채팅메시지를 클릭해주세요.',
+                      'underlined': true,
+                      'color': 'gray',
+                      'clickEvent': array(
+                        'action': 'open_url',
+                        'value': 'https://evatuna.fish/'
+                      )
+                    )
+                  ),
+                  array(
+                    array(
+                      'text': @void
+                    ),
+                    array(
+                      'text': '최신 버전의 에바참치 리소스팩이 확인되었습니다\n\n',
+                      'color': 'green'
+                    ),
+                    array(
+                      'translate': '인증을 완료하기 전까지 일부 시스템 사용이 제한되며\n%s초 후, 서버와 연결이 자동으로 종료됩니다.\n\n',
+                      'with': array(
+                        array(
+                          'text': @players_verifing_count[@uuid],
+                          'color': 'yellow'
+                        )
+                      ),
+                      'color': 'white'
+                    ),
+                    array(
+                      'text': '이 채팅메시지를 클릭할 시, 인증이 완료됩니다.',
+                      'underlined': true,
+                      'color': 'gray',
+                      'clickEvent': array(
+                        'action': 'run_command',
+                        'value': '/resourcepackverify'
+                      )
+                    )
+                  )
+                )
+              )
+            ),
+          )
+          tellraw(@player, @message)
+          @players_verifing_count[@uuid] -= 1
+        } else {
+          array_remove(@players_verifing_count, @uuid)
+          pkick(@player, '리소스팩 설정 후, 다시 접속하여 인증해 주세요!')
+        }
+      }
+    }
+  }
+})
+
+@cron_task = set_cron('*/1 * * * *', closure() {
+  foreach(@player in all_players()) {
+    @uuid = @player
+    if(import('state.'@uuid) == 'none') {
+      if(array_index_exists(@players_data, @uuid)) {
+        async_write_file('includes/chat/setting/'.@uuid.'.json', json_encode(@players_data[@uuid]['chat_setting']), 'OVERWRITE')
+        async_write_file('includes/data/option/'.@uuid.'.json', json_encode(@players_data[@uuid]['option']), 'OVERWRITE')
+      }
+    }
+  }
+})
 
 
-if(is_null(import('interface.task'))) {
-  /*@interface_task = set_interval(1000, closure() {
+
+
+
+if(is_null(import('interface.task')) && false) {
+  @interface_task = set_interval(1000, closure() {
     ### DEBUG
     #broadcast(@players_data)
     ###
     foreach(@player: @player_data in @players_data) {
       @uuid = puuid(@player)
       if(!ponline(@player)) {
-        _save_player_data(@player, @player_data)
+        async_write_file('includes/chat/setting/'.@uuid.'.json', json_encode(@player_data['chat_setting']), 'OVERWRITE')
         array_remove(@players_data, @uuid)
         if(has_bind('mastery.dash.sneak_down.'.@player)) { unbind('mastery.dash.sneak_down.'.@player) }
         if(has_bind('mastery.dash.stand_up.'.@player)) { unbind('mastery.dash.stand_up.'.@player) }
@@ -274,9 +501,11 @@ if(is_null(import('interface.task'))) {
         #bossbar        
       }
     }
-  })*/
+  })
   #export('interface.task', @interface_task)
 }
+
+
 
 /*
 bind('player_join', array('id': 'mastery.fishing.setup'), null, @event) {
@@ -709,3 +938,12 @@ bind('player_interact', null, null, @event) {
   #})
 
 #include_dir('includes', true)
+
+######################################################################################
+
+## Include
+foreach(@file in list_files('includes')) {
+  if(@file != 'data') {
+    include('includes/'.@file.'/main.ms')
+  }
+}
