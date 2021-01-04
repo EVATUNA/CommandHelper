@@ -2,6 +2,12 @@
 console('EvaChat loaded')
 include('eng_to_kor_translater.ms')
 
+## Channel Register
+if(!is_channel_registered('BungeeCord')) {
+register_channel('BungeeCord')
+}
+
+
 @emoji_data = array(
   'player': array(),
   'guild': array()
@@ -50,7 +56,11 @@ proc _convert_message(@string, @color) {
   array_remove(@messages, array_size(@messages) - 1)
   return(@messages)
 }
-
+bind('plugin_message_received', null, null, @event) {
+  #array('channel': 'BungeeCord')
+  #broadcast(a)
+  broadcast('plugin_message_received event' ba_as_array(@event['bytes']))
+}
 bind('async_player_chat', null , null, @event, @players_data) {
   @player = @event['player']
   @uuid = puuid(@player)
@@ -128,6 +138,38 @@ bind('async_player_chat', null , null, @event, @players_data) {
         @message = @event['message']
       }
       @messages = _convert_message(@message, @color)
+
+      #@msg = byte_array()
+      @data_array = byte_array()
+      @data = json_encode(array(
+        'player': @player,
+        'badge': 'A',
+        'channel': 'A',
+        'message': @event['message'],
+        'item': array(
+          'name': 'air',
+          'display': '공기',
+          'lore': array(
+            '허전하다'
+          )
+        )
+      ))
+      ba_put_string(@data_array, @data)
+
+      @byte_array = byte_array()
+      ba_put_string(@byte_array, 'ForwardToPlayer')
+      ba_put_string(@byte_array, 'aaaa__')
+      ba_put_string(@byte_array, 'Chat')
+      ba_put_short(@byte_array, array_size(@data_array))
+      ba_put_bytes(@byte_array, @data_array)
+      send_plugin_message(@player, 'BungeeCord', @byte_array)
+      
+      #broadcast(array_size(@msg))
+      
+      #ba_put_bytes(@byte_array, length(@event['message']))
+      #send_plugin_message(@player, 'BungeeCord', @byte_array)
+                #ba_put_short()
+      /*
       bind('plugin_message_received', array('id': 'read_player_list.'.@player.'.'.time()), null, @event, @player, @name, @messages, @channel, @color) {
       #broadcast(replace(substr(string_from_bytes(@event['bytes']), 19), ',', ''))
       @receivers = parse_args(replace(substr(string_from_bytes(@event['bytes']), 19), ',', ''))
@@ -146,10 +188,26 @@ bind('async_player_chat', null , null, @event, @players_data) {
                   }
                   @channel_messages = array('MessageRaw', @receiver, json_encode(@chat))
                   _send_plugin_message(@player, @channel_messages)
-                })*/
+                })
                 @chat = array_merge(array(array('text': ': ', 'color': @color)), @messages)
-                @channel_messages = array('MessageRaw', @receiver, json_encode(@chat))
-                _send_plugin_message(@player, @channel_messages)
+                @msg = 'asdf'
+
+                @byte_array = byte_array()
+                ba_put_string(@byte_array, 'Forward')
+                ba_put_string(@byte_array, 'ALL')
+                ba_put_string(@byte_array, 'Chat')
+                ba_put_short(@byte_array, 'Chat')
+                send_plugin_message(@player, 'BungeeCord', @byte_array)
+                #ba_put_short()
+
+                @channel_messages = array(
+                  'Forward',
+                  'ALL'
+                  'chat'
+                  @int
+                  @msg
+                )
+                #_send_plugin_message(@player, @channel_messages)
               }
             })
           }
@@ -196,6 +254,7 @@ bind('async_player_chat', null , null, @event, @players_data) {
         unbind()
       }
       _send_plugin_message(@player, array('PlayerList', 'ALL'))
+      */
     }
   }
   cancel()
