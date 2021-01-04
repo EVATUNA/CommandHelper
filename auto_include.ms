@@ -17,3 +17,15 @@ proc _array_to_page(@array, @size) {
   }
   return(@pages)
 }
+
+proc _json_escape(@json) {
+  return(replace(replace(@json, '"', '\"'), '\\', '\\\\'))
+}
+
+proc _json_unescape(@string) {
+  return(replace(replace(@string, '\"', '"'), '\\\\', '\\'))
+}
+
+proc _particle(@player, @particle, @pos, @delta, @speed, @count) {
+  sudo(@player, '/particle'@particle @pos['x'] @pos['y'] @pos['z'] @delta['x'] @delta['y'] @delta['z'] @speed @count 'force')
+}

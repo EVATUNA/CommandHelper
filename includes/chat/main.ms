@@ -109,7 +109,7 @@ bind('async_player_chat', null , null, @event, @players_data) {
           'color': '#ffffff'
         ),
         array(
-          'text': @player.'\n',
+          'text': @player,
           'color': @color
         )
       )
@@ -137,7 +137,7 @@ bind('async_player_chat', null , null, @event, @players_data) {
             @receiver_uuid = puuid(@receiver)
             pogu_get('state:'.@receiver_uuid, closure(@connected, @value) {
               if(@value != 'verifing') {
-                pogu_get('last_sender:'.@receiver, closure(@connected, @last_sender) {
+                /*pogu_get('last_sender:'.@receiver, closure(@connected, @last_sender) {
                   pogu_set('last_sender:'.@receiver, @player, closure(@connected, @value) {})
                   if(@player != @last_sender) {
                     @chat = array_merge(@name, array(array('text': ' ↠ ', 'color': @color)), @messages)
@@ -146,7 +146,10 @@ bind('async_player_chat', null , null, @event, @players_data) {
                   }
                   @channel_messages = array('MessageRaw', @receiver, json_encode(@chat))
                   _send_plugin_message(@player, @channel_messages)
-                })
+                })*/
+                @chat = array_merge(array(array('text': ': ', 'color': @color)), @messages)
+                @channel_messages = array('MessageRaw', @receiver, json_encode(@chat))
+                _send_plugin_message(@player, @channel_messages)
               }
             })
           }
