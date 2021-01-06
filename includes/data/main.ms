@@ -44,12 +44,13 @@ proc _new_data(@uuid, @players_data) {
 
 proc _verify_request(@player, @uuid, @players_state, @players_data) {
   @player_state = array(
+    'player': @player,
     'verifing': false,
     'verify_countdown': -1,
     'shifting': false,
     'guild': null,
-    'guild_role': array(),
-    'admin_role': array()
+    'guild_role': null,
+    'is_op': pisop(@player)
   )
   if(array_index_exists(@players_state, @uuid)) {
     @data = array(
@@ -253,6 +254,7 @@ proc _send_request_msg(@player, @players_state) {
 }
 
 @interval_task = set_interval(1000, closure() {
+  #broadcast(@players_state)
   foreach(@player in all_players()) {
     @uuid = puuid(@player)
     if(array_index_exists(@players_data, @uuid)) {
@@ -285,7 +287,7 @@ proc _send_request_msg(@player, @players_state) {
   }
 })
 
-bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event) {
+bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @players_state) {
   foreach(@key: @byte in @event['bytes']) {
     if(@key != 0) {
       if(@byte == 0) {
@@ -306,42 +308,46 @@ bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event) {
     switch(@data['value']['type']) {
     case 'join_by_logging_in':
       @players_state[@uuid] = array(
+        'player': @player,
         'verifing': true,
         'verify_countdown': -1,
         'shifting': false,
         'guild': null,
-        'guild_role': array(),
-        'admin_role': array()
+        'guild_role': null,
+        'is_op': pisop(@player)
       )
       break()
     case 'verify_resourcepack':
       @players_state[@uuid] = array(
+        'player': @player,
         'verifing': false,
         'verify_countdown': -1,
         'shifting': false,
         'guild': null,
-        'guild_role': array(),
-        'admin_role': array()
+        'guild_role': null,
+        'is_op': pisop(@player)
       )
       break()
     case 'shift':
       @players_state[@uuid] = array(
+        'player': @player,
         'verifing': false,
         'verify_countdown': -1,
         'shifting': true,
         'guild': null,
-        'guild_role': array(),
-        'admin_role': array()
+        'guild_role': null,
+        'is_op': pisop(@player)
       )
       break()
     case 'join_by_shifting':
       @players_state[@uuid] = array(
+        'player': @player,
         'verifing': false,
         'verify_countdown': -1,
         'shifting': false,
         'guild': null,
-        'guild_role': array(),
-        'admin_role': array()
+        'guild_role': null,
+        'is_op': pisop(@player)
       )
       break()
     case 'quit':
