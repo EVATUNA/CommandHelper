@@ -6,6 +6,30 @@ proc _send_plugin_message(@player, @channel_messages) {
   send_plugin_message(@player, 'BungeeCord', @byte_array)
 }
 
+proc _bungeecord_foward(@player, @subchannel, @data) {
+  @data_array = byte_array()
+  ba_put_string(@data_array, json_encode(@data))
+  @byte_array = byte_array()
+  ba_put_string(@byte_array, 'Forward')
+  ba_put_string(@byte_array, 'ALL')
+  ba_put_string(@byte_array, @subchannel)
+  ba_put_short(@byte_array, array_size(@data_array))
+  ba_put_bytes(@byte_array, @data_array)
+  send_plugin_message(@player, 'BungeeCord', @byte_array)
+}
+
+proc _bungeecord_foward_to_player(@sender, @receiver, @data) {
+  @data_array = byte_array()
+  ba_put_string(@data_array, json_encode(@data))
+  @byte_array = byte_array()
+  ba_put_string(@byte_array, 'ForwardToPlayer')
+  ba_put_string(@byte_array, @receiver)
+  ba_put_string(@byte_array, @subchannel)
+  ba_put_short(@byte_array, array_size(@data_array))
+  ba_put_bytes(@byte_array, @data_array)
+  send_plugin_message(@sender, 'BungeeCord', @byte_array)
+}
+
 proc _array_to_page(@array, @size) {
   @pages = array()
   @asize = array_size(@array)
