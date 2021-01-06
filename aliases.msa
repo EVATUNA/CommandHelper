@@ -62,8 +62,5 @@ foreach(@key: @item in get_inventory(puuid())) {
 <<<
 
 /asd = >>>
-register_channel('BungeeCord')
-<<<
-/dsa = >>>
-unregister_channel('BungeeCord')
+ptellraw(player(), array('text': 'Hello World!'))
 <<<
