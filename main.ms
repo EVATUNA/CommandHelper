@@ -1,7 +1,7 @@
 ## Data Setting
+@players_state = array()
 @players_data = array()
 @players_item = array()
-@players_verifing_count = array()
 
 @text = array()
 async_read('files/font_space.json', closure(@value) {
@@ -12,7 +12,6 @@ async_read('files/general_emoji.json', closure(@value) {
 })
 
 ## POGU UseTable
-pogu_use_table('state')
 pogu_use_table('seeting_data')
 pogu_use_table('chating_data')
 
