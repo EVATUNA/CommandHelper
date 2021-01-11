@@ -91,24 +91,36 @@ proc _get_enchanted_item(@enchanting_item, @entries, @luck) {
   return(@enchanted_item)
 }
 
-#get enchantment
-proc _get_itemdata(@item) {
-  @lore = array()
-  if(!is_null(@item) && !is_null(@item['meta']) && array_index_exists(@item['meta'], 'lore')) {
-    broadcast(@item['meta'])
-    @lores = @item['meta']['lore']
-    #foreach(@lore in @lores) {
-      #if()
-      #string_starts_with()
-    #}
-    return(array('enchantments': @lore, 'attrbutes': array()))
-
-  } else {
-    return(array('enchantments': @lore, 'attrbutes': array()))
+proc _update_item(@player, @uuid, @items, @players_item) {
+  #broacast(@players_item)
+  @enchantments = @players_item[@uuid]['enchantments']
+  if(array_index_exists(@items, 'hand')) {
+    @enchantments['hand'] = null
+    @players_item[@uuid]['hand'] = @items['hand']
+    if(!is_null(@items['hand']) && !is_null(@items['hand']['meta']) && !is_null(@items['hand']['meta']['modifiers']) && !is_null(@items['hand']['meta']['lore'])) {
+      @modifiers = @items['hand']['meta']['modifiers']
+      @lore = @items['hand']['meta']['lore']
+      if(array_size(@lore) > array_size(@modifiers)) {
+        @enchantments['hand'] = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
+      }
+    }
   }
+  if(array_index_exists(@items, 'armor')) {
+    @enchantments['armor'] = null
+    @players_item[@uuid]['armor'] = @items['armor']
+    if(!is_null(@items['armor']) && !is_null(@items['armor']['meta']) && !is_null(@items['armor']['meta']['modifiers']) && !is_null(@items['armor']['meta']['lore'])) {
+      @modifiers = @items['armor']['meta']['modifiers']
+      @lore = @items['armor']['meta']['lore']
+      if(array_size(@lore) > array_size(@modifiers)) {
+        @enchantments['armor'] = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
+      }
+    }
+  }
+  foreach(@slot: @enchantment in @enchantments) {
+    @players_item[@uuid]['enchantments'][@slot] = @enchantment
+  }
+  #broadcast(@players_item[@uuid])
 }
-
-
 
 /*
 # armor
