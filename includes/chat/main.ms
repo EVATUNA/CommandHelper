@@ -4,7 +4,7 @@ include('eng_to_kor_translater.ms')
 
 ## Channel Register
 if(!is_channel_registered('BungeeCord')) {
-register_channel('BungeeCord')
+  register_channel('BungeeCord')
 }
 
 
@@ -22,6 +22,12 @@ proc _save_player_emoji(@player) {}
 proc _load_guilds_emoji() {}
 proc _load_guild_emoji(@guild) {}
 proc _save_guild_emoji(@guild) {}
+
+proc _tellraw(@player, @raw) {
+  x_run_on_main_thread_now(closure() {
+    tellraw(@player, @raw)
+  })
+}
 
 proc _convert_message(@strings, @channel, @players_state) {
   @mentioned_players = array()
@@ -212,18 +218,15 @@ proc _convert_message(@strings, @channel, @players_state) {
   @mentioned_players = array_unique(@mentioned_players)
   return(array('raw': @messages, 'mentioned_players': @mentioned_players))
 }
-bind('async_player_chat', null , null, @event) {
-  @player = @event['player']
-  ptellraw('@a', array('text': 'Hello World!'))
-}
+
 bind('async_player_chat', null , null, @event, @players_state, @players_data, @players_item) {
-  @player = @event['player']
-  @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid)) {
-    @chating_data = @players_data[@uuid]['chating']
+  @sender = @event['player']
+  @sender_uuid = puuid(@sender)
+  if(array_index_exists(@players_data, @sender_uuid)) {
+    @chating_data = @players_data[@sender_uuid]['chating']
     @badge = @chating_data['selected_badge']
     @channel = @chating_data['channel']
-    @enko = @players_data[@uuid]['chating']['en_ko']
+    @enko = @players_data[@sender_uuid]['chating']['en_ko']
     if(@enko) {
       @message = _convert_eng_to_kor(@event['message'])
       if(@message){
@@ -238,44 +241,57 @@ bind('async_player_chat', null , null, @event, @players_state, @players_data, @p
     } else {
       @message = @event['message']
     }
-    @converted_message = _convert_message(@message, @channel, @players_state)
-    foreach(@mentioned_player in @converted_message['mentioned_players']) {
-      if(ponline(@mentioned_player)) {
-        play_named_sound(ploc(@mentioned_player), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@mentioned_player))
-      }
-    }
-    #tellraw(array('text': 'Hello World!'))
-    _send_plugin_message(@player, array('MessageRaw', @player, json_encode(@converted_message['raw'])))
     @item = null
-    if(!is_null(@players_item[@uuid]['hand'])) {
+    if(!is_null(@players_item[@sender_uuid]['hand'])) {
       @item = array()
-      @item['name'] = to_lower(@players_item[@uuid]['hand']['name'])
+      @item['name'] = to_lower(@players_item[@sender_uuid]['hand']['name'])
       if(!is_null(@players_item[@uuid]['hand']['meta'])) {
-        if(array_index_exists(@players_item[@uuid]['hand']['meta'], 'display') && !is_null(@players_item[@uuid]['hand']['meta']['display'])) {
-          @item['display'] = @players_item[@uuid]['hand']['meta']['display']
+        if(array_index_exists(@players_item[@sender_uuid]['hand']['meta'], 'display') && !is_null(@players_item[@sender_uuid]['hand']['meta']['display'])) {
+          @item['display'] = @players_item[@sender_uuid]['hand']['meta']['display']
         } else {
-          @item['display'] = to_lower(@players_item[@uuid]['hand']['name'])
+          @item['display'] = to_lower(@players_item[@sender_uuid]['hand']['name'])
         }
-        if(array_index_exists(@players_item[@uuid]['hand']['meta'], 'lore') && !is_null(@players_item[@uuid]['hand']['meta']['lore'])) {
-          @item['lore'] = @players_item[@uuid]['hand']['meta']['lore']
+        if(array_index_exists(@players_item[@sender_uuid]['hand']['meta'], 'lore') && !is_null(@players_item[@sender_uuid]['hand']['meta']['lore'])) {
+          @item['lore'] = @players_item[@sender_uuid]['hand']['meta']['lore']
         } else {
           @item['lore'] = array()
         }
       } else {
-        @item['display'] = to_lower(@players_item[@uuid]['hand']['name'])
+        @item['display'] = to_lower(@players_item[@sender_uuid]['hand']['name'])
         @item['lore'] = array()
       }
     }
-    @mentions = array()
+
+    @converted_message = _convert_message(@message, @channel, @players_state)
+    @mentioned_players = @converted_message['mentioned_players']
+    @raw = @converted_message['raw']
+
     @data = array(
-      'player': @player,
+      'player': @sender,
       'badge': @badge,
       'channel': @channel,
-      'mentions': @mentions,
-      'message': @message,
+      'mentioned_players': @mentioned_players,
+      'raw': @raw,
       'item': @item
     )
-    _bungeecord_foward(@player, 'PlayerChatEvent', @data)
+
+    _bungeecord_foward(@sender, 'PlayerChatEvent', @data)
+    foreach(@receiver_uuid in array_keys(@players_state)) {
+      @receiver = player(@receiver_uuid)
+      if(ponline(@receiver)) {
+        _tellraw(@receiver, @raw)
+        if(@receiver == @sender) {
+          play_named_sound(ploc(@sender), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender))
+        } else {
+          play_named_sound(ploc(@receiver), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver))
+          #호출 여기로 옮기기
+        }
+        if(array_contains(@mentioned_players, @receiver)) {
+          play_named_sound(ploc(@receiver), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver))
+        }
+      }
+    }
+  /*
     switch(@channel) {
     case 'local':
       @receivers = array()
@@ -352,6 +368,7 @@ bind('async_player_chat', null , null, @event, @players_state, @players_data, @p
 
 
     }
+    */
     /*
       @name = array(
         array(
