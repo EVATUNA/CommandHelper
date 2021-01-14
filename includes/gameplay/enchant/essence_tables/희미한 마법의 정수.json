@@ -4,7 +4,6 @@
     "meta": {
       "model": 1,
       "display": "§f희미한 마법의 정수",
-      "model": 1,
       "lore": [
         "§7그냥 물약처럼 보일 정도로,",
         "§7집중해야 느껴지는 마법이 담겨져 있습니다.",
@@ -15,6 +14,86 @@
     }
   },
 	"entries": [
+    {
+      "weight": 15,
+      "name": "내구성",
+      "icon": "\ue40a",
+      "color": "#eee255",
+      "descriptions": [
+        "아이템이 더 오래가도록 해주는",
+        "보존 마법이 부여되어 있습니다."
+      ]
+    },
+    {
+      "weight": 7,
+      "name": "화염",
+      "icon": "\ue40a",
+      "color": "#eee255",
+      "descriptions": [
+        "설명1",
+        "설명2"
+      ]
+    },
+    {
+      "weight": 7,
+      "name": "독성",
+      "icon": "\ue40a",
+      "color": "#eee255",
+      "descriptions": [
+        "설명1",
+        "설명2"
+      ]
+    },
+    {
+      "weight": 7,
+      "name": "약화",
+      "icon": "\ue40a",
+      "color": "#eee255",
+      "descriptions": [
+        "설명1",
+        "설명2"
+      ]
+    },
+    {
+      "weight": 5,
+      "name": "효율",
+      "icon": "\ue40a",
+      "color": "#eee255",
+      "descriptions": [
+        "설명1",
+        "설명2"
+      ]
+    },
+    {
+      "weight": 5,
+      "name": "경험",
+      "icon": "\ue40a",
+      "color": "#eee255",
+      "descriptions": [
+        "설명1",
+        "설명2"
+      ]
+    },
+    {
+      "weight": 5,
+      "name": "행운",
+      "icon": "\ue40a",
+      "color": "#eee255",
+      "descriptions": [
+        "설명1",
+        "설명2"
+      ]
+    },
+    {
+      "weight": 5,
+      "name": "신성",
+      "icon": "\ue40a",
+      "color": "#eee255",
+      "descriptions": [
+        "설명1",
+        "설명2"
+      ]
+    },
     {
       "weight": 1,
       "name": "전격",
@@ -27,47 +106,12 @@
     },
     {
       "weight": 1,
-      "name": "화염",
-      "icon": "\ue40a",
-      "color": "#eee255",
-      "descriptions": [
-        ""
-      ]
-    },
-    {
-      "weight": 1,
       "name": "서리",
       "icon": "\ue40a",
       "color": "#eee255",
       "descriptions": [
-        ""
-      ]
-    },
-    {
-      "weight": 1,
-      "name": "내구성",
-      "icon": "\ue40a",
-      "color": "#eee255",
-      "descriptions": [
-        ""
-      ]
-    },
-    {
-      "weight": 1,
-      "name": "신성",
-      "icon": "\ue40a",
-      "color": "#eee255",
-      "descriptions": [
-        ""
-      ]
-    },
-    {
-      "weight": 1,
-      "name": "독성",
-      "icon": "\ue40a",
-      "color": "#eee255",
-      "descriptions": [
-        ""
+        "설명1",
+        "설명2"
       ]
     }
   ]

@@ -1,15 +1,12 @@
 ## Gameplay
 console('EvaGameplay loaded')
 
-## Data
-@essences = array()
-
 ## Include
 include('crafting/main.ms')
 include('enchant/main.ms')
 include('skill/main.ms')
 
-## Enchant Management
+## Item Management
 @effective_items = array(
   'armor': array(
     'LEATHER_CHESTPLATE',
@@ -56,47 +53,57 @@ include('skill/main.ms')
     'SHIELD'
   )
 )
+
 bind('inventory_click', null, null, @event, @players_item, @effective_items) {
   @player = @event['player']
   @uuid = puuid(@player)
   @held_slot = pheld_slot(@player)
   @clicked_slot = @event['slot']
+  @slot_item = @event['slotitem']
   @items = array()
   switch(@event['action']) {
   case 'HOTBAR_SWAP':
     @button = @event['hotbarbutton']
+    if(@button == -1) { @button = 40 }
+    @button_item = get_inventory_item(@uuid, @button)
     if(@button == @held_slot && @button != @clicked_slot) {
-      if(!is_null(@event['slotitem']) && array_contains(@effective_items['weapon'], @event['slotitem']['name'])) {
-        @items['hand'] = get_inventory_item(@uuid, @clicked_slot)
+      if(!is_null(@slot_item) && array_contains(@effective_items['weapon'], @slot_item['name'])) {
+        @items['main_hand'] = @slot_item
       } else {
-        @items['hand'] = null
+        @items['main_hand'] = null
       }
-      if(@clicked_slot == 38) {
-        @items['armor'] = get_inventory_item(@uuid, @button)
+      if(@clicked_slot == 40) {
+        if(!is_null(@button_item) && array_contains(@effective_items['weapon'], @button_item['name'])) {
+          @items['off_hand'] = @button_item
+        } else {
+          @items['off_hand'] = null
+        }
       }
     } else if(@clicked_slot == @held_slot && @button != @clicked_slot) {
-      if(@button == -1) { #R눌렀을때
-        @button = 40
-      }
-      if(!is_null(get_inventory_item(@uuid, @button)) && array_contains(@effective_items['weapon'], get_inventory_item(@uuid, @button)['name'])) {
-        @items['hand'] = get_inventory_item(@uuid, @button)
+      if(!is_null(@button_item) && array_contains(@effective_items['weapon'], @button_item['name'])) {
+        @items['main_hand'] = @button_item
       } else {
-        @items['hand'] = null
+        @items['main_hand'] = null
       }
-    } else if(@clicked_slot == 38) {
-      if(@button == -1) {
-        @button = 40
+      if(@button == 40) {
+        if(!is_null(@slot_item) && array_contains(@effective_items['weapon'], @slot_item['name'])) {
+          @items['off_hand'] = @slot_item
+        } else {
+          @items['off_hand'] = null
+        }
       }
+    }
+    if(@clicked_slot == 38) {
       @items['armor'] = get_inventory_item(@uuid, @button)
     }
     break()
   case 'MOVE_TO_OTHER_INVENTORY':
-    @other_inventory = @event['inventory']
     @inventory = get_inventory(@uuid)
+    @other_inventory = @event['inventory']
     if(pinventory_holder(@player) == @uuid) {
       array_remove(@other_inventory, 0)
       if(array_size(@other_inventory) == 4) {
-        if(array_contains(@effective_items['armor'], @event['slotitem']['name'])) {
+        if(array_contains(@effective_items['armor'], @slot_item['name'])) {
           if(@clicked_slot == 38) {
             @is_inventory_empty = false
             for(@i = 0, @i <= 35, @i ++) {
@@ -109,10 +116,22 @@ bind('inventory_click', null, null, @event, @players_item, @effective_items) {
               @items['armor'] = null
             }
           } else if(is_null(get_inventory_item(@uuid, 38))) {
-            @items['armor'] = @event['slotitem']
+            @items['armor'] = @slot_item
           }
         }
-        if(array_contains(@effective_items['weapon'], @event['slotitem']['name'])) {
+        if(array_contains(@effective_items['weapon'], @slot_item['name'])) {
+          if(@clicked_slot == 40) {
+            @is_inventory_empty = false
+            for(@i = 0, @i <= 35, @i ++) {
+              if(is_null(@inventory[@i])) {
+                @is_inventory_empty = true
+                break()
+              }
+            }
+            if(@is_inventory_empty) {
+              @items['off_hand'] = null
+            }
+          }
           if(is_null(get_inventory_item(@uuid, @held_slot))) {
             if(@clicked_slot == 40 || @event['rawslot'] < array_size(@other_inventory)) {
               @is_inventory_empty = false
@@ -131,7 +150,22 @@ bind('inventory_click', null, null, @event, @players_item, @effective_items) {
                   }
                 }
                 if(!@is_pre_hotbar_slot_empty) {
-                  @items['hand'] = @event['slotitem']
+                  @items['main_hand'] = @slot_item
+                  if(@clicked_slot == 40) {
+                    @items['off_hand'] = null
+                  }
+                } else {
+                  @is_pre_hotbar_slot_empty = true
+                  for(@i = 0, @i < @held_slot, @i ++) {
+                    if(is_null(@inventory[@i])) {
+                      @is_pre_hotbar_slot_empty = true
+                      break()
+                    }
+                  }
+                }
+              } else {
+                if(@clicked_slot == 40) {
+                  @items['off_hand'] = null
                 }
               }
             } else if(@clicked_slot > 8 && @clicked_slot < 36) {
@@ -143,10 +177,10 @@ bind('inventory_click', null, null, @event, @players_item, @effective_items) {
                 }
               }
               if(!@is_pre_hotbar_slot_empty) {
-                @items['hand'] = @event['slotitem']
+                @items['main_hand'] = @slot_item
               }
             }
-          } else if(@held_slot == @clicked_slot && !is_null(@players_item[@uuid]['hand'])) {
+          } else if(@held_slot == @clicked_slot && !is_null(@players_item[@uuid]['main_hand'])) {
             @is_inventory_empty = false
             for(@i = 9, @i <= 35, @i ++) {
               if(is_null(@inventory[@i])) {
@@ -155,12 +189,12 @@ bind('inventory_click', null, null, @event, @players_item, @effective_items) {
               }
             }
             if(@is_inventory_empty) {
-              @items['hand'] = null
+              @items['main_hand'] = null
             }
           }
         }
       } else {
-        if(array_contains(@effective_items['weapon'], @event['slotitem']['name'])) {
+        if(array_contains(@effective_items['weapon'], @slot_item['name'])) {
           if(is_null(get_inventory_item(@uuid, @held_slot))) {
             if(@event['rawslot'] < array_size(@other_inventory)) {
               @is_inventory_empty = false
@@ -179,17 +213,17 @@ bind('inventory_click', null, null, @event, @players_item, @effective_items) {
                   }
                 }
                 if(!@is_pre_hotbar_slot_empty) {
-                  @items['hand'] = @event['slotitem']
+                  @items['main_hand'] = @slot_item
                 }
               }
             }
-          } else if(@held_slot == @clicked_slot && !is_null(@players_item[@uuid]['hand']) && array_contains(@other_inventory, null)) {
-            @items['hand'] = null
+          } else if(@held_slot == @clicked_slot && !is_null(@players_item[@uuid]['main_hand']) && array_contains(@other_inventory, null)) {
+            @items['main_hand'] = null
           }
         }
       }
     } else {
-      if(array_contains(@effective_items['weapon'], @event['slotitem']['name'])) {
+      if(array_contains(@effective_items['weapon'], @slot_item['name'])) {
         if(is_null(get_inventory_item(@uuid, @held_slot))) {
           if(@event['rawslot'] < array_size(@other_inventory)) {
             @is_post_hotbar_slot_empty = false
@@ -200,19 +234,23 @@ bind('inventory_click', null, null, @event, @players_item, @effective_items) {
               }
             }
             if(!@is_post_hotbar_slot_empty) {
-              @items['hand'] = @event['slotitem']
+              @items['main_hand'] = @slot_item
             }
           }
-        } else if(@held_slot == @clicked_slot && !is_null(@players_item[@uuid]['hand']) && array_contains(@other_inventory, null)) {
-          @items['hand'] = null
+        } else if(@held_slot == @clicked_slot && !is_null(@players_item[@uuid]['main_hand']) && array_contains(@other_inventory, null)) {
+          @items['main_hand'] = null
         }
       }
     }
     break()
   case 'PICKUP_HALF':
   case 'PICKUP_ALL':
-    if(@clicked_slot == @held_slot && !is_null(@players_item[@uuid]['hand'])) {
-      @items['hand'] = null
+    if(@clicked_slot == @held_slot && !is_null(@players_item[@uuid]['main_hand'])) {
+      @items['main_hand'] = null
+    }
+    if(pinventory_holder(@player) == @uuid && @clicked_slot == 40 && !is_null(@players_item[@uuid]['off_hand'])) {
+      broadcast(A)
+      @items['off_hand'] = null
     }
     if(pinventory_holder(@player) == @uuid && @clicked_slot == 38 && !is_null(@players_item[@uuid]['armor'])) {
       @items['armor'] = null
@@ -221,11 +259,15 @@ bind('inventory_click', null, null, @event, @players_item, @effective_items) {
   case 'PLACE_ONE':
   case 'PLACE_ALL':
   case 'SWAP_WITH_CURSOR':
-    if(@clicked_slot == @held_slot && array_contains(@effective_items['weapon'], @event['cursoritem']['name'])) {
-      @items['hand'] = @event['cursoritem']
+    @cursor_item = @event['cursoritem']
+    if(@clicked_slot == @held_slot && !is_null(@cursor_item) && array_contains(@effective_items['weapon'], @cursor_item['name'])) {
+      @items['main_hand'] = @cursor_item
     }
-    if(pinventory_holder(@player) == @uuid && @clicked_slot == 38 && array_contains(@effective_items['armor'], @event['cursoritem']['name'])) {
-      @items['armor'] = @event['cursoritem']
+    if(pinventory_holder(@player) == @uuid && @clicked_slot == 40 && !is_null(@cursor_item) && array_contains(@effective_items['weapon'], @cursor_item['name'])) {
+      @items['off_hand'] = @cursor_item
+    }
+    if(pinventory_holder(@player) == @uuid && @clicked_slot == 38 && !is_null(@cursor_item) && array_contains(@effective_items['armor'], @cursor_item['name'])) {
+      @items['armor'] = @cursor_item
     }
     break()
   case 'DROP_ALL_SLOT':
@@ -233,10 +275,13 @@ bind('inventory_click', null, null, @event, @players_item, @effective_items) {
     if(!@players_item[@uuid]['is_inv_open']) {
       @players_item[@uuid]['is_inv_open'] = true
     }
-    if(@clicked_slot == @held_slot && array_contains(@effective_items['weapon'], @event['slotitem']['name'])) {
-      @items['hand'] = null
+    if(@clicked_slot == @held_slot && array_contains(@effective_items['weapon'], @slot_item['name'])) {
+      @items['main_hand'] = null
     }
-    if(pinventory_holder(@player) == @uuid && @clicked_slot == 38 && array_contains(@effective_items['armor'], @event['slotitem']['name'])) {
+    if(pinventory_holder(@player) == @uuid && @clicked_slot == 40 && array_contains(@effective_items['weapon'], @slot_item['name'])) {
+      @items['off_hand'] = null
+    }
+    if(pinventory_holder(@player) == @uuid && @clicked_slot == 38 && array_contains(@effective_items['armor'], @slot_item['name'])) {
       @items['armor'] = null
     }
     break()
@@ -257,11 +302,17 @@ bind('inventory_close', null, null, @event, @players_item, @effective_items) {
   @uuid = puuid(@player)
   @players_item[@uuid]['is_inv_open'] = false
   @items = array()
-  @held_item = get_inventory_item(@uuid, pheld_slot(@player))
-  if(!is_null(@held_item) && array_contains(@effective_items['weapon'], @held_item['name'])) {
-    @items['hand'] = @held_item
+  @main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
+  if(!is_null(@main_hand_item) && array_contains(@effective_items['weapon'], @main_hand_item['name'])) {
+    @items['main_hand'] = @main_hand_item
   } else {
-    @items['hand'] = null
+    @items['main_hand'] = null
+  }
+  @off_hand_item = get_inventory_item(@uuid, 40)
+  if(!is_null(@off_hand_item) && array_contains(@effective_items['weapon'], @off_hand_item['name'])) {
+    @items['main_hand'] = @off_hand_item
+  } else {
+    @items['main_hand'] = null
   }
   @armor_item = get_inventory_item(@uuid, 38)
   if(!is_null(@armor_item) && array_contains(@effective_items['armor'], @armor_item['name'])) {
@@ -279,20 +330,30 @@ bind('item_held', null, null, @event, @players_item, @effective_items) {
   @uuid = puuid(@player)
   @held_item = get_inventory_item(@uuid, @event['to'])
   if(!is_null(@held_item) && array_contains(@effective_items['weapon'], @held_item['name'])) {
-    _update_item(@player, @uuid, array('hand': @held_item), @players_item)
-  } else {
-    _update_item(@player, @uuid, array('hand': null), @players_item)
+    _update_item(@player, @uuid, array('main_hand': @held_item), @players_item)
+  } else if(!is_null(@players_item[@uuid]['main_hand'])) {
+    _update_item(@player, @uuid, array('main_hand': null), @players_item)
   }
 }
 
 bind('item_swap', null, null, @event, @players_item, @effective_items) {
   @player = @event['player']
   @uuid = puuid(@player)
-  @held_item = get_inventory_item(@uuid, 40)
-  if(!is_null(@held_item) && array_contains(@effective_items['weapon'], @held_item['name'])) {
-    _update_item(@player, @uuid, array('hand': @held_item), @players_item)
-  } else {
-    _update_item(@player, @uuid, array('hand': null), @players_item)
+  @items = array()
+  @off_hand_item = get_inventory_item(@uuid, 40)
+  if(!is_null(@off_hand_item) && array_contains(@effective_items['weapon'], @off_hand_item['name'])) {
+    @items['main_hand'] = @off_hand_item
+  } else if(!is_null(@players_item[@uuid]['main_hand'])) {
+    @items['main_hand'] = null
+  }
+  @main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
+  if(!is_null(@main_hand_item) && array_contains(@effective_items['weapon'], @main_hand_item['name'])) {
+    @items['off_hand'] = @main_hand_item
+  } else if(!is_null(@players_item[@uuid]['off_hand'])) {
+    @items['off_hand'] = null
+  }
+  if(array_size(@items) > 0) {
+    _update_item(@player, @uuid, @items, @players_item)
   }
 }
 
@@ -302,7 +363,7 @@ bind('item_drop', null, null, @event, @players_item, @effective_items) {
   if(!@players_item[@uuid]['is_inv_open']) {
     @held_item = @event['item']
     if(array_contains(@effective_items['weapon'], @held_item['name'])) {
-      _update_item(@player, @uuid, array('hand': null), @players_item)
+      _update_item(@player, @uuid, array('main_hand': null), @players_item)
     }
   }
 }
@@ -321,7 +382,7 @@ bind('item_pickup', null, null, @event, @players_item, @effective_items) {
       }
     }
     if(!@is_pre_hotbar_slot_empty) {
-      _update_item(@player, @uuid, array('hand': @event['item']), @players_item)
+      _update_item(@player, @uuid, array('main_hand': @event['item']), @players_item)
     }
   }
 }
@@ -329,23 +390,31 @@ bind('item_pickup', null, null, @event, @players_item, @effective_items) {
 bind('item_damage', null, null, @event, @players_item, @effective_items) {
   @player = @event['player']
   @uuid = puuid(@player)
-  @max_durability = material_info(@event['item']['name'], 'maxDurability')
-  if(is_null(@event['item']['meta'])) {
+  @item = @event['item']
+  @max_durability = material_info(@item['name'], 'maxDurability')
+  if(is_null(@item['meta'])) {
     @durability = @event['damage']
   } else {
-    @durability = @event['item']['meta']['damage'] + @event['damage']
+    @durability = @item['meta']['damage'] + @event['damage']
   }
   if(@durability >= @max_durability) {
-    if(array_contains(@effective_items['armor'], @event['item']['name'])) {
+    if(array_contains(@effective_items['armor'], @item['name'])) {
       _update_item(@player, @uuid, array('armor': null), @players_item)
-    } else if(array_contains(@effective_items['weapon'], @event['item']['name'])) {
-      _update_item(@player, @uuid, array('hand': null), @players_item)
+    } else if(array_contains(@effective_items['weapon'], @item['name'])) {
+      @main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
+      @off_hand_item = get_inventory_item(@uuid, 40)
+      if(@item == @main_hand_item) {
+        _update_item(@player, @uuid, array('main_hand': null), @players_item)
+      } else if(@item == @off_hand_item) {
+        _update_item(@player, @uuid, array('off_hand': null), @players_item)
+      }
     }
   }
 }
 
 ## Gui Management
-bind('player_interact', null, array('hand': 'main_hand', 'button': 'right'), @event, @essences, @text) {
+
+bind('player_interact', null, array('main_hand': 'main_main_hand', 'button': 'right'), @event, @essences, @text) {
   if(is_cancelled()) {
 
   } else {
@@ -424,6 +493,47 @@ bind('player_interact', null, array('hand': 'main_hand', 'button': 'right'), @ev
           }
           if(!has_bind(@id.'.click')) {
             bind('inventory_click', array('id': @id.'.click'), array('virtual': true, 'player': @player), @event, @essences) {
+              @enchantable_armors = array(
+                'LEATHER_CHESTPLATE': 1.5,
+                'CHAINMAIL_CHESTPLATE': 0.5,
+                'IRON_CHESTPLATE': 0.9,
+                'GOLDEN_CHESTPLATE': 2.5,
+                'DIAMOND_CHESTPLATE': 1.0,
+                'NETHERITE_CHESTPLATE': 1.5
+              )
+              @enchantable_weapons = array(
+                'WOODEN_SWORD': 1.0,
+                'WOODEN_SHOVEL': 1.0,
+                'WOODEN_PICKAXE': 1.0,
+                'WOODEN_AXE': 1.0,
+                'WOODEN_HOE': 1.0,
+                'STONE_SWORD': 0.9,
+                'STONE_SHOVEL': 0.9,
+                'STONE_PICKAXE': 0.9,
+                'STONE_AXE': 0.9,
+                'STONE_HOE': 0.9,
+                'IRON_SWORD': 1.4,
+                'IRON_SHOVEL': 1.4,
+                'IRON_PICKAXE': 1.4,
+                'IRON_AXE': 1.4,
+                'IRON_HOE': 1.4,
+                'GOLDEN_SWORD': 2.2,
+                'GOLDEN_SHOVEL': 2.2,
+                'GOLDEN_PICKAXE': 2.2,
+                'GOLDEN_AXE': 2.2,
+                'GOLDEN_HOE': 2.2,
+                'DIAMOND_SWORD': 1.0,
+                'DIAMOND_SHOVEL': 1.0,
+                'DIAMOND_PICKAXE': 1.0,
+                'DIAMOND_AXE': 1.0,
+                'DIAMOND_HOE': 1.0,
+                'NETHERITE_SWORD': 1.5,
+                'NETHERITE_SHOVEL': 1.5,
+                'NETHERITE_PICKAXE': 1.5,
+                'NETHERITE_AXE': 1.5,
+                'NETHERITE_HOE': 1.5,
+                'TRIDENT': 1.0
+              )
               @rawslot = @event['rawslot']
               if(@rawslot >= 0 && @rawslot <= 26) {
                 @clicked_item = @event['inventory'][@rawslot]
@@ -434,11 +544,11 @@ bind('player_interact', null, array('hand': 'main_hand', 'button': 'right'), @ev
                 if(!is_null(@cursor_item) && @cursor_item['name'] == 'ENCHANTED_BOOK' && @rawslot == 22 && @event['action'] == 'SWAP_WITH_CURSOR') {
                   @enchanting_item = @event['inventory'][@rawslot]
                   @enchanted_item = @enchanting_item
-                  if(!is_null(@enchanting_item) && array_contains(array('IRON_SWORD'), @enchanting_item['name'])) {
+                  if(!is_null(@enchanting_item) && array_index_exists(@enchantable_weapons, @enchanting_item['name'])) {
                     @essence_name = strip_colors(@cursor_item['meta']['display'])
                     if(array_index_exists(@essences, @essence_name)) {
                       @entries = @essences[@essence_name]['entries']
-                      @enchanted_item = _get_enchanted_item(@enchanting_item, @entries, 0)
+                      @enchanted_item = _get_enchanted_item(@enchanting_item, @entries, @enchantable_weapons[@enchanting_item['name']])
                     }
                     cancel()
                     modify_event('slotitem', @enchanted_item)
@@ -522,6 +632,62 @@ bind('entity_damage', null, null, @event, @players_item) {
     @puuid = puuid(@player)
     @euuid = @event['id']
     broadcast(@players_item[@puuid]['enchantments'])
+    switch(@players_item[@puuid]['enchantments']['main_hand']) {
+    case '전격':
+
+      break()
+    case '천둥':
+    
+      break()
+    case '맹독':
+      set_mob_effect(@euuid, 'POISON', 3, 1, false, true)
+      break()
+    case '부식':
+      set_mob_effect(@euuid, 'WITHER', 3, 2, false, true)
+      break()
+    case '약화':
+      set_mob_effect(@euuid, 'WEAKNESS', 0, 6, false, true)
+      break()
+    case '파멸':
+      set_mob_effect(@euuid, 'WEAKNESS', 1, 6, false, true)
+      if(rand() < 0.1) {
+        set_mob_effect(@euuid, 'BLINDNESS', 0, 4, false, true)
+      }
+      break()
+    case '서리':
+      set_mob_effect(@euuid, 'SLOWNESS', 1, 6, false, true)
+      break()
+    case '빙결':
+      set_mob_effect(@euuid, 'SLOWNESS', 1, 11, false, true)
+      set_mob_effect(@euuid, 'SLOWNESS', 5, 4, false, true)
+      break()
+    case '신성':
+      @undead_entities = array(
+        'DROWNED',
+        'HUSK',
+        'PHANTOM',
+        'SKELETON',
+        'SKELETON_HORSE',
+        'STRAY',
+        'WITHER',
+        'WITHER_SKELETON',
+        'ZOGLIN',
+        'ZOMBIE',
+        'ZOMBIE_HORSE',
+        'ZOMBIE_VILLAGER',
+        'ZOMBIFIED_PIGLIN'
+      )
+      if(array_contains(@undead_entities, entity_type(@euuid))) {
+        set_mob_effect(@euuid, 'INSTANT_HEALTH', 1, 0.1, false, true)
+      }
+      break()
+    default:
+    @entity_location = entity_loc(@euuid)
+      if(get_highest_block_at(@entity_location)['y'] - 1 < @entity_location['y'] || get_block(@entity_location) == 'WATER') {
+        broadcast (A)
+      }
+
+    }
   } else { //엔티티가 타격시
 
   }

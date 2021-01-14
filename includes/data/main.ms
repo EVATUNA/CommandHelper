@@ -92,16 +92,19 @@ bind('player_join', null, null, @event, @players_state, @players_data, @players_
   _verify_request(@player, @uuid, @players_state, @players_data)
   @players_item[@uuid] = array(
     'is_inv_open': false,
-    'hand': null,
+    'main_hand': null,
+    'off_hand': null,
     'armor': null,
     'enchantments': array(
-      'hand': null,
+      'main_hand': null,
+      'off_hand': null,
       'armor': null
     )
   )
   @items = array(
-    'hand': get_inventory_item(@uuid, pheld_slot(@player)),
-    'armor': get_inventory_item(@uuid, 37)
+    'main_hand': get_inventory_item(@uuid, pheld_slot(@player)),
+    'off_hand': get_inventory_item(@uuid, 40),
+    'armor': get_inventory_item(@uuid, 38)
   )
   _update_item(@player, @uuid, @items, @players_item)
 }
@@ -111,16 +114,19 @@ foreach(@player in all_players()) {
   _verify_request(@player, @uuid, @players_state, @players_data)
   @players_item[@uuid] = array(
     'is_inv_open': false,
-    'hand': null,
+    'main_hand': null,
+    'off_hand': null,
     'armor': null,
     'enchantments': array(
-      'hand': null,
+      'main_hand': null,
+      'off_hand': null,
       'armor': null
     )
   )
   @items = array(
-    'hand': get_inventory_item(@uuid, pheld_slot(@player)),
-    'armor': get_inventory_item(@uuid, 37)
+    'main_hand': get_inventory_item(@uuid, pheld_slot(@player)),
+    'off_hand': get_inventory_item(@uuid, 40),
+    'armor': get_inventory_item(@uuid, 38)
   )
   _update_item(@player, @uuid, @items, @players_item)
 }

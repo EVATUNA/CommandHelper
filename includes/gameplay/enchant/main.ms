@@ -1,6 +1,7 @@
 console('EvaEnchant loaded')
 
-## Crafting Data Load
+## Essence Data Load
+@essences = array()
 foreach(@file in list_files('essence_tables')) {
   @essence = replace(@file, '.json', '')
   async_read('essence_tables/'.@file, closure(@data) {
@@ -92,29 +93,108 @@ proc _get_enchanted_item(@enchanting_item, @entries, @luck) {
 }
 
 proc _update_item(@player, @uuid, @items, @players_item) {
-  #broacast(@players_item)
   @enchantments = @players_item[@uuid]['enchantments']
-  if(array_index_exists(@items, 'hand')) {
-    @enchantments['hand'] = null
-    @players_item[@uuid]['hand'] = @items['hand']
-    if(!is_null(@items['hand']) && !is_null(@items['hand']['meta']) && !is_null(@items['hand']['meta']['modifiers']) && !is_null(@items['hand']['meta']['lore'])) {
-      @modifiers = @items['hand']['meta']['modifiers']
-      @lore = @items['hand']['meta']['lore']
+  if(array_index_exists(@items, 'main_hand')) {
+    @enchantments['main_hand'] = null
+    if(!is_null(@items['main_hand']) && !is_null(@items['main_hand']['meta']) && !is_null(@items['main_hand']['meta']['modifiers']) && !is_null(@items['main_hand']['meta']['lore'])) {
+      @modifiers = @items['main_hand']['meta']['modifiers']
+      @lore = @items['main_hand']['meta']['lore']
       if(array_size(@lore) > array_size(@modifiers)) {
-        @enchantments['hand'] = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
+        @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
+        @enchantments['main_hand'] = @enchantment
+        @vanilla_enchants = array()
+        switch(@enchantment) {
+        case '내구성':
+          @vanilla_enchants['unbreaking'] = array(
+            'etype': 'DURABILITY',
+            'elevel': 4
+          )
+          break()
+        case '수선':
+          @vanilla_enchants['unbreaking'] = array(
+            'etype': 'DURABILITY',
+            'elevel': 2
+          )
+          @vanilla_enchants['mending'] = array(
+            'etype': 'MENDING',
+            'elevel': 1
+          )
+          break()
+        case '효율':
+          @vanilla_enchants['efficiency'] = array(
+            'etype': 'DIG_SPEED',
+            'elevel': 3
+          )
+          @vanilla_enchants['sharpness'] = array(
+            'etype': 'DAMAGE_ALL',
+            'elevel': 1
+          )
+          break()
+        case '용력':
+          @vanilla_enchants['efficiency'] = array(
+            'etype': 'DIG_SPEED',
+            'elevel': 5
+          )
+          @vanilla_enchants['sharpness'] = array(
+            'etype': 'DAMAGE_ALL',
+            'elevel': 3
+          )
+          break()
+        case '화염':
+          @vanilla_enchants['fire_aspect'] = array(
+            'etype': 'FIRE_ASPECT',
+            'elevel': 1
+          )
+          break()
+        case '유황불':
+          @vanilla_enchants['fire_aspect'] = array(
+            'etype': 'FIRE_ASPECT',
+            'elevel': 5
+          )
+          break()
+        case '행운':
+          @vanilla_enchants['fortune'] = array(
+            'etype': 'LOOT_BONUS_BLOCKS',
+            'elevel': 2
+          )
+          @vanilla_enchants['looting'] = array(
+            'etype': 'LOOT_BONUS_MOBS',
+            'elevel': 2
+          )
+          break()
+        }
+
+        @items['main_hand']['meta']['enchants'] = @vanilla_enchants
+        set_timeout(0, closure() {
+          set_inventory_item(@uuid, pheld_slot(@player), @items['main_hand'])
+        })
       }
     }
+    @players_item[@uuid]['main_hand'] = @items['main_hand']
+  }
+  if(array_index_exists(@items, 'off_hand')) {
+    @enchantments['off_hand'] = null
+    if(!is_null(@items['off_hand']) && !is_null(@items['off_hand']['meta']) && !is_null(@items['off_hand']['meta']['modifiers']) && !is_null(@items['off_hand']['meta']['lore'])) {
+      @modifiers = @items['off_hand']['meta']['modifiers']
+      @lore = @items['off_hand']['meta']['lore']
+      if(array_size(@lore) > array_size(@modifiers)) {
+        @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
+        @enchantments['off_hand'] = @enchantment
+      }
+    }
+    @players_item[@uuid]['off_hand'] = @items['off_hand']
   }
   if(array_index_exists(@items, 'armor')) {
     @enchantments['armor'] = null
-    @players_item[@uuid]['armor'] = @items['armor']
     if(!is_null(@items['armor']) && !is_null(@items['armor']['meta']) && !is_null(@items['armor']['meta']['modifiers']) && !is_null(@items['armor']['meta']['lore'])) {
       @modifiers = @items['armor']['meta']['modifiers']
       @lore = @items['armor']['meta']['lore']
       if(array_size(@lore) > array_size(@modifiers)) {
-        @enchantments['armor'] = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
+        @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
+        @enchantments['armor'] = @enchantment
       }
     }
+    @players_item[@uuid]['armor'] = @items['armor']
   }
   foreach(@slot: @enchantment in @enchantments) {
     @players_item[@uuid]['enchantments'][@slot] = @enchantment

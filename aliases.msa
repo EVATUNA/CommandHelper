@@ -18,9 +18,10 @@ pogu_set('last_sender:'.player(), '*plugin_message', closure(@connected, @value)
 
 /a $a [$ = ''] = >>>
 @item = get_inventory_item(puuid(), pheld_slot())
-if(is_null(@item['meta'])) { @item['meta']= array('flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES')) }
-@item['meta']['lore'][$a] = colorize($)
-set_inventory_item(puuid(), pheld_slot(), @item)
+broadcast(@item)
+#if(is_null(@item['meta'])) { @item['meta']= array('flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES')) }
+#@item['meta']['lore'][$a] = colorize($)
+#set_inventory_item(puuid(), pheld_slot(), @item)
 <<<
 
 /aa = >>>
