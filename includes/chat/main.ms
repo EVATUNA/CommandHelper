@@ -242,22 +242,22 @@ bind('async_player_chat', null , null, @event, @players_state, @players_data, @p
       @message = @event['message']
     }
     @item = null
-    if(!is_null(@players_item[@sender_uuid]['hand'])) {
+    if(!is_null(@players_item[@sender_uuid]['main_hand'])) {
       @item = array()
-      @item['name'] = to_lower(@players_item[@sender_uuid]['hand']['name'])
-      if(!is_null(@players_item[@uuid]['hand']['meta'])) {
-        if(array_index_exists(@players_item[@sender_uuid]['hand']['meta'], 'display') && !is_null(@players_item[@sender_uuid]['hand']['meta']['display'])) {
-          @item['display'] = @players_item[@sender_uuid]['hand']['meta']['display']
+      @item['name'] = to_lower(@players_item[@sender_uuid]['main_hand']['name'])
+      if(!is_null(@players_item[@uuid]['main_hand']['meta'])) {
+        if(array_index_exists(@players_item[@sender_uuid]['main_hand']['meta'], 'display') && !is_null(@players_item[@sender_uuid]['main_hand']['meta']['display'])) {
+          @item['display'] = @players_item[@sender_uuid]['main_hand']['meta']['display']
         } else {
-          @item['display'] = to_lower(@players_item[@sender_uuid]['hand']['name'])
+          @item['display'] = to_lower(@players_item[@sender_uuid]['main_hand']['name'])
         }
-        if(array_index_exists(@players_item[@sender_uuid]['hand']['meta'], 'lore') && !is_null(@players_item[@sender_uuid]['hand']['meta']['lore'])) {
-          @item['lore'] = @players_item[@sender_uuid]['hand']['meta']['lore']
+        if(array_index_exists(@players_item[@sender_uuid]['main_hand']['meta'], 'lore') && !is_null(@players_item[@sender_uuid]['main_hand']['meta']['lore'])) {
+          @item['lore'] = @players_item[@sender_uuid]['main_hand']['meta']['lore']
         } else {
           @item['lore'] = array()
         }
       } else {
-        @item['display'] = to_lower(@players_item[@sender_uuid]['hand']['name'])
+        @item['display'] = to_lower(@players_item[@sender_uuid]['main_hand']['name'])
         @item['lore'] = array()
       }
     }
