@@ -30,7 +30,7 @@ proc _bungeecord_foward_to_player(@sender, @receiver, @data) {
   send_plugin_message(@sender, 'BungeeCord', @byte_array)
 }
 
-proc _array_to_page(@array, @size) {
+proc _paging(@array, @size) {
   @pages = array()
   @asize = array_size(@array)
   for(@i = 0, @i < integer(@asize / @size), @i++) {

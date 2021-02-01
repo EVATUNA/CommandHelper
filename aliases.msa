@@ -1,3 +1,7 @@
+/res $ = >>>
+send_resourcepack(player(), $)
+<<<
+
 /test $ = >>>
 async_read('files/font_space.json', closure(@json) {
   @fonts = json_decode(@json)
@@ -10,7 +14,19 @@ async_read('files/font_space.json', closure(@json) {
   #action_msg(player(), '\ue405'.'')
 })
 <<<
-
+/book = >>>
+@player = player()
+@pages = array(
+  json_encode(array(
+    'text': rand(),
+    'clickEvent': array(
+      'action': 'run_command',
+      'value': '/bookasdf'
+    )
+  ))
+)
+open_book(@player, @pages)
+<<<
 
 /c = >>>
 pogu_set('last_sender:'.player(), '*plugin_message', closure(@connected, @value) {})
@@ -63,5 +79,7 @@ foreach(@key: @item in get_inventory(puuid())) {
 <<<
 
 /asd = >>>
-ptellraw(player(), array('text': 'Hello World!'))
+@a = 'a'
+@a += 'b'
+broadcast(@a)
 <<<

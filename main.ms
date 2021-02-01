@@ -12,8 +12,9 @@ async_read('files/general_emoji.json', closure(@value) {
 })
 
 ## POGU UseTable
-pogu_use_table('seeting_data')
+pogu_use_table('setting_data')
 pogu_use_table('chating_data')
+pogu_use_table('skill_data')
 
 ## Initial Include
 # 가장 상위 Include EX) 채팅이나 스킬에 따른 인터페이스 보여주기위한 세팅
