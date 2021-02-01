@@ -631,7 +631,7 @@ bind('entity_damage', null, null, @event, @players_item) {
     @player = @event['damager']
     @puuid = puuid(@player)
     @euuid = @event['id']
-    broadcast(@players_item[@puuid]['enchantments'])
+    #broadcast(@players_item[@puuid]['enchantments'])
     switch(@players_item[@puuid]['enchantments']['main_hand']) {
     case '전격':
 
@@ -682,13 +682,136 @@ bind('entity_damage', null, null, @event, @players_item) {
       }
       break()
     default:
-    @entity_location = entity_loc(@euuid)
+      @entity_location = entity_loc(@euuid)
+      @ploc = ploc(@player)
       if(get_highest_block_at(@entity_location)['y'] - 1 < @entity_location['y'] || get_block(@entity_location) == 'WATER') {
-        broadcast (A)
+        #broadcast (A)
+      }
+      @allowed_entity = array(
+        'MAGMA_CUBE',
+        'SILVERFISH',
+        'MULE',
+        'HOGLIN',
+        'HUSK',
+        'VINDICATOR',
+        'PILLAGER',
+        'SHULKER_BULLET',
+        'VILLAGER',
+        'TURTLE',
+        'TRADER_LLAMA',
+        'CAVE_SPIDER',
+        'SLIME',
+        'DROWNED',
+        'EVOKER',
+        'ENDERMITE',
+        'PLAYER',
+        'SALMON',
+        'ZOMBIE',
+        'STRIDER',
+        'PANDA',
+        "OCELOT",
+        'ENDERMAN',
+        'ZOMBIE_VILLAGER',
+        'LLAMA',
+        'ENDER_DRAGON',
+        'WITCH',
+        'WITHER',
+        'CREEPER',
+        'ILLUSIONER',
+        'COD',
+        'ZOMBIE_HORSE',
+        'RAVAGER',
+        'SHULKER',
+        'BEE',
+        'PHANTOM',
+        'BLAZE',
+        'SKELETON_HORSE',
+        'COW',
+        'WANDERING_TRADER',
+        'PIG',
+        'ZOGLIN',
+        'WOLF',
+        'IRON_GOLEM',
+        'SHEEP',
+        'VEX',
+        'PIGLIN_BRUTE',
+        'POLAR_BEAR',
+        'SNOWMAN',
+        'SQUID',
+        'ELDER_GUARDIAN',
+        'HORSE',
+        'ARMOR_STAND',
+        'PARROT',
+        'FOX',
+        'STRAY',
+        'CAT',
+        'RABBIT',
+        'DONKEY',
+        'ENDER_CRYSTAL',
+        'TROPICAL_FISH',
+        'SPIDER',
+        'SKELETON',
+        'WITHER_SKELETON',
+        'MUSHROOM_COW',
+        'CHICKEN',
+        'ZOMBIFIED_PIGLIN',
+        'PUFFERFISH',
+        'GUARDIAN',
+        'PIGLIN',
+        'GHAST',
+        'BAT',
+        'DOLPHIN'
+      )
+
+      
+      @near_entities = entities_in_radius(@entity_location, 5)
+      array_remove_values(@near_entities, @puuid)
+      array_remove_values(@near_entities, @euuid)
+      @pos = array(
+        'x': @entity_location['x'] + rand() / 2 - 0.25,
+        'y': @entity_location['y'] + rand() * 1 + 0.5,
+        'z': @entity_location['z'] + rand() / 2 - 0.25
+      )
+      _particle(@player, 'minecraft:firework', @pos, array('x': 0.2, 'y': 0.3, 'z': 0.2), 0.05, 3)
+      foreach(@near_entity in @near_entities) {
+        @pos = array(
+          'x': @entity_location['x'] + rand() / 2 - 0.25,
+          'y': @entity_location['y'] + rand() * 1,
+          'z': @entity_location['z'] + rand() / 2 - 0.25
+        )
+        @near_entity_location = entity_loc(@near_entity)
+        @near_entity_location['y'] += 0.8
+        @delta = array(
+          'x': sprintf('%.5f', round((@near_entity_location['x'] - @pos['x']) / 4, 5)),
+          'y': sprintf('%.5f', round((@near_entity_location['y'] - @pos['y']) / 4, 5)),
+          'z': sprintf('%.5f', round((@near_entity_location['z'] - @pos['z']) / 4, 5))
+        )
+        _particle(@player, 'minecraft:firework', @pos, @delta, 1, 0)
+        damage_entity(@near_entity, 3)
       }
 
     }
   } else { //엔티티가 타격시
 
   }
+}
+
+bind('exp_change', null, null, @event, @players_item) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+  broadcast(@event)
+  foreach(@slot: @enchantment in @players_item[@uuid][['enchantments']]) {
+    switch(@enchantment) {
+    case '풍요':
+    case '치유':
+    case '저항':
+    case '친수성':
+    case '반엔트로피':
+    case '용력':
+      break()
+    default:
+      broadcast(A) #/summon minecraft:experience_orb ~ ~ ~ {Value:10}
+    }
+  }
+
 }
