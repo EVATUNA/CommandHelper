@@ -6,14 +6,14 @@ export('Jung.eng', split(' ', 'k o i O j p u P h hk ho hl y n nj np nl b m ml l'
 array_insert(@temp, ' ', 0)
 export('Jong', @temp)
 
-proc _is_korean(string @txt) {
+proc _is_korean(@txt) {
 	if(length(reg_match('[가-힣]', @txt)) <= 0) {
 		return(false)
 	}
 	return(true)
 }
 
-proc _uncrafting(string @txt) {
+proc _uncrafting(@txt) {
 	@code = unicode_from_char(substr(@txt, 0, 1)) - 44032
 	@var = array_resize(array(), 3)
 	@var[0] = floor(@code / 588)
@@ -22,7 +22,7 @@ proc _uncrafting(string @txt) {
 	return(array(import('Cho')[@var[0]], import('Jung')[@var[1]], import('Jong')[@var[2]]))
 }
 
-proc _crafting(string @cho, string @jung, string @jong) {
+proc _crafting(@cho, @jung, @jong) {
 	if(!array_contains(import('Cho'), @cho) || !array_contains(import('Jung'), @jung) || !array_contains(import('Jong'), @jong)) {
 		return(@cho.''.@jung.''.@jong)
 	}
@@ -43,18 +43,18 @@ proc _txt_backspace(@txt) {
 	return(@ret);
 }
 
-proc _deduction_jong(string @txt) {
+proc _deduction_jong(@txt) {
 	@txt1 = replace(replace(replace(replace(replace(replace(@txt, 'ㄱㅅ', 'ㄳ'), 'ㄴㅈ', 'ㄵ'), 'ㄴㅎ', 'ㄶ'), 'ㄹㄱ', 'ㄺ'), 'ㄹㅁ', 'ㄻ') ,'ㄹㅂ', 'ㄼ')
 	@txt2 = replace(replace(replace(replace(replace(@txt1, 'ㄹㅅ', 'ㄽ'), 'ㄹㅌ', 'ㄾ'), 'ㄹㅍ', 'ㄿ'), 'ㄹㅎ', 'ㅀ'), 'ㅂㅅ', 'ㅄ')
 	return(@txt2)
 }
 
-proc _deduction_jung(string @txt) {
+proc _deduction_jung(@txt) {
 	@txt1 = replace(replace(replace(replace(replace(replace(replace(@txt, 'ㅗㅏ', 'ㅘ'), 'ㅗㅐ', 'ㅙ'), 'ㅗㅣ', 'ㅚ'), 'ㅜㅓ', 'ㅝ'), 'ㅜㅣ', 'ㅟ'), 'ㅡㅣ', 'ㅢ'), 'ㅜㅔ', 'ㅞ');
 	return(@txt1)
 }
 
-proc _convert_eng_to_kor(string @txt) {
+proc _convert_eng_to_kor(@txt) {
 	foreach(@k:@t in split('', @txt)) { //한국어섞이면 번역 X
 		if(_is_korean(@t), return(false))
 	}

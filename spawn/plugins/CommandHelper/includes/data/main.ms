@@ -1,254 +1,34 @@
 console('EvaData loaded')
 
-proc _load_data(@uuid, @players_data) {
-  #pogu_get('setting_data:'.@uuid, closure(@connected, @value) { @players_data[@uuid]['setting'] = json_decode(@value) })
-  #pogu_get('chating_data:'.@uuid, closure(@connected, @value) { @players_data[@uuid]['chating'] = json_decode(@value) })
-  #pogu_get('skill_data:'.@uuid, closure(@connected, @value) { @players_data[@uuid]['skill'] = json_decode(@value) })
-}
+## Data Procedure
 
-proc _save_data(@uuid, @players_data, @clear) {
-  #pogu_set('setting_data:'.@uuid, json_encode(@players_data[@uuid]['setting']), closure(@connected, @value) {})
-  #pogu_set('chating_data:'.@uuid, json_encode(@players_data[@uuid]['chating']), closure(@connected, @value) {})
-  #pogu_set('skill_data:'.@uuid, json_encode(@players_data[@uuid]['skill']), closure(@connected, @value) {})
-  if(@clear) {
-    array_remove(@players_data, @uuid)
+
+proc _load_data(@uuid, @players_data) {
+  @players_data[@uuid]['setting'] = cup_get('SETTING', @uuid)
+  if(is_null(@players_data[@uuid]['setting'])) {
+    _new_data(@uuid, @players_data)
   }
+  _load_masteries(@uuid, @players_data)
 }
 
 proc _new_data(@uuid, @players_data) {
-  @players_data[@uuid]['chating'] = array(
-    'channel': 'general',
-    'en_ko': false,
-    'selected_badge': ''
-  )
   @players_data[@uuid]['setting'] = array(
-    'interface': array(
-      'resolution': 427,
-      'hand': 'right'
-    ),
-    'chating': array(
-      'type': 'general', // general / messenger
-      'alignment': 'none', // none / center / left / right
-      'listening': array(
-        'general': true,
-        'local': true,
-        'guild': true,
-        'admin': true
-      ),
-      'observer_mode': false
-    ),
-    "sound": array(
-      'chating': false,
-      'mention': true
-    ),
-    'is_premium': false
+    'general',
+    false,
+    'default',
+    'default',
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    '',
+    427,
+    true
   )
-  @players_data[@uuid]['skill'] = array(
-    'skills_manager': array(
-      'selected_combat_method': array(
-        'name': '베기',
-        'remaining': 0,
-        'cooldown': 30
-      ),
-      'unlocked_combat_inclination_slot': 2,
-      'selected_combat_inclinations': array(
-        '집중 A', '집중D'
-      ),
-      'selected_harvesting_method': null,
-      'selected_sowing_method': null
-    ),
-    'masteries': array(
-      'combat_method': array(
-        '베기': array(
-          'max_level': 3,
-          'level': 2,
-          'max_experience': 1,
-          'experience': 0,
-        ),
-        '치기': array(
-          'max_level': 3,
-          'level': 1,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '찍기': array(
-          'max_level': 3,
-          'level': 1,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '막기': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        )
-      ),
-      'combat_inclination': array(
-        '저력': array(
-          'level': 2
-        ),
-        '집중': array(
-          'level': 2
-        ),
-        '집중 A': array(
-          'level': 2
-        ),
-        '집중B': array(
-          'level': 2
-        ),
-        '집중C': array(
-          'level': 2
-        ),
-        '집중D': array(
-          'level': 2
-        )
-      ),
-      'subcombat': array(
-        '활 숙련': array(
-          'max_level': 3,
-          'level': 1,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '석궁 숙련': array(
-          'max_level': 3,
-          'level': 1,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '체력 단련': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-      ),
-      'mining': array(
-        '구리 채광 숙련': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '철 채광 숙련': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '금 채광 숙련': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '다이아몬드 채광 숙련': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '고대 파편 채광 숙련': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '선광 숙련': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '강인한 어깨': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-      ),
-      'farming': array(
-        '밀 농사 숙련': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '사탕무 농사 숙련': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '감자 농사 숙련': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '당근 농사 숙련': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '베리 농사 숙련': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '호박 농사 숙련': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '수박 농사 숙련': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '풍년': array(
-          'max_level': 3,
-          'level': 0,
-          'max_experience': 1,
-          'experience': 0
-        ),
-      ),
-      'harvesting_method': array(
-        '넓은 손': array(
-          'max_level': 3,
-          'level': 1,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '골든 핑거': array(
-          'max_level': 3,
-          'level': 1,
-          'max_experience': 1,
-          'experience': 0
-        )
-      ),
-      'sowing_method': array(
-        '젖은 손': array(
-          'max_level': 3,
-          'level': 1,
-          'max_experience': 1,
-          'experience': 0
-        ),
-        '비옥한 손길': array(
-          'max_level': 3,
-          'level': 1,
-          'max_experience': 1,
-          'experience': 0
-        )
-      )
-    )
-  )
-  _save_data(@uuid, @players_data, false)
+  cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])  
 }
 
 proc _send_resourcepack(@player, @uuid, @players_state) {
@@ -276,25 +56,7 @@ proc _send_resourcepack(@player, @uuid, @players_state) {
   title(@player, '§a예§7를 눌러주세요!', '§7서버 리소스팩 사용은 필수입니다.', 0, 99999999, 0)
 }
 
-proc _set_player_state(@player, @uuid, @players_state, @players_data) {
-  @player_state = array(
-    'player': @player,
-    'is_op': pisop(@player),
-    'quit_countdown': -1
-  )
-  @player_state['guild'] = null
-  @players_state[@uuid] = @player_state
-  @data = array(
-    'player': @player,
-    'uuid': @uuid,
-    'is_op': @player_state['is_op'],
-    'guild': @player_state['guild']
-  )
-  _bungeecord_foward(@player, 'update_state', @data)
-  _load_data(@uuid, @players_data)
-}
-
-proc _apply_join_spec(@player, @uuid, @players_state) {
+proc _apply_join_spec(@player, @uuid, @players_state, @players_data) {
   title(@player, '', '', 0, 1, 0)
   set_timeout(1000, closure() {
     set_ploc(@player, @players_state[@uuid]['join_spec']['location'])
@@ -312,21 +74,39 @@ proc _apply_join_spec(@player, @uuid, @players_state) {
       set_entity_onfire(@uuid, @players_state[@uuid]['join_spec']['onfire'])
     }
     array_remove(@players_state[@uuid], 'join_spec')
-    _set_player_state(@player, @uuid, @players_state)
+    _set_player_state(@player, @uuid, @players_state, @players_data)
   })
 }
 
-bind('player_join', null, null, @event, @players_item, @players_state, @players_data) {
-  @player = @event['player']
-  @uuid = puuid(@player)
-  modify_event('join_message', null)
-  if(!array_contains(array('LopLove', '1L_Bottle') , @player)) {
+proc _set_player_state(@player, @uuid, @players_state, @players_data) {
+  #players_state
+  @player_state = array(
+    'player': @player,
+    'is_op': pisop(@player),
+    'quit_countdown': -1
+  )
+  @player_state['guild'] = null
+  @players_state[@uuid] = @player_state
+  # bungee
+  @data = array(
+    'player': @player,
+    'uuid': @uuid,
+    'is_op': @player_state['is_op'],
+    'guild': @player_state['guild']
+  )
+  #_bungeecord_foward(@player, 'ch_update_state', @data)
+  # players_data
+  _load_data(@uuid, @players_data)
+}
+
+proc _join_event(@player, @uuid, @players_state, @players_data, @players_item, @excluded_players) {
+  if(!array_contains(@excluded_players , @player)) {
     broadcast(@players_state)
     if(!array_index_exists(@players_state, @uuid)) {
       _send_resourcepack(@player, @uuid, @players_state)
     } else {
       set_timeout(500, closure() {
-        _set_player_state(@player, @uuid, @players_state, @players_data) 
+        _set_player_state(@player, @uuid, @players_state, @players_data)
       })
     }
     @players_item[@uuid] = array(
@@ -349,48 +129,8 @@ bind('player_join', null, null, @event, @players_item, @players_state, @players_
   }
 }
 
-foreach(@player in all_players()) {
-  @uuid = puuid(@player)
-  if(!array_contains(array('LopLove', '1L_Bottle') , @player)) {
-    _set_player_state(@player, @uuid, @players_state, @players_data) 
-    @players_item[@uuid] = array(
-      'is_inv_open': false,
-      'main_hand': null,
-      'off_hand': null,
-      'armor': null,
-      'enchantments': array(
-        'main_hand': null,
-        'off_hand': null,
-        'armor': null
-      )
-    )
-    @items = array(
-      'main_hand': get_inventory_item(@uuid, pheld_slot(@player)),
-      'off_hand': get_inventory_item(@uuid, 40),
-      'armor': get_inventory_item(@uuid, 38)
-    )
-    _update_item(@player, @uuid, @items, @players_item)
-  }
-}
-
-bind('resource_pack_status', null,, null, @event, @players_state, @players_data) {
-  @player = @event['player']
-  @uuid = puuid(@player)
-  switch(@event['status']) {
-  case 'DECLINED':
-    pkick(@player, '리팩사용설정하세오')
-    break()
-  case 'SUCCESSFULLY_LOADED':
-    _apply_join_spec(@player, @uuid, @players_state, @players_data)
-    break()
-  }
-}
-
-bind('player_quit', null, null, @event, @players_state, @players_data, @players_item) {
-  @player = @event['player']
-  @uuid = puuid(@player)
-  modify_event('message', null)
-  if(!array_contains(array('LopLove', '1L_Bottle') , @player)) {
+proc _quit_event(@player, @uuid, @players_state, @players_item, @excluded_players) {
+  if(!array_contains(@excluded_players , @player)) {
     if(array_index_exists(@players_state, @uuid)) {
       @players_state[@uuid]['quit_countdown'] = 10
     }
@@ -398,6 +138,57 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
       array_remove(@players_item, @uuid)
     }
   }
+}
+
+# EVENT / TASK BINDER
+
+foreach(@player in _all_players(@excluded_players)) {
+  @uuid = puuid(@player)
+  _set_player_state(@player, @uuid, @players_state, @players_data) 
+  @players_item[@uuid] = array(
+    'is_inv_open': false,
+    'main_hand': null,
+    'off_hand': null,
+    'armor': null,
+    'enchantments': array(
+      'main_hand': null,
+      'off_hand': null,
+      'armor': null
+    )
+  )
+  @items = array(
+    'main_hand': get_inventory_item(@uuid, pheld_slot(@player)),
+    'off_hand': get_inventory_item(@uuid, 40),
+    'armor': get_inventory_item(@uuid, 38)
+  )
+  _update_item(@player, @uuid, @items, @players_item)
+}
+
+bind('player_join', null, null, @event, @players_state, @players_data, @players_item, @excluded_players) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+  modify_event('join_message', null)
+  _join_event(@player, @uuid, @players_state, @players_data, @players_item, @excluded_players)
+}
+
+bind('resource_pack_status', null,, null, @event, @players_state, @players_data) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+  switch(@event['status']) {
+  case 'DECLINED':
+    pkick(@player, '리팩사용설정하세오') #todo 더 세세한 설명
+    break()
+  case 'SUCCESSFULLY_LOADED':
+    _apply_join_spec(@player, @uuid, @players_state, @players_data)
+    break()
+  }
+}
+
+bind('player_quit', null, null, @event, @players_state, @players_data, @players_item, @excluded_players) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+  modify_event('message', null)
+  _quit_event(@player, @uuid, @players_state, @players_item, @excluded_players)
 }
 
 @interval_task = set_interval(1000, closure() {
@@ -408,7 +199,7 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
       } else if(@players_state[@uuid]['quit_countdown'] == 0) {
         array_remove(@players_state, @uuid)
         @data = array('uuid': @uuid)
-        _bungeecord_foward(@player, 'remove_state', @data)
+        #_bungeecord_foward(@player, 'ch_remove_state', @data)
       } else {
         @player = @player_state['player']
         if(array_index_exists(@players_data, @uuid)) {
@@ -439,43 +230,50 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
   }
 })
 
-
 @cron_task = set_cron('*/1 * * * *', closure() {
   foreach(@id: @hp_block in @hp_blocks) {
-    broadcast(@hp_block)
     if(@hp_block['reset_countdown'] > 0) {
       @hp_block['reset_countdown'] -= 1
     } else {
       array_remove(@hp_blocks, @id)
     }
+    #broadcast(@hp_block)
   }
 })
 
-bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @players_state) {
+bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @players_state, @players_data, @excluded_players) {
   foreach(@key: @byte in @event['bytes']) {
     if(@key != 0) {
       if(@byte == 0) {
-        @subchannel_size = @key - 2
+        @identifier_size = @key - 2
         break()
       }
     }
   }
   @data = array(
-    'subchannel': string(ba_get_bytes(@event['bytes'], @subchannel_size, 2)),
-    'value': json_decode(string(ba_get_bytes(@event['bytes'], array_size(@event['bytes']) - @subchannel_size - 6, @subchannel_size + 6)))
+    'identifier': string(ba_get_bytes(@event['bytes'], @identifier_size, 2)),
+    'value': json_decode(string(ba_get_bytes(@event['bytes'], array_size(@event['bytes']) - @identifier_size - 6, @identifier_size + 6)))
   )
-  switch(@data['subchannel']) {
-  case 'update_state':
+  switch(@data['identifier']) {
+  case 'ch_update_state':
     @players_state[@data['value']['uuid']] = array(
       'player': @data['value']['player'],
       'is_op': @data['value']['is_op'],
       'guild': @data['value']['guild']
     )
     break()
-  case 'remove_state':
+  case 'ch_remove_state':
     array_remove(@players_state, @data['value']['uuid'])
     break()
-  case 'chat':
+  case 'ch_chat':
+    @sender = @data['value']['player']
+    foreach(@receiver in _all_players(@excluded_players)) {
+      if(array_contains(@data['value']['mentioned_players'], @receiver)) {
+        play_named_sound(ploc(@receiver), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver))
+      }
+      play_named_sound(ploc(@receiver), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver))
+      _tellraw(@receiver, @raw)
+    }
     break()
   }
 }

@@ -2,6 +2,282 @@ console('EvaSkill loaded')
 
 #["\ue3db\ue3dc\ue3dd\ue3de\ue3df", "\ue3e0\ue3e1\ue3e2\ue3e3\ue3e4", "\ue3e5\ue3e6\ue3e7\ue3e8\ue3e9", "\ue3ea\ue3eb\ue3ec\ue3ed\ue3ee", "\ue3ef\ue3f0\ue3f1\ue3f2\ue3f3", "\ue3f4\ue3f5\ue3f6\ue3f7\ue3f8"]
 
+proc _load_masteries(@uuid, @players_data) {
+  #combat_method - sweeping knockback cleaving blocking
+  @players_data[@uuid]['skill_data']['masteries']['combat_method']['sweeping'] = cup_get('SKILL_DATA', @uuid.'_sweeping')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['combat_method'], 'sweeping')) {
+    cup_set('SKILL_DATA', @uuid.'_sweeping', array(
+      'combat_method',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['combat_method']['knockback'] = cup_get('SKILL_DATA', @uuid.'_knockback')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['combat_method'], 'knockback')) {
+    cup_set('SKILL_DATA', @uuid.'_knockback', array(
+      'combat_method',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['combat_method']['cleaving'] = cup_get('SKILL_DATA', @uuid.'_cleaving')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['combat_method'], 'cleaving')) {
+    cup_set('SKILL_DATA', @uuid.'_cleaving', array(
+      'combat_method',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['combat_method']['blocking'] = cup_get('SKILL_DATA', @uuid.'_blocking')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['combat_method'], 'blocking')) {
+    cup_set('SKILL_DATA', @uuid.'_blocking', array(
+      'combat_method',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+
+  #combat_inclination - 
+
+  #subcombat - bow_mastery crossbow__mastery health_traing
+  @players_data[@uuid]['skill_data']['masteries']['subcombat']['bow_mastery'] = cup_get('SKILL_DATA', @uuid.'_bow_mastery')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['subcombat'], 'bow_mastery')) {
+    cup_set('SKILL_DATA', @uuid.'_bow_mastery', array(
+      'subcombat',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['subcombat']['crossbow_mastery'] = cup_get('SKILL_DATA', @uuid.'_crossbow_mastery')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['subcombat'], 'crossbow_mastery')) {
+    cup_set('SKILL_DATA', @uuid.'_crossbow_mastery', array(
+      'subcombat',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['subcombat']['health_traing'] = cup_get('SKILL_DATA', @uuid.'_health_traing')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['subcombat'], 'health_traing')) {
+    cup_set('SKILL_DATA', @uuid.'_health_traing', array(
+      'subcombat',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+
+  #mining - copper_mining_mastery iron gold diamond ancient_debris ore_selecting tough_shoulder
+  @players_data[@uuid]['skill_data']['masteries']['mining']['copper_mining_mastery'] = cup_get('SKILL_DATA', @uuid.'_copper_mining_mastery')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['mining'], 'copper_mining_mastery')) {
+    cup_set('SKILL_DATA', @uuid.'_copper_mining_mastery', array(
+      'mining',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['mining']['iron_mining_mastery'] = cup_get('SKILL_DATA', @uuid.'_iron_mining_mastery')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['mining'], 'iron_mining_mastery')) {
+    cup_set('SKILL_DATA', @uuid.'_iron_mining_mastery', array(
+      'mining',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['mining']['gold_mining_mastery'] = cup_get('SKILL_DATA', @uuid.'_gold_mining_mastery')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['mining'], 'gold_mining_mastery')) {
+    cup_set('SKILL_DATA', @uuid.'_gold_mining_mastery', array(
+      'mining',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['mining']['diamond_mining_mastery'] = cup_get('SKILL_DATA', @uuid.'_diamond_mining_mastery')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['mining'], 'diamond_mining_mastery')) {
+    cup_set('SKILL_DATA', @uuid.'_diamond_mining_mastery', array(
+      'mining',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['mining']['ancient_debris_mining_mastery'] = cup_get('SKILL_DATA', @uuid.'_ancient_debris_mining_mastery')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['mining'], 'ancient_debris_mining_mastery')) {
+    cup_set('SKILL_DATA', @uuid.'_ancient_debris_mining_mastery', array(
+      'mining',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['mining']['ore_selecting'] = cup_get('SKILL_DATA', @uuid.'_ore_selecting')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['mining'], 'ore_selecting')) {
+    cup_set('SKILL_DATA', @uuid.'_ore_selecting', array(
+      'mining',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['mining']['tough_shoulder'] = cup_get('SKILL_DATA', @uuid.'_tough_shoulder')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['mining'], 'tough_shoulder')) {
+    cup_set('SKILL_DATA', @uuid.'_tough_shoulder', array(
+      'mining',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+
+  #farming - wheat carrots potatoes pumpkin melon beetroots berry
+  @players_data[@uuid]['skill_data']['masteries']['farming']['wheat_farming_mastery'] = cup_get('SKILL_DATA', @uuid.'_wheat_farming_mastery')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'wheat_farming_mastery')) {
+    cup_set('SKILL_DATA', @uuid.'_wheat_farming_mastery', array(
+      'farming',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['farming']['beetroots_farming_mastery'] = cup_get('SKILL_DATA', @uuid.'_beetroots_farming_mastery')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'beetroots_farming_mastery')) {
+    cup_set('SKILL_DATA', @uuid.'_beetroots_farming_mastery', array(
+      'farming',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['farming']['potatoes_farming_mastery'] = cup_get('SKILL_DATA', @uuid.'_potatoes_farming_mastery')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'potatoes_farming_mastery')) {
+    cup_set('SKILL_DATA', @uuid.'_potatoes_farming_mastery', array(
+      'farming',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['farming']['carrots_farming_mastery'] = cup_get('SKILL_DATA', @uuid.'_carrots_farming_mastery')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'carrots_farming_mastery')) {
+    cup_set('SKILL_DATA', @uuid.'_carrots_farming_mastery', array(
+      'farming',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['farming']['berry_farming_mastery'] = cup_get('SKILL_DATA', @uuid.'_berry_farming_mastery')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'berry_farming_mastery')) {
+    cup_set('SKILL_DATA', @uuid.'_berry_farming_mastery', array(
+      'farming',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['farming']['pumpkin_farming_mastery'] = cup_get('SKILL_DATA', @uuid.'_pumpkin_farming_mastery')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'pumpkin_farming_mastery')) {
+    cup_set('SKILL_DATA', @uuid.'_pumpkin_farming_mastery', array(
+      'farming',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['farming']['melon_farming_mastery'] = cup_get('SKILL_DATA', @uuid.'_melon_farming_mastery')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'melon_farming_mastery')) {
+    cup_set('SKILL_DATA', @uuid.'_melon_farming_mastery', array(
+      'farming',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['farming']['plenty'] = cup_get('SKILL_DATA', @uuid.'_plenty')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'plenty')) {
+    cup_set('SKILL_DATA', @uuid.'_plenty', array(
+      'farming',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+
+  #harvesting_method wide_hand golden_finger
+  @players_data[@uuid]['skill_data']['masteries']['harvesting_method']['wide_hand'] = cup_get('SKILL_DATA', @uuid.'_wide_hand')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['harvesting_method'], 'wide_hand')) {
+    cup_set('SKILL_DATA', @uuid.'_wide_hand', array(
+      'harvesting_method',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['harvesting_method']['golden_finger'] = cup_get('SKILL_DATA', @uuid.'_golden_finger')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['harvesting_method'], 'golden_finger')) {
+    cup_set('SKILL_DATA', @uuid.'_golden_finger', array(
+      'harvesting_method',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+
+  #sowing_method wet_hand fertile_touch
+  @players_data[@uuid]['skill_data']['masteries']['sowing_method']['wet_hand'] = cup_get('SKILL_DATA', @uuid.'_wet_hand')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['sowing_method'], 'wet_hand')) {
+    cup_set('SKILL_DATA', @uuid.'_wet_hand', array(
+      'sowing_method',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  @players_data[@uuid]['skill_data']['masteries']['sowing_method']['fertile_touch'] = cup_get('SKILL_DATA', @uuid.'_fertile_touch')
+  if(array_index_exists(@players_data[@uuid]['skill_data']['masteries']['sowing_method'], 'fertile_touch')) {
+    cup_set('SKILL_DATA', @uuid.'_fertile_touch', array(
+      'sowing_method',
+      0,
+      0.0,
+      3,
+      100.0
+    ))
+  }
+  broadcast(@players_data[@uuid])
+}
 
 @mastery_info = array(
   'combat_method': array(

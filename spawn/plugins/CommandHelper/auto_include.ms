@@ -12,12 +12,16 @@ async_read('files/general_emoji.json', closure(@value) {
   @text['general_emoji'] = json_decode(@value)
 })
 
+@excluded_players = array(
+  'LopLove',
+  '1L_Bottle'
+)
 ## Initial Including Procedure
 
 proc _send_action_msg(@player, @player_data, @text) {
-  switch(@player_data['chating']['en_ko']) {
+  switch(@player_data['setting'][1]) {
   case true:
-    switch(@player_data['chating']['channel']) {
+    switch(@player_data['setting'][0]) {
     case 'general':
       @channel = '\ue3fd'
     case 'guild':
@@ -30,7 +34,7 @@ proc _send_action_msg(@player, @player_data, @text) {
       @channel = '\ue3fd'
     }
   case false:
-  switch(@player_data['chating']['channel']) {
+  switch(@player_data['setting'][0]) {
     case 'general':
       @channel = '\ue3fe'
     case 'guild':
@@ -43,7 +47,15 @@ proc _send_action_msg(@player, @player_data, @text) {
       @channel = '\ue3fe'
     }
   }
-  action_msg(@player, @text['space_fonts']['space.5'].@channel.@text['space_fonts']['space.-65'].@text['space_fonts']['space.'.@player_data['setting']['interface']['resolution']])
+  action_msg(@player, @text['space_fonts']['space.5'].@channel.@text['space_fonts']['space.-65'].@text['space_fonts']['space.'.@player_data['setting'][12]])
+}
+  
+proc _all_players(@excluded_players) {
+  @players = all_players()
+  foreach(@excluded_player in @excluded_players) {
+    array_remove_values(@players, @excluded_player)
+  }
+  return(@players)
 }
 
 proc _send_plugin_message(@player, @channel_messages) {
