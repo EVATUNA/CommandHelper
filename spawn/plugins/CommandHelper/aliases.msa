@@ -79,3 +79,14 @@ foreach(@key: @item in get_inventory(puuid())) {
 @a += 'b'
 broadcast(@a)
 <<<
+
+/test $s $l = >>>
+  @uuid = puuid(player())
+  cup_set('SKILL_DATA', @uuid.'_'.$s, array(
+    'combat_method',
+    $l,
+    0.0,
+    3,
+    100.0
+  ))
+<<<
