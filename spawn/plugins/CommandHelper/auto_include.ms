@@ -1,3 +1,51 @@
+## Initial Including Data
+@players_state = array()
+@players_data = array()
+@players_item = array()
+@hp_blocks = array()
+
+@text = array()
+async_read('files/font_space.json', closure(@value) {
+  @text['space_fonts'] = json_decode(@value)
+})
+async_read('files/general_emoji.json', closure(@value) {
+  @text['general_emoji'] = json_decode(@value)
+})
+
+## Initial Including Procedure
+
+proc _send_action_msg(@player, @player_data, @text) {
+  switch(@player_data['chating']['en_ko']) {
+  case true:
+    switch(@player_data['chating']['channel']) {
+    case 'general':
+      @channel = '\ue3fd'
+    case 'guild':
+      @channel = '\ue3ff'
+    case 'local':
+      @channel = '\ue401'
+    case 'admin':
+      @channel = '\ue403'
+    default:
+      @channel = '\ue3fd'
+    }
+  case false:
+  switch(@player_data['chating']['channel']) {
+    case 'general':
+      @channel = '\ue3fe'
+    case 'guild':
+      @channel = '\ue400'
+    case 'local':
+      @channel = '\ue402'
+    case 'admin':
+      @channel = '\ue404'
+    default:
+      @channel = '\ue3fe'
+    }
+  }
+  action_msg(@player, @text['space_fonts']['space.5'].@channel.@text['space_fonts']['space.-65'].@text['space_fonts']['space.'.@player_data['setting']['interface']['resolution']])
+}
+
 proc _send_plugin_message(@player, @channel_messages) {
   @byte_array = byte_array()
   foreach(@channel_message in @channel_messages) {
@@ -42,14 +90,7 @@ proc _paging(@array, @size) {
   return(@pages)
 }
 
-proc _json_escape(@json) {
-  return(replace(replace(@json, '"', '\"'), '\\', '\\\\'))
-}
-
-proc _json_unescape(@string) {
-  return(replace(replace(@string, '\"', '"'), '\\\\', '\\'))
-}
-
+#확장으로 대채될 예정
 proc _particle(@player, @particle, @pos, @delta, @speed, @count) {
   sudo(@player, '/particle'@particle @pos['x'] @pos['y'] @pos['z'] @delta['x'] @delta['y'] @delta['z'] @speed @count 'force')
 }
