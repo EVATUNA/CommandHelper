@@ -1,0 +1,172 @@
+{
+	"recipe": {
+		"key": "crimson_hyphae_sword",
+		"type": "SHAPED",
+		"result": {
+			"name": "WOODEN_SWORD",
+			"meta": {
+				"display": "§f진홍빛 균사 검",
+				"model": 6,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+		"shape": [
+			"P",
+			"P",
+			"S"
+		],
+		"ingredients": {
+			"P": "CRIMSON_PLANKS",
+			"S": "STICK"
+		},
+		"ingredients_weight": {
+		}
+	},
+	"pool": {
+		"type": "entries_by_crafting_rank",
+		"entries": [
+			{
+				"type": "rank",
+				"weight": 5,
+				"display": "부서질듯한 진홍빛 균사 검",
+				"model": 6,
+				"attributes": {
+					"attack_damage": {
+						"min": 3.5,
+						"max": 3.8
+					},
+					"attack_speed": {
+						"min": 2.5,
+						"max": 3
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 10,
+				"display": "의미를 알 수 없는 진홍빛 균사 검",
+				"model": 6,
+				"attributes": {
+					"attack_damage": {
+						"min": 3.6,
+						"max": 3.9
+					},
+					"attack_speed": {
+						"min": 2.5,
+						"max": 3
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 10,
+				"display": "제 기능을 하기 힘든 진홍빛 균사 검",
+				"model": 6,
+				"attributes": {
+					"attack_damage": {
+						"min": 3.7,
+						"max": 4.0
+					},
+					"attack_speed": {
+						"min": 2.5,
+						"max": 3
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 25,
+				"display": "무딘 진홍빛 균사 검",
+				"model": 6,
+				"attributes": {
+					"attack_damage": {
+						"min": 3.8,
+						"max": 4.1
+					},
+					"attack_speed": 3
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 35,
+				"display": "무난한 진홍빛 균사 검",
+				"model": 6,
+				"attributes": {
+					"attack_damage": {
+						"min": 4.0,
+						"max": 4.3
+					},
+					"attack_speed": 3
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 30,
+				"quality": 0,
+				"display": "평범한 진홍빛 균사 검",
+				"model": 6,
+				"attributes": {
+					"attack_damage": {
+						"min": 4.2,
+						"max": 4.5
+					},
+					"attack_speed": 3
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 30,
+				"quality": 0,
+				"display": "쓸만한 진홍빛 균사 검",
+				"model": 6,
+				"attributes": {
+					"attack_damage": {
+						"min": 4.4,
+						"max": 4.7
+					},
+					"attack_speed": 3
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 30,
+				"display": "잘 만들어진 진홍빛 균사 검",
+				"model": 6,
+				"attributes": {
+					"attack_damage": {
+						"min": 4.6,
+						"max": 4.9
+					},
+					"attack_speed": 3
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 20,
+				"display": "예사롭지 않은 진홍빛 균사 검",
+				"model": 6,
+				"attributes": {
+					"attack_damage": {
+						"min": 4.8,
+						"max": 5.1
+					},
+					"attack_speed": 3
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 1,
+				"display": "전설적인 진홍빛 균사 검",
+				"model": 6,
+				"broadcast": true,
+				"attributes": {
+					"attack_damage": 5.5,
+					"attack_speed": 3
+				}
+			}
+		]
+	}
+}
