@@ -3,7 +3,6 @@
 @players_data = array()
 @players_item = array()
 @hp_blocks = array()
-
 @text = array()
 async_read('files/font_space.json', closure(@value) {
   @text['space_fonts'] = json_decode(@value)
@@ -11,11 +10,6 @@ async_read('files/font_space.json', closure(@value) {
 async_read('files/general_emoji.json', closure(@value) {
   @text['general_emoji'] = json_decode(@value)
 })
-
-## POGU UseTable
-pogu_use_table('setting_data')
-pogu_use_table('chating_data')
-pogu_use_table('skill_data')
 
 ## Initial Include
 # 공용 프로시저 등록

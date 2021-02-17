@@ -1,15 +1,15 @@
 console('EvaData loaded')
 
 proc _load_data(@uuid, @players_data) {
-  pogu_get('setting_data:'.@uuid, closure(@connected, @value) { @players_data[@uuid]['setting'] = json_decode(@value) })
-  pogu_get('chating_data:'.@uuid, closure(@connected, @value) { @players_data[@uuid]['chating'] = json_decode(@value) })
-  pogu_get('skill_data:'.@uuid, closure(@connected, @value) { @players_data[@uuid]['skill'] = json_decode(@value) })
+  #pogu_get('setting_data:'.@uuid, closure(@connected, @value) { @players_data[@uuid]['setting'] = json_decode(@value) })
+  #pogu_get('chating_data:'.@uuid, closure(@connected, @value) { @players_data[@uuid]['chating'] = json_decode(@value) })
+  #pogu_get('skill_data:'.@uuid, closure(@connected, @value) { @players_data[@uuid]['skill'] = json_decode(@value) })
 }
 
 proc _save_data(@uuid, @players_data, @clear) {
-  pogu_set('setting_data:'.@uuid, json_encode(@players_data[@uuid]['setting']), closure(@connected, @value) {})
-  pogu_set('chating_data:'.@uuid, json_encode(@players_data[@uuid]['chating']), closure(@connected, @value) {})
-  pogu_set('skill_data:'.@uuid, json_encode(@players_data[@uuid]['skill']), closure(@connected, @value) {})
+  #pogu_set('setting_data:'.@uuid, json_encode(@players_data[@uuid]['setting']), closure(@connected, @value) {})
+  #pogu_set('chating_data:'.@uuid, json_encode(@players_data[@uuid]['chating']), closure(@connected, @value) {})
+  #pogu_set('skill_data:'.@uuid, json_encode(@players_data[@uuid]['skill']), closure(@connected, @value) {})
   if(@clear) {
     array_remove(@players_data, @uuid)
   }
