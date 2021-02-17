@@ -3,5 +3,6 @@ recipe_tables/
 extensions/
 config/
 logs/
+prefs/
 LocalPackages/
 .cache/
