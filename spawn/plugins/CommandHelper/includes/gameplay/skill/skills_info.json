@@ -1,0 +1,390 @@
+{
+	"combat_method": {
+		"sweeping": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100,
+					"passive_attack_speed": 1.0,
+					"active_attack_speed": 1.0,
+					"active_duration": 1,
+					"active_cooldown": 60
+				}
+				{
+					"max_experience": 100,
+					"passive_attack_speed": 1.0,
+					"active_attack_speed": 1.0,
+					"active_duration": 1,
+					"active_cooldown": 60
+				}
+				{
+					"max_experience": 100,
+					"passive_attack_speed": 1.0,
+					"active_attack_speed": 1.0,
+					"active_duration": 1,
+					"active_cooldown": 60
+				}
+			]
+		},
+		"knockback": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+		"cleaving": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+		"blocking": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		}
+	},
+	"subcombat": {
+	"bow_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"crossbow_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"health_traing": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		}
+	},
+	"farming": {
+	"wheat_farming_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"beetroots_farming_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"potatoes_farming_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"carrots_farming_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"berry_farming_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"pumpkin_farming_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"melon_farming_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"plenty": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		}
+	},
+	"harvesting_method": {
+	"wide_hand": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"golden_finger": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		}
+	},
+	"sowing_method": {
+	"wet_hands": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"fertile_touch": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		}
+	},
+	"mining": {
+	"copper_mining_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"iron_mining_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"gold_mining_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"diamond_mining_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"ancient_debris_mining_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"ore_selecting": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		},
+	"tough_shoulder": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				},
+				{
+					"max_experience": 100
+				}
+			]
+		}
+	}
+}

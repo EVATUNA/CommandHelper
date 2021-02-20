@@ -2,13 +2,12 @@ console('EvaData loaded')
 
 ## Data Procedure
 
-
-proc _load_data(@uuid, @players_data) {
+proc _load_data(@uuid, @players_data, @skills_spec) {
   @players_data[@uuid]['setting'] = cup_get('SETTING', @uuid)
   if(is_null(@players_data[@uuid]['setting'])) {
     _new_data(@uuid, @players_data)
   }
-  _load_masteries(@uuid, @players_data)
+  _load_skills(@uuid, @players_data, @skills_spec)
 }
 
 proc _new_data(@uuid, @players_data) {
@@ -28,11 +27,11 @@ proc _new_data(@uuid, @players_data) {
     427,
     true
   )
-  cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])  
+  cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
 }
 
 proc _send_resourcepack(@player, @uuid, @players_state) {
-  @resourcepack = 'https://drive.google.com/uc?export=download&id=1vLvF4S0DIIva0m4gN08cTyY4eBO529a3'
+  @resourcepack = 'https://drive.google.com/uc?export=download&id=1n3aRXulikDxw-Ow5cbE6UmT9yqCuBebY'
   send_resourcepack(@player, @resourcepack)
   @player_state = array(
     'join_spec': array(
@@ -56,7 +55,7 @@ proc _send_resourcepack(@player, @uuid, @players_state) {
   title(@player, '§a예§7를 눌러주세요!', '§7서버 리소스팩 사용은 필수입니다.', 0, 99999999, 0)
 }
 
-proc _apply_join_spec(@player, @uuid, @players_state, @players_data) {
+proc _apply_join_spec(@player, @uuid, @players_state, @players_data, @skills_spec) {
   title(@player, '', '', 0, 1, 0)
   set_timeout(1000, closure() {
     set_ploc(@player, @players_state[@uuid]['join_spec']['location'])
@@ -74,11 +73,11 @@ proc _apply_join_spec(@player, @uuid, @players_state, @players_data) {
       set_entity_onfire(@uuid, @players_state[@uuid]['join_spec']['onfire'])
     }
     array_remove(@players_state[@uuid], 'join_spec')
-    _set_player_state(@player, @uuid, @players_state, @players_data)
+    _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec)
   })
 }
 
-proc _set_player_state(@player, @uuid, @players_state, @players_data) {
+proc _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec) { # bungee
   #players_state
   @player_state = array(
     'player': @player,
@@ -96,17 +95,17 @@ proc _set_player_state(@player, @uuid, @players_state, @players_data) {
   )
   #_bungeecord_foward(@player, 'ch_update_state', @data)
   # players_data
-  _load_data(@uuid, @players_data)
+  _load_data(@uuid, @players_data, @skills_spec)
 }
 
-proc _join_event(@player, @uuid, @players_state, @players_data, @players_item, @excluded_players) {
+proc _join_event(@player, @uuid, @players_state, @players_data, @players_item, @excluded_players, @skills_spec) {
   if(!array_contains(@excluded_players , @player)) {
     broadcast(@players_state)
     if(!array_index_exists(@players_state, @uuid)) {
       _send_resourcepack(@player, @uuid, @players_state)
     } else {
       set_timeout(500, closure() {
-        _set_player_state(@player, @uuid, @players_state, @players_data)
+        _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec)
       })
     }
     @players_item[@uuid] = array(
@@ -141,10 +140,9 @@ proc _quit_event(@player, @uuid, @players_state, @players_item, @excluded_player
 }
 
 # EVENT / TASK BINDER
-
-foreach(@player in _all_players(@excluded_players)) {
+foreach(@player in _all_players(@excluded_players)) { #조인 이벤트로 변경 리로드 명령어
   @uuid = puuid(@player)
-  _set_player_state(@player, @uuid, @players_state, @players_data) 
+  _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec) 
   @players_item[@uuid] = array(
     'is_inv_open': false,
     'main_hand': null,
@@ -164,14 +162,14 @@ foreach(@player in _all_players(@excluded_players)) {
   _update_item(@player, @uuid, @items, @players_item)
 }
 
-bind('player_join', null, null, @event, @players_state, @players_data, @players_item, @excluded_players) {
+bind('player_join', null, null, @event, @players_state, @players_data, @players_item, @excluded_players, @skills_spec) {
   @player = @event['player']
   @uuid = puuid(@player)
   modify_event('join_message', null)
   _join_event(@player, @uuid, @players_state, @players_data, @players_item, @excluded_players)
 }
 
-bind('resource_pack_status', null,, null, @event, @players_state, @players_data) {
+bind('resource_pack_status', null,, null, @event, @players_state, @players_data, @skills_spec) {
   @player = @event['player']
   @uuid = puuid(@player)
   switch(@event['status']) {
@@ -179,7 +177,7 @@ bind('resource_pack_status', null,, null, @event, @players_state, @players_data)
     pkick(@player, '리팩사용설정하세오') #todo 더 세세한 설명
     break()
   case 'SUCCESSFULLY_LOADED':
-    _apply_join_spec(@player, @uuid, @players_state, @players_data)
+    _apply_join_spec(@player, @uuid, @players_state, @players_data, @skills_spec)
     break()
   }
 }
@@ -191,7 +189,7 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
   _quit_event(@player, @uuid, @players_state, @players_item, @excluded_players)
 }
 
-@interval_task = set_interval(1000, closure() {
+@interval_task = set_interval(1000, closure() { #bungee 완전 로그아웃
   foreach(@uuid: @player_state in @players_state) {
     if(array_index_exists(@players_state[@uuid], 'quit_countdown')) {
       if(@players_state[@uuid]['quit_countdown'] > 0) {

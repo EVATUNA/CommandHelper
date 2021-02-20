@@ -1,568 +1,180 @@
 console('EvaSkill loaded')
 
+@skills_info = array()
+async_read('skills_info.json', closure(@value) {
+  foreach(@category: @skills in json_decode(@value)) {
+    @skills_info[@category] = @skills
+  }
+})
+@skills_spec = array()
+async_read('skills_spec.json', closure(@value) {
+  foreach(@category: @skills in json_decode(@value)) {
+    @skills_info[@category] = @skills
+  }
+})
 #["\ue3db\ue3dc\ue3dd\ue3de\ue3df", "\ue3e0\ue3e1\ue3e2\ue3e3\ue3e4", "\ue3e5\ue3e6\ue3e7\ue3e8\ue3e9", "\ue3ea\ue3eb\ue3ec\ue3ed\ue3ee", "\ue3ef\ue3f0\ue3f1\ue3f2\ue3f3", "\ue3f4\ue3f5\ue3f6\ue3f7\ue3f8"]
 
-proc _load_masteries(@uuid, @players_data) {
-  #combat_method - sweeping knockback cleaving blocking
-  @players_data[@uuid]['skill_data']['masteries']['combat_method']['sweeping'] = cup_get('SKILL_DATA', @uuid.'_sweeping')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['combat_method'], 'sweeping')) {
-    cup_set('SKILL_DATA', @uuid.'_sweeping', array(
-      'combat_method',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['combat_method']['knockback'] = cup_get('SKILL_DATA', @uuid.'_knockback')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['combat_method'], 'knockback')) {
-    cup_set('SKILL_DATA', @uuid.'_knockback', array(
-      'combat_method',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['combat_method']['cleaving'] = cup_get('SKILL_DATA', @uuid.'_cleaving')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['combat_method'], 'cleaving')) {
-    cup_set('SKILL_DATA', @uuid.'_cleaving', array(
-      'combat_method',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['combat_method']['blocking'] = cup_get('SKILL_DATA', @uuid.'_blocking')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['combat_method'], 'blocking')) {
-    cup_set('SKILL_DATA', @uuid.'_blocking', array(
-      'combat_method',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-
-  #combat_inclination - 
-
-  #subcombat - bow_mastery crossbow_mastery health_traing
-  @players_data[@uuid]['skill_data']['masteries']['subcombat']['bow_mastery'] = cup_get('SKILL_DATA', @uuid.'_bow_mastery')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['subcombat'], 'bow_mastery')) {
-    cup_set('SKILL_DATA', @uuid.'_bow_mastery', array(
-      'subcombat',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['subcombat']['crossbow_mastery'] = cup_get('SKILL_DATA', @uuid.'_crossbow_mastery')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['subcombat'], 'crossbow_mastery')) {
-    cup_set('SKILL_DATA', @uuid.'_crossbow_mastery', array(
-      'subcombat',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['subcombat']['health_traing'] = cup_get('SKILL_DATA', @uuid.'_health_traing')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['subcombat'], 'health_traing')) {
-    cup_set('SKILL_DATA', @uuid.'_health_traing', array(
-      'subcombat',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-
-  #mining - copper_mining_mastery iron gold diamond ancient_debris ore_selecting tough_shoulder
-  @players_data[@uuid]['skill_data']['masteries']['mining']['copper_mining_mastery'] = cup_get('SKILL_DATA', @uuid.'_copper_mining_mastery')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['mining'], 'copper_mining_mastery')) {
-    cup_set('SKILL_DATA', @uuid.'_copper_mining_mastery', array(
-      'mining',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['mining']['iron_mining_mastery'] = cup_get('SKILL_DATA', @uuid.'_iron_mining_mastery')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['mining'], 'iron_mining_mastery')) {
-    cup_set('SKILL_DATA', @uuid.'_iron_mining_mastery', array(
-      'mining',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['mining']['gold_mining_mastery'] = cup_get('SKILL_DATA', @uuid.'_gold_mining_mastery')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['mining'], 'gold_mining_mastery')) {
-    cup_set('SKILL_DATA', @uuid.'_gold_mining_mastery', array(
-      'mining',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['mining']['diamond_mining_mastery'] = cup_get('SKILL_DATA', @uuid.'_diamond_mining_mastery')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['mining'], 'diamond_mining_mastery')) {
-    cup_set('SKILL_DATA', @uuid.'_diamond_mining_mastery', array(
-      'mining',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['mining']['ancient_debris_mining_mastery'] = cup_get('SKILL_DATA', @uuid.'_ancient_debris_mining_mastery')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['mining'], 'ancient_debris_mining_mastery')) {
-    cup_set('SKILL_DATA', @uuid.'_ancient_debris_mining_mastery', array(
-      'mining',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['mining']['ore_selecting'] = cup_get('SKILL_DATA', @uuid.'_ore_selecting')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['mining'], 'ore_selecting')) {
-    cup_set('SKILL_DATA', @uuid.'_ore_selecting', array(
-      'mining',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['mining']['tough_shoulder'] = cup_get('SKILL_DATA', @uuid.'_tough_shoulder')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['mining'], 'tough_shoulder')) {
-    cup_set('SKILL_DATA', @uuid.'_tough_shoulder', array(
-      'mining',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-
-  #farming - wheat carrots potatoes pumpkin melon beetroots berry
-  @players_data[@uuid]['skill_data']['masteries']['farming']['wheat_farming_mastery'] = cup_get('SKILL_DATA', @uuid.'_wheat_farming_mastery')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'wheat_farming_mastery')) {
-    cup_set('SKILL_DATA', @uuid.'_wheat_farming_mastery', array(
-      'farming',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['farming']['beetroots_farming_mastery'] = cup_get('SKILL_DATA', @uuid.'_beetroots_farming_mastery')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'beetroots_farming_mastery')) {
-    cup_set('SKILL_DATA', @uuid.'_beetroots_farming_mastery', array(
-      'farming',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['farming']['potatoes_farming_mastery'] = cup_get('SKILL_DATA', @uuid.'_potatoes_farming_mastery')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'potatoes_farming_mastery')) {
-    cup_set('SKILL_DATA', @uuid.'_potatoes_farming_mastery', array(
-      'farming',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['farming']['carrots_farming_mastery'] = cup_get('SKILL_DATA', @uuid.'_carrots_farming_mastery')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'carrots_farming_mastery')) {
-    cup_set('SKILL_DATA', @uuid.'_carrots_farming_mastery', array(
-      'farming',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['farming']['berry_farming_mastery'] = cup_get('SKILL_DATA', @uuid.'_berry_farming_mastery')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'berry_farming_mastery')) {
-    cup_set('SKILL_DATA', @uuid.'_berry_farming_mastery', array(
-      'farming',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['farming']['pumpkin_farming_mastery'] = cup_get('SKILL_DATA', @uuid.'_pumpkin_farming_mastery')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'pumpkin_farming_mastery')) {
-    cup_set('SKILL_DATA', @uuid.'_pumpkin_farming_mastery', array(
-      'farming',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['farming']['melon_farming_mastery'] = cup_get('SKILL_DATA', @uuid.'_melon_farming_mastery')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'melon_farming_mastery')) {
-    cup_set('SKILL_DATA', @uuid.'_melon_farming_mastery', array(
-      'farming',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['farming']['plenty'] = cup_get('SKILL_DATA', @uuid.'_plenty')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['farming'], 'plenty')) {
-    cup_set('SKILL_DATA', @uuid.'_plenty', array(
-      'farming',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-
-  #harvesting_method - wide_hand golden_finger
-  @players_data[@uuid]['skill_data']['masteries']['harvesting_method']['wide_hand'] = cup_get('SKILL_DATA', @uuid.'_wide_hand')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['harvesting_method'], 'wide_hand')) {
-    cup_set('SKILL_DATA', @uuid.'_wide_hand', array(
-      'harvesting_method',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['harvesting_method']['golden_finger'] = cup_get('SKILL_DATA', @uuid.'_golden_finger')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['harvesting_method'], 'golden_finger')) {
-    cup_set('SKILL_DATA', @uuid.'_golden_finger', array(
-      'harvesting_method',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-
-  #sowing_method - wet_hand fertile_touch
-  @players_data[@uuid]['skill_data']['masteries']['sowing_method']['wet_hand'] = cup_get('SKILL_DATA', @uuid.'_wet_hand')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['sowing_method'], 'wet_hand')) {
-    cup_set('SKILL_DATA', @uuid.'_wet_hand', array(
-      'sowing_method',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
-  }
-  @players_data[@uuid]['skill_data']['masteries']['sowing_method']['fertile_touch'] = cup_get('SKILL_DATA', @uuid.'_fertile_touch')
-  if(!array_index_exists(@players_data[@uuid]['skill_data']['masteries']['sowing_method'], 'fertile_touch')) {
-    cup_set('SKILL_DATA', @uuid.'_fertile_touch', array(
-      'sowing_method',
-      0,
-      0.0,
-      3,
-      100.0
-    ))
+proc _load_skill_data(@uuid, @category, @skill, @is_default, @players_data, @skills_spec) {
+  @skill_data = cup_get('SKILL_DATA', @uuid.'_'.@skill)
+  if(@is_default) {
+    if(is_null(@skill_data)) {
+      @skill_data = array(
+        @category,
+        0,
+        0.0,
+        3,
+        @skills_spec[@category][@skill]['levels'][0]['max_experience']
+      )
+      cup_set('SKILL_DATA', @uuid.'_'.@skill, @skill_data)
+    }
+    @players_data[@uuid]['skill_data'][@category][@skill] = @skill_data
+  } else {
+    if(!is_null(@skill_data)) {
+      @players_data[@uuid]['skill_data'][@category][@skill] = @skill_data
+    }
   }
 }
 
-@mastery_info = array(
-  'combat_method': array(
-    array(
-      'name': 'sweeping',
-      'display': '베기',
-      'icon': '\ue3db',
-      'desription': array(
-        '일반 근접 공격시 숙련도가 상승합니다, 어떤 스킬일까요?',
-        '일반 근접 공격시 숙련도가 상승합니다, L.1베기 설명'
-      )
-    ),
-    array(
-      'name': 'knockback',
-      'display': '치기',
-      'icon': '\ue3dc',
-      'desription': array(
-        '넉백 공격시 숙련도가 상승합니다, 어떤 스킬일까요?',
-        '넉백 공격시 숙련도가 상승합니다, L.1치기 설명'
-      )
-    ),
-    array(
-      'name': 'cleaving',
-      'display': '찍기',
-      'icon': '\ue3dd',
-      'desription': array(
-        '크리티컬 공격시 숙련도가 상승합니다, 어떤 스킬일까요?',
-        '크리티컬 공격시 숙련도가 상승합니다, L.1찍기 공격 설명'
-      )
-    ),
-    array(
-      'name': 'blocking',
-      'display': '막기',
-      'icon': '\ue3de',
-      'desription': array(
-        '방패로 방어시 숙련도가 상승합니다, 어떤 스킬일까요?',
-        '방패로 방어시 숙련도가 상승합니다, L.1막기 공격 설명'
-      )
+proc _load_skill_manager(@uuid, @players_data) {
+  @skill_manager = cup_get('SKILL_MANAGER', @uuid)
+  if(is_null(@skill_manager)) {
+    @skill_manager = array(
+      '[]',
+      1,
+      null,
+      null,
+      null
     )
-  ),
-  'combat_inclination': array(
-    array(
-      'name': 'test1',
-      'icon': '\ue3db',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명'
-      )
+    cup_set('SKILL_MANAGER', @uuid, @skill_manager)
+  }
+  @players_data[@uuid]['skill_manager'] = @skill_manager
+}
+
+proc _load_skills(@uuid, @players_data, @skills_spec) {
+  @default_skills = array(
+    'combat_method': array(
+      'sweeping',
+      'knockback',
+      'cleaving',
+      'blocking'
     ),
-    array(
-      'name': 'test2',
-      'icon': '\ue3db',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
+    'subcombat': array(
+      'bow_mastery',
+      'crossbow_mastery',
+      'health_traing'
     ),
-    array(
-      'name': 'test3',
-      'icon': '\ue3db',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
+    'farming': array(
+      'wheat_farming_mastery',
+      'beetroots_farming_mastery',
+      'potatoes_farming_mastery',
+      'carrots_farming_mastery',
+      'berry_farming_mastery',
+      'pumpkin_farming_mastery',
+      'melon_farming_mastery',
+      'plenty'
     ),
-    array(
-      'name': 'test4',
-      'icon': '\ue3db',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
+    'harvesting_method': array(
+      'wide_hand',
+      'golden_finger'
     ),
-    array(
-      'name': 'test5',
-      'icon': '\ue3db',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    )
-  ),
-  'subcombat': array(
-    array(
-      'name': 'bow_mastery',
-      'display': '활 숙련',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
+    'sowing_method': array(
+      'wet_hands',
+      'fertile_touch'
     ),
-    array(
-      'name': 'crossbow_mastery',
-      'display': '석궁 숙련',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    ),
-    array(
-      'name': 'health_traing',
-      'display': '체력 단련',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    )
-  ),
-  'harvesting_method': array(
-    array(
-      'name': 'wide_hand',
-      'display': '넓은 손',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    ),
-    array(
-      'name': 'golden_finger',
-      'display': '골든 핑거',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    )
-  ),
-  'sowing_method': array(
-    array(
-      'name': '젖은 손',
-      'display': '',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    ),
-    array(
-      'name': '비옥한 손길',
-      'display': '',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    )
-  ),
-  'farming': array(
-    array(
-      'name': 'wheat_farming_mastery',
-      'display': '밀 수확 숙련',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    ),
-    array(
-      'name': 'beetroots_farming_mastery',
-      'display': '사탕무 수확 숙련',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    ),
-    array(
-      'name': 'potatoes_farming_mastery',
-      'display': '감자 수확 숙련',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    ),
-    array(
-      'name': 'carrots_farming_mastery',
-      'display': '당근 수확 숙련',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    ),
-    array(
-      'name': 'berry_farming_mastery',
-      'display': '베리 수확 숙련',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    ),
-    array(
-      'name': 'pumpkin_farming_mastery',
-      'display': '호박 수확 숙련',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    ),
-    array(
-      'name': 'melon_farming_mastery',
-      'display': '수박 수확 숙련',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    ),
-    array(
-      'name': 'plenty',
-      'display': '풍년',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    ),
-  ),
-  'mining': array(
-    array(
-      'name': 'wet_hand',
-      'display': '젖은 손',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
-    ),
-    array(
-      'name': 'fertile_touch',
-      'display': '비옥한 손길',
-      'icon': '\ue00f',
-      'desription': array(
-        '0렙 설명',
-        '1렙 설명',
-        '2렙 설명'
-      )
+    'mining': array(
+      'copper_mining_mastery',
+      'iron_mining_mastery',
+      'gold_mining_mastery',
+      'diamond_mining_mastery',
+      'ancient_debris_mining_mastery',
+      'ore_selecting',
+      'tough_shoulder'
     )
   )
-)
+  foreach(@category: @skills in @default_skills) {
+    foreach(@skill in @skills) {
+      _load_skill_data(@uuid, @category, @skill, true, @players_data, @skills_spec)
+    }
+  }
+  @additional_skills = array(
+    'combat_inclination': array(
+    )
+  )
+  foreach(@category: @skills in @additional_skills) {
+    foreach(@skill in @skills) {
+      _load_skill_data(@uuid, @category, @skill, false, @players_data, @skills_spec)
+    }
+  }
+
+  #_load_active_skill(@uuid, @players_data)
+  #사용했던 포리치 특정 전투 특성일시 쿨타임 로드
+  _load_skill_manager(@uuid, @players_data, @skills_spec)
+}
+
+
+#'skills_manager': array(
+#  'selected_combat_method': array(
+#    'name': '베기',
+#    'remaining': 0,
+#    'cooldown': 30
+#  ),
+#  'unlocked_combat_inclination_slot': 2,
+#  'selected_combat_inclinations': array(
+#    '집중 A', '집중D'
+#  ),
+#  'selected_harvesting_method': null,
+#  'selected_sowing_method': null
+#)
+
 #array_implode(array_get(@args, cslice(2, array_size(@args) - 1)), ' ')
+proc _open_skillbook(@player, @page, @subpage, @players_data, @skills_info, @text) {
+  switch(@page) {
+  case 'combat':
+    @combat_methods_info = @skills_info['combat_method']
+    @subcombats_info = @skills_info['subcombat']
+
+    @selected_combat_method = array(
+      'name': 'sweeping',
+    )
+
+    @content = array(
+      array(
+        'text': '- 전투 방식 / 전투 특성\n',
+        'hoverEvent': array(
+          'action': 'show_text',
+          'value': '적용중인 전투 방식과 전투특성을 간략히 보여줍니다.\n\n§c각각의 아이콘을 클릭하여자세히 확인 할 수 있으며\n전투 방식과 전투 특성을 변경 할 수 있습니다.'
+        )
+      )
+    )
+    @raw = array(array(),array())
+  
+    break()
+  case 'combat_method':
+    @combat_methods_info = @skills_info['combat_method']
+    break()
+  case 'combat_inclination':
+    @combat_inclinations_info = @skills_info['combat_inclination']
+    break()
+  case 'farming':
+    @farming_skills_info = @skills_info['farming']
+    break()
+  case 'farming_method':
+    @harvesting_methods_info = @skills_info['harvesting_method']
+    @sowing_methods_info = @skills_info['sowing_method']
+    break()
+  case 'mining':
+    @mining_skills_info = @skills_info['mining']
+    break()
+  }
+
+}
 
 proc _combat_page(@player, @player_skill_data, @mastery_info, @text) {
-  @content = array(
-    array(
-      'text': '- 전투 방식 / 전투 특성\n',
-      'hoverEvent': array(
-        'action': 'show_text',
-        'value': '적용중인 전투 방식과 전투특성을 간략히 보여줍니다.\n\n§c각각의 아이콘을 클릭하여자세히 확인 할 수 있으며\n전투 방식과 전투 특성을 변경 할 수 있습니다.'
-      )
-    )
-  )
-  @raw = array(array(),array())
+
   @combat_methods_info = @mastery_info['combat_method'] #전체 스킬 방식 목록
   #@selected_combat_method = @player_skill_data['skills_manager']['selected_combat_method'] #선택한 스킬 방식
   #임시변수
-  @selected_combat_method = array(
-    'name': 'sweeping',
-  )
+
 
   if(!is_null(@selected_combat_method)) {
     foreach(@combat_method_info in @combat_methods_info) {
