@@ -9,7 +9,7 @@ async_read('skills_info.json', closure(@value) {
 @skills_spec = array()
 async_read('skills_spec.json', closure(@value) {
   foreach(@category: @skills in json_decode(@value)) {
-    @skills_info[@category] = @skills
+    @skills_spec[@category] = @skills
   }
 })
 #["\ue3db\ue3dc\ue3dd\ue3de\ue3df", "\ue3e0\ue3e1\ue3e2\ue3e3\ue3e4", "\ue3e5\ue3e6\ue3e7\ue3e8\ue3e9", "\ue3ea\ue3eb\ue3ec\ue3ed\ue3ee", "\ue3ef\ue3f0\ue3f1\ue3f2\ue3f3", "\ue3f4\ue3f5\ue3f6\ue3f7\ue3f8"]
@@ -29,9 +29,22 @@ proc _load_skill_data(@uuid, @category, @skill, @is_default, @players_data, @ski
     }
     @players_data[@uuid]['skill_data'][@category][@skill] = @skill_data
   } else {
+    /* 나중에 아래 코드로 바꿔야 함 지금은 어떤 전투 특성이든 모두 배우게 되어있음
     if(!is_null(@skill_data)) {
       @players_data[@uuid]['skill_data'][@category][@skill] = @skill_data
     }
+    */
+    if(is_null(@skill_data)) {
+      @skill_data = array(
+        @category,
+        0,
+        0.0,
+        3,
+        @skills_spec[@category][@skill]['levels'][0]['max_experience']
+      )
+      cup_set('SKILL_DATA', @uuid.'_'.@skill, @skill_data)
+    }
+    @players_data[@uuid]['skill_data'][@category][@skill] = @skill_data
   }
 }
 
@@ -41,9 +54,9 @@ proc _load_skill_manager(@uuid, @players_data) {
     @skill_manager = array(
       '[]',
       1,
-      null,
-      null,
-      null
+      '',
+      '',
+      ''
     )
     cup_set('SKILL_MANAGER', @uuid, @skill_manager)
   }
@@ -98,6 +111,7 @@ proc _load_skills(@uuid, @players_data, @skills_spec) {
   }
   @additional_skills = array(
     'combat_inclination': array(
+      'test1'
     )
   )
   foreach(@category: @skills in @additional_skills) {
@@ -107,11 +121,12 @@ proc _load_skills(@uuid, @players_data, @skills_spec) {
   }
 
   #_load_active_skill(@uuid, @players_data)
-  #사용했던 포리치 특정 전투 특성일시 쿨타임 로드
+  #전투 방식 로드시 레벨 1이상일 경우에만 로드
+  #사용하지 않던 특성을 사용할 시 new / 매초마다 set
   _load_skill_manager(@uuid, @players_data, @skills_spec)
 }
 
-
+#activeskill
 #'skills_manager': array(
 #  'selected_combat_method': array(
 #    'name': '베기',
@@ -127,16 +142,12 @@ proc _load_skills(@uuid, @players_data, @skills_spec) {
 #)
 
 #array_implode(array_get(@args, cslice(2, array_size(@args) - 1)), ' ')
-proc _open_skillbook(@player, @page, @subpage, @players_data, @skills_info, @text) {
-  switch(@page) {
+proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, @text) {
+  @uuid = puuid(@player)
+  switch(@category) {
   case 'combat':
     @combat_methods_info = @skills_info['combat_method']
-    @subcombats_info = @skills_info['subcombat']
-
-    @selected_combat_method = array(
-      'name': 'sweeping',
-    )
-
+    @selected_combat_method = @players_data[@uuid]['skill_manager'][2]
     @content = array(
       array(
         'text': '- 전투 방식 / 전투 특성\n',
@@ -147,700 +158,1073 @@ proc _open_skillbook(@player, @page, @subpage, @players_data, @skills_info, @tex
       )
     )
     @raw = array(array(),array())
-  
-    break()
-  case 'combat_method':
-    @combat_methods_info = @skills_info['combat_method']
-    break()
-  case 'combat_inclination':
-    @combat_inclinations_info = @skills_info['combat_inclination']
-    break()
-  case 'farming':
-    @farming_skills_info = @skills_info['farming']
-    break()
-  case 'farming_method':
-    @harvesting_methods_info = @skills_info['harvesting_method']
-    @sowing_methods_info = @skills_info['sowing_method']
-    break()
-  case 'mining':
-    @mining_skills_info = @skills_info['mining']
-    break()
-  }
-
-}
-
-proc _combat_page(@player, @player_skill_data, @mastery_info, @text) {
-
-  @combat_methods_info = @mastery_info['combat_method'] #전체 스킬 방식 목록
-  #@selected_combat_method = @player_skill_data['skills_manager']['selected_combat_method'] #선택한 스킬 방식
-  #임시변수
-
-
-  if(!is_null(@selected_combat_method)) {
-    foreach(@combat_method_info in @combat_methods_info) {
-      if(@selected_combat_method['name'] == @combat_method_info['name']) {
-        @desription = @combat_method_info['display'].' 전투 방식을 사용중입니다.\n\n§c좌 클릭시, 전투 방식 선택창을 열어\n모든 전투 방식의 숙련 레벨과\n숙련 경험치를 확인 할 수 있으며\n전투 방식을 변경 할 수 있습니다.'
-        @raw[0][] = array(
-          'text': @text['space_fonts']['space.18'],
-          'color': 'white',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': @desription
-          ),
-          'clickEvent': array(
-            'action': 'run_command',
-            'value': '/skillbook open_combat_method'
-          )
-        )
-        @raw[1][] = array(
-          'text': @text['space_fonts']['space.1'].@combat_method_info['icon'],
-          'color': 'white',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': @desription
-          ),
-          'clickEvent': array(
-            'action': 'run_command',
-            'value': '/skillbook open_combat_method'
-          )
-        )
-        break()
-      }
-    }
-  } else {
-    @desription = '사용중인 전투 방식이 없습니다.\n\n§c좌 클릭시, 전투 방식 선택창을 열어\n모든 전투 방식의 숙련 레벨과\n숙련경험치를 확인 할 수 있으며\n전투 방식을 변경 할 수 있습니다.'
-    @raw[0][] = array(
-      'text': @text['space_fonts']['space.18'],
-      'color': 'white',
-      'hoverEvent': array(
-        'action': 'show_text',
-        'value': @desription
-      ),
-      'clickEvent': array(
-        'action': 'run_command',
-        'value': '/skillbook open_combat_method'
-      )
-    )
-    @raw[1][] = array(
-      'text': @text['space_fonts']['space.18'],
-      'color': 'white',
-      'hoverEvent': array(
-        'action': 'show_text',
-        'value': @desription
-      ),
-      'clickEvent': array(
-        'action': 'run_command',
-        'value': '/skillbook open_combat_method'
-      )
-    )
-  }
-  @raw[0][] = array(
-    'text': ' '
-  )
-  @raw[1][] = array(
-    'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'].' ',
-    'color': 'white'
-  )
-  @combat_inclinations_info = @mastery_info['combat_inclination'] #전체 스킬 특성 목록
-  #@selected_combat_inclinations = @player_skill_data['skills_manager']['selected_combat_inclinations'] #선택한 스킬 특성들
-  @selected_combat_inclinations = array()
-  #@unselected_slot_size = @player_skill_data['skills_manager']['unlocked_combat_inclination_slot'] - array_size(@selected_combat_inclinations) #선택 하지 않은 스킬 특성 갯수
-  @unselected_slot_size = 1
-  if(array_size(@selected_combat_inclinations) > 0) {
-    foreach(@combat_inclination_info in @combat_inclinations_info) {
-      if(array_contains(@selected_combat_inclinations, @combat_inclination_info['name'])) {
-        @desription = @combat_inclination_info['display'].' 특성을 적용중입니다.\n\n§c좌 클릭시, 전투 특성 선택창을 열어\n습득한 모든 전투 특성을 확인 할 수 있으며\n특성 변경이 가능합니다.'
-        @raw[0][] = array(
-          'text': @text['space_fonts']['space.18'],
-          'color': 'white',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': @desription
-          ),
-          'clickEvent': array(
-            'action': 'run_command',
-            'value': '/skillbook open_combat_inclination'
-          )
-        )
-        @raw[1][] = array(
-          'text': @text['space_fonts']['space.1'].@combat_inclination_info['icon'],
-          'color': 'white',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': @desription
-          ),
-          'clickEvent': array(
-            'action': 'run_command',
-            'value': '/skillbook open_combat_inclination'
-          )
-        )
-        @raw[1][] = array(
-          'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'],
-          'color': 'white'
-        )
-      }
-    }
-  }
-  @desription = '해당 슬롯에 적용된 특성이 없습니다.\n\n§c좌 클릭시, 전투 특성 선택창을 열어\n습득한 모든 전투 특성을 확인 할 수 있으며\n특성 변경이 가능합니다.'
-  for(@i = 0, @i < @unselected_slot_size, @i++) {
-    @raw[0][] = array(
-      'text': @text['space_fonts']['space.18'],
-      'color': 'white',
-      'hoverEvent': array(
-        'action': 'show_text',
-        'value': @desription
-      ),
-      'clickEvent': array(
-        'action': 'run_command',
-        'value': '/skillbook open_combat_inclination'
-      )
-    )
-    @raw[1][] = array(
-      'text': @text['space_fonts']['space.18'],
-      'color': 'white',
-      'hoverEvent': array(
-        'action': 'show_text',
-        'value': @desription
-      ),
-      'clickEvent': array(
-        'action': 'run_command',
-        'value': '/skillbook open_combat_inclination'
-      )
-    )
-    @raw[1][] = array(
-      'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'],
-      'color': 'white'
-    )
-  }
-
-  @raw[0][] = array('text': '\n')
-  @raw[1][] = array('text': '\n')
-  @content = array_merge(@content, array_merge(@raw[0], @raw[1]))
-  ### 보조 전투 숙련
-  @subcombats = @player_skill_data['masteries']['subcombat']
-  @subcombats_info = @mastery_info['subcombat']
-  @content[] = array('text': '\n- 보조 전투 숙련')
-  foreach(@subcombat_info in @subcombats_info) {
-    @subcombat_data = @subcombats[@subcombat_info['name']]
-    if(array_size(@subcombat_info['desription']) - 1 < @subcombat_data[1]) {
-      @desription_index = array_size(@subcombat_info['desription']) - 1
-    } else {
-      @desription_index = @subcombat_data[1]
-    }
-    
-    if(@subcombat_data[1] == 0) {
-      @icon = '\ue00f'
-      @name = '???'
-      @desription = string(@name.'\n'.@subcombat_info['desription'][@desription_index]).'\n\n§c숙련 레벨이 올르면,\n해당 스킬이 적용됩니다.'
-    } else {
-      @icon = @subcombat_info['icon']
-      @name = string('Lv.'.@subcombat_data[1] @subcombat_info['name'])
-      @desription = string(@name.'\n'.@subcombat_info['desription'][@desription_index])
-    }
-    @raw0 = array(
-      array(
-        'text': '\n'.@text['space_fonts']['space.18'],
-        'color': 'white',
-        'hoverEvent': array(
-          'action': 'show_text'
-        )
-      ),
-      array(
-        'text': ' Lv.'.@subcombat_data[1]'('.@subcombat_data[2].'/'.@subcombat_data[3].')\n',
-        'color': 'black'
-      )
-    )
-    @raw1 = array(
-      array(
-        'text': @text['space_fonts']['space.1'].@icon,
-        'color': 'white',
-        'hoverEvent': array(
-          'action': 'show_text'
-        )
-      ),
-      array(
-        'text': ' ',
-        'color': 'white'
-      ),
-      array(
-        'text': string_multiply('', integer(@subcombat_data[2] / @subcombat_data[4] * 50)).'\n',
-        'color': 'green'
-      )
-    )
-    @raw0[0]['hoverEvent']['value'] = @desription
-    @raw1[0]['hoverEvent']['value'] = @desription
-    @content = array_merge(@content, array_merge(@raw0, @raw1))
-  }
-  @arrow = array(
-    array(
-      'text': @text['space_fonts']['space.77'].'\ue00d\n',
-      'color': 'white'
-    ),
-    array(
-      'text':@text['space_fonts']['space.77'],
-      'color': 'white'
-    ),
-    array(
-      'text': '\ue00d',
-      'hoverEvent': array(
-        'action': 'show_text',
-        'value': '다음 페이지'
-      ),
-      'clickEvent': array(
-        'action': 'run_command',
-        'value': '/skillbook open_farming_method'
-      )
-    )
-  )
-  @content = array_merge(@content, @arrow)
-  open_book(@player, array(json_encode(@content)))
-}
-
-proc _combat_method_page(@player, @player_skill_data, @mastery_info, @text) {
-  @combat_methods = @player_skill_data['masteries']['combat_method']
-  @combat_methods_info = @mastery_info['combat_method']
-  #@selected_combat_method = @player_skill_data['skills_manager']['selected_combat_method']
-  @selected_combat_method = array(
-    'name': 'sweeping',
-  )
-  @content = array(array('text': '- 전투 방식 목록\n\n'))
-  foreach(@combat_method_info in @combat_methods_info) {
-    @combat_method_data = @combat_methods[@combat_method_info['name']]
-    if(array_size(@combat_method_info['desription']) - 1 < @combat_method_data[1]) {
-      @desription_index = array_size(@combat_method_info['desription']) - 1
-    } else {
-      @desription_index = @combat_method_data[1]
-    }
-    if(@combat_method_data[1] == 0) {
-      @icon = '\ue00f'
-      @name = '???'
-    } else {
-      @icon = @combat_method_info['icon']
-      @name = string('Lv.'.@combat_method_data[1] @combat_method_info['name'])
-    }
-    @desription = string(@name.'\n'.@combat_method_info['desription'][@desription_index].'\n\n')
-    @raw0 = array(
-      array(
-        'text': @text['space_fonts']['space.18'],
-        'color': 'white',
-        'hoverEvent': array(
-          'action': 'show_text'
-        )
-      ),
-      array(
-        'text': ' Lv.'.@combat_method_data[1]'('.@combat_method_data[2].'/'.@combat_method_data[4].')\n',
-        'color': 'black'
-      )
-    )
-    @raw1 = array(
-      array(
-        'text': @text['space_fonts']['space.1'].@icon,
-        'color': 'white',
-        'hoverEvent': array(
-          'action': 'show_text'
-        )
-      ),
-      array(
-        'text': ' ',
-        'color': 'white'
-      ),
-      array(
-        'text': string_multiply('', integer(@combat_method_data[2] / @combat_method_data[4] * 50)).'\n\n',
-        'color': 'green'
-      )
-    )
-    if(@combat_method_data[1] > 0) {
-      if(!is_null(@selected_combat_method) && @selected_combat_method['name'] == @combat_method_info['name']) {
-        @select_box = array(
-          'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'],
-          'color': 'white'
-        )
-        array_insert(@raw1, @select_box, 1)
-        @desription = @desription.'§c좌클릭 시, 해당 방식 사용을 해제합니다.'
-        @clickevent = array(
-          'action': 'run_command',
-          'value': '/skillbook unselect_combat_method 0 '.@combat_method_info['name']
-        )
-      } else {
-        @desription = @desription.'§c좌클릭 시, 해당 방식을 사용합니다.'
-        @clickevent = array(
-          'action': 'run_command',
-          'value': '/skillbook select_combat_method 0 '.@combat_method_info['name']
-        )
-      }
-      @raw0[0]['clickEvent'] = @clickevent
-      @raw1[0]['clickEvent'] = @clickevent
-    } else {
-      @desription = @desription.'§c숙련 레벨을 올린 후,\n해당 방식을 사용할 수 있습니다.'
-    }
-    @raw0[0]['hoverEvent']['value'] = @desription
-    @raw1[0]['hoverEvent']['value'] = @desription
-    @content = array_merge(@content, array_merge(@raw0, @raw1))
-  }
-  open_book(@player, array(json_encode(@content)))
-}
-
-proc _farming_method_page(@player, @player_skill_data, @mastery_info, @text) {
-  @harvesting_methods = @player_skill_data['masteries']['harvesting_method']
-  @harvesting_methods_info = @mastery_info['harvesting_method']
-  @selected_harvesting_method = @player_skill_data['skills_manager']['selected_harvesting_method']
-  @content = array(array('text': '- 수확 방식 목록'))
-  foreach(@harvesting_method_info in @harvesting_methods_info) {
-    @harvesting_method_data = @harvesting_methods[@harvesting_method_info['name']]
-    if(array_size(@harvesting_method_info['desription']) - 1 < @harvesting_method_data[1]) {
-      @desription_index = array_size(@harvesting_method_info['desription']) - 1
-    } else {
-      @desription_index = @harvesting_method_data[1]
-    }
-    if(@harvesting_method_data[1] == 0) {
-      @icon = '\ue00f'
-      @name = '???'
-    } else {
-      @icon = @harvesting_method_info['icon']
-      @name = string('Lv.'.@harvesting_method_data[1] @harvesting_method_info['name'])
-    }
-    @desription = string(@name.'\n'.@harvesting_method_info['desription'][@desription_index].'\n\n')
-    @raw0 = array(
-      array(
-        'text': '\n'.@text['space_fonts']['space.18'],
-        'color': 'white',
-        'hoverEvent': array(
-          'action': 'show_text'
-        )
-      ),
-      array(
-        'text': ' Lv.'.@harvesting_method_data[1]'('.@harvesting_method_data[2].'/'.@harvesting_method_data[4].')\n',
-        'color': 'black'
-      )
-    )
-    @raw1 = array(
-      array(
-        'text': @text['space_fonts']['space.1'].@icon,
-        'color': 'white',
-        'hoverEvent': array(
-          'action': 'show_text'
-        )
-      ),
-      array(
-        'text': ' ',
-        'color': 'white'
-      ),
-      array(
-        'text': string_multiply('', integer(@harvesting_method_data[2] / @harvesting_method_data[4] * 50)).'\n',
-        'color': 'green'
-      )
-    )
-    if(@harvesting_method_data[1] > 0) {
-      if(!is_null(@selected_harvesting_method) && @selected_harvesting_method['name'] == @harvesting_method_info['name']) {
-        @select_box = array(
-          'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'],
-          'color': 'white'
-        )
-        array_insert(@raw1, @select_box, 1)
-        @desription = @desription.'§c좌클릭 시, 해당 방식 사용을 해제합니다.'
-        @clickevent = array(
-          'action': 'run_command',
-          'value': '/skillbook unselect_harvesting_method 0 '.@harvesting_method_info['name']
-        )
-      } else {
-        @desription = @desription.'§c좌클릭 시, 해당 방식을 사용합니다.'
-        @clickevent = array(
-          'action': 'run_command',
-          'value': '/skillbook select_harvesting_method 0 '.@harvesting_method_info['name']
-        )
-      }
-      @raw0[0]['clickEvent'] = @clickevent
-      @raw1[0]['clickEvent'] = @clickevent
-    } else {
-      @desription = @desription.'§c숙련 레벨을 올린 후,\n해당 방식을 사용할 수 있습니다.'
-    }
-    @raw0[0]['hoverEvent']['value'] = @desription
-    @raw1[0]['hoverEvent']['value'] = @desription
-    @content = array_merge(@content, array_merge(@raw0, @raw1))
-  }
-  @sowing_methods = @player_skill_data['masteries']['sowing_method']
-  @sowing_methods_info = @mastery_info['sowing_method']
-  @selected_sowing_method = @player_skill_data['skills_manager']['selected_sowing_method']
-  @content[] = array('text': '\n- 파종 방식 목록')
-  foreach(@sowing_method_info in @sowing_methods_info) {
-    @sowing_method_data = @sowing_methods[@sowing_method_info['name']]
-    if(array_size(@sowing_method_info['desription']) - 1 < @sowing_method_data[1]) {
-      @desription_index = array_size(@sowing_method_info['desription']) - 1
-    } else {
-      @desription_index = @sowing_method_data[1]
-    }
-    if(@sowing_method_data[1] == 0) {
-      @icon = '\ue00f'
-      @name = '???'
-    } else {
-      @icon = @sowing_method_info['icon']
-      @name = string('Lv.'.@sowing_method_data[1] @sowing_method_info['name'])
-    }
-    @desription = string(@name.'\n'.@sowing_method_info['desription'][@desription_index].'\n\n')
-    @raw0 = array(
-      array(
-        'text': '\n'.@text['space_fonts']['space.18'],
-        'color': 'white',
-        'hoverEvent': array(
-          'action': 'show_text'
-        )
-      ),
-      array(
-        'text': ' Lv.'.@sowing_method_data[1]'('.@sowing_method_data[2].'/'.@sowing_method_data[4].')\n',
-        'color': 'black'
-      )
-    )
-    @raw1 = array(
-      array(
-        'text': @text['space_fonts']['space.1'].@icon,
-        'color': 'white',
-        'hoverEvent': array(
-          'action': 'show_text'
-        )
-      ),
-      array(
-        'text': ' ',
-        'color': 'white'
-      ),
-      array(
-        'text': string_multiply('', integer(@sowing_method_data[2] / @sowing_method_data[4] * 50)).'\n',
-        'color': 'green'
-      )
-    )
-    if(@sowing_method_data[1] > 0) {
-      if(!is_null(@selected_sowing_method) && @selected_sowing_method['name'] == @sowing_method_info['name']) {
-        @select_box = array(
-          'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'],
-          'color': 'white'
-        )
-        array_insert(@raw1, @select_box, 1)
-        @desription = @desription.'§c좌클릭 시, 해당 방식 사용을 해제합니다.'
-        @clickevent = array(
-          'action': 'run_command',
-          'value': '/skillbook unselect_sowing_method 0 '.@sowing_method_info['name']
-        )
-      } else {
-        @desription = @desription.'§c좌클릭 시, 해당 방식을 사용합니다.'
-        @clickevent = array(
-          'action': 'run_command',
-          'value': '/skillbook select_sowing_method 0 '.@sowing_method_info['name']
-        )
-      }
-      @raw0[0]['clickEvent'] = @clickevent
-      @raw1[0]['clickEvent'] = @clickevent
-    } else {
-      @desription = @desription.'§c숙련 레벨을 올린 후,\n해당 방식을 사용할 수 있습니다.'
-    }
-    @raw0[0]['hoverEvent']['value'] = @desription
-    @raw1[0]['hoverEvent']['value'] = @desription
-    @content = array_merge(@content, array_merge(@raw0, @raw1))
-  }
-  @arrow = array(
-    array(
-      'text':@text['space_fonts']['space.28'].'\ue00c'.@text['space_fonts']['space.37'].'\ue00d\n',
-      'color': 'white'
-    ),
-    array(
-      'text':@text['space_fonts']['space.28'],
-      'color': 'white'
-    ),
-    array(
-      'text': '\ue00c',
-      'hoverEvent': array(
-        'action': 'show_text',
-        'value': '이전 페이지'
-      ),
-      'clickEvent': array(
-        'action': 'run_command',
-        'value': '/skillbook'
-      )
-    ),
-    array(
-      'text':@text['space_fonts']['space.37'],
-      'color': 'white'
-    ),
-    array(
-      'text': '\ue00d',
-      'hoverEvent': array(
-        'action': 'show_text',
-        'value': '다음 페이지'
-      ),
-      'clickEvent': array(
-        'action': 'run_command',
-        'value': '/skillbook open_farming_1'
-      )
-    )
-  )
-  @content = array_merge(@content, @arrow)
-  open_book(@player, array(json_encode(@content)))
-}
-
-proc _combat_inclination_page(@player, @player_skill_data, @book_page, @mastery_info, @text) {
-  @combat_inclinations = @player_skill_data['masteries']['combat_inclination']
-  @combat_inclinations_info = @mastery_info['combat_inclination']
-  @selectable_combat_inclinations = array_keys(@combat_inclinations)
-  @selected_combat_inclinations = @player_skill_data['skills_manager']['selected_combat_inclinations']
-  @unselected_slot_size = @player_skill_data['skills_manager']['unlocked_combat_inclination_slot'] - array_size(@selected_combat_inclinations)
-  @pages = array()
-  @paging_array = _paging(@combat_inclinations_info, 36)
-  foreach(@page_key: @page in @paging_array) {
-    @content = array(array('text': '- 전투 특성 목록\n'))
-    foreach(@line_key: @line in _paging(@page, 6)) {
-      @raw = array(array(array('text': @text['space_fonts']['space.4'])), array(array('text': @text['space_fonts']['space.4'])))
-      foreach(@key: @combat_inclination_info in @line) {
-        if(array_contains(@selectable_combat_inclinations, @combat_inclination_info['name'])) {
-          @combat_inclination_data = @combat_inclinations[@combat_inclination_info['name']]
-          if(array_size(@combat_inclination_info['desription']) - 1 < @combat_inclination_data[1]) {
-            @desription_index = array_size(@combat_inclination_info['desription']) - 1
-          } else {
-            @desription_index = @combat_inclination_data[1]
-          }
-          @desription = string('Lv.'.@combat_inclination_data[1]@combat_inclination_info['name'].'\n'.@combat_inclination_info['desription'][@desription_index].'\n\n')
-          @raw0 = array(
+    if(@selected_combat_method != '') {
+      foreach(@combat_method_info in @combat_methods_info) {
+        if(@selected_combat_method['name'] == @combat_method_info['name']) {
+          @desription = @combat_method_info['display'].' 전투 방식을 사용중입니다.\n\n§c좌 클릭시, 전투 방식 선택창을 열어\n모든 전투 방식의 숙련 레벨과\n숙련 경험치를 확인 할 수 있으며\n전투 방식을 변경 할 수 있습니다.'
+          @raw[0][] = array(
             'text': @text['space_fonts']['space.18'],
             'color': 'white',
             'hoverEvent': array(
-              'action': 'show_text'
+              'action': 'show_text',
+              'value': @desription
+            ),
+            'clickEvent': array(
+              'action': 'run_command',
+              'value': '/skillbook open combat_method'
             )
           )
-          @raw1 = array(
+          @raw[1][] = array(
+            'text': @text['space_fonts']['space.1'].@combat_method_info['icon'],
+            'color': 'white',
+            'hoverEvent': array(
+              'action': 'show_text',
+              'value': @desription
+            ),
+            'clickEvent': array(
+              'action': 'run_command',
+              'value': '/skillbook open combat_method'
+            )
+          )
+          break()
+        }
+      }
+    } else {
+      @desription = '사용중인 전투 방식이 없습니다.\n\n§c좌 클릭시, 전투 방식 선택창을 열어\n모든 전투 방식의 숙련 레벨과\n숙련경험치를 확인 할 수 있으며\n전투 방식을 변경 할 수 있습니다.'
+      @raw[0][] = array(
+        'text': @text['space_fonts']['space.18'],
+        'color': 'white',
+        'hoverEvent': array(
+          'action': 'show_text',
+          'value': @desription
+        ),
+        'clickEvent': array(
+          'action': 'run_command',
+          'value': '/skillbook open combat_method'
+        )
+      )
+      @raw[1][] = array(
+        'text': @text['space_fonts']['space.18'],
+        'color': 'white',
+        'hoverEvent': array(
+          'action': 'show_text',
+          'value': @desription
+        ),
+        'clickEvent': array(
+          'action': 'run_command',
+          'value': '/skillbook open combat_method'
+        )
+      )
+    }
+    @raw[0][] = array(
+      'text': ' '
+    )
+    @raw[1][] = array(
+      'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'].' ',
+      'color': 'white'
+    )
+    @combat_inclinations_info = @skills_info['combat_inclination']
+    @selected_combat_inclinations = json_decode(@players_data[@uuid]['skill_manager'][0])
+    @unselected_slot_size = @players_data[@uuid]['skill_manager'][1]
+    if(array_size(@selected_combat_inclinations) > 0) {
+      foreach(@combat_inclination_info in @combat_inclinations_info) {
+        if(array_contains(@selected_combat_inclinations, @combat_inclination_info['name'])) {
+          @desription = @combat_inclination_info['display'].' 특성을 적용중입니다.\n\n§c좌 클릭시, 전투 특성 선택창을 열어\n습득한 모든 전투 특성을 확인 할 수 있으며\n특성 변경이 가능합니다.'
+          @raw[0][] = array(
+            'text': @text['space_fonts']['space.18'],
+            'color': 'white',
+            'hoverEvent': array(
+              'action': 'show_text',
+              'value': @desription
+            ),
+            'clickEvent': array(
+              'action': 'run_command',
+              'value': '/skillbook open combat_inclination'
+            )
+          )
+          @raw[1][] = array(
             'text': @text['space_fonts']['space.1'].@combat_inclination_info['icon'],
+            'color': 'white',
+            'hoverEvent': array(
+              'action': 'show_text',
+              'value': @desription
+            ),
+            'clickEvent': array(
+              'action': 'run_command',
+              'value': '/skillbook open combat_inclination'
+            )
+          )
+          @raw[1][] = array(
+            'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'],
+            'color': 'white'
+          )
+        }
+      }
+    }
+    @desription = '해당 슬롯에 적용된 특성이 없습니다.\n\n§c좌 클릭시, 전투 특성 선택창을 열어\n습득한 모든 전투 특성을 확인 할 수 있으며\n특성 변경이 가능합니다.'
+    for(@i = 0, @i < @unselected_slot_size, @i++) {
+      @raw[0][] = array(
+        'text': @text['space_fonts']['space.18'],
+        'color': 'white',
+        'hoverEvent': array(
+          'action': 'show_text',
+          'value': @desription
+        ),
+        'clickEvent': array(
+          'action': 'run_command',
+          'value': '/skillbook open combat_inclination'
+        )
+      )
+      @raw[1][] = array(
+        'text': @text['space_fonts']['space.18'],
+        'color': 'white',
+        'hoverEvent': array(
+          'action': 'show_text',
+          'value': @desription
+        ),
+        'clickEvent': array(
+          'action': 'run_command',
+          'value': '/skillbook open combat_inclination'
+        )
+      )
+      @raw[1][] = array(
+        'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'],
+        'color': 'white'
+      )
+    }
+    @raw[0][] = array('text': '\n')
+    @raw[1][] = array('text': '\n')
+    @content = array_merge(@content, array_merge(@raw[0], @raw[1]))
+    @subcombats_info = @skills_info['subcombat']
+    @subcombats = @players_data[@uuid]['skill_data']['subcombat']
+    @content[] = array('text': '\n- 보조 전투 숙련')
+    foreach(@subcombat_info in @subcombats_info) {
+      @subcombat_data = @subcombats[@subcombat_info['name']]
+      if(array_size(@subcombat_info['desription']) - 1 < @subcombat_data[1]) {
+        @desription_index = array_size(@subcombat_info['desription']) - 1
+      } else {
+        @desription_index = @subcombat_data[1]
+      }
+      if(@subcombat_data[1] == 0) {
+        @icon = '\ue00f'
+        @name = '???'
+        @desription = string(@name.'\n'.@subcombat_info['desription'][@desription_index]).'\n\n§c숙련 레벨이 올르면,\n해당 스킬이 적용됩니다.'
+      } else {
+        @icon = @subcombat_info['icon']
+        @name = string('Lv.'.@subcombat_data[1] @subcombat_info['name'])
+        @desription = string(@name.'\n'.@subcombat_info['desription'][@desription_index])
+      }
+      @raw0 = array(
+        array(
+          'text': '\n'.@text['space_fonts']['space.18'],
+          'color': 'white',
+          'hoverEvent': array(
+            'action': 'show_text'
+          )
+        ),
+        array(
+          'text': ' Lv.'.@subcombat_data[1]'('.@subcombat_data[2].'/'.@subcombat_data[4].')\n',
+          'color': 'black'
+        )
+      )
+      @raw1 = array(
+        array(
+          'text': @text['space_fonts']['space.1'].@icon,
+          'color': 'white',
+          'hoverEvent': array(
+            'action': 'show_text'
+          )
+        ),
+        array(
+          'text': ' ',
+          'color': 'white'
+        ),
+        array(
+          'text': string_multiply('', integer(@subcombat_data[2] / @subcombat_data[4] * 50)).'\n',
+          'color': 'green'
+        )
+      )
+      @raw0[0]['hoverEvent']['value'] = @desription
+      @raw1[0]['hoverEvent']['value'] = @desription
+      @content = array_merge(@content, array_merge(@raw0, @raw1))
+    }
+    @arrow = array(
+      array(
+        'text': @text['space_fonts']['space.77'].'\ue00d\n',
+        'color': 'white'
+      ),
+      array(
+        'text':@text['space_fonts']['space.77'],
+        'color': 'white'
+      ),
+      array(
+        'text': '\ue00d',
+        'hoverEvent': array(
+          'action': 'show_text',
+          'value': '다음 페이지'
+        ),
+        'clickEvent': array(
+          'action': 'run_command',
+          'value': '/skillbook open farming_method'
+        )
+      )
+    )
+    @content = array_merge(@content, @arrow)
+    open_book(@player, array(json_encode(@content)))
+    break()
+  case 'combat_method':
+    @combat_methods_info = @skills_info['combat_method']
+    @combat_methods = @players_data[@uuid]['skill_data']['combat_method']
+    @selected_combat_method = @players_data[@uuid]['skill_manager'][2]
+    @content = array(array('text': '- 전투 방식 목록\n\n'))
+    foreach(@combat_method_info in @combat_methods_info) {
+      @combat_method_data = @combat_methods[@combat_method_info['name']]
+      if(array_size(@combat_method_info['desription']) - 1 < @combat_method_data[1]) {
+        @desription_index = array_size(@combat_method_info['desription']) - 1
+      } else {
+        @desription_index = @combat_method_data[1]
+      }
+      if(@combat_method_data[1] == 0) {
+        @icon = '\ue00f'
+        @name = '???'
+      } else {
+        @icon = @combat_method_info['icon']
+        @name = string('Lv.'.@combat_method_data[1] @combat_method_info['name'])
+      }
+      @desription = string(@name.'\n'.@combat_method_info['desription'][@desription_index].'\n\n')
+      @raw0 = array(
+        array(
+          'text': @text['space_fonts']['space.18'],
+          'color': 'white',
+          'hoverEvent': array(
+            'action': 'show_text'
+          )
+        ),
+        array(
+          'text': ' Lv.'.@combat_method_data[1]'('.@combat_method_data[2].'/'.@combat_method_data[4].')\n',
+          'color': 'black'
+        )
+      )
+      @raw1 = array(
+        array(
+          'text': @text['space_fonts']['space.1'].@icon,
+          'color': 'white',
+          'hoverEvent': array(
+            'action': 'show_text'
+          )
+        ),
+        array(
+          'text': ' ',
+          'color': 'white'
+        ),
+        array(
+          'text': string_multiply('', integer(@combat_method_data[2] / @combat_method_data[4] * 50)).'\n\n',
+          'color': 'green'
+        )
+      )
+      if(@combat_method_data[1] > 0) {
+        if(@selected_combat_method['name'] == @combat_method_info['name']) {
+          @select_box = array(
+            'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'],
+            'color': 'white'
+          )
+          array_insert(@raw1, @select_box, 1)
+          @desription = @desription.'§c좌클릭 시, 해당 방식 사용을 해제합니다.'
+          @clickevent = array(
+            'action': 'run_command',
+            'value': '/skillbook unselect combat_method '.@combat_method_info['name']
+          )
+        } else {
+          @desription = @desription.'§c좌클릭 시, 해당 방식을 사용합니다.'
+          @clickevent = array(
+            'action': 'run_command',
+            'value': '/skillbook select combat_method '.@combat_method_info['name']
+          )
+        }
+        @raw0[0]['clickEvent'] = @clickevent
+        @raw1[0]['clickEvent'] = @clickevent
+      } else {
+        @desription = @desription.'§c숙련 레벨을 올린 후,\n해당 방식을 사용할 수 있습니다.'
+      }
+      @raw0[0]['hoverEvent']['value'] = @desription
+      @raw1[0]['hoverEvent']['value'] = @desription
+      @content = array_merge(@content, array_merge(@raw0, @raw1))
+    }
+    open_book(@player, array(json_encode(@content)))
+    break()
+  case 'combat_inclination':
+    @combat_inclinations_info = @skills_info['combat_inclination']
+    @combat_inclinations = @players_data[@uuid]['skill_data']['combat_inclination']
+    @selectable_combat_inclinations = array_keys(@combat_inclinations)
+    @selected_combat_inclinations = json_decode(@players_data[@uuid]['skill_manager'][0])
+    @unselected_slot_size = @players_data[@uuid]['skill_manager'][1] - array_size(@selected_combat_inclinations)
+    @pages = array()
+    @paging_array = _paging(@combat_inclinations_info, 36)
+    foreach(@page_key: @page in @paging_array) {
+      @content = array(array('text': '- 전투 특성 목록\n'))
+      foreach(@line_key: @line in _paging(@page, 6)) {
+        @raw = array(array(array('text': @text['space_fonts']['space.4'])), array(array('text': @text['space_fonts']['space.4'])))
+        foreach(@key: @combat_inclination_info in @line) {
+          if(array_contains(@selectable_combat_inclinations, @combat_inclination_info['name'])) {
+            @combat_inclination_data = @combat_inclinations[@combat_inclination_info['name']]
+            if(array_size(@combat_inclination_info['desription']) - 1 < @combat_inclination_data[1]) {
+              @desription_index = array_size(@combat_inclination_info['desription']) - 1
+            } else {
+              @desription_index = @combat_inclination_data[1]
+            }
+            @desription = string('Lv.'.@combat_inclination_data[1]@combat_inclination_info['name'].'\n'.@combat_inclination_info['desription'][@desription_index].'\n\n')
+            @raw0 = array(
+              'text': @text['space_fonts']['space.18'],
+              'color': 'white',
+              'hoverEvent': array(
+                'action': 'show_text'
+              )
+            )
+            @raw1 = array(
+              'text': @text['space_fonts']['space.1'].@combat_inclination_info['icon'],
+              'color': 'white',
+              'hoverEvent': array(
+                'action': 'show_text'
+              )
+            )
+            if(array_contains(@selected_combat_inclinations, @combat_inclination_info['name'])) {
+              @desription = @desription.'§c좌클릭 시, 해당 특성 적용을 해제합니다.'
+              @raw1['text'] = @raw1['text'].@text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1']
+              @clickevent = array(
+                'action': 'run_command',
+                'value': '/skillbook unselect combat_inclination '.@subpage @combat_inclination_info['name']
+              )
+              @raw0['clickEvent'] = @clickevent
+              @raw1['clickEvent'] = @clickevent
+            } else {
+              if(@unselected_slot_size == 0) {
+                @desription = @desription.'§c더 이상 특성을 적용할 수 없습니다.\n§7적용되어 있는 특성을 해제한 후,\n해당 특성을 적용할 수 있습니다.'
+              } else {
+                @desription = @desription.'§c좌클릭 시, 해당 특성을 적용합니다.\n§7'.@unselected_slot_size.'개의 특성을 더 적용할 수 있습니다.'
+                @clickevent = array(
+                  'action': 'run_command',
+                  'value': '/skillbook select combat_inclination '.@subpage @combat_inclination_info['name']
+                )
+                @raw0['clickEvent'] = @clickevent
+                @raw1['clickEvent'] = @clickevent
+              }
+            }
+            @raw0['hoverEvent']['value'] = @desription
+            @raw1['hoverEvent']['value'] = @desription
+            @raw[0][] = @raw0
+            @raw[1][] = @raw1
+          }
+        }
+        @raw[0][] = array('text': '\n')
+        @raw[1][] = array('text': '\n')
+        @content = array_merge(@content, array_merge(@raw[0], @raw[1]))
+      }
+      if(array_size(@paging_array) != 1) {
+        if(@page_key == 0) {
+          @arrow = array(
+            array(
+              'text': string_multiply('\n', (5 - @line_key) * 2)
+            ),
+            array(
+              'text':@text['space_fonts']['space.77'].'\ue00d\n',
+              'color': 'white'
+            ),
+            array(
+              'text':@text['space_fonts']['space.77'],
+              'color': 'white'
+            ),
+            array(
+              'text': '\ue00d',
+              'hoverEvent': array(
+                'action': 'show_text',
+                'value': '다음 페이지'
+              ),
+              'clickEvent': array(
+                'action': 'run_command',
+                'value': '/skillbook open combat_inclination'@page_key + 1
+              )
+            )
+          )
+        } else if(@page_key == array_size(@paging_array) - 1) {
+          @arrow = array(
+            array(
+              'text': string_multiply('\n', (5 - @line_key) * 2)
+            ),
+            array(
+              'text':@text['space_fonts']['space.28'].'\ue00c\n',
+              'color': 'white'
+            ),
+            array(
+              'text':@text['space_fonts']['space.28'],
+              'color': 'white'
+            ),
+            array(
+              'text': '\ue00c',
+              'hoverEvent': array(
+                'action': 'show_text',
+                'value': '이전 페이지'
+              ),
+              'clickEvent': array(
+                'action': 'run_command',
+                'value': '/skillbook open combat_inclination'@page_key - 1
+              )
+            )
+          )
+        } else {
+          @arrow = array(
+            array(
+              'text': string_multiply('\n', (5 - @line_key) * 2)
+            ),
+            array(
+              'text':@text['space_fonts']['space.28'].'\ue00c'.@text['space_fonts']['space.37'].'\ue00d\n',
+              'color': 'white'
+            ),
+            array(
+              'text':@text['space_fonts']['space.28'],
+              'color': 'white'
+            ),
+            array(
+              'text': '\ue00c',
+              'hoverEvent': array(
+                'action': 'show_text',
+                'value': '이전 페이지'
+              ),
+              'clickEvent': array(
+                'action': 'run_command',
+                'value': '/skillbook open combat_inclination'@page_key - 1
+              )
+            ),
+            array(
+              'text':@text['space_fonts']['space.37'],
+              'color': 'white'
+            ),
+            array(
+              'text': '\ue00d',
+              'hoverEvent': array(
+                'action': 'show_text',
+                'value': '다음 페이지'
+              ),
+              'clickEvent': array(
+                'action': 'run_command',
+                'value': '/skillbook open combat_inclination'@page_key + 1
+              )
+            )
+          )
+        }
+        @content = array_merge(@content, @arrow)
+      }
+      @pages[] = json_encode(@content)
+    }
+    open_book(@player, array(@pages[@subpage]))
+    break()
+  case 'farming_method':
+    @harvesting_methods_info = @skills_info['harvesting_method']
+    @harvesting_methods = @players_data[@uuid]['skill_data']['harvesting_method']
+    @selected_harvesting_method = @players_data[@uuid]['skill_manager'][4]
+    @content = array(array('text': '- 수확 방식 목록'))
+    foreach(@harvesting_method_info in @harvesting_methods_info) {
+      @harvesting_method_data = @harvesting_methods[@harvesting_method_info['name']]
+      if(array_size(@harvesting_method_info['desription']) - 1 < @harvesting_method_data[1]) {
+        @desription_index = array_size(@harvesting_method_info['desription']) - 1
+      } else {
+        @desription_index = @harvesting_method_data[1]
+      }
+      if(@harvesting_method_data[1] == 0) {
+        @icon = '\ue00f'
+        @name = '???'
+      } else {
+        @icon = @harvesting_method_info['icon']
+        @name = string('Lv.'.@harvesting_method_data[1] @harvesting_method_info['name'])
+      }
+      @desription = string(@name.'\n'.@harvesting_method_info['desription'][@desription_index].'\n\n')
+      @raw0 = array(
+        array(
+          'text': '\n'.@text['space_fonts']['space.18'],
+          'color': 'white',
+          'hoverEvent': array(
+            'action': 'show_text'
+          )
+        ),
+        array(
+          'text': ' Lv.'.@harvesting_method_data[1]'('.@harvesting_method_data[2].'/'.@harvesting_method_data[4].')\n',
+          'color': 'black'
+        )
+      )
+      @raw1 = array(
+        array(
+          'text': @text['space_fonts']['space.1'].@icon,
+          'color': 'white',
+          'hoverEvent': array(
+            'action': 'show_text'
+          )
+        ),
+        array(
+          'text': ' ',
+          'color': 'white'
+        ),
+        array(
+          'text': string_multiply('', integer(@harvesting_method_data[2] / @harvesting_method_data[4] * 50)).'\n',
+          'color': 'green'
+        )
+      )
+      if(@harvesting_method_data[1] > 0) {
+        if(!is_null(@selected_harvesting_method) && @selected_harvesting_method['name'] == @harvesting_method_info['name']) {
+          @select_box = array(
+            'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'],
+            'color': 'white'
+          )
+          array_insert(@raw1, @select_box, 1)
+          @desription = @desription.'§c좌클릭 시, 해당 방식 사용을 해제합니다.'
+          @clickevent = array(
+            'action': 'run_command',
+            'value': '/skillbook unselect harvesting_method '.@harvesting_method_info['name']
+          )
+        } else {
+          @desription = @desription.'§c좌클릭 시, 해당 방식을 사용합니다.'
+          @clickevent = array(
+            'action': 'run_command',
+            'value': '/skillbook select harvesting_method '.@harvesting_method_info['name']
+          )
+        }
+        @raw0[0]['clickEvent'] = @clickevent
+        @raw1[0]['clickEvent'] = @clickevent
+      } else {
+        @desription = @desription.'§c숙련 레벨을 올린 후,\n해당 방식을 사용할 수 있습니다.'
+      }
+      @raw0[0]['hoverEvent']['value'] = @desription
+      @raw1[0]['hoverEvent']['value'] = @desription
+      @content = array_merge(@content, array_merge(@raw0, @raw1))
+    }
+    @sowing_methods_info = @skills_info['sowing_method']
+    @sowing_methods = @players_data[@uuid]['skill_data']['sowing_method']
+    @selected_sowing_method = @players_data[@uuid]['skill_manager'][4]
+    @content[] = array('text': '\n- 파종 방식 목록')
+    foreach(@sowing_method_info in @sowing_methods_info) {
+      @sowing_method_data = @sowing_methods[@sowing_method_info['name']]
+      if(array_size(@sowing_method_info['desription']) - 1 < @sowing_method_data[1]) {
+        @desription_index = array_size(@sowing_method_info['desription']) - 1
+      } else {
+        @desription_index = @sowing_method_data[1]
+      }
+      if(@sowing_method_data[1] == 0) {
+        @icon = '\ue00f'
+        @name = '???'
+      } else {
+        @icon = @sowing_method_info['icon']
+        @name = string('Lv.'.@sowing_method_data[1] @sowing_method_info['name'])
+      }
+      @desription = string(@name.'\n'.@sowing_method_info['desription'][@desription_index].'\n\n')
+      @raw0 = array(
+        array(
+          'text': '\n'.@text['space_fonts']['space.18'],
+          'color': 'white',
+          'hoverEvent': array(
+            'action': 'show_text'
+          )
+        ),
+        array(
+          'text': ' Lv.'.@sowing_method_data[1]'('.@sowing_method_data[2].'/'.@sowing_method_data[4].')\n',
+          'color': 'black'
+        )
+      )
+      @raw1 = array(
+        array(
+          'text': @text['space_fonts']['space.1'].@icon,
+          'color': 'white',
+          'hoverEvent': array(
+            'action': 'show_text'
+          )
+        ),
+        array(
+          'text': ' ',
+          'color': 'white'
+        ),
+        array(
+          'text': string_multiply('', integer(@sowing_method_data[2] / @sowing_method_data[4] * 50)).'\n',
+          'color': 'green'
+        )
+      )
+      if(@sowing_method_data[1] > 0) {
+        if(!is_null(@selected_sowing_method) && @selected_sowing_method['name'] == @sowing_method_info['name']) {
+          @select_box = array(
+            'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'],
+            'color': 'white'
+          )
+          array_insert(@raw1, @select_box, 1)
+          @desription = @desription.'§c좌클릭 시, 해당 방식 사용을 해제합니다.'
+          @clickevent = array(
+            'action': 'run_command',
+            'value': '/skillbook unselect_sowing_method '.@sowing_method_info['name']
+          )
+        } else {
+          @desription = @desription.'§c좌클릭 시, 해당 방식을 사용합니다.'
+          @clickevent = array(
+            'action': 'run_command',
+            'value': '/skillbook select_sowing_method '.@sowing_method_info['name']
+          )
+        }
+        @raw0[0]['clickEvent'] = @clickevent
+        @raw1[0]['clickEvent'] = @clickevent
+      } else {
+        @desription = @desription.'§c숙련 레벨을 올린 후,\n해당 방식을 사용할 수 있습니다.'
+      }
+      @raw0[0]['hoverEvent']['value'] = @desription
+      @raw1[0]['hoverEvent']['value'] = @desription
+      @content = array_merge(@content, array_merge(@raw0, @raw1))
+    }
+    @arrow = array(
+      array(
+        'text':@text['space_fonts']['space.28'].'\ue00c'.@text['space_fonts']['space.37'].'\ue00d\n',
+        'color': 'white'
+      ),
+      array(
+        'text':@text['space_fonts']['space.28'],
+        'color': 'white'
+      ),
+      array(
+        'text': '\ue00c',
+        'hoverEvent': array(
+          'action': 'show_text',
+          'value': '이전 페이지'
+        ),
+        'clickEvent': array(
+          'action': 'run_command',
+          'value': '/skillbook open combat'
+        )
+      ),
+      array(
+        'text':@text['space_fonts']['space.37'],
+        'color': 'white'
+      ),
+      array(
+        'text': '\ue00d',
+        'hoverEvent': array(
+          'action': 'show_text',
+          'value': '다음 페이지'
+        ),
+        'clickEvent': array(
+          'action': 'run_command',
+          'value': '/skillbook open farming 0'
+        )
+      )
+    )
+    @content = array_merge(@content, @arrow)
+    open_book(@player, array(json_encode(@content)))
+    break()
+  case 'farming':
+    switch(@subpage) {
+    case 0:
+      @farming_skills_info = array_get(@skills_info['farming'], cslice(0, 3))
+      @farming_skills = @players_data[@uuid]['skill_data']['farming']
+      @content = array(
+        array(
+          'text': '- 농사 숙련\n',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': '적용중인 전투 방식과 전투특성을 간략히 보여줍니다.\n\n§c각각의 아이콘을 클릭하여자세히 확인 할 수 있으며\n전투 방식과 전투 특성을 변경 할 수 있습니다.'
+          )
+        )
+      )
+      foreach(@farming_skill_info in @farming_skills_info) {
+        @farming_skill_data = @farming_skills[@farming_skill_info['name']]
+        if(array_size(@farming_skill_info['desription']) - 1 < @farming_skill_data[1]) {
+          @desription_index = array_size(@farming_skill_info['desription']) - 1
+        } else {
+          @desription_index = @farming_skill_data[1]
+        }
+        if(@farming_skill_data[1] == 0) {
+          @icon = '\ue00f'
+          @name = '???'
+          @desription = string(@name.'\n'.@farming_skill_info['desription'][@desription_index]).'\n\n§c숙련 레벨이 올르면,\n해당 스킬이 적용됩니다.'
+        } else {
+          @icon = @farming_skill_info['icon']
+          @name = string('Lv.'.@farming_skill_data[1] @farming_skill_info['name'])
+          @desription = string(@name.'\n'.@farming_skill_info['desription'][@desription_index])
+        }
+        @raw0 = array(
+          array(
+            'text': '\n'.@text['space_fonts']['space.18'],
             'color': 'white',
             'hoverEvent': array(
               'action': 'show_text'
             )
+          ),
+          array(
+            'text': ' Lv.'.@farming_skill_data[1]'('.@farming_skill_data[2].'/'.@farming_skill_data[4].')\n',
+            'color': 'black'
           )
-          if(array_contains(@selected_combat_inclinations, @combat_inclination_info['name'])) {
-            @desription = @desription.'§c좌클릭 시, 해당 특성 적용을 해제합니다.'
-            @raw1['text'] = @raw1['text'].@text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1']
-            @clickevent = array(
-              'action': 'run_command',
-              'value': '/skillbook unselect_combat_inclination '.@book_page @combat_inclination_info['name']
+        )
+        @raw1 = array(
+          array(
+            'text': @text['space_fonts']['space.1'].@icon,
+            'color': 'white',
+            'hoverEvent': array(
+              'action': 'show_text'
             )
-            @raw0['clickEvent'] = @clickevent
-            @raw1['clickEvent'] = @clickevent
-          } else {
-            if(@unselected_slot_size == 0) {
-              @desription = @desription.'§c더 이상 특성을 적용할 수 없습니다.\n§7적용되어 있는 특성을 해제한 후,\n해당 특성을 적용할 수 있습니다.'
-            } else {
-              @desription = @desription.'§c좌클릭 시, 해당 특성을 적용합니다.\n§7'.@unselected_slot_size.'개의 특성을 더 적용할 수 있습니다.'
-              @clickevent = array(
-                'action': 'run_command',
-                'value': '/skillbook select_combat_inclination '.@book_page @combat_inclination_info['name']
-              )
-              @raw0['clickEvent'] = @clickevent
-              @raw1['clickEvent'] = @clickevent
-            }
-          }
-          @raw0['hoverEvent']['value'] = @desription
-          @raw1['hoverEvent']['value'] = @desription
-          @raw[0][] = @raw0
-          @raw[1][] = @raw1
-        }
+          ),
+          array(
+            'text': ' ',
+            'color': 'white'
+          ),
+          array(
+            'text': string_multiply('', integer(@farming_skill_data[2] / @farming_skill_data[4] * 50)).'\n',
+            'color': 'green'
+          )
+        )
+        @raw0[0]['hoverEvent']['value'] = @desription
+        @raw1[0]['hoverEvent']['value'] = @desription
+        @content = array_merge(@content, array_merge(@raw0, @raw1))
       }
-      @raw[0][] = array('text': '\n')
-      @raw[1][] = array('text': '\n')
-      @content = array_merge(@content, array_merge(@raw[0], @raw[1]))
-    }
-    if(array_size(@paging_array) != 1) {
-      if(@page_key == 0) {
-        @arrow = array(
-          array(
-            'text': string_multiply('\n', (5 - @line_key) * 2)
+      @arrow = array(
+        array(
+          'text':@text['space_fonts']['space.28'].'\ue00c'.@text['space_fonts']['space.37'].'\ue00d\n',
+          'color': 'white'
+        ),
+        array(
+          'text':@text['space_fonts']['space.28'],
+          'color': 'white'
+        ),
+        array(
+          'text': '\ue00c',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': '이전 페이지'
           ),
-          array(
-            'text':@text['space_fonts']['space.77'].'\ue00d\n',
-            'color': 'white'
+          'clickEvent': array(
+            'action': 'run_command',
+            'value': '/skillbook open farming_method'
+          )
+        ),
+        array(
+          'text':@text['space_fonts']['space.37'],
+          'color': 'white'
+        ),
+        array(
+          'text': '\ue00d',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': '다음 페이지'
           ),
-          array(
-            'text':@text['space_fonts']['space.77'],
-            'color': 'white'
-          ),
-          array(
-            'text': '\ue00d',
-            'hoverEvent': array(
-              'action': 'show_text',
-              'value': '다음 페이지'
-            ),
-            'clickEvent': array(
-              'action': 'run_command',
-              'value': '/skillbook open_combat_inclination'@page_key + 1
-            )
+          'clickEvent': array(
+            'action': 'run_command',
+            'value': '/skillbook open farming 1'
           )
         )
-      } else if(@page_key == array_size(@paging_array) - 1) {
-        @arrow = array(
-          array(
-            'text': string_multiply('\n', (5 - @line_key) * 2)
-          ),
-          array(
-            'text':@text['space_fonts']['space.28'].'\ue00c\n',
-            'color': 'white'
-          ),
-          array(
-            'text':@text['space_fonts']['space.28'],
-            'color': 'white'
-          ),
-          array(
-            'text': '\ue00c',
-            'hoverEvent': array(
-              'action': 'show_text',
-              'value': '이전 페이지'
-            ),
-            'clickEvent': array(
-              'action': 'run_command',
-              'value': '/skillbook open_combat_inclination'@page_key - 1
-            )
-          )
-        )
-      } else {
-        @arrow = array(
-          array(
-            'text': string_multiply('\n', (5 - @line_key) * 2)
-          ),
-          array(
-            'text':@text['space_fonts']['space.28'].'\ue00c'.@text['space_fonts']['space.37'].'\ue00d\n',
-            'color': 'white'
-          ),
-          array(
-            'text':@text['space_fonts']['space.28'],
-            'color': 'white'
-          ),
-          array(
-            'text': '\ue00c',
-            'hoverEvent': array(
-              'action': 'show_text',
-              'value': '이전 페이지'
-            ),
-            'clickEvent': array(
-              'action': 'run_command',
-              'value': '/skillbook open_combat_inclination'@page_key - 1
-            )
-          ),
-          array(
-            'text':@text['space_fonts']['space.37'],
-            'color': 'white'
-          ),
-          array(
-            'text': '\ue00d',
-            'hoverEvent': array(
-              'action': 'show_text',
-              'value': '다음 페이지'
-            ),
-            'clickEvent': array(
-              'action': 'run_command',
-              'value': '/skillbook open_combat_inclination'@page_key + 1
-            )
-          )
-        )
-      }
+      )
       @content = array_merge(@content, @arrow)
+      open_book(@player, array(json_encode(@content)))
+      break()
+    case 1:
+      @farming_skills_info = array_get(@skills_info['farming'], cslice(4, 7))
+      @farming_skills = @players_data[@uuid]['skill_data']['farming']
+      @content = array(
+        array(
+          'text': '- 농사 숙련\n',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': '적용중인 전투 방식과 전투특성을 간략히 보여줍니다.\n\n§c각각의 아이콘을 클릭하여자세히 확인 할 수 있으며\n전투 방식과 전투 특성을 변경 할 수 있습니다.'
+          )
+        )
+      )
+      foreach(@farming_skill_info in @farming_skills_info) {
+        @farming_skill_data = @farming_skills[@farming_skill_info['name']]
+        if(array_size(@farming_skill_info['desription']) - 1 < @farming_skill_data[1]) {
+          @desription_index = array_size(@farming_skill_info['desription']) - 1
+        } else {
+          @desription_index = @farming_skill_data[1]
+        }
+        if(@farming_skill_data[1] == 0) {
+          @icon = '\ue00f'
+          @name = '???'
+          @desription = string(@name.'\n'.@farming_skill_info['desription'][@desription_index]).'\n\n§c숙련 레벨이 올르면,\n해당 스킬이 적용됩니다.'
+        } else {
+          @icon = @farming_skill_info['icon']
+          @name = string('Lv.'.@farming_skill_data[1] @farming_skill_info['name'])
+          @desription = string(@name.'\n'.@farming_skill_info['desription'][@desription_index])
+        }
+        @raw0 = array(
+          array(
+            'text': '\n'.@text['space_fonts']['space.18'],
+            'color': 'white',
+            'hoverEvent': array(
+              'action': 'show_text'
+            )
+          ),
+          array(
+            'text': ' Lv.'.@farming_skill_data[1]'('.@farming_skill_data[2].'/'.@farming_skill_data[4].')\n',
+            'color': 'black'
+          )
+        )
+        @raw1 = array(
+          array(
+            'text': @text['space_fonts']['space.1'].@icon,
+            'color': 'white',
+            'hoverEvent': array(
+              'action': 'show_text'
+            )
+          ),
+          array(
+            'text': ' ',
+            'color': 'white'
+          ),
+          array(
+            'text': string_multiply('', integer(@farming_skill_data[2] / @farming_skill_data[4] * 50)).'\n',
+            'color': 'green'
+          )
+        )
+        @raw0[0]['hoverEvent']['value'] = @desription
+        @raw1[0]['hoverEvent']['value'] = @desription
+        @content = array_merge(@content, array_merge(@raw0, @raw1))
+      }
+      @arrow = array(
+        array(
+          'text':@text['space_fonts']['space.28'].'\ue00c'.@text['space_fonts']['space.37'].'\ue00d\n',
+          'color': 'white'
+        ),
+        array(
+          'text':@text['space_fonts']['space.28'],
+          'color': 'white'
+        ),
+        array(
+          'text': '\ue00c',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': '이전 페이지'
+          ),
+          'clickEvent': array(
+            'action': 'run_command',
+            'value': '/skillbook open farming 0'
+          )
+        ),
+        array(
+          'text':@text['space_fonts']['space.37'],
+          'color': 'white'
+        ),
+        array(
+          'text': '\ue00d',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': '다음 페이지'
+          ),
+          'clickEvent': array(
+            'action': 'run_command',
+            'value': '/skillbook open mining 0'
+          )
+        )
+      )
+      @content = array_merge(@content, @arrow)
+      open_book(@player, array(json_encode(@content)))
+      break()
     }
-    @pages[] = json_encode(@content)
+    break()
+  case 'mining':
+    switch(@subpage) {
+    case 0:
+      @mining_skills_info = array_get(@skills_info['mining'], cslice(0, 3))
+      @mining_skills = @players_data[@uuid]['skill_data']['mining']
+      @content = array(
+        array(
+          'text': '- 채광 숙련\n',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': '적용중인 전투 방식과 전투특성을 간략히 보여줍니다.\n\n§c각각의 아이콘을 클릭하여자세히 확인 할 수 있으며\n전투 방식과 전투 특성을 변경 할 수 있습니다.'
+          )
+        )
+      )
+      foreach(@mining_skill_info in @mining_skills_info) {
+        @mining_skill_data = @mining_skills[@mining_skill_info['name']]
+        if(array_size(@mining_skill_info['desription']) - 1 < @mining_skill_data[1]) {
+          @desription_index = array_size(@mining_skill_info['desription']) - 1
+        } else {
+          @desription_index = @mining_skill_data[1]
+        }
+        if(@mining_skill_data[1] == 0) {
+          @icon = '\ue00f'
+          @name = '???'
+          @desription = string(@name.'\n'.@mining_skill_info['desription'][@desription_index]).'\n\n§c숙련 레벨이 올르면,\n해당 스킬이 적용됩니다.'
+        } else {
+          @icon = @mining_skill_info['icon']
+          @name = string('Lv.'.@mining_skill_data[1] @mining_skill_info['name'])
+          @desription = string(@name.'\n'.@mining_skill_info['desription'][@desription_index])
+        }
+        @raw0 = array(
+          array(
+            'text': '\n'.@text['space_fonts']['space.18'],
+            'color': 'white',
+            'hoverEvent': array(
+              'action': 'show_text'
+            )
+          ),
+          array(
+            'text': ' Lv.'.@mining_skill_data[1]'('.@mining_skill_data[2].'/'.@mining_skill_data[4].')\n',
+            'color': 'black'
+          )
+        )
+        @raw1 = array(
+          array(
+            'text': @text['space_fonts']['space.1'].@icon,
+            'color': 'white',
+            'hoverEvent': array(
+              'action': 'show_text'
+            )
+          ),
+          array(
+            'text': ' ',
+            'color': 'white'
+          ),
+          array(
+            'text': string_multiply('', integer(@mining_skill_data[2] / @mining_skill_data[4] * 50)).'\n',
+            'color': 'green'
+          )
+        )
+        @raw0[0]['hoverEvent']['value'] = @desription
+        @raw1[0]['hoverEvent']['value'] = @desription
+        @content = array_merge(@content, array_merge(@raw0, @raw1))
+      }
+      @arrow = array(
+        array(
+          'text':@text['space_fonts']['space.28'].'\ue00c'.@text['space_fonts']['space.37'].'\ue00d\n',
+          'color': 'white'
+        ),
+        array(
+          'text':@text['space_fonts']['space.28'],
+          'color': 'white'
+        ),
+        array(
+          'text': '\ue00c',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': '이전 페이지'
+          ),
+          'clickEvent': array(
+            'action': 'run_command',
+            'value': '/skillbook open mining_method'
+          )
+        ),
+        array(
+          'text':@text['space_fonts']['space.37'],
+          'color': 'white'
+        ),
+        array(
+          'text': '\ue00d',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': '다음 페이지'
+          ),
+          'clickEvent': array(
+            'action': 'run_command',
+            'value': '/skillbook open mining 1'
+          )
+        )
+      )
+      @content = array_merge(@content, @arrow)
+      open_book(@player, array(json_encode(@content)))
+      break()
+    case 1:
+      @mining_skills_info = array_get(@skills_info['mining'], cslice(4, 6))
+      @mining_skills = @players_data[@uuid]['skill_data']['mining']
+      @content = array(
+        array(
+          'text': '- 채광 숙련\n',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': '적용중인 전투 방식과 전투특성을 간략히 보여줍니다.\n\n§c각각의 아이콘을 클릭하여자세히 확인 할 수 있으며\n전투 방식과 전투 특성을 변경 할 수 있습니다.'
+          )
+        )
+      )
+      foreach(@mining_skill_info in @mining_skills_info) {
+        @mining_skill_data = @mining_skills[@mining_skill_info['name']]
+        if(array_size(@mining_skill_info['desription']) - 1 < @mining_skill_data[1]) {
+          @desription_index = array_size(@mining_skill_info['desription']) - 1
+        } else {
+          @desription_index = @mining_skill_data[1]
+        }
+        if(@mining_skill_data[1] == 0) {
+          @icon = '\ue00f'
+          @name = '???'
+          @desription = string(@name.'\n'.@mining_skill_info['desription'][@desription_index]).'\n\n§c숙련 레벨이 올르면,\n해당 스킬이 적용됩니다.'
+        } else {
+          @icon = @mining_skill_info['icon']
+          @name = string('Lv.'.@mining_skill_data[1] @mining_skill_info['name'])
+          @desription = string(@name.'\n'.@mining_skill_info['desription'][@desription_index])
+        }
+        @raw0 = array(
+          array(
+            'text': '\n'.@text['space_fonts']['space.18'],
+            'color': 'white',
+            'hoverEvent': array(
+              'action': 'show_text'
+            )
+          ),
+          array(
+            'text': ' Lv.'.@mining_skill_data[1]'('.@mining_skill_data[2].'/'.@mining_skill_data[4].')\n',
+            'color': 'black'
+          )
+        )
+        @raw1 = array(
+          array(
+            'text': @text['space_fonts']['space.1'].@icon,
+            'color': 'white',
+            'hoverEvent': array(
+              'action': 'show_text'
+            )
+          ),
+          array(
+            'text': ' ',
+            'color': 'white'
+          ),
+          array(
+            'text': string_multiply('', integer(@mining_skill_data[2] / @mining_skill_data[4] * 50)).'\n',
+            'color': 'green'
+          )
+        )
+        @raw0[0]['hoverEvent']['value'] = @desription
+        @raw1[0]['hoverEvent']['value'] = @desription
+        @content = array_merge(@content, array_merge(@raw0, @raw1))
+      }
+      @arrow = array(
+        array(
+          'text': '\n\n\n'.@text['space_fonts']['space.28'].'\ue00c'.@text['space_fonts']['space.37'].'\ue00d\n',
+          'color': 'white'
+        ),
+        array(
+          'text': @text['space_fonts']['space.28'],
+          'color': 'white'
+        ),
+        array(
+          'text': '\ue00c',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': '이전 페이지'
+          ),
+          'clickEvent': array(
+            'action': 'run_command',
+            'value': '/skillbook open mining 0'
+          )
+        ),
+        array(
+          'text':@text['space_fonts']['space.37'],
+          'color': 'white'
+        ),
+        array(
+          'text': '\ue00d',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': '다음 페이지'
+          ),
+          'clickEvent': array(
+            'action': 'run_command',
+            'value': '/skillbook open mining 0'
+          )
+        )
+      )
+      @content = array_merge(@content, @arrow)
+      open_book(@player, array(json_encode(@content)))
+      break()
+    }
+    break()
   }
-  open_book(@player, array(@pages[@book_page]))
 }
-
 
 register_command('skillbook', array(
   'description': 'can see skill book',
@@ -850,13 +1234,83 @@ register_command('skillbook', array(
   'executor': closure(@command, @player, @args) { 
     @uuid = puuid(@player)
     @player_skill_data = @players_data[@uuid]['skill_data']
+    if(array_size(@args) > 0) {
+      switch(@args[0]) {
+      case 'open':
+        switch(@args[1]) {
+        case 'combat':
+          _open_skillbook(@player, 'combat', null, @players_data, @skills_info, @text)
+          break()
+        case 'combat_method':
+          _open_skillbook(@player, 'combat_method', null, @players_data, @skills_info, @text)
+          break()
+        case 'combat_inclination':
+          if(array_size(@args) == 2) {
+            @subpage = 0
+          } else {
+            @subpage = @args[2]
+          }
+          _open_skillbook(@player, 'combat_inclination', @subpage, @players_data, @skills_info, @text)
+          break()
+        case 'farming':
+          if(array_size(@args) == 2) {
+            @subpage = 0
+          } else {
+            @subpage = @args[2]
+          }
+          _open_skillbook(@player, 'farming', @subpage, @players_data, @skills_info, @text)
+          break()
+        case 'farming_method':
+          _open_skillbook(@player, 'farming_method', null, @players_data, @skills_info, @text)
+          break()
+        case 'mining':
+          if(array_size(@args) == 2) {
+            @subpage = 0
+          } else {
+            @subpage = @args[2]
+          }
+          _open_skillbook(@player, 'mining', @subpage, @players_data, @skills_info, @text)
+          break()
+        }
+        break()
+      case 'select':
+        switch(@args[1]) {
+        case 'combat_method':
+          break()
+        case 'combat_inclination':
+          break()
+        case 'harvesting_method':
+          break()
+        case 'sowing_method':
+          break()
+        }
+        break()
+      case 'unselect':
+        switch(@args[1]) {
+        case 'combat_method':
+          break()
+        case 'combat_inclination':
+          break()
+        case 'harvesting_method':
+          break()
+        case 'sowing_method':
+          break()
+        }
+        break()
+      }
+    } else {
+      _open_skillbook(@player, 'combat', null, @players_data, @skills_info, @text)
+    }
+    
+    /*
+    
     if(array_size(@args) == 1) {
       switch(@args[0]) {
       case 'open_combat_inclination':
         _combat_inclination_page(@player, @player_skill_data, 0, @mastery_info, @text)
         break()
       case 'open_combat_method': 
-        _combat_method_page(@player, @player_skill_data, @mastery_info, @text)
+        _open_skillbook(@player, 'combat_method', null, @players_data, @skills_info, @text)
         break()
       case 'open_farming_method': 
         _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
@@ -914,8 +1368,9 @@ register_command('skillbook', array(
         break()
       }
     } else {
-      _combat_page(@player, @player_skill_data, @mastery_info, @text)
+      
     }
+    */
     #_open_masterybook(@player, @player_skill, @mastery_info, @text)
   }
 ))

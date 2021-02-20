@@ -142,7 +142,9 @@ proc _quit_event(@player, @uuid, @players_state, @players_item, @excluded_player
 # EVENT / TASK BINDER
 foreach(@player in _all_players(@excluded_players)) { #조인 이벤트로 변경 리로드 명령어
   @uuid = puuid(@player)
-  _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec) 
+  set_timeout(1000, closure() {
+    _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec) 
+  })
   @players_item[@uuid] = array(
     'is_inv_open': false,
     'main_hand': null,
