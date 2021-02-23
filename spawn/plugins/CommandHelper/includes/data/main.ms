@@ -335,6 +335,12 @@ bind('player_interact', null, null, @event, @players_data, @players_item, @hp_bl
       }
     }
   }
+
+  #broadcast(@event)
+  if(!is_null(@event['item']) && @event['item']['name'] == 'ENCHANTED_BOOK' && !is_null(@event['item']['meta']) && !is_null(@event['item']['meta']) && @event['item']['meta']['model'] > 0) {
+    #broadcast(A)
+    #take_from_inventory(@uuid, 'PAPER', 1)
+  }
 }
 
 bind('block_grow', null, null, @event) {

@@ -1,92 +1,37 @@
-/res $ = >>>
-send_resourcepack(player(), $)
+/hex = >>>
+  broadcast(replace(hexcolor("#ffffff"), '§', '&'))
+  #'§'
 <<<
 
-/test $ = >>>
-async_read('files/font_space.json', closure(@json) {
-  @fonts = json_decode(@json)
-  #broadcast(@fonts)
-  @msg = '|'.@fonts['space.-3'].@fonts['space.'.$].'|'.@fonts['space.-1']
-  #action_msg(player(), @msg)
-  action_msg(player(), @fonts['space.5'].'\ue3ff'.@fonts['space.-65'].@fonts['space.'.$])
-  action_msg(player(), @fonts['space.-58'].'\ue405'.@fonts['space.-67'].'')
-  action_msg(player(), '\ue405')
-  #action_msg(player(), '\ue405'.'')
-})
-<<<
-/book = >>>
-@player = player()
-@pages = array(
-  json_encode(array(
-    'text': rand(),
-    'clickEvent': array(
-      'action': 'run_command',
-      'value': '/bookasdf'
-    )
-  ))
-)
-open_book(@player, @pages)
-<<<
-
-/a $a [$ = ''] = >>>
-@item = get_inventory_item(puuid(), pheld_slot())
-broadcast(@item)
-#if(is_null(@item['meta'])) { @item['meta']= array('flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES')) }
-#@item['meta']['lore'][$a] = colorize($)
-#set_inventory_item(puuid(), pheld_slot(), @item)
-<<<
-
-/aa = >>>
-@item = get_inventory_item(puuid(), pheld_slot())
-@item['meta']['display'] = hexcolor("#ffffff").'잘 만들어진 철 검'
-@item['meta']['lore'][2] = ''
-@item['meta']['lore'][3] = hexcolor("#ffffff").'\ue40a '.hexcolor("#eee255").'전격'
-@item['meta']['lore'][4] = ''
-@item['meta']['lore'][5] = '§7타격시, 인접한 다른 몹에게도 피해를 줍니다.'
-@item['meta']['lore'][6] = '§7비에 맞은 몹이나 물속의 몹에겐 더 큰 범위의 전격 피해가 퍼집니다'
-#@item['meta']['lore'][3] = hexcolor("#996e6b").'\ue40a 전격 III'
-#@item['meta']['lore'][4] = hexcolor("#996e6b").'\ue409 내구성 II'
-set_inventory_item(puuid(), pheld_slot(), @item)
-<<<
-
-/s = >>>
-broadcast(hexcolor("#996e6b").'asdf'hexcolor("#6cb88f")'asdf')
-<<<
-
-/br = >>>
-@item = get_inventory_item(puuid(), pheld_slot())
-if(is_null(@item['meta'])) {
-  @item['meta'] = array()
-}
-@item['meta']['display'] = hexcolor("#ffffff").'\ue3fb'
-set_inventory_item(puuid(), pheld_slot(), @item)
-<<<
-
-/g $ = >>>
-foreach(@key: @item in get_inventory(puuid())) {
-  if(!is_null(@item)) {
-    if(is_null(@item['meta'])) {
-      @item['meta'] = array()
-    }
-    @item['meta']['model'] = $
-    set_inventory_item(puuid(), @key, @item)
-  }
-}
-<<<
-
-/asd = >>>
-@a = 'a'
-@a += 'b'
-broadcast(@a)
-<<<
-
-/test $s $l = >>>
+/sattr $attr $id $amount = >>>
   @uuid = puuid(player())
-  cup_set('SKILL_DATA', @uuid.'_'.$s, array(
-    'combat_method',
-    $l,
-    0.0,
-    3,
-    100.0
-  ))
+  @modifier = array(
+    'attribute': $attr,
+    'operation': 'ADD_NUMBER',
+    'amount': $amount,
+    'name': $id
+  )
+  add_entity_attribute_modifier(@uuid, @modifier)
+<<<
+
+/gattr $attr = >>>
+  #GENERIC_ARMOR, GENERIC_ARMOR_TOUGHNESS, GENERIC_ATTACK_DAMAGE, GENERIC_ATTACK_KNOCKBACK, GENERIC_ATTACK_SPEED, GENERIC_FLYING_SPEED,
+  #GENERIC_FOLLOW_RANGE, GENERIC_KNOCKBACK_RESISTANCE, GENERIC_LUCK, GENERIC_MAX_HEALTH, GENERIC_MOVEMENT_SPEED,
+  #HORSE_JUMP_STRENGTH, ZOMBIE_SPAWN_REINFORCEMENTS
+  @uuid = puuid(player())
+  set_timeout(2000, closure() {
+    broadcast(entity_attribute_modifiers(@uuid, $attr))
+    broadcast(entity_attribute_value(@uuid, $attr))
+  })
+<<<
+
+/rattr $attr $id = >>>
+  @uuid = puuid(player())
+  remove_entity_attribute_modifier(@uuid, $attr, $id)
+<<<
+
+/imm $tick = >>>
+@uuid = puuid(player())
+broadcast(get_entity_immunity_ticks(@uuid))
+set_entity_immunity_ticks(@uuid, $tick)
 <<<

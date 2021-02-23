@@ -54,6 +54,46 @@ include('skill/main.ms')
   )
 )
 
+# PROC
+@death_penalties_multiply = array(
+  'world': array(
+    'default': array('multiply': 0.8, 'deviation': 0.15),
+    'DIAMOND': array('multiply': 0.5, 'deviation': 0.2)
+  )
+)
+
+proc _apply_death_penalty(@player, @uuid, @death_penalties_multiply) {
+  @inventory = get_inventory(@uuid)
+  foreach(@key: @item in @inventory) {
+    if(!is_null(@item)) {
+      if(array_index_exists(@death_penalties_multiply['world'], @item['name'])) {
+        @death_penalty_multiply = @death_penalties_multiply['world'][@item['name']]
+      } else {
+        @death_penalty_multiply = @death_penalties_multiply['world']['default']
+      }
+      @max_durability = material_info(@item['name'], 'maxDurability')
+      if(@max_durability == 0) {
+        @inventory[@key]['qty'] = integer(_multiply_value(@item['qty'], @death_penalty_multiply['multiply'], @death_penalty_multiply['deviation']))
+      } else {
+        #내구성 반영
+        @new_damage = integer(_multiply_value(@max_durability, 1 - @death_penalty_multiply['multiply'], @death_penalty_multiply['deviation']))
+        if(is_null(@item['meta'])) {
+          @durability = @new_damage
+          @inventory[@key]['meta'] = array()
+        } else {
+          @durability = @item['meta']['damage'] + @new_damage
+        }
+        if(@durability < @max_durability) {
+          @inventory[@key]['meta']['damage'] = @durability
+        } else {
+          @inventory[@key] = null
+        }
+      }
+    }
+  }
+  set_inventory(@uuid, @inventory)
+}
+
 bind('inventory_click', null, null, @event, @players_item, @effective_items) {
   @player = @event['player']
   @uuid = puuid(@player)
@@ -627,61 +667,56 @@ bind('player_interact', null, array('main_hand': 'main_main_hand', 'button': 'ri
 
 
 bind('entity_damage', null, null, @event, @players_item) {
-  if(array_index_exists(@event, 'damager') && ponline(@event['damager'])) { //플레이어가 타격시
+  if(array_index_exists(@event, 'damager') && ponline(@event['damager'])) { //플레이어가 때리는 경우
     @player = @event['damager']
     @puuid = puuid(@player)
     @euuid = @event['id']
-    #broadcast(@players_item[@puuid]['enchantments'])
+    @items = @players_item[@puuid]
+    
+    @weapons = array(
+      'WOODEN_SWORD',
+      'WOODEN_SHOVEL',
+      'WOODEN_PICKAXE',
+      'WOODEN_AXE',
+      'WOODEN_HOE',
+      'STONE_SWORD',
+      'STONE_SHOVEL',
+      'STONE_PICKAXE',
+      'STONE_AXE',
+      'STONE_HOE',
+      'IRON_SWORD',
+      'IRON_SHOVEL',
+      'IRON_PICKAXE',
+      'IRON_AXE',
+      'IRON_HOE',
+      'GOLDEN_SWORD',
+      'GOLDEN_SHOVEL',
+      'GOLDEN_PICKAXE',
+      'GOLDEN_AXE',
+      'GOLDEN_HOE',
+      'DIAMOND_SWORD',
+      'DIAMOND_SHOVEL',
+      'DIAMOND_PICKAXE',
+      'DIAMOND_AXE',
+      'DIAMOND_HOE',
+      'NETHERITE_SWORD',
+      'NETHERITE_SHOVEL',
+      'NETHERITE_PICKAXE',
+      'NETHERITE_AXE',
+      'NETHERITE_HOE',
+      'TRIDENT'
+    )
+    @items = @players_item[@puuid]
+    if(!is_null(@items['main_hand']) && array_contains(@weapons, @items['main_hand']['name'])) {
+      @attack_speed = entity_attribute_value(@puuid, 'GENERIC_ATTACK_SPEED')
+      @tick = integer(1/ @attack_speed * 20)
+      if(@tick < 20) {
+        set_timeout(0, closure( set_entity_immunity_ticks(@euuid, @tick) ))
+      }
+    }
+    #broadcast(@players_item[@puuid]['main_hand'])
     switch(@players_item[@puuid]['enchantments']['main_hand']) {
     case '전격':
-
-      break()
-    case '천둥':
-    
-      break()
-    case '맹독':
-      set_mob_effect(@euuid, 'POISON', 3, 1, false, true)
-      break()
-    case '부식':
-      set_mob_effect(@euuid, 'WITHER', 3, 2, false, true)
-      break()
-    case '약화':
-      set_mob_effect(@euuid, 'WEAKNESS', 0, 6, false, true)
-      break()
-    case '파멸':
-      set_mob_effect(@euuid, 'WEAKNESS', 1, 6, false, true)
-      if(rand() < 0.1) {
-        set_mob_effect(@euuid, 'BLINDNESS', 0, 4, false, true)
-      }
-      break()
-    case '서리':
-      set_mob_effect(@euuid, 'SLOWNESS', 1, 6, false, true)
-      break()
-    case '빙결':
-      set_mob_effect(@euuid, 'SLOWNESS', 1, 11, false, true)
-      set_mob_effect(@euuid, 'SLOWNESS', 5, 4, false, true)
-      break()
-    case '신성':
-      @undead_entities = array(
-        'DROWNED',
-        'HUSK',
-        'PHANTOM',
-        'SKELETON',
-        'SKELETON_HORSE',
-        'STRAY',
-        'WITHER',
-        'WITHER_SKELETON',
-        'ZOGLIN',
-        'ZOMBIE',
-        'ZOMBIE_HORSE',
-        'ZOMBIE_VILLAGER',
-        'ZOMBIFIED_PIGLIN'
-      )
-      if(array_contains(@undead_entities, entity_type(@euuid))) {
-        set_mob_effect(@euuid, 'INSTANT_HEALTH', 1, 0.1, false, true)
-      }
-      break()
-    default:
       @entity_location = entity_loc(@euuid)
       @ploc = ploc(@player)
       if(get_highest_block_at(@entity_location)['y'] - 1 < @entity_location['y'] || get_block(@entity_location) == 'WATER') {
@@ -789,29 +824,124 @@ bind('entity_damage', null, null, @event, @players_item) {
         _particle(@player, 'minecraft:firework', @pos, @delta, 1, 0)
         damage_entity(@near_entity, 3)
       }
+      break()
+    case '천둥':
+    
+      break()
+    case '맹독':
+      set_mob_effect(@euuid, 'POISON', 3, 1, false, true)
+      break()
+    case '부식':
+      set_mob_effect(@euuid, 'WITHER', 3, 2, false, true)
+      break()
+    case '약화':
+      set_mob_effect(@euuid, 'WEAKNESS', 0, 6, false, true)
+      break()
+    case '파멸':
+      set_mob_effect(@euuid, 'WEAKNESS', 1, 6, false, true)
+      if(rand() < 0.1) {
+        set_mob_effect(@euuid, 'BLINDNESS', 0, 4, false, true)
+      }
+      break()
+    case '서리':
+      set_mob_effect(@euuid, 'SLOWNESS', 1, 6, false, true)
+      break()
+    case '빙결':
+      set_mob_effect(@euuid, 'SLOWNESS', 1, 11, false, true)
+      set_mob_effect(@euuid, 'SLOWNESS', 5, 4, false, true)
+      break()
+    case '신성':
+      @undead_entities = array(
+        'DROWNED',
+        'HUSK',
+        'PHANTOM',
+        'SKELETON',
+        'SKELETON_HORSE',
+        'STRAY',
+        'WITHER',
+        'WITHER_SKELETON',
+        'ZOGLIN',
+        'ZOMBIE',
+        'ZOMBIE_HORSE',
+        'ZOMBIE_VILLAGER',
+        'ZOMBIFIED_PIGLIN'
+      )
+      if(array_contains(@undead_entities, entity_type(@euuid))) {
+        set_mob_effect(@euuid, 'INSTANT_HEALTH', 1, 0.1, false, true)
+      }
+      break()
+    default:
 
     }
-  } else { //엔티티가 타격시
+  }
+  if(@event['type'] == 'PLAYER') {
+    @player = @event['player']
+    @puuid = @event['id']
+    
+    if(@event['finalamount'] == 0 && pblocking(@player)) {
+      @items = @players_item[@puuid]
+      if(!is_null(@items['main_hand']) && @items['main_hand']['name'] == 'SHIELD') {
+        @shield_slot = pheld_slot(@player)
+      } else {
+        @shield_slot = 40
+      }
+      set_timeout(1, closure() {
+        @damaged_item = get_inventory_item(@puuid, @shield_slot)
+        if(@damaged_item['name'] == 'SHIELD') {
+          set_inventory_item(@puuid, @shield_slot, array('name': "CLOCK", "qty: -1", 'meta': null))
+          set_timeout(1, closure() {set_inventory_item(@puuid, @shield_slot, @damaged_item)})
+        }
+      })
 
+      #@mastry_type = 'shield'
+      #@masteries = import(@player.'.masteries')
+      #@skill_level = integer(@masteries[@mastry_type] / 500)
+      #if(@skill_level > 3) {
+      #  @skill_level = 3
+      #}
+      @skill_level = 1
+      
+      set_pcooldown(@player, 'SHIELD', integer(@event['amount'] * (5 - @skill_level)))
+      #set_timeout(0, closure() {
+        #play_entity_effect(puuid(@player), 'SHIELD_BLOCK')#SHIELD_BLOCK
+        #set_pcooldown(@player, 'SHIELD', integer(@event['amount'] * (5 - @skill_level)))
+      #})
+      #@defense_damage = @event['amount']
+      #@adding_mastry_xp = @defense_damage / 20
+      #if(@skill_level < 3) {
+      #  if(@adding_mastry_xp > 0) {
+      #    _add_mastry(@player, @mastry_type, @adding_mastry_xp)
+      #  }
+      #}
+    }
   }
 }
 
 bind('exp_change', null, null, @event, @players_item) {
   @player = @event['player']
   @uuid = puuid(@player)
-  broadcast(@event)
-  foreach(@slot: @enchantment in @players_item[@uuid][['enchantments']]) {
+  foreach(@slot: @enchantment in @players_item[@uuid]['enchantments']) {
     switch(@enchantment) {
     case '풍요':
+      break()
     case '치유':
+      break()
     case '저항':
+      break()
     case '친수성':
+      break()
     case '반엔트로피':
+      break()
     case '용력':
       break()
     default:
-      broadcast(A) #/summon minecraft:experience_orb ~ ~ ~ {Value:10}
+      #broadcast('A') #/summon minecraft:experience_orb ~ ~ ~ {Value:10}
     }
   }
+}
 
+bind('player_death', null, null, @event, @death_penalties_multiply) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+  _apply_death_penalty(@player, @uuid, @death_penalties_multiply)
 }

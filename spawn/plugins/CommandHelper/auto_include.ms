@@ -102,6 +102,10 @@ proc _paging(@array, @size) {
   return(@pages)
 }
 
+proc _multiply_value(@value, @multiply, @deviation) {
+  return(@value * @multiply + @value * @deviation * 0.5 - @value * @deviation * rand())
+}
+
 #확장으로 대채될 예정
 proc _particle(@player, @particle, @pos, @delta, @speed, @count) {
   sudo(@player, '/particle'@particle @pos['x'] @pos['y'] @pos['z'] @delta['x'] @delta['y'] @delta['z'] @speed @count 'force')
