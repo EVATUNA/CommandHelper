@@ -1,9 +1,11 @@
 console('EvaData loaded')
 
 ## Data Procedure
-
 proc _load_data(@uuid, @players_data, @skills_spec) {
   @players_data[@uuid]['setting'] = cup_get('SETTING', @uuid)
+  @players_data[@uuid]['cache'] = array(
+    'resolution_setting': false
+  )
   if(is_null(@players_data[@uuid]['setting'])) {
     _new_data(@uuid, @players_data)
   }
@@ -31,7 +33,7 @@ proc _new_data(@uuid, @players_data) {
 }
 
 proc _send_resourcepack(@player, @uuid, @players_state) {
-  @resourcepack = 'https://drive.google.com/uc?export=download&id=1n3aRXulikDxw-Ow5cbE6UmT9yqCuBebY'
+  @resourcepack = 'https://drive.google.com/uc?export=download&id=1WtJjCL0MbFShi7Tj5LfxZ7FGN49uaMKt'
   send_resourcepack(@player, @resourcepack)
   @player_state = array(
     'join_spec': array(
@@ -51,7 +53,7 @@ proc _send_resourcepack(@player, @uuid, @players_state) {
   }
   @player_state['join_spec']['gamemode'] = @gamemode
   @players_state[@uuid] = @player_state
-  set_pmode(@player, 'SPECTATOR') #고정 기능 추가?
+  set_pmode(@player, 'SPECTATOR')
   title(@player, '§a예§7를 눌러주세요!', '§7서버 리소스팩 사용은 필수입니다.', 0, 99999999, 0)
 }
 
@@ -77,7 +79,7 @@ proc _apply_join_spec(@player, @uuid, @players_state, @players_data, @skills_spe
   })
 }
 
-proc _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec) { # bungee
+proc _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec) {
   #players_state
   @player_state = array(
     'player': @player,
@@ -93,14 +95,13 @@ proc _set_player_state(@player, @uuid, @players_state, @players_data, @skills_sp
     'is_op': @player_state['is_op'],
     'guild': @player_state['guild']
   )
-  #_bungeecord_foward(@player, 'ch_update_state', @data)
+  _bungeecord_foward(@player, 'ch_update_state', @data)
   # players_data
   _load_data(@uuid, @players_data, @skills_spec)
 }
 
-proc _join_event(@player, @uuid, @players_state, @players_data, @players_item, @excluded_players, @skills_spec) {
-  if(!array_contains(@excluded_players , @player)) {
-    broadcast(@players_state)
+proc _join_event(@player, @uuid, @players_state, @players_data, @players_item, @server, @bots, @skills_spec) {
+  if(!array_contains(@bots, @player)) {
     if(!array_index_exists(@players_state, @uuid)) {
       _send_resourcepack(@player, @uuid, @players_state)
     } else {
@@ -125,22 +126,36 @@ proc _join_event(@player, @uuid, @players_state, @players_data, @players_item, @
       'armor': get_inventory_item(@uuid, 38)
     )
     _update_item(@player, @uuid, @items, @players_item)
+  } else {
+    #if(!array_contains(@server['bots'], @player)) {
+      @server['bots'][] = @player
+      if(!@server['loaded']) {
+        @server['loaded'] = true
+        @data = array('request_bot': @player)
+        _bungeecord_foward(@server['bots'][0], 'ch_request_states', @new_data)
+      }
+    #}
   }
 }
 
-proc _quit_event(@player, @uuid, @players_state, @players_item, @excluded_players) {
-  if(!array_contains(@excluded_players , @player)) {
+proc _quit_event(@player, @uuid, @players_state, @players_item, @server, @bots) {
+  if(!array_contains(@bots , @player)) {
     if(array_index_exists(@players_state, @uuid)) {
       @players_state[@uuid]['quit_countdown'] = 10
     }
     if(array_index_exists(@players_item, @uuid)) {
       array_remove(@players_item, @uuid)
     }
+  } else {
+    if(array_contains(@server['bots'], @player)) {
+      array_remove(@server['bots'], @player)
+    }
   }
 }
 
 # EVENT / TASK BINDER
-foreach(@player in _all_players(@excluded_players)) { #조인 이벤트로 변경 리로드 명령어
+
+foreach(@player in _all_players(@bots)) { #조인 이벤트로 변경 리로드 명령어
   @uuid = puuid(@player)
   set_timeout(1000, closure() {
     _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec) 
@@ -164,11 +179,11 @@ foreach(@player in _all_players(@excluded_players)) { #조인 이벤트로 변�
   _update_item(@player, @uuid, @items, @players_item)
 }
 
-bind('player_join', null, null, @event, @players_state, @players_data, @players_item, @excluded_players, @skills_spec) {
+bind('player_join', null, null, @event, @players_state, @players_data, @players_item, @bots, @skills_spec) {
   @player = @event['player']
   @uuid = puuid(@player)
   modify_event('join_message', null)
-  _join_event(@player, @uuid, @players_state, @players_data, @players_item, @excluded_players)
+  _join_event(@player, @uuid, @players_state, @players_data, @players_item, @server, @bots, @skills_spec)
 }
 
 bind('resource_pack_status', null,, null, @event, @players_state, @players_data, @skills_spec) {
@@ -176,7 +191,7 @@ bind('resource_pack_status', null,, null, @event, @players_state, @players_data,
   @uuid = puuid(@player)
   switch(@event['status']) {
   case 'DECLINED':
-    pkick(@player, '리팩사용설정하세오') #todo 더 세세한 설명
+    pkick(@player, hexcolor('#ff4040').'§l서버 리소스팩을 사용하도록 설정해 주시기 바랍니다.\n'.hexcolor('#c0c0c0').'§l에바참치 서버를 선택한 후, 수정 버튼을 눌러\n서버 리소스팩을 사용으로 설정해 주세요.\n\n'.hexcolor('#ffff80').'§l버그 문의: ')
     break()
   case 'SUCCESSFULLY_LOADED':
     _apply_join_spec(@player, @uuid, @players_state, @players_data, @skills_spec)
@@ -184,11 +199,11 @@ bind('resource_pack_status', null,, null, @event, @players_state, @players_data,
   }
 }
 
-bind('player_quit', null, null, @event, @players_state, @players_data, @players_item, @excluded_players) {
+bind('player_quit', null, null, @event, @players_state, @players_data, @players_item, @bots) {
   @player = @event['player']
   @uuid = puuid(@player)
   modify_event('message', null)
-  _quit_event(@player, @uuid, @players_state, @players_item, @excluded_players)
+  _quit_event(@player, @uuid, @players_state, @players_item, @bots)
 }
 
 @interval_task = set_interval(1000, closure() { #bungee 완전 로그아웃
@@ -199,7 +214,7 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
       } else if(@players_state[@uuid]['quit_countdown'] == 0) {
         array_remove(@players_state, @uuid)
         @data = array('uuid': @uuid)
-        #_bungeecord_foward(@player, 'ch_remove_state', @data)
+        #_bungeecord_foward(@player, 'ch_remove_state', @data) #@player 봇으로 대체하기 
       } else {
         @player = @player_state['player']
         if(array_index_exists(@players_data, @uuid)) {
@@ -241,7 +256,7 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
   }
 })
 
-bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @players_state, @players_data, @excluded_players) {
+bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @players_state, @players_data, @bots) {
   foreach(@key: @byte in @event['bytes']) {
     if(@key != 0) {
       if(@byte == 0) {
@@ -254,7 +269,39 @@ bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @p
     'identifier': string(ba_get_bytes(@event['bytes'], @identifier_size, 2)),
     'value': json_decode(string(ba_get_bytes(@event['bytes'], array_size(@event['bytes']) - @identifier_size - 6, @identifier_size + 6)))
   )
+  broadcast(@data)
   switch(@data['identifier']) {
+  
+  #                          A B서버에서 요청받음 B로 데이터 보내기
+  #                        /                                        \
+  # B 요청 보냄 (모든서버)                                            B 데이터 받음
+  #                        \                                        /
+  #                          C B서버에서 요청받음 B로 데이터 보내기
+
+  # B 서버 로드,                      B서버에서 A서버로 데이터 리퀘스트
+  # A서버에서 데이터 리퀘스트 받음    A서버에서 B서버로 데이터 전송
+  # B서버에서 데이터 받음             B서버에선 받은 데이터 반영
+
+  case 'ch_request_states':
+    @request_bot = @data['request_bot']
+    @new_data = array()
+    foreach(@uuid: @player_state in @players_state) {
+      if(array_index_exists(@player_state, 'quit_countdown')) {
+        @player = player(@uuid)
+        @new_data[@uuid] = array(
+          'player': @player['player'],
+          'is_op': @player_state['is_op'],
+          'guild': @player_state['guild']
+        )
+      }
+    }
+    _bungeecord_foward_to_bot(@server_bot, @request_bot 'ch_update_states', @new_data)
+    break()
+  case 'ch_update_states':
+    foreach(@uuid: @player_state in @data['value']) {
+      @players_state[@uuid] = @player_state
+    }
+    break()
   case 'ch_update_state':
     @players_state[@data['value']['uuid']] = array(
       'player': @data['value']['player'],
@@ -265,9 +312,9 @@ bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @p
   case 'ch_remove_state':
     array_remove(@players_state, @data['value']['uuid'])
     break()
-  case 'ch_chat':
+  case 'ch_chat': #todo 리팩토링, 
     @sender = @data['value']['player']
-    foreach(@receiver in _all_players(@excluded_players)) {
+    foreach(@receiver in _all_players(@bots)) {
       if(array_contains(@data['value']['mentioned_players'], @receiver)) {
         play_named_sound(ploc(@receiver), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver))
       }

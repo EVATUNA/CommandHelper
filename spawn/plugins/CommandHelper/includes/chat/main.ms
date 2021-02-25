@@ -471,11 +471,11 @@ register_command('enko', array(
     if(array_index_exists(@players_data, @uuid)) {
       if(@players_data[@uuid]['setting'][1]) {
         @players_data[@uuid]['setting'][1] = false
-        cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+        #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
         _send_action_msg(@player, @players_data[@uuid], @text)
       } else {
         @players_data[@uuid]['setting'][1] = true
-        cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+        #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
         _send_action_msg(@player, @players_data[@uuid], @text)
       }
     }
@@ -501,23 +501,23 @@ register_command('ch', array(
         case 'local':
           #길드가 있을시
           @players_data[@uuid]['setting'][0] = 'guild'
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           #길드가 없고 어드민일시
           #길드도 없고 어드민도 아닐시
           break()
         case 'guild':
           #어드민일시
           @players_data[@uuid]['setting'][0] = 'admin'
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           #어드민이 아닐시
           break()
         case 'admin':
           @players_data[@uuid]['setting'][0] = 'general'
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           break()
         default:
           @players_data[@uuid]['setting'][0] = 'local'
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           break()
         }
         _send_action_msg(@player, @players_data[@uuid], @text)
@@ -526,31 +526,55 @@ register_command('ch', array(
         case 'local':
           #길드가 있을시
           @players_data[@uuid]['setting'][0] = 'local'
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           #길드가 없고 어드민일시
           #길드도 없고 어드민도 아닐시
           break()
         case 'guild':
           #어드민일시
           @players_data[@uuid]['setting'][0] = 'guild'
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           #어드민이 아닐시
           break()
         case 'admin':
           if(pisop(@player)) {
             @players_data[@uuid]['setting'][0] = 'admin'
-            cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+            #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           }
           break()
         default:
           @players_data[@uuid]['setting'][0] = 'default'
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           break()
         }
         _send_action_msg(@player, @players_data[@uuid], @font)
       } else {
 
       }
+    }
+  }
+))
+
+register_command('resolution', array(
+  'description': 'can set resolution',
+  'usage': '/resolution [resolution]',
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    @uuid = puuid(@player)
+    switch(array_size(@args)) {
+    case 0:
+      if(@players_data[@uuid]['cache']) {
+        @players_data[@uuid]['cache'] = false
+      } else {
+        @players_data[@uuid]['cache'] = true
+      }
+      _send_action_msg(@player, @players_data[@uuid], @text)
+      break()
+    case 1:
+      @players_data[@uuid]['setting'][12] = @args[0]
+      _send_action_msg(@player, @players_data[@uuid], @text)
+      #chcup set
+      break()
     }
   }
 ))
