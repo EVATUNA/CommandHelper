@@ -4,21 +4,21 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0,
+					"max_experience": 1000,
 					"passive_attack_speed": 1.0,
 					"active_attack_speed": 1.0,
 					"active_duration": 1,
 					"active_cooldown": 60
 				},
 				{
-					"max_experience": 100.0,
+					"max_experience": 1000,
 					"passive_attack_speed": 1.0,
 					"active_attack_speed": 1.0,
 					"active_duration": 1,
 					"active_cooldown": 60
 				},
 				{
-					"max_experience": 100.0,
+					"max_experience": 1000,
 					"passive_attack_speed": 1.0,
 					"active_attack_speed": 1.0,
 					"active_duration": 1,
@@ -30,13 +30,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -44,13 +44,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -58,13 +58,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		}
@@ -74,13 +74,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		}
@@ -90,13 +90,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.1
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -104,13 +104,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -118,13 +118,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		}
@@ -134,13 +134,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -148,13 +148,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -162,13 +162,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -176,13 +176,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -190,13 +190,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -204,13 +204,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -218,13 +218,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -232,13 +232,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		}
@@ -248,13 +248,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -262,13 +262,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		}
@@ -278,13 +278,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -292,13 +292,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		}
@@ -308,13 +308,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -322,13 +322,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -336,13 +336,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -350,13 +350,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -364,13 +364,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -378,13 +378,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		},
@@ -392,13 +392,13 @@
 			"default_max_level": 3,
 			"levels": [
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				},
 				{
-					"max_experience": 100.0
+					"max_experience": 1000
 				}
 			]
 		}

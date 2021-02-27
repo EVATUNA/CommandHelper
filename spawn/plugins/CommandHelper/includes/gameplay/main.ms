@@ -289,7 +289,6 @@ bind('inventory_click', null, null, @event, @players_item, @effective_items) {
       @items['main_hand'] = null
     }
     if(pinventory_holder(@player) == @uuid && @clicked_slot == 40 && !is_null(@players_item[@uuid]['off_hand'])) {
-      broadcast(A)
       @items['off_hand'] = null
     }
     if(pinventory_holder(@player) == @uuid && @clicked_slot == 38 && !is_null(@players_item[@uuid]['armor'])) {

@@ -19,12 +19,31 @@ proc _tellraw(@player, @raw) {
   })
 }
 
+proc _convert_whisper(@strings) {
+  @messages = array(
+    array('text': '')
+  )
+  foreach(@key: @string in parse_args(@strings)) {
+    if(@player_state['player'] == @mentioned_message && @player_state['quit_countdown'] == -1 && @player_state['is_op']) {
+      @is_modified_message = true
+      @message = array(
+        'text': @string,
+        'color': 'blue'
+      )
+      @mentioned_players[] = @mentioned_message
+      #채팅부분에 멘션 메시지 색 설정 클릭시 귓말vs채팅에 호출
+    }
+  }
+}
+
+proc _convert_broadcast(@strings) {
+
+}
+
 proc _convert_message(@strings, @channel, @players_state) {
   @mentioned_players = array()
   @messages = array(
-    array(
-      'text': ''
-    )
+    array('text': '')
   )
   foreach(@key: @string in parse_args(@strings)) {
     @is_modified_message = false
@@ -232,8 +251,80 @@ bind('async_player_chat', null , null, @event, @players_state, @players_data, @p
     }
     @converted_message = _convert_message(@message, @channel, @players_state)
     @mentioned_players = @converted_message['mentioned_players']
-    @raw = @converted_message['raw']
-
+    ##b3e2c5초 #b5e8fc파 #fdc4d5빨 #fffcbe노 #ffd6bf주 #d5d0f4 보
+    switch(@channel) {
+    case 'general':
+      @name = array(
+        array(
+          'text': ' ',
+          'color': '#ffffff',
+        ),
+        array(
+          'text': @sender,
+          'insertion': '@'.@sender'',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': array(
+              '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+              '좌클릭 시, 유저에게 귓속말을 보냅니다',
+            )
+          ),
+          'clickEvent': array(
+            'action': 'suggest_command',
+            'value': '/w'@sender''
+          )
+        ),
+        array(
+          'text': ': ',
+        )
+      )
+      break()
+    case 'local':
+      @name = array(
+        array(
+          'text': ' ',
+          'color': '#ffd6bf'
+        ),
+        array(
+          'text': @sender,
+          'color': 'fbd2bc'
+        ),
+        array(
+          'text': ': ',
+        )
+      )
+      break()
+    case 'guild':
+      @name = array(
+        array(
+          'text': ' ',
+          'color': '#d5d0f4'
+        ),
+        array(
+          'text': @sender
+        ),
+        array(
+          'text': ': ',
+        )
+      )
+      break()
+    case 'admin':
+      @name = array(
+        array(
+          'text': ' ',
+          'color': '#fdc4d5'
+        ),
+        array(
+          'text': @sender
+        ),
+        array(
+          'text': ': ',
+        )
+      )
+      break()
+    }
+    @raw = array_merge(@name, @converted_message['raw'])
+    
     @data = array(
       'player': @sender,
       'badge': @badge,
@@ -241,8 +332,8 @@ bind('async_player_chat', null , null, @event, @players_state, @players_data, @p
       'mentioned_players': @mentioned_players,
       'raw': @raw
     )
-
     _bungeecord_foward(@sender, 'ch_chat', @data)
+
     foreach(@receiver_uuid: @player_data in @players_data) {
       @receiver = player(@receiver_uuid)
       if(ponline(@receiver)) {
@@ -471,11 +562,11 @@ register_command('enko', array(
     if(array_index_exists(@players_data, @uuid)) {
       if(@players_data[@uuid]['setting'][1]) {
         @players_data[@uuid]['setting'][1] = false
-        #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+        cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
         _send_action_msg(@player, @players_data[@uuid], @text)
       } else {
         @players_data[@uuid]['setting'][1] = true
-        #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+        cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
         _send_action_msg(@player, @players_data[@uuid], @text)
       }
     }
@@ -499,57 +590,59 @@ register_command('ch', array(
       if(array_size(@args) == 0) {
         switch(@players_data[@uuid]['setting'][0]) {
         case 'local':
-          #길드가 있을시
-          @players_data[@uuid]['setting'][0] = 'guild'
-          #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-          #길드가 없고 어드민일시
-          #길드도 없고 어드민도 아닐시
+          if(!is_null(@players_state[@uuid]['guild'])) {
+            @players_data[@uuid]['setting'][0] = 'guild'
+          } else {
+            if(@players_state[@uuid]['is_op']) {
+              @players_data[@uuid]['setting'][0] = 'admin'
+            } else {
+              @players_data[@uuid]['setting'][0] = 'general'
+            }
+          }
+          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           break()
         case 'guild':
-          #어드민일시
-          @players_data[@uuid]['setting'][0] = 'admin'
-          #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-          #어드민이 아닐시
+          if(@players_state[@uuid]['is_op']) {
+            @players_data[@uuid]['setting'][0] = 'admin'
+          } else {
+            @players_data[@uuid]['setting'][0] = 'general'
+          }
+          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           break()
         case 'admin':
           @players_data[@uuid]['setting'][0] = 'general'
-          #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           break()
         default:
           @players_data[@uuid]['setting'][0] = 'local'
-          #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           break()
         }
         _send_action_msg(@player, @players_data[@uuid], @text)
       } else if(array_size(@args) == 1) {
         switch(@args[0]) {
         case 'local':
-          #길드가 있을시
           @players_data[@uuid]['setting'][0] = 'local'
-          #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-          #길드가 없고 어드민일시
-          #길드도 없고 어드민도 아닐시
+          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           break()
         case 'guild':
-          #어드민일시
-          @players_data[@uuid]['setting'][0] = 'guild'
-          #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-          #어드민이 아닐시
+          if(!is_null(@players_state[@uuid]['guild'])) {
+            @players_data[@uuid]['setting'][0] = 'guild'
+            cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          }
           break()
         case 'admin':
           if(pisop(@player)) {
             @players_data[@uuid]['setting'][0] = 'admin'
-            #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+            cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           }
           break()
         default:
           @players_data[@uuid]['setting'][0] = 'default'
-          #cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           break()
         }
-        _send_action_msg(@player, @players_data[@uuid], @font)
-      } else {
-
+        _send_action_msg(@player, @players_data[@uuid], @text)
       }
     }
   }
@@ -571,10 +664,51 @@ register_command('resolution', array(
       _send_action_msg(@player, @players_data[@uuid], @text)
       break()
     case 1:
-      @players_data[@uuid]['setting'][12] = @args[0]
+      @players_data[@uuid]['setting'][12] = integer(@args[0])
       _send_action_msg(@player, @players_data[@uuid], @text)
-      #chcup set
+      cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
       break()
+    }
+  }
+))
+
+register_command('whisper', array(
+  'description': 'can whisper',
+  'usage': '/whisper <player> <msg>',
+  'aliases': array('w', 'm', 'msg', 'tell'),
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    @sender = @player
+    @sender_uuid = puuid(@sender)
+    @receiver = @args[0]
+    @receiver_uuid = puuid(@receiver)
+    if(array_size(@args) > 1) { #다른 플레이어에게 메시지를 보낼시 && @sender != @receiver
+      if(ponline(@receiver)) {
+        @imploded_message = array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' ')
+        @setting = @players_data[@sender_uuid]['setting']
+        @enko = @setting[1]
+        if(@enko) {
+          @message = _convert_eng_to_kor(@imploded_message)
+          if(@message){
+            @reg = reg_match_all('\\[([^\\]]*)\\]', @imploded_message)
+            foreach(@arr in @reg){
+              @converted = _convert_eng_to_kor(@arr[0])
+              @message = replace(@message, @converted, @arr[1])
+            }
+          } else {
+            @message = @imploded_message
+          }
+        } else {
+          @message = @imploded_message
+        }
+
+        broadcast(@message)
+      } else if(true) {
+
+        #bungee
+      }
+    } else {
+      tmsg(@player, color('red')'/'.@command'<player> <message>')
     }
   }
 ))

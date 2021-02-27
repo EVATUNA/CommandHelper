@@ -179,7 +179,7 @@ foreach(@player in _all_players(@bots)) { #조인 이벤트로 변경 리로드 
   _update_item(@player, @uuid, @items, @players_item)
 }
 
-bind('player_join', null, null, @event, @players_state, @players_data, @players_item, @bots, @skills_spec) {
+bind('player_join', null, null, @event, @players_state, @players_data, @players_item, @server, @bots, @skills_spec) {
   @player = @event['player']
   @uuid = puuid(@player)
   modify_event('join_message', null)
@@ -199,11 +199,11 @@ bind('resource_pack_status', null,, null, @event, @players_state, @players_data,
   }
 }
 
-bind('player_quit', null, null, @event, @players_state, @players_data, @players_item, @bots) {
+bind('player_quit', null, null, @event, @players_state, @players_data, @players_item, @server, @bots) {
   @player = @event['player']
   @uuid = puuid(@player)
   modify_event('message', null)
-  _quit_event(@player, @uuid, @players_state, @players_item, @bots)
+  _quit_event(@player, @uuid, @players_state, @players_item, @server, @bots)
 }
 
 @interval_task = set_interval(1000, closure() { #bungee 완전 로그아웃
@@ -212,9 +212,14 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
       if(@players_state[@uuid]['quit_countdown'] > 0) {
         @players_state[@uuid]['quit_countdown'] -= 1
       } else if(@players_state[@uuid]['quit_countdown'] == 0) {
-        array_remove(@players_state, @uuid)
+        if(array_index_exists(@players_data, @uuid)) {
+          array_remove(@players_data, @uuid)
+        }
+        if(array_index_exists(@players_state, @uuid)) {
+          array_remove(@players_state, @uuid)
+        }
         @data = array('uuid': @uuid)
-        #_bungeecord_foward(@player, 'ch_remove_state', @data) #@player 봇으로 대체하기 
+        _bungeecord_foward(@server['bots'][0], 'ch_remove_state', @data) #@player 봇으로 대체하기 
       } else {
         @player = @player_state['player']
         if(array_index_exists(@players_data, @uuid)) {
@@ -254,6 +259,8 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
     }
     #broadcast(@hp_block)
   }
+  #broadcast('state - '@players_state)
+  broadcast('data - '@players_data)
 })
 
 bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @players_state, @players_data, @bots) {

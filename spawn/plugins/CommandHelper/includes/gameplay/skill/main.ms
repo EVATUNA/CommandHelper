@@ -15,13 +15,14 @@ async_read('skills_spec.json', closure(@value) {
 #["\ue3db\ue3dc\ue3dd\ue3de\ue3df", "\ue3e0\ue3e1\ue3e2\ue3e3\ue3e4", "\ue3e5\ue3e6\ue3e7\ue3e8\ue3e9", "\ue3ea\ue3eb\ue3ec\ue3ed\ue3ee", "\ue3ef\ue3f0\ue3f1\ue3f2\ue3f3", "\ue3f4\ue3f5\ue3f6\ue3f7\ue3f8"]
 
 proc _load_skill_data(@uuid, @category, @skill, @is_default, @players_data, @skills_spec) {
+  broadcast(@skill)
   @skill_data = cup_get('SKILL_DATA', @uuid.'_'.@skill)
+  broadcast(@skill_data)
   if(@is_default) {
     if(is_null(@skill_data)) {
       @skill_data = array(
-        @category,
-        0,
-        0.0,
+        1,
+        10,
         3,
         @skills_spec[@category][@skill]['levels'][0]['max_experience']
       )
@@ -36,9 +37,8 @@ proc _load_skill_data(@uuid, @category, @skill, @is_default, @players_data, @ski
     */
     if(is_null(@skill_data)) {
       @skill_data = array(
-        @category,
-        0,
-        0.0,
+        1,
+        10,
         3,
         @skills_spec[@category][@skill]['levels'][0]['max_experience']
       )
@@ -46,6 +46,50 @@ proc _load_skill_data(@uuid, @category, @skill, @is_default, @players_data, @ski
     }
     @players_data[@uuid]['skill_data'][@category][@skill] = @skill_data
   }
+}
+
+proc _set_skill_effect(@player, @skill) {
+  switch(@skill) {
+  case 'test':
+    break()
+  default:
+    break()
+  }
+}
+
+proc _reset_skill_effect(@player, @category) {
+  switch(@category) {
+  case 'combat_method':
+    break()
+  }
+  case 'combat_inclination':
+    break()
+  }
+  case 'subcombat':
+    break()
+  }
+  case 'farming':
+    break()
+  }
+  case 'harvesting_method':
+    break()
+  }
+  case 'sowing_method':
+    break()
+  }
+  case 'mining':
+    break()
+  }
+}
+
+proc _reset_all_skills_effect(@player) {
+  _reset_skill_effect(@player, 'combat_method')
+  _reset_skill_effect(@player, 'combat_inclination')
+  _reset_skill_effect(@player, 'subcombat')
+  _reset_skill_effect(@player, 'farming')
+  _reset_skill_effect(@player, 'harvesting_method')
+  _reset_skill_effect(@player, 'sowing_method')
+  _reset_skill_effect(@player, 'mining')
 }
 
 proc _load_skill_manager(@uuid, @players_data) {
@@ -61,6 +105,12 @@ proc _load_skill_manager(@uuid, @players_data) {
     cup_set('SKILL_MANAGER', @uuid, @skill_manager)
   }
   @players_data[@uuid]['skill_manager'] = @skill_manager
+  @player = player(@uuid)
+  #combat_inclination
+  #_reset_
+  #_set_skill_effect(@player, @category, @skill)
+  #
+  _reset_all_skills_effect(@player)
 }
 
 proc _load_skills(@uuid, @players_data, @skills_spec) {
