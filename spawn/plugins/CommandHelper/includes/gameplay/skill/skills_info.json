@@ -54,7 +54,7 @@
 		{
 			"name": "bow_mastery",
 			"display": "활 숙련",
-			"icon": "\ue00f",
+			"icon": "\ue3df",
 			"desription": [
 				"",
 				""
@@ -63,7 +63,7 @@
 		{
 			"name": "crossbow_mastery",
 			"display": "쇠뇌 숙련",
-			"icon": "\ue00f",
+			"icon": "\ue3e0",
 			"desription": [
 				"",
 				""
@@ -72,7 +72,7 @@
 		{
 			"name": "health_traing",
 			"display": "체력 단련",
-			"icon": "\ue00f",
+			"icon": "\ue3e1",
 			"desription": [
 				"",
 				""
@@ -83,7 +83,7 @@
 		{
 			"name": "wheat_farming_mastery",
 			"display": "밀 수확 숙련",
-			"icon": "\ue00f",
+			"icon": "\ue3e6",
 			"desription": [
 				"",
 				""
@@ -92,7 +92,7 @@
 		{
 			"name": "beetroots_farming_mastery",
 			"display": "사탕무 수확 숙련",
-			"icon": "\ue00f",
+			"icon": "\ue3e7",
 			"desription": [
 				"",
 				""
@@ -101,7 +101,7 @@
 		{
 			"name": "potatoes_farming_mastery",
 			"display": "감자 수확 숙련",
-			"icon": "\ue00f",
+			"icon": "\ue3e8",
 			"desription": [
 				"",
 				""
@@ -110,7 +110,7 @@
 		{
 			"name": "carrots_farming_mastery",
 			"display": "당근 수확 숙련",
-			"icon": "\ue00f",
+			"icon": "\ue3e9",
 			"desription": [
 				"",
 				""
@@ -119,7 +119,7 @@
 		{
 			"name": "berry_farming_mastery",
 			"display": "(베리 or 딸기) 수확 숙련",
-			"icon": "\ue00f",
+			"icon": "\ue3ea",
 			"desription": [
 				"",
 				""
@@ -128,7 +128,7 @@
 		{
 			"name": "pumpkin_farming_mastery",
 			"display": "호박 수확 숙련",
-			"icon": "\ue00f",
+			"icon": "\ue3eb",
 			"desription": [
 				"",
 				""
@@ -137,7 +137,7 @@
 		{
 			"name": "melon_farming_mastery",
 			"display": "수박 수확 숙련",
-			"icon": "\ue00f",
+			"icon": "\ue3ec",
 			"desription": [
 				"",
 				""
@@ -146,7 +146,7 @@
 		{
 			"name": "plenty",
 			"display": "풍년",
-			"icon": "\ue00f",
+			"icon": "\ue3ed",
 			"desription": [
 				"",
 				""
@@ -157,7 +157,7 @@
 		{
 			"name": "wide_hand",
 			"display": "넓은 손",
-			"icon": "\ue00f",
+			"icon": "\ue3e2",
 			"desription": [
 				"",
 				""
@@ -166,7 +166,7 @@
 		{
 			"name": "golden_finger",
 			"display": "골든 핑거",
-			"icon": "\ue00f",
+			"icon": "\ue3e3",
 			"desription": [
 				"",
 				""
@@ -177,7 +177,7 @@
 		{
 			"name": "wet_hands",
 			"display": "젖은 손",
-			"icon": "\ue00f",
+			"icon": "\ue3e4",
 			"desription": [
 				"",
 				""
@@ -186,7 +186,7 @@
 		{
 			"name": "fertile_touch",
 			"display": "비옥한 손길",
-			"icon": "\ue00f",
+			"icon": "\ue3e5",
 			"desription": [
 				"",
 				""
@@ -197,7 +197,7 @@
 		{
 			"name": "copper_mining_mastery",
 			"display": "구리 채광 숙련",
-			"icon": "\ue00f",
+			"icon": "\ue3ee",
 			"desription": [
 				"",
 				""
@@ -206,7 +206,7 @@
 		{
 			"name": "iron_mining_mastery",
 			"display": "철 채광 숙련",
-			"icon": "\ue00f",
+			"icon": "\ue3ef",
 			"desription": [
 				"",
 				""
@@ -215,7 +215,7 @@
 		{
 			"name": "gold_mining_mastery",
 			"display": "금 채광 숙련",
-			"icon": "\ue00f",
+			"icon": "\ue3f0",
 			"desription": [
 				"",
 				""
@@ -224,7 +224,7 @@
 		{
 			"name": "diamond_mining_mastery",
 			"display": "다이아몬드 채광 숙련",
-			"icon": "\ue00f",
+			"icon": "\ue3f1",
 			"desription": [
 				"",
 				""
@@ -233,7 +233,7 @@
 		{
 			"name": "ancient_debris_mining_mastery",
 			"display": "고대 파편 채광 숙련",
-			"icon": "\ue00f",
+			"icon": "\ue3f2",
 			"desription": [
 				"",
 				""
@@ -242,7 +242,7 @@
 		{
 			"name": "ore_selecting",
 			"display": "선광 숙련",
-			"icon": "\ue00f",
+			"icon": "\ue3f3",
 			"desription": [
 				"",
 				""
@@ -251,7 +251,7 @@
 		{
 			"name": "tough_shoulder",
 			"display": "강인한 어깨",
-			"icon": "\ue00f",
+			"icon": "\ue3f4",
 			"desription": [
 				"",
 				""

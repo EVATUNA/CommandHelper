@@ -3,11 +3,11 @@
   #'§'
 <<<
 
-/sattr $attr $id $amount = >>>
+/sattr $attr $id $amount $oper = >>>
   @uuid = puuid(player())
   @modifier = array(
     'attribute': $attr,
-    'operation': 'ADD_NUMBER',
+    'operation': $oper,
     'amount': $amount,
     'name': $id
   )

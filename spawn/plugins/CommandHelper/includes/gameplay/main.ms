@@ -375,24 +375,79 @@ bind('item_held', null, null, @event, @players_item, @effective_items) {
   }
 }
 
-bind('item_swap', null, null, @event, @players_item, @effective_items) {
+bind('item_swap', null, null, @event, @players_data, @players_item, @effective_items, @skills_spec) {
   @player = @event['player']
   @uuid = puuid(@player)
-  @items = array()
-  @off_hand_item = get_inventory_item(@uuid, 40)
-  if(!is_null(@off_hand_item) && array_contains(@effective_items['weapon'], @off_hand_item['name'])) {
-    @items['main_hand'] = @off_hand_item
-  } else if(!is_null(@players_item[@uuid]['main_hand'])) {
-    @items['main_hand'] = null
-  }
-  @main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
-  if(!is_null(@main_hand_item) && array_contains(@effective_items['weapon'], @main_hand_item['name'])) {
-    @items['off_hand'] = @main_hand_item
-  } else if(!is_null(@players_item[@uuid]['off_hand'])) {
-    @items['off_hand'] = null
-  }
-  if(array_size(@items) > 0) {
-    _update_item(@player, @uuid, @items, @players_item)
+  if(psneaking()) {
+    @items = array()
+    @off_hand_item = get_inventory_item(@uuid, 40)
+    if(!is_null(@off_hand_item) && array_contains(@effective_items['weapon'], @off_hand_item['name'])) {
+      @items['main_hand'] = @off_hand_item
+    } else if(!is_null(@players_item[@uuid]['main_hand'])) {
+      @items['main_hand'] = null
+    }
+    @main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
+    if(!is_null(@main_hand_item) && array_contains(@effective_items['weapon'], @main_hand_item['name'])) {
+      @items['off_hand'] = @main_hand_item
+    } else if(!is_null(@players_item[@uuid]['off_hand'])) {
+      @items['off_hand'] = null
+    }
+    if(array_size(@items) > 0) {
+      _update_item(@player, @uuid, @items, @players_item)
+    }
+  } else {
+    cancel()
+    #combat_method
+    @category = 'combat_method'
+    @skill = @players_data[@uuid]['skill_manager'][2]
+    if(@skill != '') {
+      @active_skill = @players_data[@uuid]['active_skill'][@category][@skill]
+      @level = @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+      @level = 3
+      switch(@skill) {
+      case 'sweeping':
+        broadcast(@active_skill)
+        if(@active_skill[2] == 1) {
+          @active_attack_speed = @skills_spec['combat_method'][@skill]['levels'][@level]['active']['attack_speed']
+          @modifier = array(
+            'attribute': 'GENERIC_ATTACK_SPEED',
+            'operation': 'ADD_SCALAR',
+            'amount': @active_attack_speed,
+            'name': 'sweeping_active'
+          )
+          add_entity_attribute_modifier(@uuid, @modifier)
+          @active_skill[2] = 0
+          @active_skill[1] = @skills_spec['combat_method'][@skill]['levels'][@level]['active']['duration']
+        }
+        break()
+      case 'knockback':
+        broadcast(@active_skill)
+        if(@active_skill[2] > 0) {
+          @old_ploc = ploc(@player)
+          set_timeout(200, closure() {
+            @new_ploc = ploc(@player)
+            @yaw = get_yaw(@old_ploc, @new_ploc)
+            @vector = get_vector(array('yaw': @yaw, 'pitch': 0), 2)
+            set_pvelocity(@player, @vector)
+            play_named_sound(ploc(@player), array('sound': 'entity.bat.takeoff', 'category': 'NEUTRAL', 'volume': 0.3, 'pitch': 1))
+          })
+          @active_skill[2] -= 1
+          @active_skill[0] = 5
+        }
+        break()
+      case 'cleaving':
+        if(@active_skill[2] == 1) {
+          broadcast(스킬발동)
+          @active_skill[2] = 0
+          @active_skill[1] = 15
+        }
+        break()
+      #case 'blocking':
+      #  break()
+      }
+    }
+
+
   }
 }
 

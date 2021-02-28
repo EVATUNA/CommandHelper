@@ -33,7 +33,7 @@ proc _new_data(@uuid, @players_data) {
 }
 
 proc _send_resourcepack(@player, @uuid, @players_state) {
-  @resourcepack = 'https://drive.google.com/uc?export=download&id=1WtJjCL0MbFShi7Tj5LfxZ7FGN49uaMKt'
+  @resourcepack = 'https://drive.google.com/uc?export=download&id=17Q-4BbmrPynLt-xKKL2U8MMIm35k7HcG'
   send_resourcepack(@player, @resourcepack)
   @player_state = array(
     'join_spec': array(
@@ -226,6 +226,110 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
           _send_action_msg(@player, @players_data[@uuid], @text)
           
           #_countdown_skill() {}로 아래 코드 대체
+          @category = 'combat_inclination'
+          foreach(@skill in json_decode(@players_data[@uuid]['skill_manager'][0])) {
+            #broadcast(@skill)
+          }
+
+          #combat_method
+          @category = 'combat_method'
+          @skill = @players_data[@uuid]['skill_manager'][2]
+          @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+          if(@skill != '') {
+            @active_skill = @players_data[@uuid]['active_skill'][@category][@skill]
+            switch(@skill) {
+            case 'sweeping':
+              if(@active_skill[2] != 1) {
+                if(@active_skill[1] > 0) {
+                  @active_skill[1] -= 1
+                  if(@active_skill[1] == 0) {
+                    @active_skill[0] = @skills_spec['combat_method'][@skill]['levels'][@level]['active']['cooldown']
+                    remove_entity_attribute_modifier(@uuid, 'GENERIC_ATTACK_SPEED', 'sweeping_active')
+                    broadcast(RESET)
+                  }
+                } else {
+                  if(@active_skill[0] > 0) {
+                    @active_skill[0] -= 1
+                  } else {
+                    @active_skill[2] = 1
+                  }
+                }
+              }
+              break()
+            case 'knockback':
+              if(@active_skill[2] < 3) { #최대 갯수보다 충전 갯수 작을 시
+                if(@active_skill[0] > 0) {
+                  @active_skill[0] -= 1
+                } else {
+                  @active_skill[2] += 1
+                }
+              }
+              break()
+            case 'cleaving':
+              if(@active_skill[2] != 1) {
+                if(@active_skill[1] > 0) {
+                  @active_skill[1] -= 1
+                  if(@active_skill[1] == 0) {
+                    #지속시간 종료
+                  }
+                } else {
+                  if(@active_skill[0] > 0) {
+                    @active_skill[0] -= 1
+                  } else {
+                    @active_skill[2] = 1
+                  }
+                }
+              }
+              break()
+            #case 'blocking':
+            #  break()
+            }
+          }
+
+          #harvesting_method
+          @category = 'harvesting_method'
+          @skill = @players_data[@uuid]['skill_manager'][3]
+          @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+          if(@skill != '') {
+            @active_skill = @players_data[@uuid]['active_skill'][@category][@skill]
+            if(@active_skill[2] != 1) {
+              if(@active_skill[1] > 0) {
+                @active_skill[1] -= 1
+                if(@active_skill[1] == 0) {
+                  #지속시간 종료
+                }
+              } else {
+                if(@active_skill[0] > 0) {
+                  @active_skill[0] -= 1
+                } else {
+                  @active_skill[2] = 1
+                }
+              }
+            }
+          }
+
+          #sowing_method
+          @category = 'sowing_method'
+          @skill = @players_data[@uuid]['skill_manager'][4]
+          @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+          if(@skill != '') {
+            @active_skill = @players_data[@uuid]['active_skill'][@category][@skill]
+            if(@active_skill[2] != 1) {
+              if(@active_skill[1] > 0) {
+                @active_skill[1] -= 1
+                if(@active_skill[1] == 0) {
+                  #지속시간 종료
+                }
+              } else {
+                if(@active_skill[0] > 0) {
+                  @active_skill[0] -= 1
+                } else {
+                  @active_skill[2] = 1
+                }
+              }
+            }
+          }
+
           switch(@players_item[@uuid]['enchantments']['armor']) {
           case '날렵함':
             break()
@@ -260,7 +364,7 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
     #broadcast(@hp_block)
   }
   #broadcast('state - '@players_state)
-  broadcast('data - '@players_data)
+  #broadcast('data - '@players_data)
 })
 
 bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @players_state, @players_data, @bots) {

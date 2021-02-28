@@ -15,9 +15,7 @@ async_read('skills_spec.json', closure(@value) {
 #["\ue3db\ue3dc\ue3dd\ue3de\ue3df", "\ue3e0\ue3e1\ue3e2\ue3e3\ue3e4", "\ue3e5\ue3e6\ue3e7\ue3e8\ue3e9", "\ue3ea\ue3eb\ue3ec\ue3ed\ue3ee", "\ue3ef\ue3f0\ue3f1\ue3f2\ue3f3", "\ue3f4\ue3f5\ue3f6\ue3f7\ue3f8"]
 
 proc _load_skill_data(@uuid, @category, @skill, @is_default, @players_data, @skills_spec) {
-  broadcast(@skill)
   @skill_data = cup_get('SKILL_DATA', @uuid.'_'.@skill)
-  broadcast(@skill_data)
   if(@is_default) {
     if(is_null(@skill_data)) {
       @skill_data = array(
@@ -48,51 +46,101 @@ proc _load_skill_data(@uuid, @category, @skill, @is_default, @players_data, @ski
   }
 }
 
-proc _set_skill_effect(@player, @skill) {
-  switch(@skill) {
-  case 'test':
-    break()
-  default:
-    break()
+proc _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills_spec) {
+  @active_skill = cup_get('ACTIVE_SKILL', @uuid.'_'.@skill)
+  if(is_null(@active_skill)) {
+    @active_skill = array(
+      @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown'],
+      0,
+      0,
+      0
+    )
+    cup_set('ACTIVE_SKILL', @uuid.'_'.@skill, @active_skill)
   }
+  @players_data[@uuid]['active_skill'][@category][@skill] = @active_skill
 }
 
-proc _reset_skill_effect(@player, @category) {
+proc _set_skill_effect(@uuid, @category, @skill, @level, @players_data, @skills_spec) {
   switch(@category) {
   case 'combat_method':
+    switch(@skill) {
+    case 'sweeping':
+      _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills_spec)
+      @passive_attack_speed = @skills_spec['combat_method'][@skill]['levels'][@level]['passive']['attack_speed']
+      @modifier = array(
+        'attribute': 'GENERIC_ATTACK_SPEED',
+        'operation': 'ADD_SCALAR',
+        'amount': @passive_attack_speed,
+        'name': 'sweeping_passive'
+      )
+      add_entity_attribute_modifier(@uuid, @modifier)
+      break()
+    case 'knockback':
+      _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills_spec)
+      break()
+    case 'cleaving':
+      _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills_spec)
+      break()
+    #case 'blocking':
+    #  _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills_spec)
+    #  break()
+    }
     break()
+  case 'subcombat':
+    switch(@skill) {
+    case 'health_traing':
+      @max_health = @skills_spec['subcombat'][@skill]['levels'][@level]['max_health']
+      set_entity_attribute_base(@uuid, 'GENERIC_MAX_HEALTH', @max_health)
+      break()
+    }
+    break()
+  #case 'farming':
+  #  break()
+  case 'harvesting_method':
+    _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills_spec)
+    #switch(@skill) {
+    #case 'wide_hand':
+    #  break()
+    #case 'golden_finger':
+    #  break()
+    #}
+    break()
+  case 'sowing_method':
+    _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills_spec)
+    #switch(@skill) {
+    #case 'wet_hands':
+    #  break()
+    #case 'fertile_touch':
+    #  break()
+    #}
+    break()
+  #case 'mining':
+  #  break()
   }
+}
+
+proc _reset_skill_effect(@uuid, @category) {
+  switch(@category) {
+  case 'combat_method':
+    remove_entity_attribute_modifier(@uuid, 'GENERIC_ATTACK_SPEED', 'sweeping_passive')
+    remove_entity_attribute_modifier(@uuid, 'GENERIC_ATTACK_SPEED', 'sweeping_active')
+    break()
   case 'combat_inclination':
     break()
-  }
-  case 'subcombat':
-    break()
-  }
-  case 'farming':
-    break()
-  }
-  case 'harvesting_method':
-    break()
-  }
-  case 'sowing_method':
-    break()
-  }
-  case 'mining':
-    break()
+  #case 'subcombat':
+  #  break()
+  #case 'farming':
+  #  break()
+  #case 'harvesting_method':
+  #  break()
+  #case 'sowing_method':
+  #  break()
+  #case 'mining':
+  #  break()
   }
 }
 
-proc _reset_all_skills_effect(@player) {
-  _reset_skill_effect(@player, 'combat_method')
-  _reset_skill_effect(@player, 'combat_inclination')
-  _reset_skill_effect(@player, 'subcombat')
-  _reset_skill_effect(@player, 'farming')
-  _reset_skill_effect(@player, 'harvesting_method')
-  _reset_skill_effect(@player, 'sowing_method')
-  _reset_skill_effect(@player, 'mining')
-}
-
-proc _load_skill_manager(@uuid, @players_data) {
+proc _load_skill_manager(@uuid, @players_data, @skills_spec) {
   @skill_manager = cup_get('SKILL_MANAGER', @uuid)
   if(is_null(@skill_manager)) {
     @skill_manager = array(
@@ -105,12 +153,65 @@ proc _load_skill_manager(@uuid, @players_data) {
     cup_set('SKILL_MANAGER', @uuid, @skill_manager)
   }
   @players_data[@uuid]['skill_manager'] = @skill_manager
-  @player = player(@uuid)
+
+  #reset effect
+  _reset_skill_effect(@uuid, 'combat_method')
+  _reset_skill_effect(@uuid, 'combat_inclination')
+
+  #subcombat
+  @category = 'subcombat'
+  @skill = 'health_traing'
+  @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+  if(@level > 0) {
+    _set_skill_effect(@uuid, @category, @skill, @level, @players_data, @skills_spec)
+  }
+
   #combat_inclination
-  #_reset_
-  #_set_skill_effect(@player, @category, @skill)
-  #
-  _reset_all_skills_effect(@player)
+  @category = 'combat_inclination'
+  foreach(@skill in json_decode(@skill_manager[0])) {
+    if(@skill != '') {
+      @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+      if(@level > 0) {
+
+      }
+    }
+    switch(@skill) {
+    case 'test':
+      #조건에 맞을시 효과 반영
+      #액티브 스킬 있을시 액티브 추가
+      break()
+    }
+  }
+
+  #combat_method
+  if(@skill_manager[2] != '') {
+    @category = 'combat_method'
+    @skill = @skill_manager[2]
+    @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+    if(@level > 0) {
+      _set_skill_effect(@uuid, @category, @skill, @level, @players_data, @skills_spec)
+    }
+  }
+
+  #harvesting_method
+  if(@skill_manager[3] != '') {
+    @category = 'harvesting_method'
+    @skill = @skill_manager[3]
+    @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+    if(@level > 0) {
+      _set_skill_effect(@uuid, @category, @skill, @level, @players_data, @skills_spec)
+    }
+  }
+
+  #sowing_method
+  if(@skill_manager[4] != '') {
+    @category = 'sowing_method'
+    @skill = @skill_manager[4]
+    @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+    if(@level > 0) {
+      _set_skill_effect(@uuid, @category, @skill, @level, @players_data, @skills_spec)
+    }
+  }
 }
 
 proc _load_skills(@uuid, @players_data, @skills_spec) {
@@ -170,28 +271,11 @@ proc _load_skills(@uuid, @players_data, @skills_spec) {
     }
   }
 
-  #_load_active_skill(@uuid, @players_data)
   #전투 방식 로드시 레벨 1이상일 경우에만 로드
   #사용하지 않던 특성을 사용할 시 new / 매초마다 set
   _load_skill_manager(@uuid, @players_data, @skills_spec)
 }
 
-#activeskill
-#'skills_manager': array(
-#  'selected_combat_method': array(
-#    'name': '베기',
-#    'remaining': 0,
-#    'cooldown': 30
-#  ),
-#  'unlocked_combat_inclination_slot': 2,
-#  'selected_combat_inclinations': array(
-#    '집중 A', '집중D'
-#  ),
-#  'selected_harvesting_method': null,
-#  'selected_sowing_method': null
-#)
-
-#array_implode(array_get(@args, cslice(2, array_size(@args) - 1)), ' ')
 proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, @text) {
   @uuid = puuid(@player)
   switch(@category) {
@@ -210,7 +294,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
     @raw = array(array(),array())
     if(@selected_combat_method != '') {
       foreach(@combat_method_info in @combat_methods_info) {
-        if(@selected_combat_method['name'] == @combat_method_info['name']) {
+        if(@selected_combat_method == @combat_method_info['name']) {
           @desription = @combat_method_info['display'].' 전투 방식을 사용중입니다.\n\n§c좌 클릭시, 전투 방식 선택창을 열어\n모든 전투 방식의 숙련 레벨과\n숙련 경험치를 확인 할 수 있으며\n전투 방식을 변경 할 수 있습니다.'
           @raw[0][] = array(
             'text': @text['space_fonts']['space.18'],
@@ -350,18 +434,18 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
     @content[] = array('text': '\n- 보조 전투 숙련')
     foreach(@subcombat_info in @subcombats_info) {
       @subcombat_data = @subcombats[@subcombat_info['name']]
-      if(array_size(@subcombat_info['desription']) - 1 < @subcombat_data[1]) {
+      if(array_size(@subcombat_info['desription']) - 1 < @subcombat_data[0]) {
         @desription_index = array_size(@subcombat_info['desription']) - 1
       } else {
-        @desription_index = @subcombat_data[1]
+        @desription_index = @subcombat_data[0]
       }
-      if(@subcombat_data[1] == 0) {
+      if(@subcombat_data[0] == 0) {
         @icon = '\ue00f'
         @name = '???'
         @desription = string(@name.'\n'.@subcombat_info['desription'][@desription_index]).'\n\n§c숙련 레벨이 올르면,\n해당 스킬이 적용됩니다.'
       } else {
         @icon = @subcombat_info['icon']
-        @name = string('Lv.'.@subcombat_data[1] @subcombat_info['name'])
+        @name = string('Lv.'.@subcombat_data[0] @subcombat_info['display'])
         @desription = string(@name.'\n'.@subcombat_info['desription'][@desription_index])
       }
       @raw0 = array(
@@ -373,7 +457,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
           )
         ),
         array(
-          'text': ' Lv.'.@subcombat_data[1]'('.@subcombat_data[2].'/'.@subcombat_data[4].')\n',
+          'text': ' Lv.'.@subcombat_data[0]'('.@subcombat_data[1].'/'.@subcombat_data[3].')\n',
           'color': 'black'
         )
       )
@@ -390,7 +474,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
           'color': 'white'
         ),
         array(
-          'text': string_multiply('', integer(@subcombat_data[2] / @subcombat_data[4] * 50)).'\n',
+          'text': string_multiply('', integer(@subcombat_data[1] / @subcombat_data[3] * 50)).'\n',
           'color': 'green'
         )
       )
@@ -429,17 +513,17 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
     @content = array(array('text': '- 전투 방식 목록\n\n'))
     foreach(@combat_method_info in @combat_methods_info) {
       @combat_method_data = @combat_methods[@combat_method_info['name']]
-      if(array_size(@combat_method_info['desription']) - 1 < @combat_method_data[1]) {
+      if(array_size(@combat_method_info['desription']) - 1 < @combat_method_data[0]) {
         @desription_index = array_size(@combat_method_info['desription']) - 1
       } else {
-        @desription_index = @combat_method_data[1]
+        @desription_index = @combat_method_data[0]
       }
-      if(@combat_method_data[1] == 0) {
+      if(@combat_method_data[0] == 0) {
         @icon = '\ue00f'
         @name = '???'
       } else {
         @icon = @combat_method_info['icon']
-        @name = string('Lv.'.@combat_method_data[1] @combat_method_info['name'])
+        @name = string('Lv.'.@combat_method_data[0] @combat_method_info['display'])
       }
       @desription = string(@name.'\n'.@combat_method_info['desription'][@desription_index].'\n\n')
       @raw0 = array(
@@ -451,7 +535,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
           )
         ),
         array(
-          'text': ' Lv.'.@combat_method_data[1]'('.@combat_method_data[2].'/'.@combat_method_data[4].')\n',
+          'text': ' Lv.'.@combat_method_data[0]'('.@combat_method_data[1].'/'.@combat_method_data[3].')\n',
           'color': 'black'
         )
       )
@@ -468,12 +552,12 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
           'color': 'white'
         ),
         array(
-          'text': string_multiply('', integer(@combat_method_data[2] / @combat_method_data[4] * 50)).'\n\n',
+          'text': string_multiply('', integer(@combat_method_data[1] / @combat_method_data[3] * 50)).'\n\n',
           'color': 'green'
         )
       )
-      if(@combat_method_data[1] > 0) {
-        if(@selected_combat_method['name'] == @combat_method_info['name']) {
+      if(@combat_method_data[0] > 0) {
+        if(@selected_combat_method == @combat_method_info['name']) {
           @select_box = array(
             'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'],
             'color': 'white'
@@ -517,12 +601,12 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
         foreach(@key: @combat_inclination_info in @line) {
           if(array_contains(@selectable_combat_inclinations, @combat_inclination_info['name'])) {
             @combat_inclination_data = @combat_inclinations[@combat_inclination_info['name']]
-            if(array_size(@combat_inclination_info['desription']) - 1 < @combat_inclination_data[1]) {
+            if(array_size(@combat_inclination_info['desription']) - 1 < @combat_inclination_data[0]) {
               @desription_index = array_size(@combat_inclination_info['desription']) - 1
             } else {
-              @desription_index = @combat_inclination_data[1]
+              @desription_index = @combat_inclination_data[0]
             }
-            @desription = string('Lv.'.@combat_inclination_data[1]@combat_inclination_info['name'].'\n'.@combat_inclination_info['desription'][@desription_index].'\n\n')
+            @desription = string('Lv.'.@combat_inclination_data[0]@combat_inclination_info['display'].'\n'.@combat_inclination_info['desription'][@desription_index].'\n\n')
             @raw0 = array(
               'text': @text['space_fonts']['space.18'],
               'color': 'white',
@@ -670,21 +754,21 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
   case 'farming_method':
     @harvesting_methods_info = @skills_info['harvesting_method']
     @harvesting_methods = @players_data[@uuid]['skill_data']['harvesting_method']
-    @selected_harvesting_method = @players_data[@uuid]['skill_manager'][4]
+    @selected_harvesting_method = @players_data[@uuid]['skill_manager'][3]
     @content = array(array('text': '- 수확 방식 목록'))
     foreach(@harvesting_method_info in @harvesting_methods_info) {
       @harvesting_method_data = @harvesting_methods[@harvesting_method_info['name']]
-      if(array_size(@harvesting_method_info['desription']) - 1 < @harvesting_method_data[1]) {
+      if(array_size(@harvesting_method_info['desription']) - 1 < @harvesting_method_data[0]) {
         @desription_index = array_size(@harvesting_method_info['desription']) - 1
       } else {
-        @desription_index = @harvesting_method_data[1]
+        @desription_index = @harvesting_method_data[0]
       }
-      if(@harvesting_method_data[1] == 0) {
+      if(@harvesting_method_data[0] == 0) {
         @icon = '\ue00f'
         @name = '???'
       } else {
         @icon = @harvesting_method_info['icon']
-        @name = string('Lv.'.@harvesting_method_data[1] @harvesting_method_info['name'])
+        @name = string('Lv.'.@harvesting_method_data[0] @harvesting_method_info['display'])
       }
       @desription = string(@name.'\n'.@harvesting_method_info['desription'][@desription_index].'\n\n')
       @raw0 = array(
@@ -696,7 +780,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
           )
         ),
         array(
-          'text': ' Lv.'.@harvesting_method_data[1]'('.@harvesting_method_data[2].'/'.@harvesting_method_data[4].')\n',
+          'text': ' Lv.'.@harvesting_method_data[0]'('.@harvesting_method_data[1].'/'.@harvesting_method_data[3].')\n',
           'color': 'black'
         )
       )
@@ -713,12 +797,13 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
           'color': 'white'
         ),
         array(
-          'text': string_multiply('', integer(@harvesting_method_data[2] / @harvesting_method_data[4] * 50)).'\n',
+          'text': string_multiply('', integer(@harvesting_method_data[1] / @harvesting_method_data[3] * 50)).'\n',
           'color': 'green'
         )
       )
-      if(@harvesting_method_data[1] > 0) {
-        if(!is_null(@selected_harvesting_method) && @selected_harvesting_method['name'] == @harvesting_method_info['name']) {
+      #broadcast(@selected_harvesting_method  @harvesting_method_info['name'])
+      if(@harvesting_method_data[0] > 0) {
+        if(@selected_harvesting_method == @harvesting_method_info['name']) {
           @select_box = array(
             'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'],
             'color': 'white'
@@ -751,17 +836,17 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
     @content[] = array('text': '\n- 파종 방식 목록')
     foreach(@sowing_method_info in @sowing_methods_info) {
       @sowing_method_data = @sowing_methods[@sowing_method_info['name']]
-      if(array_size(@sowing_method_info['desription']) - 1 < @sowing_method_data[1]) {
+      if(array_size(@sowing_method_info['desription']) - 1 < @sowing_method_data[0]) {
         @desription_index = array_size(@sowing_method_info['desription']) - 1
       } else {
-        @desription_index = @sowing_method_data[1]
+        @desription_index = @sowing_method_data[0]
       }
-      if(@sowing_method_data[1] == 0) {
+      if(@sowing_method_data[0] == 0) {
         @icon = '\ue00f'
         @name = '???'
       } else {
         @icon = @sowing_method_info['icon']
-        @name = string('Lv.'.@sowing_method_data[1] @sowing_method_info['name'])
+        @name = string('Lv.'.@sowing_method_data[0] @sowing_method_info['display'])
       }
       @desription = string(@name.'\n'.@sowing_method_info['desription'][@desription_index].'\n\n')
       @raw0 = array(
@@ -773,7 +858,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
           )
         ),
         array(
-          'text': ' Lv.'.@sowing_method_data[1]'('.@sowing_method_data[2].'/'.@sowing_method_data[4].')\n',
+          'text': ' Lv.'.@sowing_method_data[0]'('.@sowing_method_data[1].'/'.@sowing_method_data[3].')\n',
           'color': 'black'
         )
       )
@@ -790,12 +875,12 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
           'color': 'white'
         ),
         array(
-          'text': string_multiply('', integer(@sowing_method_data[2] / @sowing_method_data[4] * 50)).'\n',
+          'text': string_multiply('', integer(@sowing_method_data[1] / @sowing_method_data[3] * 50)).'\n',
           'color': 'green'
         )
       )
-      if(@sowing_method_data[1] > 0) {
-        if(!is_null(@selected_sowing_method) && @selected_sowing_method['name'] == @sowing_method_info['name']) {
+      if(@sowing_method_data[0] > 0) {
+        if(@selected_sowing_method == @sowing_method_info['name']) {
           @select_box = array(
             'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'],
             'color': 'white'
@@ -804,13 +889,13 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
           @desription = @desription.'§c좌클릭 시, 해당 방식 사용을 해제합니다.'
           @clickevent = array(
             'action': 'run_command',
-            'value': '/skillbook unselect_sowing_method '.@sowing_method_info['name']
+            'value': '/skillbook unselect sowing_method '.@sowing_method_info['name']
           )
         } else {
           @desription = @desription.'§c좌클릭 시, 해당 방식을 사용합니다.'
           @clickevent = array(
             'action': 'run_command',
-            'value': '/skillbook select_sowing_method '.@sowing_method_info['name']
+            'value': '/skillbook select sowing_method '.@sowing_method_info['name']
           )
         }
         @raw0[0]['clickEvent'] = @clickevent
@@ -877,18 +962,18 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
       )
       foreach(@farming_skill_info in @farming_skills_info) {
         @farming_skill_data = @farming_skills[@farming_skill_info['name']]
-        if(array_size(@farming_skill_info['desription']) - 1 < @farming_skill_data[1]) {
+        if(array_size(@farming_skill_info['desription']) - 1 < @farming_skill_data[0]) {
           @desription_index = array_size(@farming_skill_info['desription']) - 1
         } else {
-          @desription_index = @farming_skill_data[1]
+          @desription_index = @farming_skill_data[0]
         }
-        if(@farming_skill_data[1] == 0) {
+        if(@farming_skill_data[0] == 0) {
           @icon = '\ue00f'
           @name = '???'
           @desription = string(@name.'\n'.@farming_skill_info['desription'][@desription_index]).'\n\n§c숙련 레벨이 올르면,\n해당 스킬이 적용됩니다.'
         } else {
           @icon = @farming_skill_info['icon']
-          @name = string('Lv.'.@farming_skill_data[1] @farming_skill_info['name'])
+          @name = string('Lv.'.@farming_skill_data[0] @farming_skill_info['display'])
           @desription = string(@name.'\n'.@farming_skill_info['desription'][@desription_index])
         }
         @raw0 = array(
@@ -900,7 +985,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
             )
           ),
           array(
-            'text': ' Lv.'.@farming_skill_data[1]'('.@farming_skill_data[2].'/'.@farming_skill_data[4].')\n',
+            'text': ' Lv.'.@farming_skill_data[0]'('.@farming_skill_data[1].'/'.@farming_skill_data[3].')\n',
             'color': 'black'
           )
         )
@@ -917,7 +1002,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
             'color': 'white'
           ),
           array(
-            'text': string_multiply('', integer(@farming_skill_data[2] / @farming_skill_data[4] * 50)).'\n',
+            'text': string_multiply('', integer(@farming_skill_data[1] / @farming_skill_data[3] * 50)).'\n',
             'color': 'green'
           )
         )
@@ -978,18 +1063,18 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
       )
       foreach(@farming_skill_info in @farming_skills_info) {
         @farming_skill_data = @farming_skills[@farming_skill_info['name']]
-        if(array_size(@farming_skill_info['desription']) - 1 < @farming_skill_data[1]) {
+        if(array_size(@farming_skill_info['desription']) - 1 < @farming_skill_data[0]) {
           @desription_index = array_size(@farming_skill_info['desription']) - 1
         } else {
-          @desription_index = @farming_skill_data[1]
+          @desription_index = @farming_skill_data[0]
         }
-        if(@farming_skill_data[1] == 0) {
+        if(@farming_skill_data[0] == 0) {
           @icon = '\ue00f'
           @name = '???'
           @desription = string(@name.'\n'.@farming_skill_info['desription'][@desription_index]).'\n\n§c숙련 레벨이 올르면,\n해당 스킬이 적용됩니다.'
         } else {
           @icon = @farming_skill_info['icon']
-          @name = string('Lv.'.@farming_skill_data[1] @farming_skill_info['name'])
+          @name = string('Lv.'.@farming_skill_data[0] @farming_skill_info['display'])
           @desription = string(@name.'\n'.@farming_skill_info['desription'][@desription_index])
         }
         @raw0 = array(
@@ -1001,7 +1086,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
             )
           ),
           array(
-            'text': ' Lv.'.@farming_skill_data[1]'('.@farming_skill_data[2].'/'.@farming_skill_data[4].')\n',
+            'text': ' Lv.'.@farming_skill_data[0]'('.@farming_skill_data[1].'/'.@farming_skill_data[3].')\n',
             'color': 'black'
           )
         )
@@ -1018,7 +1103,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
             'color': 'white'
           ),
           array(
-            'text': string_multiply('', integer(@farming_skill_data[2] / @farming_skill_data[4] * 50)).'\n',
+            'text': string_multiply('', integer(@farming_skill_data[1] / @farming_skill_data[3] * 50)).'\n',
             'color': 'green'
           )
         )
@@ -1083,18 +1168,18 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
       )
       foreach(@mining_skill_info in @mining_skills_info) {
         @mining_skill_data = @mining_skills[@mining_skill_info['name']]
-        if(array_size(@mining_skill_info['desription']) - 1 < @mining_skill_data[1]) {
+        if(array_size(@mining_skill_info['desription']) - 1 < @mining_skill_data[0]) {
           @desription_index = array_size(@mining_skill_info['desription']) - 1
         } else {
-          @desription_index = @mining_skill_data[1]
+          @desription_index = @mining_skill_data[0]
         }
-        if(@mining_skill_data[1] == 0) {
+        if(@mining_skill_data[0] == 0) {
           @icon = '\ue00f'
           @name = '???'
           @desription = string(@name.'\n'.@mining_skill_info['desription'][@desription_index]).'\n\n§c숙련 레벨이 올르면,\n해당 스킬이 적용됩니다.'
         } else {
           @icon = @mining_skill_info['icon']
-          @name = string('Lv.'.@mining_skill_data[1] @mining_skill_info['name'])
+          @name = string('Lv.'.@mining_skill_data[0] @mining_skill_info['display'])
           @desription = string(@name.'\n'.@mining_skill_info['desription'][@desription_index])
         }
         @raw0 = array(
@@ -1106,7 +1191,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
             )
           ),
           array(
-            'text': ' Lv.'.@mining_skill_data[1]'('.@mining_skill_data[2].'/'.@mining_skill_data[4].')\n',
+            'text': ' Lv.'.@mining_skill_data[0]'('.@mining_skill_data[1].'/'.@mining_skill_data[3].')\n',
             'color': 'black'
           )
         )
@@ -1123,7 +1208,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
             'color': 'white'
           ),
           array(
-            'text': string_multiply('', integer(@mining_skill_data[2] / @mining_skill_data[4] * 50)).'\n',
+            'text': string_multiply('', integer(@mining_skill_data[1] / @mining_skill_data[3] * 50)).'\n',
             'color': 'green'
           )
         )
@@ -1148,7 +1233,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
           ),
           'clickEvent': array(
             'action': 'run_command',
-            'value': '/skillbook open mining_method'
+            'value': '/skillbook open farming 1'
           )
         ),
         array(
@@ -1184,18 +1269,18 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
       )
       foreach(@mining_skill_info in @mining_skills_info) {
         @mining_skill_data = @mining_skills[@mining_skill_info['name']]
-        if(array_size(@mining_skill_info['desription']) - 1 < @mining_skill_data[1]) {
+        if(array_size(@mining_skill_info['desription']) - 1 < @mining_skill_data[0]) {
           @desription_index = array_size(@mining_skill_info['desription']) - 1
         } else {
-          @desription_index = @mining_skill_data[1]
+          @desription_index = @mining_skill_data[0]
         }
-        if(@mining_skill_data[1] == 0) {
+        if(@mining_skill_data[0] == 0) {
           @icon = '\ue00f'
           @name = '???'
           @desription = string(@name.'\n'.@mining_skill_info['desription'][@desription_index]).'\n\n§c숙련 레벨이 올르면,\n해당 스킬이 적용됩니다.'
         } else {
           @icon = @mining_skill_info['icon']
-          @name = string('Lv.'.@mining_skill_data[1] @mining_skill_info['name'])
+          @name = string('Lv.'.@mining_skill_data[0] @mining_skill_info['display'])
           @desription = string(@name.'\n'.@mining_skill_info['desription'][@desription_index])
         }
         @raw0 = array(
@@ -1207,7 +1292,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
             )
           ),
           array(
-            'text': ' Lv.'.@mining_skill_data[1]'('.@mining_skill_data[2].'/'.@mining_skill_data[4].')\n',
+            'text': ' Lv.'.@mining_skill_data[0]'('.@mining_skill_data[1].'/'.@mining_skill_data[3].')\n',
             'color': 'black'
           )
         )
@@ -1224,7 +1309,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
             'color': 'white'
           ),
           array(
-            'text': string_multiply('', integer(@mining_skill_data[2] / @mining_skill_data[4] * 50)).'\n',
+            'text': string_multiply('', integer(@mining_skill_data[1] / @mining_skill_data[3] * 50)).'\n',
             'color': 'green'
           )
         )
@@ -1234,7 +1319,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
       }
       @arrow = array(
         array(
-          'text': '\n\n\n'.@text['space_fonts']['space.28'].'\ue00c'.@text['space_fonts']['space.37'].'\ue00d\n',
+          'text': '\n\n\n'.@text['space_fonts']['space.28'].'\ue00c'.'\n',
           'color': 'white'
         ),
         array(
@@ -1246,21 +1331,6 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
           'hoverEvent': array(
             'action': 'show_text',
             'value': '이전 페이지'
-          ),
-          'clickEvent': array(
-            'action': 'run_command',
-            'value': '/skillbook open mining 0'
-          )
-        ),
-        array(
-          'text':@text['space_fonts']['space.37'],
-          'color': 'white'
-        ),
-        array(
-          'text': '\ue00d',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': '다음 페이지'
           ),
           'clickEvent': array(
             'action': 'run_command',
@@ -1326,24 +1396,56 @@ register_command('skillbook', array(
       case 'select':
         switch(@args[1]) {
         case 'combat_method':
+          @players_data[@uuid]['skill_manager'][2] = @args[2]
+          cup_set('SKILL_MANAGER', @uuid, @players_data[@uuid]['skill_manager'])
+          _reset_skill_effect(@uuid, 'combat_method')
+          @level = @players_data[@uuid]['skill_data']['combat_method'][@args[2]][0]
+          _set_skill_effect(@uuid, 'combat_method', @args[2], @level, @players_data, @skills_spec)
+          _open_skillbook(@player, 'combat_method', null, @players_data, @skills_info, @text)
           break()
         case 'combat_inclination':
+          _open_skillbook(@player, 'combat_inclination', @args[2], @players_data, @skills_info, @text)
           break()
         case 'harvesting_method':
+          @players_data[@uuid]['skill_manager'][3] = @args[2]
+          cup_set('SKILL_MANAGER', @uuid, @players_data[@uuid]['skill_manager'])
+          _reset_skill_effect(@uuid, 'combat_method')
+          @level = @players_data[@uuid]['skill_data']['harvesting_method'][@args[2]][0]
+          _set_skill_effect(@uuid, 'harvesting_method', @args[2], @level, @players_data, @skills_spec)
+          _open_skillbook(@player, 'farming_method', null, @players_data, @skills_info, @text)
           break()
         case 'sowing_method':
+          @players_data[@uuid]['skill_manager'][4] = @args[2]
+          cup_set('SKILL_MANAGER', @uuid, @players_data[@uuid]['skill_manager'])
+          _reset_skill_effect(@uuid, 'combat_method')
+          @level = @players_data[@uuid]['skill_data']['sowing_method'][@args[2]][0]
+          _set_skill_effect(@uuid, 'sowing_method', @args[2], @level, @players_data, @skills_spec)
+          _open_skillbook(@player, 'farming_method', null, @players_data, @skills_info, @text)
           break()
         }
         break()
       case 'unselect':
         switch(@args[1]) {
         case 'combat_method':
+          @players_data[@uuid]['skill_manager'][2] = ''
+          cup_set('SKILL_MANAGER', @uuid, @players_data[@uuid]['skill_manager'])
+          _reset_skill_effect(@uuid, 'combat_method')
+          _open_skillbook(@player, 'combat_method', null, @players_data, @skills_info, @text)
           break()
         case 'combat_inclination':
+          _open_skillbook(@player, 'combat_inclination', @args[2], @players_data, @skills_info, @text)
           break()
         case 'harvesting_method':
+          @players_data[@uuid]['skill_manager'][3] = ''
+          cup_set('SKILL_MANAGER', @uuid, @players_data[@uuid]['skill_manager'])
+          _reset_skill_effect(@uuid, 'combat_method')
+          _open_skillbook(@player, 'farming_method', null, @players_data, @skills_info, @text)
           break()
         case 'sowing_method':
+          @players_data[@uuid]['skill_manager'][4] = ''
+          cup_set('SKILL_MANAGER', @uuid, @players_data[@uuid]['skill_manager'])
+          _reset_skill_effect(@uuid, 'combat_method')
+          _open_skillbook(@player, 'farming_method', null, @players_data, @skills_info, @text)
           break()
         }
         break()
