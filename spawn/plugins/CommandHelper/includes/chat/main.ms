@@ -563,11 +563,11 @@ register_command('enko', array(
       if(@players_data[@uuid]['setting'][1]) {
         @players_data[@uuid]['setting'][1] = false
         cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-        _send_action_msg(@player, @players_data[@uuid], @text)
+        _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
       } else {
         @players_data[@uuid]['setting'][1] = true
         cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-        _send_action_msg(@player, @players_data[@uuid], @text)
+        _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
       }
     }
   }
@@ -618,7 +618,7 @@ register_command('ch', array(
           cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           break()
         }
-        _send_action_msg(@player, @players_data[@uuid], @text)
+        _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
       } else if(array_size(@args) == 1) {
         switch(@args[0]) {
         case 'local':
@@ -642,7 +642,7 @@ register_command('ch', array(
           cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           break()
         }
-        _send_action_msg(@player, @players_data[@uuid], @text)
+        _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
       }
     }
   }
@@ -661,11 +661,11 @@ register_command('resolution', array(
       } else {
         @players_data[@uuid]['cache'] = true
       }
-      _send_action_msg(@player, @players_data[@uuid], @text)
+      _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
       break()
     case 1:
       @players_data[@uuid]['setting'][12] = integer(@args[0])
-      _send_action_msg(@player, @players_data[@uuid], @text)
+      _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
       cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
       break()
     }

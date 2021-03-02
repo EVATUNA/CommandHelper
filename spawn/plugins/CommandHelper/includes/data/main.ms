@@ -33,7 +33,7 @@ proc _new_data(@uuid, @players_data) {
 }
 
 proc _send_resourcepack(@player, @uuid, @players_state) {
-  @resourcepack = 'https://drive.google.com/uc?export=download&id=17Q-4BbmrPynLt-xKKL2U8MMIm35k7HcG'
+  @resourcepack = 'https://drive.google.com/uc?export=download&id=1HZYW4CkySBKNw8NDmf5wtNQcz1RyrbXB'
   send_resourcepack(@player, @resourcepack)
   @player_state = array(
     'join_spec': array(
@@ -223,8 +223,7 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
       } else {
         @player = @player_state['player']
         if(array_index_exists(@players_data, @uuid)) {
-          _send_action_msg(@player, @players_data[@uuid], @text)
-          
+          _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
           #_countdown_skill() {}로 아래 코드 대체
           @category = 'combat_inclination'
           foreach(@skill in json_decode(@players_data[@uuid]['skill_manager'][0])) {
@@ -234,8 +233,9 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
           #combat_method
           @category = 'combat_method'
           @skill = @players_data[@uuid]['skill_manager'][2]
-          @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+          
           if(@skill != '') {
+            @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
             @active_skill = @players_data[@uuid]['active_skill'][@category][@skill]
             switch(@skill) {
             case 'sweeping':
@@ -289,9 +289,11 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
           #harvesting_method
           @category = 'harvesting_method'
           @skill = @players_data[@uuid]['skill_manager'][3]
-          @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+          
           if(@skill != '') {
+            @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
             @active_skill = @players_data[@uuid]['active_skill'][@category][@skill]
+            #broadcast(@category @skill @active_skill)
             if(@active_skill[2] != 1) {
               if(@active_skill[1] > 0) {
                 @active_skill[1] -= 1
@@ -311,8 +313,9 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
           #sowing_method
           @category = 'sowing_method'
           @skill = @players_data[@uuid]['skill_manager'][4]
-          @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+          
           if(@skill != '') {
+            @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
             @active_skill = @players_data[@uuid]['active_skill'][@category][@skill]
             if(@active_skill[2] != 1) {
               if(@active_skill[1] > 0) {

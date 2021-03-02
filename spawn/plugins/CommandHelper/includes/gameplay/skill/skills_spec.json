@@ -104,7 +104,7 @@
 					"active": {
 						"cooldown": 60,
 						"duration": 1,
-						"count": 0,
+						"count": 1,
 						"energy": 0
 					}
 				},
@@ -115,7 +115,18 @@
 					"active": {
 						"cooldown": 60,
 						"duration": 1,
-						"count": 0,
+						"count": 2,
+						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					},
+					"active": {
+						"cooldown": 60,
+						"duration": 1,
+						"count": 3,
 						"energy": 0
 					}
 				}
