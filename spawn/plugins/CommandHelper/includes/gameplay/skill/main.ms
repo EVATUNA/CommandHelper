@@ -1423,6 +1423,7 @@ register_command('skillbook', array(
           _open_skillbook(@player, 'farming_method', null, @players_data, @skills_info, @text)
           break()
         }
+        _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
         break()
       case 'unselect':
         switch(@args[1]) {
@@ -1448,6 +1449,7 @@ register_command('skillbook', array(
           _open_skillbook(@player, 'farming_method', null, @players_data, @skills_info, @text)
           break()
         }
+        _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
         break()
       }
     } else {
@@ -1455,277 +1457,105 @@ register_command('skillbook', array(
     }
     
     /*
-    
-    if(array_size(@args) == 1) {
-      switch(@args[0]) {
-      case 'open_combat_inclination':
-        _combat_inclination_page(@player, @player_skill_data, 0, @mastery_info, @text)
-        break()
-      case 'open_combat_method': 
-        _open_skillbook(@player, 'combat_method', null, @players_data, @skills_info, @text)
-        break()
-      case 'open_farming_method': 
-        _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
-        break()
-      case 'open_sowing_method': 
-        _sowing_method_page(@player, @player_skill_data, @mastery_info, @text)
-        break()
-      }
-    } else if(array_size(@args) == 2) {
-      switch(@args[0]) {
-      case 'open_combat_inclination':
-        _combat_inclination_page(@player, @player_skill_data, @args[1], @mastery_info, @text)
-        break()
-      }
-    } else if(array_size(@args) >= 3) {
-      @mastery = array_implode(array_get(@args, cslice(2, array_size(@args) - 1)), ' ')
-      switch(@args[0]) {
-      case 'select_combat_inclination':
-        @players_data[@uuid]['skill']['skills_manager']['selected_combat_inclinations'][] = @mastery
-        _combat_inclination_page(@player, @player_skill_data, @args[1], @mastery_info, @text)
-        break()
-      case 'unselect_combat_inclination':
-        array_remove_values(@players_data[@uuid]['skill']['skills_manager']['selected_combat_inclinations'], @mastery)
-        _combat_inclination_page(@player, @player_skill_data, @args[1], @mastery_info, @text)
-        break()
-      case 'select_combat_method':
-        @players_data[@uuid]['skill']['skills_manager']['selected_combat_method'] = array(
-          'name': @mastery
-        )
-        _combat_method_page(@player, @player_skill_data, @mastery_info, @text)
-        break()
-      case 'unselect_combat_method':
-        @players_data[@uuid]['skill']['skills_manager']['selected_combat_method'] = null
-        _combat_method_page(@player, @player_skill_data, @mastery_info, @text)
-        break()
-      case 'select_sowing_method':
-        @players_data[@uuid]['skill']['skills_manager']['selected_sowing_method'] = array(
-          'name': @mastery
-        )
-        _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
-        break()
-      case 'unselect_sowing_method':
-        @players_data[@uuid]['skill']['skills_manager']['selected_sowing_method'] = null
-        _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
-        break()
-      case 'select_harvesting_method':
-        @players_data[@uuid]['skill']['skills_manager']['selected_harvesting_method'] = array(
-          'name': @mastery
-        )
-        _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
-        break()
-      case 'unselect_harvesting_method':
-        @players_data[@uuid]['skill']['skills_manager']['selected_harvesting_method'] = null
-        _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
-        break()
-      }
-    } else {
       
-    }
+      if(array_size(@args) == 1) {
+        switch(@args[0]) {
+        case 'open_combat_inclination':
+          _combat_inclination_page(@player, @player_skill_data, 0, @mastery_info, @text)
+          break()
+        case 'open_combat_method': 
+          _open_skillbook(@player, 'combat_method', null, @players_data, @skills_info, @text)
+          break()
+        case 'open_farming_method': 
+          _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
+          break()
+        case 'open_sowing_method': 
+          _sowing_method_page(@player, @player_skill_data, @mastery_info, @text)
+          break()
+        }
+      } else if(array_size(@args) == 2) {
+        switch(@args[0]) {
+        case 'open_combat_inclination':
+          _combat_inclination_page(@player, @player_skill_data, @args[1], @mastery_info, @text)
+          break()
+        }
+      } else if(array_size(@args) >= 3) {
+        @mastery = array_implode(array_get(@args, cslice(2, array_size(@args) - 1)), ' ')
+        switch(@args[0]) {
+        case 'select_combat_inclination':
+          @players_data[@uuid]['skill']['skills_manager']['selected_combat_inclinations'][] = @mastery
+          _combat_inclination_page(@player, @player_skill_data, @args[1], @mastery_info, @text)
+          break()
+        case 'unselect_combat_inclination':
+          array_remove_values(@players_data[@uuid]['skill']['skills_manager']['selected_combat_inclinations'], @mastery)
+          _combat_inclination_page(@player, @player_skill_data, @args[1], @mastery_info, @text)
+          break()
+        case 'select_combat_method':
+          @players_data[@uuid]['skill']['skills_manager']['selected_combat_method'] = array(
+            'name': @mastery
+          )
+          _combat_method_page(@player, @player_skill_data, @mastery_info, @text)
+          break()
+        case 'unselect_combat_method':
+          @players_data[@uuid]['skill']['skills_manager']['selected_combat_method'] = null
+          _combat_method_page(@player, @player_skill_data, @mastery_info, @text)
+          break()
+        case 'select_sowing_method':
+          @players_data[@uuid]['skill']['skills_manager']['selected_sowing_method'] = array(
+            'name': @mastery
+          )
+          _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
+          break()
+        case 'unselect_sowing_method':
+          @players_data[@uuid]['skill']['skills_manager']['selected_sowing_method'] = null
+          _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
+          break()
+        case 'select_harvesting_method':
+          @players_data[@uuid]['skill']['skills_manager']['selected_harvesting_method'] = array(
+            'name': @mastery
+          )
+          _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
+          break()
+        case 'unselect_harvesting_method':
+          @players_data[@uuid]['skill']['skills_manager']['selected_harvesting_method'] = null
+          _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
+          break()
+        }
+      } else {
+        
+      }
     */
     #_open_masterybook(@player, @player_skill, @mastery_info, @text)
   }
 ))
 
-
-
-
-
-
-
-
-
-proc _get_rank_mineral(@mineral, @mining_level, @ore_selecting_level, @minerals) {
-   @rank_chances
-   @ore_name
-   @drop_items = array()
-   switch(@mineral) {
-      case 'IRON_ORE':
-      @ore_name = 'IRON_INGOT'
-      switch(@mining_level) {
-         case 0:
-         @rank_chances = array(
-            array(
-               'rank': 1,
-               'chance': 0.86
-            ),
-            array(
-               'rank': 2,
-               'chance': 0.10
-            ),
-            array(
-               'rank': 3,
-               'chance': 0.4
-            )
-         )
-         case 1:
-         @rank_chances = array(
-            array(
-               'rank': 1,
-               'chance': 0.75
-            ),
-            array(
-               'rank': 2,
-               'chance': 0.15
-            ),
-            array(
-               'rank': 3,
-               'chance': 0.10
-            )
-         )
-         case 2:
-         @rank_chances = array(
-            array(
-               'rank': 1,
-               'chance': 0.48
-            ),
-            array(
-               'rank': 2,
-               'chance': 0.37
-            ),
-            array(
-               'rank': 3,
-               'chance': 0.08
-            ),
-            array(
-               'rank': 4,
-               'chance': 0.07
-            )
-         )
-         case 3:
-         @rank_chances = array(
-            array(
-               'rank': 1,
-               'chance': 0.31
-            ),
-            array(
-               'rank': 2,
-               'chance': 0.52
-            ),
-            array(
-               'rank': 3,
-               'chance': 0.08
-            ),
-            array(
-               'rank': 4,
-               'chance': 0.08
-            )
-         )
-      }
-      case 'DIAMOND_ORE':
-      @ore_name = 'DIAMOND'
-      switch(@mining_level) {
-         case 0:
-         @rank_chances = array(
-            array(
-               'rank': 1,
-               'chance': 0.89
-            ),
-            array(
-               'rank': 2,
-               'chance': 0.11
-            )
-         )
-         case 1:
-         @rank_chances = array(
-            array(
-               'rank': 1,
-               'chance': 0.86
-            ),
-            array(
-               'rank': 2,
-               'chance': 0.1
-            ),
-            array(
-               'rank': 3,
-               'chance': 0.04
-            )
-         )
-         case 2:
-         @rank_chances = array(
-            array(
-               'rank': 1,
-               'chance': 0.75
-            ),
-            array(
-               'rank': 2,
-               'chance': 0.15
-            ),
-            array(
-               'rank': 3,
-               'chance': 0.1
-            )
-         )
-         case 3:
-         @rank_chances = array(
-            array(
-               'rank': 1,
-               'chance': 0.48
-            ),
-            array(
-               'rank': 2,
-               'chance': 0.38
-            ),
-            array(
-               'rank': 3,
-               'chance': 0.1
-            ),
-            array(
-               'rank': 4,
-               'chance': 0.04
-            )
-         )
-      }
-   }
-   for(@try_num = 0, @try_num <= rand(0, 1 + @ore_selecting_level), @try_num++) {
-      @drop_item = array('name': @ore_name, 'qty': 1, 'meta': array())
-      @max_chance = 0.0
-      foreach(@rank_chance in @rank_chances) {
-         @max_chance += @rank_chance['chance']
-         @item_rank = 1
-         if(rand() < @max_chance) {
-            @item_rank = @rank_chance['rank']
-            @drop_item['meta']['model'] = @item_rank
-            break()
-         }
-      }
-      #@display_name = @minerals[@mineral]['ranks'][@item_rank - 1]
-      #@drop_item['meta']['display'] = @display_name
-      @drop_items[] = @drop_item
-   }
-   return(@drop_items)
-}
-
-
-
-proc _add_epxerience(@skill, @add_experience) {
-  if(@skill[1] < @skill[3]) {
-    @new_experience = @skill[2] + @add_experience
-    if(@new_experience < @skill[4]) {
-      @skill[2] = @new_experience
-      #CHCUP에 바뀐 정보 저장(경험치)
+proc _add_epxerience(@uuid, @skill, @skill_data, @add_experience) {
+  if(@skill_data[0] < @skill_data[2]) {
+    @new_experience = @skill_data[1] + @add_experience
+    if(@new_experience < @skill_data[3]) {
+      @skill_data[1] = @new_experience
     } else {
-      @skill[1] += 1
-      @skill[2] = 0
-      #CHCUP에 바뀐 정보 저장(레벨, 경험치)
+      @skill_data[0] += 1
+      @skill_data[1] = 0
     }
+    cup_set('SKILL_DATA', @uuid.'_'.@skill, @skill_data)
   }
-  
 }
 
 proc _mineral_mine_event(@event, @player_item, @player_mining_skills, @hp_blocks) {
   @player = @event['player']
+  @uuid = puuid(@player)
   @mineral = @event['block']
-  @minerals_spec = array(                                #필요도구
-    'COAL_ORE': array('hp': 8, 'hardness': 1),       #나무
-    'COPPER_ORE': array('hp': 20, 'hardness': 2),    #돌, 금
-    'IRON_ORE': array('hp': 35, 'hardness': 3),      #구리
-    'LAPIS_ORE': array('hp': 23, 'hardness': 3),     #구리
-    'GOLD_ORE': array('hp': 23, 'hardness': 4),      #철
-    'REDSTONE_ORE': array('hp': 35, 'hardness': 4),  #철
-    'DIAMOND_ORE': array('hp': 47, 'hardness': 4),   #철
-    'EMERALD_ORE': array('hp': 47, 'hardness': 4),   #철
-    'ANCIENT_DEBRIS': array('hp': 70, 'hardness': 5) #다이야
+  @minerals_spec = array(                                                    #필요도구
+    'COAL_ORE': array('hp': 8, 'hardness': 1, 'ore_selecting_xp': 1),        #나무
+    'COPPER_ORE': array('hp': 20, 'hardness': 2, 'ore_selecting_xp': 2),     #돌, 금
+    'IRON_ORE': array('hp': 35, 'hardness': 3, 'ore_selecting_xp': 4),       #구리
+    'LAPIS_ORE': array('hp': 23, 'hardness': 3, 'ore_selecting_xp': 5),      #구리
+    'GOLD_ORE': array('hp': 23, 'hardness': 4, 'ore_selecting_xp': 7),       #철
+    'REDSTONE_ORE': array('hp': 35, 'hardness': 4, 'ore_selecting_xp': 5),   #철
+    'DIAMOND_ORE': array('hp': 47, 'hardness': 4, 'ore_selecting_xp': 15),   #철
+    'EMERALD_ORE': array('hp': 47, 'hardness': 4, 'ore_selecting_xp': 10),   #철
+    'ANCIENT_DEBRIS': array('hp': 70, 'hardness': 5, 'ore_selecting_xp': 50) #다이야
   )
   @pickaxes_hardness = array(          # 캘수있는 광물
     'WOODEN_PICKAXE': 1,   #나무         (석탄)
@@ -1746,8 +1576,8 @@ proc _mineral_mine_event(@event, @player_item, @player_mining_skills, @hp_blocks
       if(array_index_exists(@player_item['main_hand']['meta'], 'modifiers')) {
         foreach(@modifier in @player_item['main_hand']['meta']['modifiers']) {
           if(@modifier['attribute'] == 'HORSE_JUMP_STRENGTH') {
-            @mining_power = @modifier['amount'] * (1 + @player_mining_skills['강인한 어깨'][1] * 0.1)
-            broadcast(@mining_power)
+            @mining_power = @modifier['amount'] * (1 + @player_mining_skills['tough_shoulder'][0] * 0.1)
+            #broadcast(@mining_power)
             break()
           }
         }
@@ -1777,10 +1607,33 @@ proc _mineral_mine_event(@event, @player_item, @player_mining_skills, @hp_blocks
     @hp_blocks[@id]['reset_countdown'] = 3
     @hp = @hp_blocks[@id]['hp']
     if(@hp_blocks[@id]['hp'] > 0) {
-      modify_event('xp', 0)
-      set_timeout(0, closure() {
-        set_block(@location, @mineral)
-      })
+      cancel()
+      @item = @player_item['main_hand']
+      @slot = pheld_slot(@player)
+      if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
+        @damage = 0
+      } else {
+        @damage = @item['meta']['damage']
+      }
+      if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'enchants') || !array_index_exists(@item['meta']['enchants'], 'unbreaking')) {
+        @unbreaking_level = 0
+      } else {
+        @unbreaking_level = @item['meta']['enchants']['unbreaking']['elevel']
+      }
+      @breaking_chance = 1 / (@unbreaking_level + 1)
+      if(rand() < @breaking_chance) {
+        if(is_null(@item['meta'])) {
+          @item['meta'] = array('damage': @damage + 1)
+        } else {
+          @item['meta']['damage'] = @damage + 1
+        }
+        if(material_info(@item['name'], 'maxDurability') == @item['meta']['damage']) {
+          play_entity_effect(puuid(@player), 'BREAK_EQUIPMENT_MAIN_HAND')
+          set_inventory_item(puuid(@player), @slot, null)
+        } else {
+          set_inventory_item(puuid(@player), @slot, @item)
+        }
+      }
     } else {
       array_remove(@hp_blocks, @id)
       play_named_sound(@location, array(
@@ -1789,8 +1642,110 @@ proc _mineral_mine_event(@event, @player_item, @player_mining_skills, @hp_blocks
          'volume': 0.4,
          'pitch': 1.5
       ), @player)
-      _add_epxerience(@player_mining_skills['강인한 어깨'], 0.2)
-      # 스위치 미네랄 에 따른 숙련도 주기
+      @multiply = @player_mining_skills['tough_shoulder'][0] + 0 #아이템에 행운이 있을시 + 1 축복이 있을시 + 2
+      @alpha_qty = 1 + @multiply
+      @is_normal_mineral = false
+      switch(@mineral) {
+      case 'REDSTONE_ORE':
+        @drop_item = 'REDSTONE'
+        @is_normal_mineral = true
+        @alpha_qty = 5 + @multiply
+        break()
+      case 'LAPIS_ORE':
+        @drop_item = 'LAPIS_LAZULI'
+        @is_normal_mineral = true
+        @alpha_qty = 5 + @multiply
+        break()
+      case 'COAL_ORE':
+        @drop_item = 'COAL'
+        @is_normal_mineral = true
+        break()
+      case 'EMERALD_ORE':
+        @drop_item = 'EMERALD'
+        @is_normal_mineral = true
+        break()
+      case 'COPPER_ORE':
+        @drop_item = 'IRON_NUGGET'
+        _add_epxerience(@uuid, 'copper_mining_mastery'. @player_mining_skills['copper_mining_mastery'], 1)
+        @mastery_level = @player_mining_skills['copper_mining_mastery'][0]
+        @display = '구리 주괴'
+        break()
+      case 'IRON_ORE':
+        @drop_item = 'IRON_INGOT'
+        _add_epxerience(@uuid, 'iron_mining_mastery', @player_mining_skills['iron_mining_mastery'], 1)
+        @mastery_level = @player_mining_skills['iron_mining_mastery'][0]
+        @display = '철괴'
+        break()
+      case 'GOLD_ORE':
+      case 'NETHER_GOLD_ORE':
+        @drop_item = 'GOLD_INGOT'
+        _add_epxerience(@uuid, 'gold_mining_mastery', @player_mining_skills['gold_mining_mastery'], 1)
+        @mastery_level = @player_mining_skills['gold_mining_mastery'][0]
+        @display = '금괴'
+        break()
+      case 'DIAMOND_ORE':
+        @drop_item = 'DIAMOND'
+        _add_epxerience(@uuid, 'diamond_mining_mastery', @player_mining_skills['diamond_mining_mastery'], 1)
+        @mastery_level = @player_mining_skills['diamond_mining_mastery'][0]
+        @display = '다이아몬드'
+        break()
+      case 'ANCIENT_DEBRIS':
+        @drop_item = 'NETHERITE_SCRAP'
+        _add_epxerience(@uuid, 'ancient_debris_mining_mastery', @player_mining_skills['ancient_debris_mining_mastery'], 1)
+        @mastery_level = @player_mining_skills['ancient_debris_mining_mastery'][0]
+        @display = '네더라이트 파편'
+        break()
+      }
+      if(@is_normal_mineral) {
+        @qty = 1 + integer(rand() * @alpha_qty)
+        @location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.5, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
+        drop_item(@location, array('name': @drop_item, 'qty': @qty), false)
+      } else {
+        @qty = 1 + integer(rand() * @alpha_qty)
+        @entries = array(
+          array(
+            'rank': '§f하급',
+            'model': 1,
+            'weight': 100 + 0 * @mastery_level
+          ),
+          array(
+            'rank': '§e중급',
+            'model': 2,
+            'weight': 20 + 1 * @mastery_level
+          ),
+          array(
+            'rank': '§b상급',
+            'model': 3,
+            'weight': 5 + 0.5 * @mastery_level
+          ),
+          array(
+            'rank': '§d최상급',
+            'model': 4,
+            'weight': 0.5 + 0.1 * @mastery_level
+          )
+        )
+        @total_weight = 0
+        foreach(@key: @entry in @entries) {
+          @total_weight += @entry['weight']
+        }
+        for(@i = 0, @i < @qty, @i++){
+          @result_weight = @total_weight * round(rand(), 5)
+          @min_weight = 0
+          foreach(@entry in @entries) {
+            @weight = @entry['weight']
+            @max_weight = @min_weight + @weight
+            if(@max_weight > @result_weight) {
+              @location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.5, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
+              drop_item(@location, array('name': @drop_item, 'meta': array('display': @entry['rank'] @display, 'model': @entry['model'])), false)
+              break()
+            } else {
+              @min_weight = @max_weight
+            }
+          }
+        }
+      }
+      _add_epxerience(@uuid, 'ore_selecting', @player_mining_skills['ore_selecting'], @minerals_spec[@mineral]['ore_selecting_xp'])
+      #_add_epxerience(@player_mining_skills['tough_shoulder'], 1) #돌 캘시 이벤트로 이동# 돌을 캘시, 곡괭이로 전투 시 숙련도 상승
     }
   } else {
     if(array_index_exists(@hp_blocks, @id)) {
@@ -1800,7 +1755,8 @@ proc _mineral_mine_event(@event, @player_item, @player_mining_skills, @hp_blocks
     }
     cancel()
   }
-  modify_event('drops', @drop_items)
+  modify_event('drops', array())
+  #경험 인첸트에 따른 경험치 드랍 조절
 }
 
 proc _farmland_sow_event(@event, @player_item, @player_farming_skills, @sowing_method_skills, @hp_blocks) {

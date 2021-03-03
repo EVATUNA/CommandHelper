@@ -23,7 +23,7 @@ async_read('files/general_emoji.json', closure(@value) {
 
 ## Initial Including Procedure
 proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
-  if(@player_data['cache']) {
+  if(@player_data['cache'] ) {
     switch(@player_data['setting'][1]) {
     case true:
       switch(@player_data['setting'][0]) {
@@ -71,46 +71,87 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
       @category = 'combat_method'
       @skill = @player_data['skill_manager'][2]
     }
-    if(@skill != '') {
+    if(@skill != '' && array_index_exists(@player_data['active_skill'][@category], @skill)) {
       @level = @player_data['skill_data'][@category][@skill][0]
       if(@skills_spec[@category][@skill]['levels'][@level]['active']['count'] == 0) {
-        @max_cooldown = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
-        @remain_cooldown = @max_cooldown - @player_data['active_skill'][@category][@skill][0]
-        @index = integer(@remain_cooldown / @max_cooldown * 10)
-        switch(@index) {
-        case 0:
-          @hotbar = '\ue406'
-          break()
-        case 1:
-          @hotbar = '\ue408'
-          break()
-        case 2:
-          @hotbar = '\ue409'
-          break()
-        case 3:
-          @hotbar = '\ue40a'
-          break()
-        case 4:
-          @hotbar = '\ue40b'
-          break()
-        case 5:
-          @hotbar = '\ue40c'
-          break()
-        case 6:
-          @hotbar = '\ue40d'
-          break()
-        case 7:
-          @hotbar = '\ue40e'
-          break()
-        case 8:
-          @hotbar = '\ue40f'
-          break()
-        case 9:
-          @hotbar = '\ue410'
-          break()
-        case 10:
-          @hotbar = '\ue411'
-          break()
+        if(@player_data['active_skill'][@category][@skill][1] > 0) {
+          @max_duration = @skills_spec[@category][@skill]['levels'][@level]['active']['duration']
+          @duration = @player_data['active_skill'][@category][@skill][1]
+          @index = integer(@duration / @max_duration * 10)
+          switch(@index) {
+          case 0:
+            @hotbar = '\ue406'
+            break()
+          case 1:
+            @hotbar = '\ue408'
+            break()
+          case 2:
+            @hotbar = '\ue409'
+            break()
+          case 3:
+            @hotbar = '\ue40a'
+            break()
+          case 4:
+            @hotbar = '\ue40b'
+            break()
+          case 5:
+            @hotbar = '\ue40c'
+            break()
+          case 6:
+            @hotbar = '\ue40d'
+            break()
+          case 7:
+            @hotbar = '\ue40e'
+            break()
+          case 8:
+            @hotbar = '\ue40f'
+            break()
+          case 9:
+            @hotbar = '\ue410'
+            break()
+          case 10:
+            @hotbar = '\ue411'
+            break()
+          }
+        } else {
+          @max_cooldown = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
+          @remain_cooldown = @max_cooldown - @player_data['active_skill'][@category][@skill][0]
+          @index = integer(@remain_cooldown / @max_cooldown * 10)
+          switch(@index) {
+          case 0:
+            @hotbar = '\ue406'
+            break()
+          case 1:
+            @hotbar = '\ue408'
+            break()
+          case 2:
+            @hotbar = '\ue409'
+            break()
+          case 3:
+            @hotbar = '\ue40a'
+            break()
+          case 4:
+            @hotbar = '\ue40b'
+            break()
+          case 5:
+            @hotbar = '\ue40c'
+            break()
+          case 6:
+            @hotbar = '\ue40d'
+            break()
+          case 7:
+            @hotbar = '\ue40e'
+            break()
+          case 8:
+            @hotbar = '\ue40f'
+            break()
+          case 9:
+            @hotbar = '\ue410'
+            break()
+          case 10:
+            @hotbar = '\ue411'
+            break()
+          }
         }
       } else {
         @max_cooldown = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
@@ -258,24 +299,10 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
         @icon = '\ue430'
         break()
       }
-      #switch(@category) {
-      #case 'harvesting_method':
-      #  
-      #  broadcast(@player_data['active_skill'][@category][@skill])
-      #  break()
-      #case 'sowing_method':
-      #  broadcast(@player_data['active_skill'][@category][@skill])
-      #  break()
-      #default:
-      #  broadcast(@player_data['active_skill'][@category][@skill])
-      #  break()
-      #}
     } else {
       @hotbar = @text['space_fonts']['space.23']
       @icon = @text['space_fonts']['space.17']
-      #보여줄 스킬 없음
     }
-
     if(@player_data['setting'][13]) {
       @left_hotbar = @text['space_fonts']['space.23']
       @left_icon = @text['space_fonts']['space.17']

@@ -33,7 +33,7 @@ proc _new_data(@uuid, @players_data) {
 }
 
 proc _send_resourcepack(@player, @uuid, @players_state) {
-  @resourcepack = 'https://drive.google.com/uc?export=download&id=1HZYW4CkySBKNw8NDmf5wtNQcz1RyrbXB'
+  @resourcepack = 'https://drive.google.com/uc?export=download&id=1ES7ItMFnA4fhLiGXjwSB-ztu6CZqy5Fc'
   send_resourcepack(@player, @resourcepack)
   @player_state = array(
     'join_spec': array(
@@ -225,6 +225,8 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
         if(array_index_exists(@players_data, @uuid)) {
           _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
           #_countdown_skill() {}로 아래 코드 대체
+          
+          #combat_combat_inclination
           @category = 'combat_inclination'
           foreach(@skill in json_decode(@players_data[@uuid]['skill_manager'][0])) {
             #broadcast(@skill)
@@ -245,7 +247,6 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
                   if(@active_skill[1] == 0) {
                     @active_skill[0] = @skills_spec['combat_method'][@skill]['levels'][@level]['active']['cooldown']
                     remove_entity_attribute_modifier(@uuid, 'GENERIC_ATTACK_SPEED', 'sweeping_active')
-                    broadcast(RESET)
                   }
                 } else {
                   if(@active_skill[0] > 0) {
@@ -447,13 +448,13 @@ bind('block_break', null, null, @event, @players_data, @players_item, @hp_blocks
     # mining
     @is_mining_allowed = true
     if(@is_mining_allowed && array_contains(array('COAL_ORE', 'COPPER_ORE', 'GOLD_ORE', 'IRON_ORE', 'REDSTONE_ORE', 'LAPIS_ORE', 'DIAMOND_ORE', 'EMERALD_ORE', 'ANCIENT_DEBRIS'), @event['block'])) {
-      @player_mining_skills = @players_data[@uuid]['skill']['masteries']['mining']
+      @player_mining_skills = @players_data[@uuid]['skill_data']['mining']
       _mineral_mine_event(@event, @player_item, @player_mining_skills, @hp_blocks)
     }
     # farming
     @is_farming_allowed = true
     if(@is_mining_allowed && array_contains(array('WHEAT', 'CARROTS', 'POTATOS', 'BEETROOTS', 'SWEET_BERRIES', 'PUMPKIN', 'MELON'), @event['block'])) {
-      @player_farming_skills = @players_data[@uuid]['skill']['masteries']['farming']
+      @player_farming_skills = @players_data[@uuid]['skill_data']['farming']
       _crop_break_event(@event, @player_item, @player_farming_skills, @hp_blocks)
     }
   }
@@ -473,6 +474,7 @@ bind('player_interact', null, null, @event, @players_data, @players_item, @hp_bl
     }
 
   }
+
   if(@event['action'] == 'right_click_block') {
     # cancel right click harvest berry
     if(@event['block'] == 'SWEET_BERRY_BUSH') {
@@ -490,15 +492,51 @@ bind('player_interact', null, null, @event, @players_data, @players_item, @hp_bl
         @pos = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.2, 'z': @event['location']['z'] + 0.5)
         @delta = array('x': 0.25, 'y': 0.125, 'z': 0.25)
         _particle(@player, 'happy_villager', @pos, @delta, 0, 15)
+        #@uuid = puuid(@player)
+        #mom_playerparticle(@uuid, 'VILLAGER_HAPPY', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 15)
         set_timeout(0, closure( set_blockdata(@event['location'], @data) ))
       } else {
         cancel()
+      }
+    }
+    # watering
+    if(!is_null(@event['item']) && @event['item']['name'] == 'POTION' && @event['item']['meta']['base']['type'] == 'WATER') {
+      if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'ATTACHED_PUMPKIN_STEM', 'ATTACHED_MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
+        @event['location']['y'] -= 1
+        @is_farmland = true
+        cancel()
+      } else if(@event['block'] == 'FARMLAND') {
+        @is_farmland = true
+        cancel()
+      } else {
+        @is_farmland = false
+      }
+      if(@is_farmland) {
+        @data = get_blockdata(@event['location'])
+        play_named_sound(@event['location'], array('sound': 'minecraft:item.bottle.empty', 'category': 'NEUTRAL', 'volum': 1))
+        @data['moisture'] = 6
+        set_blockdata(@event['location'], @data)
+        if(@event['hand'] =='main_hand') {
+          @slot = pheld_slot(@player)
+        } else {
+          @slot = 40
+        }
+        @event['item']['qty'] -= 1
+        if(pmode(@player) != 'CREATIVE') {
+          if(@event['item']['qty'] > 0) {
+            set_inventory_item(@uuid, @slot, @event['item'])
+            pgive_item(@player, array('name': 'GLASS_BOTTLE'))
+          } else {
+            set_inventory_item(@uuid, @slot, array('name': 'GLASS_BOTTLE'))
+          }
+        }
       }
     }
   }
 
   #broadcast(@event)
   if(!is_null(@event['item']) && @event['item']['name'] == 'ENCHANTED_BOOK' && !is_null(@event['item']['meta']) && !is_null(@event['item']['meta']) && @event['item']['meta']['model'] > 0) {
+
     #broadcast(A)
     #take_from_inventory(@uuid, 'PAPER', 1)
   }
@@ -507,25 +545,28 @@ bind('player_interact', null, null, @event, @players_data, @players_item, @hp_bl
 bind('block_grow', null, null, @event) {
   if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
     if(get_blockdata(@event['location'])['age'] > 0) {
-      @under_location = array('x': @event['location']['x'], 'y': @event['location']['y'] - 1, 'z': @event['location']['z'], 'world': @event['location']['world'])
-      if(get_block(@under_location) == 'FARMLAND') {
-        @data = get_blockdata(@under_location)
-        if(@data['moisture'] > 0) { # || @data['moisture'] == 7
-          @data['moisture'] -= rand(0, 3)
-          if(@data['moisture'] < 0) { @data['moisture'] = 0}
-          set_blockdata(@under_location, @data)
+      if((has_storm(@event['location']['world']) || has_thunder(@event['location']['world'])) && @event['location'] == get_highest_block_at(@event['location'])) {
+      
+      } else {
+        @under_location = array('x': @event['location']['x'], 'y': @event['location']['y'] - 1, 'z': @event['location']['z'], 'world': @event['location']['world'])
+        if(get_block(@under_location) == 'FARMLAND') {
+          @data = get_blockdata(@under_location)
+          if(@data['moisture'] > 0) {
+            @data['moisture'] -= rand(1, 3)
+            if(@data['moisture'] < 0) { @data['moisture'] = 0}
+            set_blockdata(@under_location, @data)
+          } else {
+            cancel()
+          }
         } else {
           cancel()
         }
-      } else {
-        cancel()
       }
     } else {
       cancel()
     }
   }
 }
-
 bind('block_fade', null, null, @event) {
   if(@event['block'] == 'FARMLAND') {
     @upper_location = array('x': @event['location']['x'], 'y': @event['location']['y'] + 1, 'z': @event['location']['z'], 'world': @event['location']['world'])

@@ -93,8 +93,7 @@ proc _get_enchanted_item(@enchanting_item, @entries, @luck) {
 }
 
 proc _update_item(@player, @uuid, @items, @players_item) {
-  if(ponline(@player) && array_index_exists(@players_item, @uuid)) {
-    #broadcast(@players_item[@uuid])
+  if(ponline(@player) && array_index_exists(@players_item, @uuid) && array_index_exists(@players_item[@uuid], 'enchantments')) {
     @enchantments = @players_item[@uuid]['enchantments']
     if(array_index_exists(@items, 'main_hand')) {
       @enchantments['main_hand'] = null
