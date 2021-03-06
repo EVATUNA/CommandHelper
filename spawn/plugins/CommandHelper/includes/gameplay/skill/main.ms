@@ -1530,10 +1530,11 @@ register_command('skillbook', array(
 ))
 
 proc _add_epxerience(@uuid, @skill, @skill_data, @add_experience) {
+  #핫타임 있을시 핫타임 반영하기
   if(@skill_data[0] < @skill_data[2]) {
-    @new_experience = @skill_data[1] + @add_experience
+    @new_experience = @skill_data[1] + @add_experience #핫타임 배수 반영
     if(@new_experience < @skill_data[3]) {
-      @skill_data[1] = @new_experience
+      @skill_data[1] = integer(@new_experience)
     } else {
       @skill_data[0] += 1
       @skill_data[1] = 0
@@ -1547,15 +1548,15 @@ proc _mineral_mine_event(@event, @player_item, @player_mining_skills, @hp_blocks
   @uuid = puuid(@player)
   @mineral = @event['block']
   @minerals_spec = array(                                                    #필요도구
-    'COAL_ORE': array('hp': 8, 'hardness': 1, 'ore_selecting_xp': 1),        #나무
-    'COPPER_ORE': array('hp': 20, 'hardness': 2, 'ore_selecting_xp': 2),     #돌, 금
-    'IRON_ORE': array('hp': 35, 'hardness': 3, 'ore_selecting_xp': 4),       #구리
-    'LAPIS_ORE': array('hp': 23, 'hardness': 3, 'ore_selecting_xp': 5),      #구리
-    'GOLD_ORE': array('hp': 23, 'hardness': 4, 'ore_selecting_xp': 7),       #철
-    'REDSTONE_ORE': array('hp': 35, 'hardness': 4, 'ore_selecting_xp': 5),   #철
-    'DIAMOND_ORE': array('hp': 47, 'hardness': 4, 'ore_selecting_xp': 15),   #철
-    'EMERALD_ORE': array('hp': 47, 'hardness': 4, 'ore_selecting_xp': 10),   #철
-    'ANCIENT_DEBRIS': array('hp': 70, 'hardness': 5, 'ore_selecting_xp': 50) #다이야
+    'COAL_ORE': array('hp': 8, 'hardness': 1, 'ore_selecting_xp': 10),        #나무
+    'COPPER_ORE': array('hp': 20, 'hardness': 2, 'ore_selecting_xp': 20),     #돌, 금
+    'IRON_ORE': array('hp': 35, 'hardness': 3, 'ore_selecting_xp': 40),       #구리
+    'LAPIS_ORE': array('hp': 23, 'hardness': 3, 'ore_selecting_xp': 50),      #구리
+    'GOLD_ORE': array('hp': 23, 'hardness': 4, 'ore_selecting_xp': 70),       #철
+    'REDSTONE_ORE': array('hp': 35, 'hardness': 4, 'ore_selecting_xp': 50),   #철
+    'DIAMOND_ORE': array('hp': 47, 'hardness': 4, 'ore_selecting_xp': 150),   #철
+    'EMERALD_ORE': array('hp': 47, 'hardness': 4, 'ore_selecting_xp': 100),   #철
+    'ANCIENT_DEBRIS': array('hp': 70, 'hardness': 5, 'ore_selecting_xp': 500) #다이야
   )
   @pickaxes_hardness = array(          # 캘수있는 광물
     'WOODEN_PICKAXE': 1,   #나무         (석탄)
@@ -1633,6 +1634,7 @@ proc _mineral_mine_event(@event, @player_item, @player_mining_skills, @hp_blocks
         } else {
           set_inventory_item(puuid(@player), @slot, @item)
         }
+        #업데이트 아이템
       }
     } else {
       array_remove(@hp_blocks, @id)
@@ -1759,6 +1761,134 @@ proc _mineral_mine_event(@event, @player_item, @player_mining_skills, @hp_blocks
   #경험 인첸트에 따른 경험치 드랍 조절
 }
 
+proc _crop_mine_event(@event, @player, @uuid, @player_data, @player_item, @crops_spec) {
+  @crop = @event['block']
+  #cancel()
+  if(array_contains(array_keys(@crops_spec), @crop)) {
+    @crop_spec = @crops_spec[@crop]
+    if(array_contains(array('PUMPKIN', 'MELON'), @crop)) {
+
+    } else {
+      @locations = array()
+      @center_location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.5, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
+      @harvesting_method = @player_data['skill_manager'][3]
+      @age = get_blockdata(@center_location)['age']
+      @item = @player_item['main_hand']
+      @slot = pheld_slot(@player)
+      if(!is_null(@item) && array_contains(array('WOODEN_HOE', 'STONE_HOE', 'GOLDEN_HOE', 'IRON_HOE', 'DIAMOND_HOE', 'NETHERITE_HOE'), @item['name'])) {
+        #if(@harvesting_method != '' && @player_data['active_skill']['harvesting_method'][@harvesting_method][1] > 0) {
+          @max_durability = material_info(@item['name'], 'maxDurability')
+          if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
+            @damage = 0
+            @item['meta'] = array()
+          } else {
+            @damage = @item['meta']['damage']
+          }
+          if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'enchants') || !array_index_exists(@item['meta']['enchants'], 'unbreaking')) {
+            @unbreaking_level = 0
+          } else {
+            @unbreaking_level = @item['meta']['enchants']['unbreaking']['elevel']
+          }
+          @breaking_chance = 1 / (@unbreaking_level + 1)
+          switch(@harvesting_method) {
+          case 'wide_hand':
+            if(@age == @crop_spec['max_age']) {
+              if(rand() < @breaking_chance) {
+                @damage += 1
+              }
+              @locations[] = @center_location
+              for(@x = -1, @x < 2, @x++) {
+                for(@z = -1, @z < 2, @z++) {
+                  if(@x != 0 || @z != 0) {
+                    @surrounding_location = array('x': @center_location['x'] + @x, 'y': @center_location['y'], 'z': @center_location['z'] + @z, 'world': @center_location['world'])
+                    if(get_block(@surrounding_location) == @crop && get_blockdata(@surrounding_location)['age'] == @crop_spec['max_age']) {
+                      if(@max_durability > @damage) {
+                        if(rand() < @breaking_chance) {
+                          @damage += 1
+                        }
+                        @locations[] = @surrounding_location
+                        break_block(@surrounding_location)
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            break()
+          case 'golden_finger':
+            if(@age == @crop_spec['max_age']) {
+              if(rand() < @breaking_chance) {
+                @damage += 1
+              }
+              @locations[] = @center_location
+              array_remove(@event['drops'], 0)
+              foreach(@seed in @event['drops']) {
+                drop_item(@center_location, @seed, false)
+              }
+              if(!is_cancelled()) {
+                set_timeout(1, closure() {
+                  set_block(@center_location, @crop)
+                })
+              }
+            } else {
+              cancel()
+            }
+            break()
+          default:
+            if(@age == @crop_spec['max_age']) {
+              if(rand() < @breaking_chance) {
+                @damage += 1
+              }
+              @locations[] = @center_location
+            }
+            break()
+          }
+          if(@max_durability > @damage) {
+            @item['meta']['damage'] = @damage
+            set_inventory_item(puuid(@player), @slot, @item)
+          } else {
+            play_entity_effect(puuid(@player), 'BREAK_EQUIPMENT_MAIN_HAND')
+            set_inventory_item(puuid(@player), @slot, null)
+          }
+          #아이템 업데이트
+        #}
+        if(!is_cancelled()) {
+          @drop_multiply = @player_data['skill_data']['farming']['plenty'][0] + 0 #아이템에 행운이 있을시 + 1 축복이 있을시 + 2
+          @entries = @crop_spec['loot_table']
+          @total_weight = 0
+          foreach(@key: @entry in @entries) {
+            @entries[@key]['weight'] += @entry['quality'] * @player_data['skill_data']['farming'][@crop_spec['mastery']][0]
+            @total_weight += @entry['weight']
+          }
+          foreach(@location in @locations) {
+            @qty = 1 + integer(rand() * (@crop_spec['min_qty'] + @drop_multiply))
+            broadcast(@qty)
+            for(@i = 0, @i < @qty, @i++){
+              @result_weight = @total_weight * round(rand(), 5)
+              @min_weight = 0
+              foreach(@entry in @entries) {
+                @weight = @entry['weight']
+                @max_weight = @min_weight + @weight
+                if(@max_weight > @result_weight) {
+                  drop_item(@location, array('name': @crop_spec['drop'], 'meta': array('display': @entry['rank'] @crop_spec["display"], 'model': @entry['model'])), false)
+                  #경험치 드랍
+                  break()
+                } else {
+                  @min_weight = @max_weight
+                }
+              }
+            }
+          }
+          #숙련도 주기
+          _add_epxerience(@uuid, @crop_spec['mastery'], @player_data['skill_data']['farming'][@crop_spec['mastery']], 10)
+          _add_epxerience(@uuid, 'plenty', @player_data['skill_data']['farming']['plenty'], @crop_spec['plenty_xp'])
+        }
+      }
+    }
+    #break_block()
+  }
+}
+
 proc _farmland_sow_event(@event, @player_item, @player_farming_skills, @sowing_method_skills, @hp_blocks) {
   @player = @event['player']
   @block = @event['block']
@@ -1837,10 +1967,10 @@ proc _farmland_sow_event(@event, @player_item, @player_farming_skills, @sowing_m
         if(material_info(@item['name'], 'maxDurability') == @item['meta']['damage']) {
           play_entity_effect(puuid(@player), 'BREAK_EQUIPMENT_MAIN_HAND')
           set_inventory_item(puuid(@player), @slot, null)
-          #변수상 아이템 설정
         } else {
           set_inventory_item(puuid(@player), @slot, @item)
         }
+        #업데이트 아이템
       }
     } else {
       @hp = 0
@@ -1848,100 +1978,6 @@ proc _farmland_sow_event(@event, @player_item, @player_farming_skills, @sowing_m
     }
   }
 }
-
-
-/*
-bind('block_break', array('id': 'mastery.mining'), null, @e, @minerals, @pickaxes) {
-   @player = @e['player']
-   @location = @e['location']
-   @allow_worlds = array('world')
-   if(!array_contains(@allow_worlds, @location['world']), exit())
-   @mineral_name = @e['block']
-   if(!array_index_exists(@minerals, @mineral_name), exit())
-   @progress_id = array_implode(@location, '.')
-   @mineral_spec = @minerals[@mineral_name]
-   @player_progress = _get_progress(@player)
-   @drop_items = array()
-   if(!array_index_exists(@player_progress, @progress_id)) { ## 아직 캐보지 않은 곳일 경우
-      @player_progress[@progress_id] = array(
-         'mineral_name': @mineral_name,
-         'health': @mineral_spec['health']
-      )
-   }
-   @here_progress = @player_progress[@progress_id]
-   if(@here_progress['mineral_name'] != @mineral_name) { ###
-      modify_event('xp', 0)
-      set_timeout(0, closure() {
-         set_block(@location, @mineral_name)
-      })
-      @player_progress[@progress_key] = array(
-         'mineral_name': @mineral_name,
-         'health': @mineral_spec['health']
-      )
-      _set_value(@progress)
-      exit()
-   }
-   @held_item = pinv(@player, null)
-   @pickaxe_hardness = 0
-   @breakble = 0
-   @mining_power = 1.0
-   if(@held_item && array_index_exists(@pickaxes, @held_item['name'])) {
-      if(@held_item['meta'] && array_index_exists(@held_item['meta'], 'modifiers')) {
-         foreach(@modifier in @held_item['meta']['modifiers']) {
-            if(@modifier['attribute'] == 'HORSE_JUMP_STRENGTH') {
-               @mining_power = @modifier['amount']
-               break()
-            }
-         }
-      }
-      @pickaxe_hardness = @pickaxes[@held_item['name']]
-   }
-   if(@pickaxe_hardness >= @mineral_spec['hardness']) { ## 곡괭이가 광물 수준에 맞을 경우
-      @breakble = 1
-   }
-   #@masteries = _get_value(@player)
-   #@experiences = @masteries['EXPERIENCE']
-   @mineral_damage = (@breakble * @mining_power)
-   #@mineral_damage = (@breakble * @mining_power + @breakble * @mining_power * (1 + (@experiences['MINER_SKILL'] * 2)) / 100)
-
-   @mineral_max_health = @minerals[@mineral_name]['health']
-   @mineral_health = integer(@here_progress['health'] - @mineral_damage)
-   @here_progress['health'] = @mineral_health
-   @progress_text
-   if(@mineral_health <= 0) {
-      @mineral_health = 0
-      play_named_sound(@location, array(
-         'sound': 'minecraft:entity.player.levelup',
-         'category': 'PLAYERS',
-         'volume': 0.4,
-         'pitch': 1.5
-      ), @player)
-      array_remove(@player_progress, @progress_id)
-      @progress_text = ''
-
-      @use_ability_name = (split('_', @mineral_name)[0].'_MINING')
-      @drop_items = _get_rank_mineral(@mineral_name, 3, 0)
-      #if(array_index_exists(@experiences, @use_ability_name)) {
-      #   @mining_level = _get_ability_level(@player, @use_ability_name)
-      #   @ore_selecting_level = _get_ability_level(@player, 'ORE_SELECTING')
-      #   @drop_items = _get_rank_mineral(@mineral_name, @mining_level, @ore_selecting_level)
-      #   _add_mastery(@player, @use_ability_name, @rewards['MINERALS'][@mineral_name])
-      #}
-   } else {
-      modify_event('xp', 0)
-      set_timeout(0, closure() {
-         set_block(@location, @mineral_name)
-      })
-   }
-   _set_progress(@player, @player_progress)
-   @progress_text_multiple = integer(@mineral_health / @mineral_max_health * 50)
-   if(@mineral_health > 0) {
-      @progress_text = '§9'.string_multiply('', @progress_text_multiple).string_multiply('', @progress_text_multiple) '§9'.string_multiply('', @progress_text_multiple).string_multiply('', @progress_text_multiple)
-   }
-   action_msg(@player, @progress_text)
-   modify_event('drops', @drop_items)
-}
-*/
 /*
 bind('block_break', null, null, @event) {
   @player = @event['player']

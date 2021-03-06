@@ -440,22 +440,218 @@ bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @p
   }
 }
 
-bind('block_break', null, null, @event, @players_data, @players_item, @hp_blocks) {
+@crops_spec = array(
+  'WHEAT': array(
+    'drop': 'WHEAT',
+    'display': '밀',
+    'max_age': 7,
+    'min_qty': 1,
+    'mastery': 'wheat_farming_mastery',
+    'plenty_xp': 20,
+    'loot_table': array(
+      array(
+        'rank': '§f하급',
+        'model': 1,
+        'weight': 100,
+        'quality': 0
+      ),
+      array(
+        'rank': '§e중급',
+        'model': 2,
+        'weight': 20,
+        'quality': 1
+      ),
+      array(
+        'rank': '§b상급',
+        'model': 3,
+        'weight': 5,
+        'quality': 0.5
+      )
+    )
+  ),
+  'BEETROOTS': array(
+    'drop': 'BEETROOT',
+    'display': '사탕무',
+    'max_age': 3,
+    'min_qty': 1,
+    'mastery': 'beetroots_farming_mastery',
+    'plenty_xp': 10,
+    'loot_table': array(
+      array(
+        'rank': '§f하급',
+        'model': 1,
+        'weight': 100,
+        'quality': 0
+      ),
+      array(
+        'rank': '§e중급',
+        'model': 2,
+        'weight': 20,
+        'quality': 1
+      ),
+      array(
+        'rank': '§b상급',
+        'model': 3,
+        'weight': 5,
+        'quality': 0.5
+      )
+    )
+  ),
+  'POTATOS': array(
+    'drop': 'PATATO',
+    'display': '감자',
+    'max_age': 7,
+    'min_qty': 3,
+    'mastery': 'potatoes_farming_mastery',
+    'plenty_xp': 20,
+    'loot_table': array(
+      array(
+        'rank': '§f하급',
+        'model': 1,
+        'weight': 100,
+        'quality': 0
+      ),
+      array(
+        'rank': '§e중급',
+        'model': 2,
+        'weight': 20,
+        'quality': 1
+      ),
+      array(
+        'rank': '§b상급',
+        'model': 3,
+        'weight': 5,
+        'quality': 0.5
+      )
+    )
+  ),
+  'CARROTS': array(
+    'drop': 'CARROT',
+    'display': '당근',
+    'max_age': 7,
+    'min_qty': 3,
+    'mastery': 'carrots_farming_mastery',
+    'plenty_xp': 20,
+    'loot_table': array(
+      array(
+        'rank': '§f하급',
+        'model': 1,
+        'weight': 100,
+        'quality': 0
+      ),
+      array(
+        'rank': '§e중급',
+        'model': 2,
+        'weight': 20,
+        'quality': 1
+      ),
+      array(
+        'rank': '§b상급',
+        'model': 3,
+        'weight': 5,
+        'quality': 0.5
+      )
+    )
+  ),
+  'SWEET_BERRIES': array(
+    'drop': 'SWEET_BERRIES',
+    'display': '크랜베리',
+    'max_age': 3,
+    'min_qty': 2,
+    'mastery': 'berry_farming_mastery',
+    'plenty_xp': 10,
+    'loot_table': array(
+      array(
+        array(
+          'rank': '§f하급',
+          'model': 1,
+          'weight': 100,
+          'quality': 0
+        ),
+        array(
+          'rank': '§e중급',
+          'model': 2,
+          'weight': 20,
+          'quality': 1
+        ),
+        array(
+          'rank': '§b상급',
+          'model': 3,
+          'weight': 5,
+          'quality': 0.5
+        )
+      )
+    )),
+  'PUMPKIN': array(
+    'drop': 'PUMPKIN',
+    'display': '호박',
+    'min_qty': 1,
+    'mastery': 'pumpkin_farming_mastery',
+    'plenty_xp': 0,
+    'loot_table': array(
+      array(
+        'rank': '§f하급',
+        'model': 1,
+        'weight': 100,
+        'quality': 0
+      ),
+      array(
+        'rank': '§e중급',
+        'model': 2,
+        'weight': 20,
+        'quality': 1
+      ),
+      array(
+        'rank': '§b상급',
+        'model': 3,
+        'weight': 5,
+        'quality': 0.5
+      )
+    )
+  ),
+  'MELON': array(
+    'drop': 'MELON',
+    'display': '수박',
+    'min_qty': 1,
+    'mastery': 'melon_farming_mastery',
+    'plenty_xp': 0,
+    'loot_table': array(
+      array(
+        'rank': '§f하급',
+        'model': 1,
+        'weight': 100,
+        'quality': 0
+      ),
+      array(
+        'rank': '§e중급',
+        'model': 2,
+        'weight': 20,
+        'quality': 1
+      ),
+      array(
+        'rank': '§b상급',
+        'model': 3,
+        'weight': 5,
+        'quality': 0.5
+      )
+    )
+  )
+)
+
+bind('block_break', null, null, @event, @players_data, @players_item, @hp_blocks, @crops_spec) {
   @player = @event['player']
   @uuid = puuid(@player)
   if(pmode(@player) == 'SURVIVAL') {
+    @player_data = @players_data[@uuid]
     @player_item = @players_item[@uuid]
-    # mining
+    @is_farming_allowed = true
+    if(@is_farming_allowed) {
+      _crop_mine_event(@event, @player, @uuid, @player_data, @player_item, @crops_spec)
+    }
     @is_mining_allowed = true
     if(@is_mining_allowed && array_contains(array('COAL_ORE', 'COPPER_ORE', 'GOLD_ORE', 'IRON_ORE', 'REDSTONE_ORE', 'LAPIS_ORE', 'DIAMOND_ORE', 'EMERALD_ORE', 'ANCIENT_DEBRIS'), @event['block'])) {
       @player_mining_skills = @players_data[@uuid]['skill_data']['mining']
       _mineral_mine_event(@event, @player_item, @player_mining_skills, @hp_blocks)
-    }
-    # farming
-    @is_farming_allowed = true
-    if(@is_mining_allowed && array_contains(array('WHEAT', 'CARROTS', 'POTATOS', 'BEETROOTS', 'SWEET_BERRIES', 'PUMPKIN', 'MELON'), @event['block'])) {
-      @player_farming_skills = @players_data[@uuid]['skill_data']['farming']
-      _crop_break_event(@event, @player_item, @player_farming_skills, @hp_blocks)
     }
   }
 }
@@ -491,9 +687,9 @@ bind('player_interact', null, null, @event, @players_data, @players_item, @hp_bl
         cancel()
         @pos = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.2, 'z': @event['location']['z'] + 0.5)
         @delta = array('x': 0.25, 'y': 0.125, 'z': 0.25)
-        _particle(@player, 'happy_villager', @pos, @delta, 0, 15)
-        #@uuid = puuid(@player)
-        #mom_playerparticle(@uuid, 'VILLAGER_HAPPY', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 15)
+        @uuid = puuid(@player)
+        mom_playerparticle(@uuid, 'VILLAGER_HAPPY', @pos['x'], @pos['y'], @pos['z'], 15, @delta['x'], @delta['y'], @delta['z'], 0.0)
+        #_particle(@player, 'happy_villager', @pos, @delta, 0, 15)
         set_timeout(0, closure( set_blockdata(@event['location'], @data) ))
       } else {
         cancel()
