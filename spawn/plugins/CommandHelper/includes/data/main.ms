@@ -433,9 +433,8 @@ bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spe
       _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skills_spec, @text)
     }
     @is_mining_allowed = true
-    if(@is_mining_allowed && array_contains(array('COAL_ORE', 'COPPER_ORE', 'GOLD_ORE', 'IRON_ORE', 'REDSTONE_ORE', 'LAPIS_ORE', 'DIAMOND_ORE', 'EMERALD_ORE', 'ANCIENT_DEBRIS'), @event['block'])) {
-      #@player_mining_skills = @players_data[@uuid]['skill_data']['mining']
-      _mineral_mine_event(@event, @players_data, @hp_blocks, @minerals_spec, @skills_spec, @text)
+    if(@is_mining_allowed) {
+      _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @minerals_spec, @skills_spec, @text)
     }
   }
 }

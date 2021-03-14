@@ -1,45 +1,98 @@
 {
-  "WHEAT": {
-    "max_age": 7,
+  "COAL_ORE": {
+    "hp": 15,
+    "hardness": 1,
+    "default_qty": 1,
+    "default_xp": 1,
+    "extra_xp": 0,
+    "mastery": "iron_mining_mastery",
+    "skills": {
+      "mining": {
+        "iron_mining_mastery": {
+          "default_xp": 1,
+          "extra_xp": 0
+        },
+        "ore_selecting": {
+          "default_xp": 1,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "IRON_INGOT"
+        },
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§e중급 철괴",
+            "model": 1
+          }
+        },
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§b상급 철괴",
+            "model": 2
+          }
+        },
+        "weight": 5,
+        "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§d최상급 철괴",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
+      }
+    ]
+  },
+  "NETHER_QUARTZ_ORE": {
+    "hp": 25,
+    "hardness": 1,
     "default_qty": 1,
     "default_xp": 0.125,
     "extra_xp": 1.5,
-    "mastery": "wheat_farming_mastery",
+    "mastery": "iron_mining_mastery",
     "skills": {
-      "farming": {
-        "wheat_farming_mastery": {
-          "default_xp": -0.5,
-          "extra_xp": 2
+      "mining": {
+        "iron_mining_mastery": {
+          "default_xp": 1,
+          "extra_xp": 0
         },
-        "plenty": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      },
-      "harvesting_method": {
-        "wide_hand": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "golden_finger": {
-          "default_xp": -0.5,
-          "extra_xp": 2
+        "ore_selecting": {
+          "default_xp": 1.25,
+          "extra_xp": 0.5
         }
       }
     },
     "loot_table": [
       {
         "item": {
-          "name": "WHEAT"
+          "name": "IRON_INGOT"
         },
         "weight": 100,
         "quality": 0
       },
       {
         "item": {
-          "name": "WHEAT",
+          "name": "IRON_INGOT",
           "meta": {
-            "display": "§e중급 밀",
+            "display": "§e중급 철괴",
             "model": 1
           }
         },
@@ -48,298 +101,60 @@
       },
       {
         "item": {
-          "name": "WHEAT",
+          "name": "IRON_INGOT",
           "meta": {
-            "display": "§b상급 밀",
+            "display": "§b상급 철괴",
             "model": 2
           }
         },
         "weight": 5,
         "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§d최상급 철괴",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
       }
     ]
   },
-  "BEETROOTS": {
-    "max_age": 3,
-    "default_qty": 1,
-    "default_xp": -0.25,
-    "extra_xp": 1,
-    "mastery": "beetroot_farming_mastery",
-    "skills": {
-      "farming": {
-        "beetroot_farming_mastery": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "plenty": {
-          "default_xp": -0.5,
-          "extra_xp": 1.75
-        }
-      },
-      "harvesting_method": {
-        "wide_hand": {
-          "default_xp": -0.5,
-          "extra_xp": 1.75
-        },
-        "golden_finger": {
-          "default_xp": -0.5,
-          "extra_xp": 1.75
-        }
-      }
-    },
-    "loot_table": [
-      {
-        "item": {
-          "name": "BEETROOT"
-        },
-        "weight": 100,
-        "quality": 0
-      },
-      {
-        "item": {
-          "name": "BEETROOT",
-          "meta": {
-            "display": "§e중급 사탕무",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
-      },
-      {
-        "item": {
-          "name": "BEETROOT",
-          "meta": {
-            "display": "§b상급 사탕무",
-            "model": 2
-          }
-        },
-        "weight": 5,
-        "quality": 0.5
-      }
-    ]
-  },
-  "POTATOS": {
-    "max_age": 7,
-    "default_qty": 3,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
-    "mastery": "potato_farming_mastery",
-    "skills": {
-      "farming": {
-        "potato_farming_mastery": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "plenty": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      },
-      "harvesting_method": {
-        "wide_hand": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "golden_finger": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      }
-    },
-    "loot_table": [
-      {
-        "item": {
-          "name": "POTATO"
-        },
-        "weight": 100,
-        "quality": 0
-      },
-      {
-        "item": {
-          "name": "POTATO",
-          "meta": {
-            "display": "§e중급 감자",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
-      },
-      {
-        "item": {
-          "name": "POTATO",
-          "meta": {
-            "display": "§b상급 감자",
-            "model": 2
-          }
-        },
-        "weight": 5,
-        "quality": 0.5
-      }
-    ]
-  },
-  "CARROTS": {
-    "max_age": 7,
-    "default_qty": 3,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
-    "mastery": "carrot_farming_mastery",
-    "skills": {
-      "farming": {
-        "carrot_farming_mastery": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "plenty": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      },
-      "harvesting_method": {
-        "wide_hand": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "golden_finger": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      }
-    },
-    "loot_table": [
-      {
-        "item": {
-          "name": "CARROT"
-        },
-        "weight": 100,
-        "quality": 0
-      },
-      {
-        "item": {
-          "name": "CARROT",
-          "meta": {
-            "display": "§e중급 당근",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
-      },
-      {
-        "item": {
-          "name": "CARROT",
-          "meta": {
-            "display": "§b상급 당근",
-            "model": 2
-          }
-        },
-        "weight": 5,
-        "quality": 0.5
-      }
-    ]
-  },
-  "SWEET_BERRIES": {
-    "max_age": 3,
-    "default_qty": 2,
-    "default_xp": -0.25,
-    "extra_xp": 1,
-    "mastery": "berries_farming_mastery",
-    "skills": {
-      "farming": {
-        "berries_farming_mastery": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "plenty": {
-          "default_xp": -0.5,
-          "extra_xp": 1.75
-        }
-      },
-      "harvesting_method": {
-        "wide_hand": {
-          "default_xp": -0.5,
-          "extra_xp": 1.75
-        },
-        "golden_finger": {
-          "default_xp": -0.5,
-          "extra_xp": 1.75
-        }
-      }
-    },
-    "loot_table": [
-      {
-        "item": {
-          "name": "SWEET_BERRIES"
-        },
-        "weight": 100,
-        "quality": 0
-      },
-      {
-        "item": {
-          "name": "SWEET_BERRIES",
-          "meta": {
-            "display": "§e중급 크랜베리",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
-      },
-      {
-        "item": {
-          "name": "SWEET_BERRIES",
-          "meta": {
-            "display": "§b상급 크랜베리",
-            "model": 2
-          }
-        },
-        "weight": 5,
-        "quality": 0.5
-      }
-    ]
-  },
-  "PUMPKIN": {
-    "stem": "ATTACHED_PUMPKIN_STEM",
+  "COPPER_ORE": {
+    "hp": 40,
+    "hardness": 2,
     "default_qty": 1,
     "default_xp": 0.125,
     "extra_xp": 1.5,
-    "mastery": "pumpkin_farming_mastery",
+    "mastery": "iron_mining_mastery",
     "skills": {
-      "farming": {
-        "pumpkin_farming_mastery": {
-          "default_xp": -0.5,
-          "extra_xp": 2
+      "mining": {
+        "iron_mining_mastery": {
+          "default_xp": 1,
+          "extra_xp": 0
         },
-        "plenty": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      },
-      "harvesting_method": {
-        "wide_hand": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "golden_finger": {
-          "default_xp": -0.5,
-          "extra_xp": 2
+        "ore_selecting": {
+          "default_xp": 2,
+          "extra_xp": 0
         }
       }
     },
     "loot_table": [
       {
         "item": {
-          "name": "PUMPKIN"
+          "name": "IRON_INGOT"
         },
         "weight": 100,
         "quality": 0
       },
       {
         "item": {
-          "name": "PUMPKIN",
+          "name": "IRON_INGOT",
           "meta": {
-            "display": "§e중급 호박",
+            "display": "§e중급 철괴",
             "model": 1
           }
         },
@@ -348,58 +163,60 @@
       },
       {
         "item": {
-          "name": "PUMPKIN",
+          "name": "IRON_INGOT",
           "meta": {
-            "display": "§b상급 호박",
+            "display": "§b상급 철괴",
             "model": 2
           }
         },
         "weight": 5,
         "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§d최상급 철괴",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
       }
     ]
   },
-  "MELON": {
-    "stem": "ATTACHED_MELON_STEM",
+  "IRON_ORE": {
+    "hp": 70,
+    "hardness": 3,
     "default_qty": 1,
     "default_xp": 0.125,
     "extra_xp": 1.5,
-    "mastery": "melon_farming_mastery",
+    "mastery": "iron_mining_mastery",
     "skills": {
-      "farming": {
-        "melon_farming_mastery": {
-          "default_xp": -0.5,
-          "extra_xp": 2
+      "mining": {
+        "iron_mining_mastery": {
+          "default_xp": 1,
+          "extra_xp": 0
         },
-        "plenty": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      },
-      "harvesting_method": {
-        "wide_hand": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "golden_finger": {
-          "default_xp": -0.5,
-          "extra_xp": 2
+        "ore_selecting": {
+          "default_xp": 4,
+          "extra_xp": 0
         }
       }
     },
     "loot_table": [
       {
         "item": {
-          "name": "MELON"
+          "name": "IRON_INGOT"
         },
         "weight": 100,
         "quality": 0
       },
       {
         "item": {
-          "name": "MELON",
+          "name": "IRON_INGOT",
           "meta": {
-            "display": "§e중급 수박",
+            "display": "§e중급 철괴",
             "model": 1
           }
         },
@@ -408,14 +225,459 @@
       },
       {
         "item": {
-          "name": "MELON",
+          "name": "IRON_INGOT",
           "meta": {
-            "display": "§b상급 수박",
+            "display": "§b상급 철괴",
             "model": 2
           }
         },
         "weight": 5,
         "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§d최상급 철괴",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
+      }
+    ]
+  },
+  "LAPIS_ORE": {
+    "hp": 50,
+    "hardness": 3,
+    "default_qty": 4,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "mastery": "iron_mining_mastery",
+    "skills": {
+      "mining": {
+        "iron_mining_mastery": {
+          "default_xp": 1,
+          "extra_xp": 0
+        },
+        "ore_selecting": {
+          "default_xp": 5,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "IRON_INGOT"
+        },
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§e중급 철괴",
+            "model": 1
+          }
+        },
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§b상급 철괴",
+            "model": 2
+          }
+        },
+        "weight": 5,
+        "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§d최상급 철괴",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
+      }
+    ]
+  },
+  "GOLD_ORE": {
+    "hp": 50,
+    "hardness": 4,
+    "default_qty": 1,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "mastery": "iron_mining_mastery",
+    "skills": {
+      "mining": {
+        "iron_mining_mastery": {
+          "default_xp": 1,
+          "extra_xp": 0
+        },
+        "ore_selecting": {
+          "default_xp": 7,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "IRON_INGOT"
+        },
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§e중급 철괴",
+            "model": 1
+          }
+        },
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§b상급 철괴",
+            "model": 2
+          }
+        },
+        "weight": 5,
+        "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§d최상급 철괴",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
+      }
+    ]
+  },
+  "NETHER_GOLD_ORE": {
+    "hp": 50,
+    "hardness": 4,
+    "default_qty": 1,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "mastery": "iron_mining_mastery",
+    "skills": {
+      "mining": {
+        "iron_mining_mastery": {
+          "default_xp": 7.25,
+          "extra_xp": 0.5
+        },
+        "ore_selecting": {
+          "default_xp": 1,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "IRON_INGOT"
+        },
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§e중급 철괴",
+            "model": 1
+          }
+        },
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§b상급 철괴",
+            "model": 2
+          }
+        },
+        "weight": 5,
+        "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§d최상급 철괴",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
+      }
+    ]
+  },
+  "REDSTONE_ORE": {
+    "hp": 70,
+    "hardness": 4,
+    "default_qty": 4,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "mastery": "iron_mining_mastery",
+    "skills": {
+      "mining": {
+        "iron_mining_mastery": {
+          "default_xp": 1,
+          "extra_xp": 0
+        },
+        "ore_selecting": {
+          "default_xp": 5,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "IRON_INGOT"
+        },
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§e중급 철괴",
+            "model": 1
+          }
+        },
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§b상급 철괴",
+            "model": 2
+          }
+        },
+        "weight": 5,
+        "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§d최상급 철괴",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
+      }
+    ]
+  },
+  "DIAMOND_ORE": {
+    "hp": 100,
+    "hardness": 4,
+    "default_qty": 1,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "mastery": "iron_mining_mastery",
+    "skills": {
+      "mining": {
+        "iron_mining_mastery": {
+          "default_xp": 1,
+          "extra_xp": 0
+        },
+        "ore_selecting": {
+          "default_xp": 15,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "IRON_INGOT"
+        },
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§e중급 철괴",
+            "model": 1
+          }
+        },
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§b상급 철괴",
+            "model": 2
+          }
+        },
+        "weight": 5,
+        "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§d최상급 철괴",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
+      }
+    ]
+  },
+  "EMERALD_ORE": {
+    "hp": 100,
+    "hardness": 4,
+    "default_qty": 1,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "mastery": "iron_mining_mastery",
+    "skills": {
+      "mining": {
+        "iron_mining_mastery": {
+          "default_xp": 15,
+          "extra_xp": 0
+        },
+        "ore_selecting": {
+          "default_xp": 1,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "IRON_INGOT"
+        },
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§e중급 철괴",
+            "model": 1
+          }
+        },
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§b상급 철괴",
+            "model": 2
+          }
+        },
+        "weight": 5,
+        "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§d최상급 철괴",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
+      }
+    ]
+  },
+  "ANCIENT_DEBRIS": {
+    "hp": 200,
+    "hardness": 5,
+    "default_qty": 1,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "mastery": "iron_mining_mastery",
+    "skills": {
+      "mining": {
+        "iron_mining_mastery": {
+          "default_xp": 1,
+          "extra_xp": 0
+        },
+        "ore_selecting": {
+          "default_xp": 50,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "IRON_INGOT"
+        },
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§e중급 철괴",
+            "model": 1
+          }
+        },
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§b상급 철괴",
+            "model": 2
+          }
+        },
+        "weight": 5,
+        "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§d최상급 철괴",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
       }
     ]
   }
