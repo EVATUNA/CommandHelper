@@ -35,3 +35,16 @@
 broadcast(get_entity_immunity_ticks(@uuid))
 set_entity_immunity_ticks(@uuid, $tick)
 <<<
+
+/shield = >>>
+@item = array('name': 'SHIELD', meta: array('damage': 1))
+set_inventory_item(puuid(player()), pheld_slot(player()), @item)
+<<<
+
+/item = >>>
+broadcast(get_inventory_item(puuid(player()), pheld_slot(player())))
+<<<
+
+/itemframe = >>>
+spawn_entity('item_frame', 1, ploc())
+<<<

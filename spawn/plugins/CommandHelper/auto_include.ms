@@ -11,7 +11,6 @@
 )
 @players_state = array()
 @players_data = array()
-@players_item = array()
 @hp_blocks = array()
 @text = array()
 async_read('files/font_space.json', closure(@value) {
@@ -19,6 +18,14 @@ async_read('files/font_space.json', closure(@value) {
 })
 async_read('files/general_emoji.json', closure(@value) {
   @text['general_emoji'] = json_decode(@value)
+})
+
+## Gameplay Data
+@crops_spec = array()
+async_read('files/crops_spec.json', closure(@value) {
+  foreach(@crop: @spec in json_decode(@value)) {
+    @crops_spec[@crop] = @spec
+  }
 })
 
 ## Initial Including Procedure

@@ -167,12 +167,34 @@
 						"count": 0,
 						"energy": 0
 					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					},
+					"active": {
+						"cooldown": 60,
+						"duration": 1,
+						"count": 0,
+						"energy": 0
+					}
 				}
 			]
 		},
 		"blocking": {
 			"default_max_level": 3,
 			"levels": [
+				{
+					"max_experience": 1000,
+					"passive": {
+					},
+					"active": {
+						"cooldown": 60,
+						"duration": 1,
+						"count": 0,
+						"energy": 0
+					}
+				},
 				{
 					"max_experience": 1000,
 					"passive": {
@@ -285,12 +307,34 @@
 						"count": 0,
 						"energy": 0
 					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					},
+					"active": {
+						"cooldown": 60,
+						"duration": 1,
+						"count": 0,
+						"energy": 0
+					}
 				}
 			]
 		},
 	"crossbow_mastery": {
 			"default_max_level": 3,
 			"levels": [
+				{
+					"max_experience": 1000,
+					"passive": {
+					},
+					"active": {
+						"cooldown": 60,
+						"duration": 1,
+						"count": 0,
+						"energy": 0
+					}
+				},
 				{
 					"max_experience": 1000,
 					"passive": {
@@ -363,34 +407,21 @@
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
 					}
 				}
 			]
@@ -401,34 +432,21 @@
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
 					}
 				}
 			]
@@ -439,34 +457,21 @@
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
 					}
 				}
 			]
@@ -477,34 +482,21 @@
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
 					}
 				}
 			]
@@ -515,34 +507,21 @@
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
 					}
 				}
 			]
@@ -553,34 +532,21 @@
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
 					}
 				}
 			]
@@ -591,34 +557,21 @@
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
 					}
 				}
 			]
@@ -629,34 +582,21 @@
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
 					}
 				}
 			]
@@ -698,12 +638,34 @@
 						"count": 0,
 						"energy": 0
 					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					},
+					"active": {
+						"cooldown": 60,
+						"duration": 1,
+						"count": 0,
+						"energy": 0
+					}
 				}
 			]
 		},
 	"golden_finger": {
 			"default_max_level": 3,
 			"levels": [
+				{
+					"max_experience": 1000,
+					"passive": {
+					},
+					"active": {
+						"cooldown": 60,
+						"duration": 1,
+						"count": 0,
+						"energy": 0
+					}
+				},
 				{
 					"max_experience": 1000,
 					"passive": {
@@ -776,12 +738,34 @@
 						"count": 0,
 						"energy": 0
 					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					},
+					"active": {
+						"cooldown": 60,
+						"duration": 1,
+						"count": 0,
+						"energy": 0
+					}
 				}
 			]
 		},
 	"fertile_touch": {
 			"default_max_level": 3,
 			"levels": [
+				{
+					"max_experience": 1000,
+					"passive": {
+					},
+					"active": {
+						"cooldown": 60,
+						"duration": 1,
+						"count": 0,
+						"energy": 0
+					}
+				},
 				{
 					"max_experience": 1000,
 					"passive": {
@@ -825,34 +809,31 @@
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
 					}
 				}
 			]
@@ -863,34 +844,31 @@
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
 					}
 				}
 			]
@@ -901,34 +879,31 @@
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
 					}
 				}
 			]
@@ -939,34 +914,31 @@
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
 					}
 				}
 			]
@@ -977,34 +949,31 @@
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
 					}
 				}
 			]
@@ -1015,34 +984,31 @@
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
 					}
 				}
 			]
@@ -1053,34 +1019,31 @@
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
-					},
-					"active": {
-						"cooldown": 60,
-						"duration": 1,
-						"count": 0,
-						"energy": 0
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1000,
+					"passive": {
 					}
 				}
 			]

@@ -12,7 +12,6 @@ async_read('skills_spec.json', closure(@value) {
     @skills_spec[@category] = @skills
   }
 })
-#["\ue3db\ue3dc\ue3dd\ue3de\ue3df", "\ue3e0\ue3e1\ue3e2\ue3e3\ue3e4", "\ue3e5\ue3e6\ue3e7\ue3e8\ue3e9", "\ue3ea\ue3eb\ue3ec\ue3ed\ue3ee", "\ue3ef\ue3f0\ue3f1\ue3f2\ue3f3", "\ue3f4\ue3f5\ue3f6\ue3f7\ue3f8"]
 
 proc _load_skill_data(@uuid, @category, @skill, @is_default, @players_data, @skills_spec) {
   @skill_data = cup_get('SKILL_DATA', @uuid.'_'.@skill)
@@ -1763,7 +1762,6 @@ proc _mineral_mine_event(@event, @player_item, @player_mining_skills, @hp_blocks
 
 proc _crop_mine_event(@event, @player, @uuid, @player_data, @player_item, @crops_spec) {
   @crop = @event['block']
-  #cancel()
   if(array_contains(array_keys(@crops_spec), @crop)) {
     @crop_spec = @crops_spec[@crop]
     if(array_contains(array('PUMPKIN', 'MELON'), @crop)) {
@@ -1790,6 +1788,8 @@ proc _crop_mine_event(@event, @player, @uuid, @player_data, @player_item, @crops
             @unbreaking_level = @item['meta']['enchants']['unbreaking']['elevel']
           }
           @breaking_chance = 1 / (@unbreaking_level + 1)
+          @wide_hand_xp = @crop_spec['skill']['wide_hand_xp']
+          @golden_finger_xp = @crop_spec['skill']['golden_finger_xp']
           switch(@harvesting_method) {
           case 'wide_hand':
             if(@age == @crop_spec['max_age']) {
@@ -1814,6 +1814,7 @@ proc _crop_mine_event(@event, @player, @uuid, @player_data, @player_item, @crops
                 }
               }
             }
+            @wide_hand_xp *= 1.5
             break()
           case 'golden_finger':
             if(@age == @crop_spec['max_age']) {
@@ -1833,6 +1834,7 @@ proc _crop_mine_event(@event, @player, @uuid, @player_data, @player_item, @crops
             } else {
               cancel()
             }
+            @golden_finger_xp *= 1.5
             break()
           default:
             if(@age == @crop_spec['max_age']) {
@@ -1857,18 +1859,17 @@ proc _crop_mine_event(@event, @player, @uuid, @player_data, @player_item, @crops
           @entries = @crop_spec['loot_table']
           @total_weight = 0
           foreach(@key: @entry in @entries) {
-            @entries[@key]['weight'] += @entry['quality'] * @player_data['skill_data']['farming'][@crop_spec['mastery']][0]
+            @entries[@key]['weight'] += @entry['quality'] * @player_data['skill_data']['farming'][@crop_spec['skill']['mastery']][0]
             @total_weight += @entry['weight']
           }
           foreach(@location in @locations) {
             @qty = 1 + integer(rand() * (@crop_spec['min_qty'] + @drop_multiply))
-            broadcast(@qty)
+            #broadcast(@qty)
             for(@i = 0, @i < @qty, @i++){
               @result_weight = @total_weight * round(rand(), 5)
               @min_weight = 0
               foreach(@entry in @entries) {
-                @weight = @entry['weight']
-                @max_weight = @min_weight + @weight
+                @max_weight = @min_weight + @entry['weight']
                 if(@max_weight > @result_weight) {
                   drop_item(@location, array('name': @crop_spec['drop'], 'meta': array('display': @entry['rank'] @crop_spec["display"], 'model': @entry['model'])), false)
                   #경험치 드랍
@@ -1879,211 +1880,114 @@ proc _crop_mine_event(@event, @player, @uuid, @player_data, @player_item, @crops
               }
             }
           }
-          #숙련도 주기
-          _add_epxerience(@uuid, @crop_spec['mastery'], @player_data['skill_data']['farming'][@crop_spec['mastery']], 10)
-          _add_epxerience(@uuid, 'plenty', @player_data['skill_data']['farming']['plenty'], @crop_spec['plenty_xp'])
+          _add_epxerience(@uuid, @crop_spec['skill']['mastery'], @player_data['skill_data']['farming'][@crop_spec['skill']['mastery']], 10)
+          _add_epxerience(@uuid, 'plenty', @player_data['skill_data']['farming']['plenty'], @crop_spec['skill']['plenty_xp'])
+          _add_epxerience(@uuid, 'wide_hand', @player_data['skill_data']['harvesting_method']['wide_hand'], @wide_hand_xp)
+          _add_epxerience(@uuid, 'golden_finger', @player_data['skill_data']['harvesting_method']['golden_finger'], @golden_finger_xp)
         }
       }
     }
-    #break_block()
   }
 }
 
-proc _farmland_sow_event(@event, @player_item, @player_farming_skills, @sowing_method_skills, @hp_blocks) {
-  @player = @event['player']
+proc _farmland_sow_event(@event, @player, @uuid, @player_item, @hp_blocks) {
   @block = @event['block']
-  @hoes_cooldown = array(
-    'WOODEN_HOE': 40, #30
-    'STONE_HOE': 28, #21
-    'IRON_HOE': 20, #15
-    'DIAMOND_HOE': 12, #9
-    'NETHERITE_HOE': 8, #6
-    'GOLDEN_HOE': 4 #3
-  )
-  @location = array('x': @event['location']['x'], 'y': @event['location']['y'], 'z': @event['location']['z'], 'world': @event['location']['world'])
-  if(@event['hand'] == 'main_hand') {
-    @slot = pheld_slot(@player)
-  } else {
-    @slot = 40
-  }
-  @item = @player_item[@event['hand']]
-  if(pcooldown(@player, @item['name']) == 0) {
-    #효율 인첸트가 되어있을시 쿨타임 * 0.75
-    foreach(@hoe:@hoe_cooldown in @hoes_cooldown) {
-      if(@hoe_cooldown > @hoes_cooldown[@item['name']]) {
-        set_pcooldown(@player, @hoe, @hoe_cooldown)
-        #40 28
+  if(@event['action'] == 'right_click_block' && array_contains(array('GRASS_BLOCK', 'DIRT'), @event['block']) && !is_null(@event['item']) && array_index_exists(@event, 'location')) {
+    @location = array('x': @event['location']['x'], 'y': @event['location']['y'], 'z': @event['location']['z'], 'world': @event['location']['world'])
+    @hoes_cooldown = array(
+      'WOODEN_HOE': 40, #30
+      'STONE_HOE': 28, #21
+      'IRON_HOE': 20, #15
+      'DIAMOND_HOE': 12, #9
+      'NETHERITE_HOE': 8, #6
+      'GOLDEN_HOE': 4 #3
+    )
+    if(array_contains(array_keys(@hoes_cooldown), @event['item']['name']) && array_contains(array('AIR', 'CAVE_AIR', 'VOID_AIR'), get_block(array('x': @location['x'], 'y': @location['y'] + 1, 'z': @location['z'], 'world': @location['world'])))) {
+      if(@event['hand'] == 'main_hand') {
+        @slot = pheld_slot(@player)
       } else {
-        set_pcooldown(@player, @hoe, @hoes_cooldown[@item['name']]) #효율 인첸트 존재시 쿨타임 감소
+        @slot = 40
       }
-    }
-    @sowing_power = 1
-    if(!is_null(@item['meta']) && !is_null(@item['meta']['modifiers']) && array_index_exists(@item['meta'], 'modifiers')) {
-      foreach(@modifier in @item['meta']['modifiers']) {
-        if(@modifier['attribute'] == 'GENERIC_FOLLOW_RANGE') {
-          @sowing_power = @modifier['amount']
-          break()
+      @item = @player_item[@event['hand']]
+      if(pcooldown(@player, @item['name']) == 0) {
+        #효율 인첸트가 되어있을시 쿨타임 * 0.75
+        foreach(@hoe:@hoe_cooldown in @hoes_cooldown) {
+          if(@hoe_cooldown > @hoes_cooldown[@item['name']]) {
+            set_pcooldown(@player, @hoe, @hoe_cooldown)
+            #40 28
+          } else {
+            set_pcooldown(@player, @hoe, @hoes_cooldown[@item['name']]) #효율 인첸트 존재시 쿨타임 감소
+          }
         }
-      }
-    }
-    @max_hp = 20
-    @id = array_implode(array(integer(@location['x']), integer(@location['y']), integer(@location['z']), @location['world']), '.')
-    if(!array_index_exists(@hp_blocks, @id)) {
-      @hp_blocks[@id] = array(
-        'name': @block,
-        'hp': @max_hp,
-        'reset_countdown': 3
-      )
-    } else if(@hp_blocks[@id]['name'] != @block) {
-      @hp_blocks[@id] = array(
-        'name': @block,
-        'hp': @max_hp,
-        'reset_countdown': 3
-      )
-    }
-    @hp_blocks[@id]['hp'] -= @sowing_power
-    if(@hp_blocks[@id]['hp'] > 0) {
-      @hp_blocks[@id]['reset_countdown'] = 3
-      @hp = @hp_blocks[@id]['hp']
-      # @hp를 HUB에 표시
-      cancel()
-      if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
-        @damage = 0
-      } else {
-        @damage = @item['meta']['damage']
-      }
-      if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'enchants') || !array_index_exists(@item['meta']['enchants'], 'unbreaking')) {
-        @unbreaking_level = 0
-      } else {
-        @unbreaking_level = @item['meta']['enchants']['unbreaking']['elevel']
-      }
-      @breaking_chance = 1 / (@unbreaking_level + 1)
-      if(rand() < @breaking_chance) {
-        if(is_null(@item['meta'])) {
-          @item['meta'] = array('damage': @damage + 1)
-        } else {
-          @item['meta']['damage'] = @damage + 1
-        }
-        if(material_info(@item['name'], 'maxDurability') == @item['meta']['damage']) {
-          play_entity_effect(puuid(@player), 'BREAK_EQUIPMENT_MAIN_HAND')
-          set_inventory_item(puuid(@player), @slot, null)
-        } else {
-          set_inventory_item(puuid(@player), @slot, @item)
-        }
-        #업데이트 아이템
-      }
-    } else {
-      @hp = 0
-      # @hp를 HUB에 표시
-    }
-  }
-}
-/*
-bind('block_break', null, null, @event) {
-  @player = @event['player']
-  if(array_contains(array('WHEAT', 'CARROTS', 'POTATOS', 'BEETROOTS'), @event['block']) && array_contains(array('SURVIVAL', 'ADVENTURE'), pmode(@player))) {
-    @slot = pheld_slot(@player)
-    @item = get_inventory_item(puuid(@player), @slot)
-    if(!is_null(@item) && array_contains(array('WOODEN_HOE', 'STONE_HOE', 'GOLDEN_HOE', 'IRON_HOE', 'DIAMOND_HOE', 'NETHERITE_HOE'), @item['name'])) {
-      if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
-        @damage = 0
-      } else {
-        @damage = @item['meta']['damage']
-      }
-      if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'enchants') || !array_index_exists(@item['meta']['enchants'], 'unbreaking')) {
-        @unbreaking_level = 0
-      } else {
-        @unbreaking_level = @item['meta']['enchants']['unbreaking']['elevel']
-      }
-      @breaking_chance = 1 / (@unbreaking_level + 1)
-      if(rand() < @breaking_chance) {
-        if(is_null(@item['meta'])) {
-          @item['meta'] = array('damage': @damage + 1)
-        } else {
-          @item['meta']['damage'] = @damage + 1
-        }
-        if(material_info(@item['name'], 'maxDurability') <= @item['meta']['damage']) {
-          play_entity_effect(puuid(@player), 'BREAK_EQUIPMENT_MAIN_HAND')
-          set_inventory_item(puuid(@player), @slot, null)
-        } else {
-          set_inventory_item(puuid(@player), @slot, @item)
-        }
-      }
-      @skill_mode = import('farming_skill')
-      @location = @event['location']
-      switch(@skill_mode) {
-      case 'golden_finger':
-        if(array_contains(array('WHEAT', 'CARROTS', 'POTATOS'), @event['block'])) {
-          @max_age = 7
-        } else {
-          @max_age = 3
-        }
-        if(get_blockdata(@location)['age'] == @max_age) {
-          @drops = @event['drops']
-          array_remove(@drops, 0)
-          modify_event('drops', @drops)
-          set_timeout(0, closure() { set_block(@location, @event['block']) })
-        } else {
-          cancel()
-        }
-        break()
-      case 'wide_hand':
-        for(@x = -1, @x < 2, @x++) {
-          for(@z = -1, @z < 2, @z++) {
-            if(@x != 0 || @z != 0) {
-              @breaking_location = array('x': @location['x'] + @x, 'y': @location['y'], 'z': @location['z'] + @z, 'world': @location['world'])
-              if(array_contains(array('WHEAT', 'CARROTS', 'POTATOS'), @event['block'])) {
-                @max_age = 7
-              } else {
-                @max_age = 3
-              }
-              if(get_block(@breaking_location) == @event['block'] && get_blockdata(@breaking_location)['age'] == @max_age) {
-                @item = get_inventory_item(puuid(@player), @slot)
-                if(!is_null(@item) && array_contains(array('WOODEN_HOE', 'STONE_HOE', 'GOLDEN_HOE', 'IRON_HOE', 'DIAMOND_HOE', 'NETHERITE_HOE'), @item['name'])) {
-                  if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
-                    @damage = 0
-                  } else {
-                    @damage = @item['meta']['damage']
-                  }
-                  if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'enchants') || !array_index_exists(@item['meta']['enchants'], 'unbreaking')) {
-                    @unbreaking_level = 0
-                  } else {
-                    @unbreaking_level = @item['meta']['enchants']['unbreaking']['elevel']
-                  }
-                  @breaking_chance = 1 / (@unbreaking_level + 1)
-                  if(rand() < @breaking_chance) {
-                    if(is_null(@item['meta'])) {
-                      @item['meta'] = array('damage': @damage + 1)
-                    } else {
-                      @item['meta']['damage'] = @damage + 1
-                    }
-                    if(material_info(@item['name'], 'maxDurability') <= @item['meta']['damage']) {
-                      play_entity_effect(puuid(@player), 'BREAK_EQUIPMENT_MAIN_HAND')
-                      set_inventory_item(puuid(@player), @slot, null)
-                    } else {
-                      set_inventory_item(puuid(@player), @slot, @item)
-                    }
-                  }
-                  sudo(player(), '/loot spawn' @breaking_location['x'] + 0.5 @breaking_location['y'] @breaking_location['z'] + 0.5 'mine' integer(@breaking_location['x']) integer(@breaking_location['y']) integer(@breaking_location['z']) 'mainhand')
-                  set_block(@breaking_location, 'AIR')
-                }
-              }
+        @sowing_power = 1
+        if(!is_null(@item['meta']) && !is_null(@item['meta']['modifiers']) && array_index_exists(@item['meta'], 'modifiers')) {
+          foreach(@modifier in @item['meta']['modifiers']) {
+            if(@modifier['attribute'] == 'GENERIC_FOLLOW_RANGE') {
+              @sowing_power = @modifier['amount']
+              break()
             }
           }
         }
-        break()
-      default:
-        break()
+        @max_hp = 20
+        @id = array_implode(array(integer(@location['x']), integer(@location['y']), integer(@location['z']), @location['world']), '.')
+        if(!array_index_exists(@hp_blocks, @id)) {
+          @hp_blocks[@id] = array(
+            'name': @block,
+            'hp': @max_hp,
+            'reset_countdown': 3
+          )
+        } else if(@hp_blocks[@id]['name'] != @block) {
+          @hp_blocks[@id] = array(
+            'name': @block,
+            'hp': @max_hp,
+            'reset_countdown': 3
+          )
+        }
+        @hp_blocks[@id]['hp'] -= @sowing_power
+        if(@hp_blocks[@id]['hp'] > 0) {
+          @hp_blocks[@id]['reset_countdown'] = 3
+          @hp = @hp_blocks[@id]['hp']
+          # @hp를 HUB에 표시
+          cancel()
+          if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
+            @damage = 0
+          } else {
+            @damage = @item['meta']['damage']
+          }
+          if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'enchants') || !array_index_exists(@item['meta']['enchants'], 'unbreaking')) {
+            @unbreaking_level = 0
+          } else {
+            @unbreaking_level = @item['meta']['enchants']['unbreaking']['elevel']
+          }
+          @breaking_chance = 1 / (@unbreaking_level + 1)
+          if(rand() < @breaking_chance) {
+            if(is_null(@item['meta'])) {
+              @item['meta'] = array('damage': @damage + 1)
+            } else {
+              @item['meta']['damage'] = @damage + 1
+            }
+            if(material_info(@item['name'], 'maxDurability') == @item['meta']['damage']) {
+              play_entity_effect(puuid(@player), 'BREAK_EQUIPMENT_MAIN_HAND')
+              set_inventory_item(puuid(@player), @slot, null)
+            } else {
+              set_inventory_item(puuid(@player), @slot, @item)
+            }
+            #업데이트 아이템
+          }
+        } else {
+          @hp = 0
+          # @hp를 HUB에 표시
+        }
       }
     }
-    
   }
+
+
+  
+
+  
+
 }
-
-
-
-
-
 
 /*
 bind('player_join', array('id': 'mastery.fishing.setup'), null, @event) {

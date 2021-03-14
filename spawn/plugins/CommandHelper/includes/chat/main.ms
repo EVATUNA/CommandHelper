@@ -227,7 +227,7 @@ proc _convert_message(@strings, @channel, @players_state) {
   return(array('raw': @messages, 'mentioned_players': @mentioned_players))
 }
 
-bind('async_player_chat', null , null, @event, @players_state, @players_data, @players_item) {
+bind('async_player_chat', null , null, @event, @players_state, @players_data) {
   @sender = @event['player']
   @sender_uuid = puuid(@sender)
   if(array_index_exists(@players_data, @sender_uuid)) {

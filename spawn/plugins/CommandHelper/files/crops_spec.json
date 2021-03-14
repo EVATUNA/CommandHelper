@@ -1,0 +1,224 @@
+{
+  "WHEAT": {
+    "drop": "WHEAT",
+    "display": "밀",
+    "max_age": 7,
+    "min_qty": 1,
+    "skill": {
+      "mastery": "beetroots_farming_mastery",
+      "plenty_xp": 10,
+      "wide_hand_xp": 10,
+      "golden_finger_xp": 10
+    },
+    "loot_table": [
+      {
+        "rank": "§f하급",
+        "model": 1,
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "rank": "§e중급",
+        "model": 2,
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "rank": "§b상급",
+        "model": 3,
+        "weight": 5,
+        "quality": 0.5
+      }
+    ]
+  },
+  "BEETROOTS": {
+    "drop": "BEETROOT",
+    "display": "사탕무",
+    "max_age": 3,
+    "min_qty": 1,
+    "skill": {
+      "mastery": "beetroots_farming_mastery",
+      "plenty_xp": 10,
+      "wide_hand_xp": 10,
+      "golden_finger_xp": 10
+    },
+    "loot_table": [
+      {
+        "rank": "§f하급",
+        "model": 1,
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "rank": "§e중급",
+        "model": 2,
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "rank": "§b상급",
+        "model": 3,
+        "weight": 5,
+        "quality": 0.5
+      }
+    ]
+  },
+  "POTATOS": {
+    "drop": "PATATO",
+    "display": "감자",
+    "max_age": 7,
+    "min_qty": 3,
+    "skill": {
+      "mastery": "beetroots_farming_mastery",
+      "plenty_xp": 10,
+      "wide_hand_xp": 10,
+      "golden_finger_xp": 10
+    },
+    "loot_table": [
+      {
+        "rank": "§f하급",
+        "model": 1,
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "rank": "§e중급",
+        "model": 2,
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "rank": "§b상급",
+        "model": 3,
+        "weight": 5,
+        "quality": 0.5
+      }
+    ]
+  },
+  "CARROTS": {
+    "drop": "CARROT",
+    "display": "당근",
+    "max_age": 7,
+    "min_qty": 3,
+    "skill": {
+      "mastery": "beetroots_farming_mastery",
+      "plenty_xp": 10,
+      "wide_hand_xp": 10,
+      "golden_finger_xp": 10
+    },
+    "loot_table": [
+      {
+        "rank": "§f하급",
+        "model": 1,
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "rank": "§e중급",
+        "model": 2,
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "rank": "§b상급",
+        "model": 3,
+        "weight": 5,
+        "quality": 0.5
+      }
+    ]
+  },
+  "SWEET_BERRIES": {
+    "drop": "SWEET_BERRIES",
+    "display": "크랜베리",
+    "max_age": 3,
+    "min_qty": 2,
+    "skill": {
+      "mastery": "beetroots_farming_mastery",
+      "plenty_xp": 10,
+      "wide_hand_xp": 10,
+      "golden_finger_xp": 10
+    },
+    "loot_table": [
+      {
+        "rank": "§f하급",
+        "model": 1,
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "rank": "§e중급",
+        "model": 2,
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "rank": "§b상급",
+        "model": 3,
+        "weight": 5,
+        "quality": 0.5
+      }
+    ]
+  },
+  "PUMPKIN": {
+    "drop": "PUMPKIN",
+    "display": "호박",
+    "min_qty": 1,
+    "skill": {
+      "mastery": "beetroots_farming_mastery",
+      "plenty_xp": 15,
+      "wide_hand_xp": 0,
+      "golden_finger_xp": 0
+    },
+    "loot_table": [
+      {
+        "rank": "§f하급",
+        "model": 1,
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "rank": "§e중급",
+        "model": 2,
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "rank": "§b상급",
+        "model": 3,
+        "weight": 5,
+        "quality": 0.5
+      }
+    ]
+  },
+  "MELON": {
+    "drop": "MELON",
+    "display": "수박",
+    "min_qty": 1,
+    "skill": {
+      "mastery": "beetroots_farming_mastery",
+      "plenty_xp": 10,
+      "wide_hand_xp": 0,
+      "golden_finger_xp": 0
+    },
+    "loot_table": [
+      {
+        "rank": "§f하급",
+        "model": 1,
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "rank": "§e중급",
+        "model": 2,
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "rank": "§b상급",
+        "model": 3,
+        "weight": 5,
+        "quality": 0.5
+      }
+    ]
+  }
+}

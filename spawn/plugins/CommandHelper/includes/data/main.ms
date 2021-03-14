@@ -1,15 +1,36 @@
 console('EvaData loaded')
 
 ## Data Procedure
-proc _load_data(@uuid, @players_data, @skills_spec) {
-  @players_data[@uuid]['setting'] = cup_get('SETTING', @uuid)
+proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
+  # cache (cup에 저장 x)
   @players_data[@uuid]['cache'] = array(
     'resolution_setting': false
   )
+  # setting (cup에 저장)
+  @players_data[@uuid]['setting'] = cup_get('SETTING', @uuid)
   if(is_null(@players_data[@uuid]['setting'])) {
     _new_data(@uuid, @players_data)
   }
+  # skill (cup에 저장)
   _load_skills(@uuid, @players_data, @skills_spec)
+  # item (cup에 저장 x)
+  @players_data[@uuid]['item'] = array(
+    'is_inv_open': false,
+    'main_hand': null,
+    'off_hand': null,
+    'armor': null,
+    'enchantments': array(
+      'main_hand': null,
+      'off_hand': null,
+      'armor': null
+    )
+  )
+  @items = array(
+    'main_hand': get_inventory_item(@uuid, pheld_slot(@player)),
+    'off_hand': get_inventory_item(@uuid, 40),
+    'armor': get_inventory_item(@uuid, 38)
+  )
+  _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text)
 }
 
 proc _new_data(@uuid, @players_data) {
@@ -33,7 +54,7 @@ proc _new_data(@uuid, @players_data) {
 }
 
 proc _send_resourcepack(@player, @uuid, @players_state) {
-  @resourcepack = 'https://drive.google.com/uc?export=download&id=1ES7ItMFnA4fhLiGXjwSB-ztu6CZqy5Fc'
+  @resourcepack = 'https://drive.google.com/uc?export=download&id=1WDSOp3NGhZGfy6OhzGPOuY1qFa8tzs4l'
   send_resourcepack(@player, @resourcepack)
   @player_state = array(
     'join_spec': array(
@@ -57,7 +78,7 @@ proc _send_resourcepack(@player, @uuid, @players_state) {
   title(@player, '§a예§7를 눌러주세요!', '§7서버 리소스팩 사용은 필수입니다.', 0, 99999999, 0)
 }
 
-proc _apply_join_spec(@player, @uuid, @players_state, @players_data, @skills_spec) {
+proc _apply_join_spec(@player, @uuid, @players_state, @players_data, @skills_spec, @text) {
   title(@player, '', '', 0, 1, 0)
   set_timeout(1000, closure() {
     set_ploc(@player, @players_state[@uuid]['join_spec']['location'])
@@ -75,11 +96,11 @@ proc _apply_join_spec(@player, @uuid, @players_state, @players_data, @skills_spe
       set_entity_onfire(@uuid, @players_state[@uuid]['join_spec']['onfire'])
     }
     array_remove(@players_state[@uuid], 'join_spec')
-    _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec)
+    _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec, @text)
   })
 }
 
-proc _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec) {
+proc _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec, @text) {
   #players_state
   @player_state = array(
     'player': @player,
@@ -97,35 +118,18 @@ proc _set_player_state(@player, @uuid, @players_state, @players_data, @skills_sp
   )
   _bungeecord_foward(@player, 'ch_update_state', @data)
   # players_data
-  _load_data(@uuid, @players_data, @skills_spec)
+  _load_data(@player, @uuid, @players_data, @skills_spec, @text)
 }
 
-proc _join_event(@player, @uuid, @players_state, @players_data, @players_item, @server, @bots, @skills_spec) {
+proc _join_event(@player, @uuid, @players_state, @players_data, @server, @bots, @skills_spec, @text) {
   if(!array_contains(@bots, @player)) {
     if(!array_index_exists(@players_state, @uuid)) {
       _send_resourcepack(@player, @uuid, @players_state)
     } else {
       set_timeout(500, closure() {
-        _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec)
+        _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec, @text)
       })
     }
-    @players_item[@uuid] = array(
-      'is_inv_open': false,
-      'main_hand': null,
-      'off_hand': null,
-      'armor': null,
-      'enchantments': array(
-        'main_hand': null,
-        'off_hand': null,
-        'armor': null
-      )
-    )
-    @items = array(
-      'main_hand': get_inventory_item(@uuid, pheld_slot(@player)),
-      'off_hand': get_inventory_item(@uuid, 40),
-      'armor': get_inventory_item(@uuid, 38)
-    )
-    _update_item(@player, @uuid, @items, @players_item)
   } else {
     #if(!array_contains(@server['bots'], @player)) {
       @server['bots'][] = @player
@@ -138,13 +142,10 @@ proc _join_event(@player, @uuid, @players_state, @players_data, @players_item, @
   }
 }
 
-proc _quit_event(@player, @uuid, @players_state, @players_item, @server, @bots) {
+proc _quit_event(@player, @uuid, @players_state, @server, @bots) {
   if(!array_contains(@bots , @player)) {
     if(array_index_exists(@players_state, @uuid)) {
       @players_state[@uuid]['quit_countdown'] = 10
-    }
-    if(array_index_exists(@players_item, @uuid)) {
-      array_remove(@players_item, @uuid)
     }
   } else {
     if(array_contains(@server['bots'], @player)) {
@@ -158,35 +159,18 @@ proc _quit_event(@player, @uuid, @players_state, @players_item, @server, @bots) 
 foreach(@player in _all_players(@bots)) { #조인 이벤트로 변경 리로드 명령어
   @uuid = puuid(@player)
   set_timeout(1000, closure() {
-    _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec) 
+    _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec, @text) 
   })
-  @players_item[@uuid] = array(
-    'is_inv_open': false,
-    'main_hand': null,
-    'off_hand': null,
-    'armor': null,
-    'enchantments': array(
-      'main_hand': null,
-      'off_hand': null,
-      'armor': null
-    )
-  )
-  @items = array(
-    'main_hand': get_inventory_item(@uuid, pheld_slot(@player)),
-    'off_hand': get_inventory_item(@uuid, 40),
-    'armor': get_inventory_item(@uuid, 38)
-  )
-  _update_item(@player, @uuid, @items, @players_item)
 }
 
-bind('player_join', null, null, @event, @players_state, @players_data, @players_item, @server, @bots, @skills_spec) {
+bind('player_join', null, null, @event, @players_state, @players_data, @server, @bots, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
   modify_event('join_message', null)
-  _join_event(@player, @uuid, @players_state, @players_data, @players_item, @server, @bots, @skills_spec)
+  _join_event(@player, @uuid, @players_state, @players_data, @server, @bots, @skills_spec, @text)
 }
 
-bind('resource_pack_status', null,, null, @event, @players_state, @players_data, @skills_spec) {
+bind('resource_pack_status', null,, null, @event, @players_state, @players_data, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
   switch(@event['status']) {
@@ -194,16 +178,16 @@ bind('resource_pack_status', null,, null, @event, @players_state, @players_data,
     pkick(@player, hexcolor('#ff4040').'§l서버 리소스팩을 사용하도록 설정해 주시기 바랍니다.\n'.hexcolor('#c0c0c0').'§l에바참치 서버를 선택한 후, 수정 버튼을 눌러\n서버 리소스팩을 사용으로 설정해 주세요.\n\n'.hexcolor('#ffff80').'§l버그 문의: ')
     break()
   case 'SUCCESSFULLY_LOADED':
-    _apply_join_spec(@player, @uuid, @players_state, @players_data, @skills_spec)
+    _apply_join_spec(@player, @uuid, @players_state, @players_data, @skills_spec, @text)
     break()
   }
 }
 
-bind('player_quit', null, null, @event, @players_state, @players_data, @players_item, @server, @bots) {
+bind('player_quit', null, null, @event, @players_state, @players_data, @server, @bots) {
   @player = @event['player']
   @uuid = puuid(@player)
   modify_event('message', null)
-  _quit_event(@player, @uuid, @players_state, @players_item, @server, @bots)
+  _quit_event(@player, @uuid, @players_state, @server, @bots)
 }
 
 @interval_task = set_interval(1000, closure() { #bungee 완전 로그아웃
@@ -334,7 +318,7 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @players_
             }
           }
 
-          switch(@players_item[@uuid]['enchantments']['armor']) {
+          switch(@players_data[@uuid]['item']['enchantments']['armor']) {
           case '날렵함':
             break()
           case '심안':
@@ -440,213 +424,14 @@ bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @p
   }
 }
 
-@crops_spec = array(
-  'WHEAT': array(
-    'drop': 'WHEAT',
-    'display': '밀',
-    'max_age': 7,
-    'min_qty': 1,
-    'mastery': 'wheat_farming_mastery',
-    'plenty_xp': 20,
-    'loot_table': array(
-      array(
-        'rank': '§f하급',
-        'model': 1,
-        'weight': 100,
-        'quality': 0
-      ),
-      array(
-        'rank': '§e중급',
-        'model': 2,
-        'weight': 20,
-        'quality': 1
-      ),
-      array(
-        'rank': '§b상급',
-        'model': 3,
-        'weight': 5,
-        'quality': 0.5
-      )
-    )
-  ),
-  'BEETROOTS': array(
-    'drop': 'BEETROOT',
-    'display': '사탕무',
-    'max_age': 3,
-    'min_qty': 1,
-    'mastery': 'beetroots_farming_mastery',
-    'plenty_xp': 10,
-    'loot_table': array(
-      array(
-        'rank': '§f하급',
-        'model': 1,
-        'weight': 100,
-        'quality': 0
-      ),
-      array(
-        'rank': '§e중급',
-        'model': 2,
-        'weight': 20,
-        'quality': 1
-      ),
-      array(
-        'rank': '§b상급',
-        'model': 3,
-        'weight': 5,
-        'quality': 0.5
-      )
-    )
-  ),
-  'POTATOS': array(
-    'drop': 'PATATO',
-    'display': '감자',
-    'max_age': 7,
-    'min_qty': 3,
-    'mastery': 'potatoes_farming_mastery',
-    'plenty_xp': 20,
-    'loot_table': array(
-      array(
-        'rank': '§f하급',
-        'model': 1,
-        'weight': 100,
-        'quality': 0
-      ),
-      array(
-        'rank': '§e중급',
-        'model': 2,
-        'weight': 20,
-        'quality': 1
-      ),
-      array(
-        'rank': '§b상급',
-        'model': 3,
-        'weight': 5,
-        'quality': 0.5
-      )
-    )
-  ),
-  'CARROTS': array(
-    'drop': 'CARROT',
-    'display': '당근',
-    'max_age': 7,
-    'min_qty': 3,
-    'mastery': 'carrots_farming_mastery',
-    'plenty_xp': 20,
-    'loot_table': array(
-      array(
-        'rank': '§f하급',
-        'model': 1,
-        'weight': 100,
-        'quality': 0
-      ),
-      array(
-        'rank': '§e중급',
-        'model': 2,
-        'weight': 20,
-        'quality': 1
-      ),
-      array(
-        'rank': '§b상급',
-        'model': 3,
-        'weight': 5,
-        'quality': 0.5
-      )
-    )
-  ),
-  'SWEET_BERRIES': array(
-    'drop': 'SWEET_BERRIES',
-    'display': '크랜베리',
-    'max_age': 3,
-    'min_qty': 2,
-    'mastery': 'berry_farming_mastery',
-    'plenty_xp': 10,
-    'loot_table': array(
-      array(
-        array(
-          'rank': '§f하급',
-          'model': 1,
-          'weight': 100,
-          'quality': 0
-        ),
-        array(
-          'rank': '§e중급',
-          'model': 2,
-          'weight': 20,
-          'quality': 1
-        ),
-        array(
-          'rank': '§b상급',
-          'model': 3,
-          'weight': 5,
-          'quality': 0.5
-        )
-      )
-    )),
-  'PUMPKIN': array(
-    'drop': 'PUMPKIN',
-    'display': '호박',
-    'min_qty': 1,
-    'mastery': 'pumpkin_farming_mastery',
-    'plenty_xp': 0,
-    'loot_table': array(
-      array(
-        'rank': '§f하급',
-        'model': 1,
-        'weight': 100,
-        'quality': 0
-      ),
-      array(
-        'rank': '§e중급',
-        'model': 2,
-        'weight': 20,
-        'quality': 1
-      ),
-      array(
-        'rank': '§b상급',
-        'model': 3,
-        'weight': 5,
-        'quality': 0.5
-      )
-    )
-  ),
-  'MELON': array(
-    'drop': 'MELON',
-    'display': '수박',
-    'min_qty': 1,
-    'mastery': 'melon_farming_mastery',
-    'plenty_xp': 0,
-    'loot_table': array(
-      array(
-        'rank': '§f하급',
-        'model': 1,
-        'weight': 100,
-        'quality': 0
-      ),
-      array(
-        'rank': '§e중급',
-        'model': 2,
-        'weight': 20,
-        'quality': 1
-      ),
-      array(
-        'rank': '§b상급',
-        'model': 3,
-        'weight': 5,
-        'quality': 0.5
-      )
-    )
-  )
-)
-
-bind('block_break', null, null, @event, @players_data, @players_item, @hp_blocks, @crops_spec) {
+bind('block_break', null, null, @event, @players_data, @hp_blocks, @crops_spec) {
   @player = @event['player']
   @uuid = puuid(@player)
   if(pmode(@player) == 'SURVIVAL') {
     @player_data = @players_data[@uuid]
-    @player_item = @players_item[@uuid]
     @is_farming_allowed = true
     if(@is_farming_allowed) {
-      _crop_mine_event(@event, @player, @uuid, @player_data, @player_item, @crops_spec)
+      _crop_mine_event(@event, @player, @uuid, @player_data, @crops_spec)
     }
     @is_mining_allowed = true
     if(@is_mining_allowed && array_contains(array('COAL_ORE', 'COPPER_ORE', 'GOLD_ORE', 'IRON_ORE', 'REDSTONE_ORE', 'LAPIS_ORE', 'DIAMOND_ORE', 'EMERALD_ORE', 'ANCIENT_DEBRIS'), @event['block'])) {
@@ -656,19 +441,15 @@ bind('block_break', null, null, @event, @players_data, @players_item, @hp_blocks
   }
 }
 
-bind('player_interact', null, null, @event, @players_data, @players_item, @hp_blocks) {
+bind('player_interact', null, null, @event, @players_data, @hp_blocks) {
   @player = @event['player']
   @uuid = puuid(@player)
   if(pmode(@player) == 'SURVIVAL') {
-    @player_item = @players_item[@uuid]
-    # set_entity_glowing
+    @player_data = @players_data[@uuid]
     @is_sowing_allowed = true
-    if(@is_sowing_allowed && !is_null(@event['item']) && array_contains(array('WOODEN_HOE', 'STONE_HOE', 'GOLDEN_HOE', 'IRON_HOE', 'DIAMOND_HOE', 'NETHERITE_HOE'), @event['item']['name']) && @event['action'] == 'right_click_block' && array_contains(array('GRASS_BLOCK', 'DIRT'), @event['block']) && array_index_exists(@event, 'location') && array_contains(array('AIR', 'CAVE_AIR', 'VOID_AIR'), get_block(array('x': @event['location']['x'], 'y': @event['location']['y'] + 1, 'z': @event['location']['z'], 'world': @event['location']['world'])))) {
-      @farming_skills = @players_data[@uuid]['skill']['masteries']['mining']
-      @sowing_method_skills = @players_data[@uuid]['skill']['masteries']['sowing_method']
-      _farmland_sow_event(@event, @player_item, @farming_skills, @sowing_method_skills, @hp_blocks)
+    if(@is_sowing_allowed) {
+      _farmland_sow_event(@event, @player, @uuid, @player_item, @hp_blocks)
     }
-
   }
 
   if(@event['action'] == 'right_click_block') {
