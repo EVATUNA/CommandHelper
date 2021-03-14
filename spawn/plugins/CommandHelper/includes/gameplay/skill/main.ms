@@ -228,10 +228,10 @@ proc _load_skills(@uuid, @players_data, @skills_spec) {
     ),
     'farming': array(
       'wheat_farming_mastery',
-      'beetroots_farming_mastery',
-      'potatoes_farming_mastery',
-      'carrots_farming_mastery',
-      'berry_farming_mastery',
+      'beetroot_farming_mastery',
+      'potato_farming_mastery',
+      'carrot_farming_mastery',
+      'berries_farming_mastery',
       'pumpkin_farming_mastery',
       'melon_farming_mastery',
       'plenty'
@@ -1528,21 +1528,24 @@ register_command('skillbook', array(
   }
 ))
 
-proc _add_epxerience(@uuid, @skill, @skill_data, @add_experience) {
+proc _add_epxerience(@uuid, @skill, @skill_data, @default_xp, @extra_xp) {
   #핫타임 있을시 핫타임 반영하기
   if(@skill_data[0] < @skill_data[2]) {
-    @new_experience = @skill_data[1] + @add_experience #핫타임 배수 반영
-    if(@new_experience < @skill_data[3]) {
-      @skill_data[1] = integer(@new_experience)
-    } else {
-      @skill_data[0] += 1
-      @skill_data[1] = 0
+    @xp = round(@default_xp + rand() * @extra_xp * 1) #핫타임 배수 반영
+    if(@xp > 0) {
+      @new_experience = @skill_data[1] + @xp
+      if(@new_experience < @skill_data[3]) {
+        @skill_data[1] = integer(@new_experience)
+      } else {
+        @skill_data[0] += 1
+        @skill_data[1] = 0
+      }
+      cup_set('SKILL_DATA', @uuid.'_'.@skill, @skill_data)
     }
-    cup_set('SKILL_DATA', @uuid.'_'.@skill, @skill_data)
   }
 }
 
-proc _mineral_mine_event(@event, @player_item, @player_mining_skills, @hp_blocks) {
+proc _mineral_mine_event(@event, @players_data, @hp_blocks, @minerals_spec, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
   @mineral = @event['block']
@@ -1760,21 +1763,85 @@ proc _mineral_mine_event(@event, @player_item, @player_mining_skills, @hp_blocks
   #경험 인첸트에 따른 경험치 드랍 조절
 }
 
-proc _crop_mine_event(@event, @player, @uuid, @player_data, @player_item, @crops_spec) {
+proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skills_spec, @text) {
   @crop = @event['block']
   if(array_contains(array_keys(@crops_spec), @crop)) {
     @crop_spec = @crops_spec[@crop]
     if(array_contains(array('PUMPKIN', 'MELON'), @crop)) {
-
+      @center_location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.5, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
+      @near_locations = array(
+        'east': array(
+          'facing': 'west',
+          'location': array('x': @center_location['x'] + 1, 'y': @center_location['y'], 'z': @center_location['z'], 'world': @center_location['world'])
+        ),
+        'west': array(
+          'facing': 'east',
+          'location': array('x': @center_location['x'] - 1, 'y': @center_location['y'], 'z': @center_location['z'], 'world': @center_location['world'])
+        ),
+        'south': array(
+          'facing': 'north',
+          'location': array('x': @center_location['x'], 'y': @center_location['y'], 'z': @center_location['z'] + 1, 'world': @center_location['world'])
+        ),
+        'north': array(
+          'facing': 'south',
+          'location': array('x': @center_location['x'], 'y': @center_location['y'], 'z': @center_location['z'] - 1, 'world': @center_location['world'])
+        )
+      )
+      @is_placed = true
+      foreach(@near_location in @near_locations) {
+        if(get_block(@near_location['location']) == @crop_spec['stem'] && get_blockdata(@near_location['location'])['facing'] == @near_location['facing']) {
+          @is_placed = false
+          break()
+        }
+      }
+      if(!@is_placed) {
+        break_block(@near_location['location'])
+        #@drop_multiply 배수: * (풍년 + 행운 or 축복 인첸)
+        @extra_qty = @players_data[@uuid]['skill_data']['farming']['plenty'][0] + 0
+        @entries = @crop_spec['loot_table']
+        @total_weight = 0
+        foreach(@key: @entry in @entries) {
+          @entries[@key]['weight'] += @entry['quality'] * @players_data[@uuid]['skill_data']['farming'][@crop_spec['mastery']][0]
+          @total_weight += @entry['weight']
+        }
+        @qty = integer(round(@crop_spec['default_qty'] + rand() * @extra_qty))
+        for(@i = 0, @i < @qty, @i++) {
+          @result_weight = @total_weight * round(rand(), 5)
+          @min_weight = 0
+          foreach(@entry in @entries) {
+            @max_weight = @min_weight + @entry['weight']
+            if(@max_weight > @result_weight) {
+              drop_item(@center_location, @entry['item'], false)
+              break()
+            } else {
+              @min_weight = @max_weight
+            }
+          }
+        }
+        #경험 인첸트 있을시 엑스트라xp 수치 조정
+        @xp = integer(round(@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']))
+        if(@xp > 0) {
+          spawn_entity('EXPERIENCE_ORB', 1, @center_location, closure(@euuid) {
+            set_entity_spec(@euuid, array('amount': @xp))
+          })
+        }
+        modify_event('drops', array())
+        modify_event('xp', 0)
+        foreach(@category: @skills in @crop_spec['skills']) {
+          foreach(@skill: @xp_data in @skills) {
+            _add_epxerience(@uuid, @skill, @players_data[@uuid]['skill_data'][@category][@skill], @xp_data['default_xp'], @xp_data['extra_xp'])
+          }
+        }
+      }
     } else {
       @locations = array()
       @center_location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.5, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
-      @harvesting_method = @player_data['skill_manager'][3]
+      @harvesting_method = @players_data[@uuid]['skill_manager'][3]
       @age = get_blockdata(@center_location)['age']
-      @item = @player_item['main_hand']
+      @item = @players_data[@uuid]['item']['main_hand']
       @slot = pheld_slot(@player)
       if(!is_null(@item) && array_contains(array('WOODEN_HOE', 'STONE_HOE', 'GOLDEN_HOE', 'IRON_HOE', 'DIAMOND_HOE', 'NETHERITE_HOE'), @item['name'])) {
-        #if(@harvesting_method != '' && @player_data['active_skill']['harvesting_method'][@harvesting_method][1] > 0) {
+        #if(@harvesting_method != '' && @players_data[@uuid]['active_skill']['harvesting_method'][@harvesting_method][1] > 0) {
           @max_durability = material_info(@item['name'], 'maxDurability')
           if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
             @damage = 0
@@ -1788,8 +1855,6 @@ proc _crop_mine_event(@event, @player, @uuid, @player_data, @player_item, @crops
             @unbreaking_level = @item['meta']['enchants']['unbreaking']['elevel']
           }
           @breaking_chance = 1 / (@unbreaking_level + 1)
-          @wide_hand_xp = @crop_spec['skill']['wide_hand_xp']
-          @golden_finger_xp = @crop_spec['skill']['golden_finger_xp']
           switch(@harvesting_method) {
           case 'wide_hand':
             if(@age == @crop_spec['max_age']) {
@@ -1814,7 +1879,7 @@ proc _crop_mine_event(@event, @player, @uuid, @player_data, @player_item, @crops
                 }
               }
             }
-            @wide_hand_xp *= 1.5
+            @crop_spec['skills']['harvesting_method']['wide_hand']['extra_xp'] *= 1.5
             break()
           case 'golden_finger':
             if(@age == @crop_spec['max_age']) {
@@ -1834,7 +1899,7 @@ proc _crop_mine_event(@event, @player, @uuid, @player_data, @player_item, @crops
             } else {
               cancel()
             }
-            @golden_finger_xp *= 1.5
+            @crop_spec['skills']['harvesting_method']['golden_finger']['extra_xp'] *= 1.5
             break()
           default:
             if(@age == @crop_spec['max_age']) {
@@ -1850,47 +1915,54 @@ proc _crop_mine_event(@event, @player, @uuid, @player_data, @player_item, @crops
             set_inventory_item(puuid(@player), @slot, @item)
           } else {
             play_entity_effect(puuid(@player), 'BREAK_EQUIPMENT_MAIN_HAND')
-            set_inventory_item(puuid(@player), @slot, null)
+            @item = null
+            set_inventory_item(puuid(@player), @slot, @item)
           }
-          #아이템 업데이트
+          _update_item(@player, @uuid, array('main_hand': @item), @players_data, @skills_spec, @text)
         #}
-        if(!is_cancelled()) {
-          @drop_multiply = @player_data['skill_data']['farming']['plenty'][0] + 0 #아이템에 행운이 있을시 + 1 축복이 있을시 + 2
+        if(@age == @crop_spec['max_age']) {
+          #@drop_multiply 배수: * (풍년 + 행운 or 축복 인첸)
+          @extra_qty = @players_data[@uuid]['skill_data']['farming']['plenty'][0] + 0
           @entries = @crop_spec['loot_table']
           @total_weight = 0
           foreach(@key: @entry in @entries) {
-            @entries[@key]['weight'] += @entry['quality'] * @player_data['skill_data']['farming'][@crop_spec['skill']['mastery']][0]
+            @entries[@key]['weight'] += @entry['quality'] * @players_data[@uuid]['skill_data']['farming'][@crop_spec['mastery']][0]
             @total_weight += @entry['weight']
           }
           foreach(@location in @locations) {
-            @qty = 1 + integer(rand() * (@crop_spec['min_qty'] + @drop_multiply))
-            #broadcast(@qty)
-            for(@i = 0, @i < @qty, @i++){
+            @qty = integer(round(@crop_spec['default_qty'] + rand() * @extra_qty))
+            for(@i = 0, @i < @qty, @i++) {
               @result_weight = @total_weight * round(rand(), 5)
               @min_weight = 0
               foreach(@entry in @entries) {
                 @max_weight = @min_weight + @entry['weight']
                 if(@max_weight > @result_weight) {
-                  drop_item(@location, array('name': @crop_spec['drop'], 'meta': array('display': @entry['rank'] @crop_spec["display"], 'model': @entry['model'])), false)
-                  #경험치 드랍
+                  drop_item(@location, @entry['item'], false)
                   break()
                 } else {
                   @min_weight = @max_weight
                 }
               }
             }
+            @xp = integer(round(@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']))
+            if(@xp > 0) {
+              spawn_entity('EXPERIENCE_ORB', 1, @location, closure(@euuid) {
+                set_entity_spec(@euuid, array('amount': @xp))
+              })
+            }
           }
-          _add_epxerience(@uuid, @crop_spec['skill']['mastery'], @player_data['skill_data']['farming'][@crop_spec['skill']['mastery']], 10)
-          _add_epxerience(@uuid, 'plenty', @player_data['skill_data']['farming']['plenty'], @crop_spec['skill']['plenty_xp'])
-          _add_epxerience(@uuid, 'wide_hand', @player_data['skill_data']['harvesting_method']['wide_hand'], @wide_hand_xp)
-          _add_epxerience(@uuid, 'golden_finger', @player_data['skill_data']['harvesting_method']['golden_finger'], @golden_finger_xp)
+          foreach(@category: @skills in @crop_spec['skills']) {
+            foreach(@skill: @xp_data in @skills) {
+              _add_epxerience(@uuid, @skill, @players_data[@uuid]['skill_data'][@category][@skill], @xp_data['default_xp'], @xp_data['extra_xp'])
+            }
+          }
         }
       }
     }
   }
 }
 
-proc _farmland_sow_event(@event, @player, @uuid, @player_item, @hp_blocks) {
+proc _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @skills_spec, @text) {
   @block = @event['block']
   if(@event['action'] == 'right_click_block' && array_contains(array('GRASS_BLOCK', 'DIRT'), @event['block']) && !is_null(@event['item']) && array_index_exists(@event, 'location')) {
     @location = array('x': @event['location']['x'], 'y': @event['location']['y'], 'z': @event['location']['z'], 'world': @event['location']['world'])
@@ -1908,7 +1980,7 @@ proc _farmland_sow_event(@event, @player, @uuid, @player_item, @hp_blocks) {
       } else {
         @slot = 40
       }
-      @item = @player_item[@event['hand']]
+      @item = @players_data[@uuid]['item'][@event['hand']]
       if(pcooldown(@player, @item['name']) == 0) {
         #효율 인첸트가 되어있을시 쿨타임 * 0.75
         foreach(@hoe:@hoe_cooldown in @hoes_cooldown) {
@@ -1972,7 +2044,12 @@ proc _farmland_sow_event(@event, @player, @uuid, @player_item, @hp_blocks) {
             } else {
               set_inventory_item(puuid(@player), @slot, @item)
             }
-            #업데이트 아이템
+            if(@slot == 40) {
+              @items = array('off_hand': @item)
+            } else {
+              @items = array('main_hand': @item)
+            }
+            _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text)
           }
         } else {
           @hp = 0
@@ -1981,12 +2058,6 @@ proc _farmland_sow_event(@event, @player, @uuid, @player_item, @hp_blocks) {
       }
     }
   }
-
-
-  
-
-  
-
 }
 
 /*

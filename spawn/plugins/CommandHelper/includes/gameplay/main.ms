@@ -168,8 +168,9 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
   foreach(@slot: @enchantment in @enchantments) {
     @players_data[@uuid]['item']['enchantments'][@slot] = @enchantment
   }
-  #broadcast(@players_data[@uuid])
-  _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
+  set_timeout(0, closure() {
+    _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
+  })
 }
 
 

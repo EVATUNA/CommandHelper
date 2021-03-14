@@ -424,31 +424,29 @@ bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @p
   }
 }
 
-bind('block_break', null, null, @event, @players_data, @hp_blocks, @crops_spec) {
+bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spec, @crops_spec, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(pmode(@player) == 'SURVIVAL') {
-    @player_data = @players_data[@uuid]
+  if(!is_cancelled() && pmode(@player) == 'SURVIVAL') {
     @is_farming_allowed = true
     if(@is_farming_allowed) {
-      _crop_mine_event(@event, @player, @uuid, @player_data, @crops_spec)
+      _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skills_spec, @text)
     }
     @is_mining_allowed = true
     if(@is_mining_allowed && array_contains(array('COAL_ORE', 'COPPER_ORE', 'GOLD_ORE', 'IRON_ORE', 'REDSTONE_ORE', 'LAPIS_ORE', 'DIAMOND_ORE', 'EMERALD_ORE', 'ANCIENT_DEBRIS'), @event['block'])) {
-      @player_mining_skills = @players_data[@uuid]['skill_data']['mining']
-      _mineral_mine_event(@event, @player_item, @player_mining_skills, @hp_blocks)
+      #@player_mining_skills = @players_data[@uuid]['skill_data']['mining']
+      _mineral_mine_event(@event, @players_data, @hp_blocks, @minerals_spec, @skills_spec, @text)
     }
   }
 }
 
-bind('player_interact', null, null, @event, @players_data, @hp_blocks) {
+bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(pmode(@player) == 'SURVIVAL') {
-    @player_data = @players_data[@uuid]
+  if(!is_cancelled() && pmode(@player) == 'SURVIVAL') {
     @is_sowing_allowed = true
     if(@is_sowing_allowed) {
-      _farmland_sow_event(@event, @player, @uuid, @player_item, @hp_blocks)
+      _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @skills_spec, @text)
     }
   }
 
@@ -460,6 +458,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks) {
         cancel()
       }
     }
+    
     # cancel bone mealing
     if(!is_null(@event['item']) && @event['item']['name'] == 'BONE_MEAL' && array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
       @data = get_blockdata(@event['location'])
@@ -476,6 +475,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks) {
         cancel()
       }
     }
+
     # watering
     if(!is_null(@event['item']) && @event['item']['name'] == 'POTION' && @event['item']['meta']['base']['type'] == 'WATER') {
       if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'ATTACHED_PUMPKIN_STEM', 'ATTACHED_MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {

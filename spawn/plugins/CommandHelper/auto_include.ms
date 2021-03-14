@@ -21,6 +21,12 @@ async_read('files/general_emoji.json', closure(@value) {
 })
 
 ## Gameplay Data
+@minerals_spec = array()
+async_read('files/minerals_spec.json', closure(@value) {
+  foreach(@mineral: @spec in json_decode(@value)) {
+    @minerals_spec[@mineral] = @spec
+  }
+})
 @crops_spec = array()
 async_read('files/crops_spec.json', closure(@value) {
   foreach(@crop: @spec in json_decode(@value)) {

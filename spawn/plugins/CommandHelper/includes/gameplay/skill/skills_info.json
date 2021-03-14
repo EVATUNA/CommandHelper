@@ -90,7 +90,7 @@
 			]
 		},
 		{
-			"name": "beetroots_farming_mastery",
+			"name": "beetroot_farming_mastery",
 			"display": "사탕무 수확 숙련",
 			"icon": "\ue3e7",
 			"desription": [
@@ -99,7 +99,7 @@
 			]
 		},
 		{
-			"name": "potatoes_farming_mastery",
+			"name": "potato_farming_mastery",
 			"display": "감자 수확 숙련",
 			"icon": "\ue3e8",
 			"desription": [
@@ -108,7 +108,7 @@
 			]
 		},
 		{
-			"name": "carrots_farming_mastery",
+			"name": "carrot_farming_mastery",
 			"display": "당근 수확 숙련",
 			"icon": "\ue3e9",
 			"desription": [
@@ -117,7 +117,7 @@
 			]
 		},
 		{
-			"name": "berry_farming_mastery",
+			"name": "berries_farming_mastery",
 			"display": "크랜베리 수확 숙련",
 			"icon": "\ue3ea",
 			"desription": [

@@ -426,7 +426,7 @@
 				}
 			]
 		},
-	"beetroots_farming_mastery": {
+	"beetroot_farming_mastery": {
 			"default_max_level": 3,
 			"levels": [
 				{
@@ -451,7 +451,7 @@
 				}
 			]
 		},
-	"potatoes_farming_mastery": {
+	"potato_farming_mastery": {
 			"default_max_level": 3,
 			"levels": [
 				{
@@ -476,7 +476,7 @@
 				}
 			]
 		},
-	"carrots_farming_mastery": {
+	"carrot_farming_mastery": {
 			"default_max_level": 3,
 			"levels": [
 				{
@@ -501,7 +501,7 @@
 				}
 			]
 		},
-	"berry_farming_mastery": {
+	"berries_farming_mastery": {
 			"default_max_level": 3,
 			"levels": [
 				{
