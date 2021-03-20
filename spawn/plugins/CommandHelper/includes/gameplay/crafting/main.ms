@@ -12,24 +12,26 @@ foreach(@file in list_files('recipe_tables')) {
 
 ## Procedure
 proc _get_result_item_rank(@ingredients_weight, @ingredient_items) { #등급있는 재료아이템 종류, 실제 조합하는 재료 아이템들
-  if(array_size(@ingredients_weight) != 0) {
+  if(array_size(@ingredients_weight) != 0) { #
     @ingredient_item_ranks = array()
     foreach(@ingredient_item in @ingredient_items) {
-      if(array_index_exists(@ingredients_weight, @ingredient_item['name'])) { ###등급광석이 있을 시
+      if(array_index_exists(@ingredients_weight, @ingredient_item['name'])) {
         @ingredient_item_rank = 0.2 * @ingredients_weight[@ingredient_item['name']]
         if(is_array(@ingredient_item['meta']) && array_index_exists(@ingredient_item['meta'], 'model')) {
           switch(@ingredient_item['meta']['model']) {
-          case 1:
+          case 0:
             @ingredient_item_rank = 0.2 * @ingredients_weight[@ingredient_item['name']]
-          case 2:
+          case 1:
             @ingredient_item_rank = 0.4 * @ingredients_weight[@ingredient_item['name']]
-          case 3:
+          case 2:
             @ingredient_item_rank = 0.6 * @ingredients_weight[@ingredient_item['name']]
-          case 4:
+          case 3:
             @ingredient_item_rank = 0.8 * @ingredients_weight[@ingredient_item['name']]
           default:
             @ingredient_item_rank = 0.2 * @ingredients_weight[@ingredient_item['name']]
           }
+        } else {
+          @ingredient_item_rank = 0.2 * @ingredients_weight[@ingredient_item['name']]
         }
         @ingredient_item_ranks[] = @ingredient_item_rank
       }
@@ -41,6 +43,7 @@ proc _get_result_item_rank(@ingredients_weight, @ingredient_items) { #등급있�
     return(round(rand(), 5))
   }
 }
+
 proc _get_final_entry_from_first_entry(@entry, @result_item_rank, @luck) {
   #broadcast(@result_item_rank @luck)
   @type = @entry['type']
@@ -54,7 +57,7 @@ proc _get_final_entry_from_first_entry(@entry, @result_item_rank, @luck) {
     }
     @result_weight = @total_weight * @result_item_rank
     @min_weight = 0
-    @return = array('type': 'rank', 'prefix': '오류가 난') #범위안에 @result_weight가 들어가지 않을시
+    @return = array('type': 'rank', 'display': '오류가 난 아이템') #범위안에 @result_weight가 들어가지 않을시
     foreach(@entry in @entries) {
       @weight = @entry['weight']
       @max_weight = @min_weight + @weight
@@ -111,6 +114,7 @@ proc _get_final_entry_from_first_entry(@entry, @result_item_rank, @luck) {
     broadcast('잘못된 json!즉시 json을 고치세요!', '*') #잘못된 타입을 작성함
   }
 }
+
 proc _get_modified_item(@entry, @item) {
   @items_slot = array(
     'WEAPON': array(
@@ -152,8 +156,8 @@ proc _get_modified_item(@entry, @item) {
       
       'TRIDENT'
     ),
-    'CHESTPLATE': array('LEATHER_CHESTPLATE', 'CHAINMAIL_CHESTPLATE', 'IRON_CHESTPLATE', 'DIAMOND_CHESTPLATE', 'GOLDEN_CHESTPLATE', 'NETHERITE_CHESTPLATE')
-  ) #하드코딩 ㅎㅎ 이정도는..
+    'BOOTS': array('LEATHER_BOOTS', 'CHAINMAIL_BOOTS', 'IRON_BOOTS', 'DIAMOND_BOOTS', 'GOLDEN_BOOTS', 'NETHERITE_BOOTS')
+  )
   foreach(@slot: @item_names in @items_slot) {
     foreach(@item_name in @item_names) {
       if(@item_name == @item['name']) {
@@ -187,7 +191,7 @@ proc _get_modified_item(@entry, @item) {
           @final_amount = @amount
         }
         #갑옷일시, 곡괭이 일시에 따라서 다른 표기
-        @lore[] = '§f\ue40a 채굴 강도 '.string(round(@final_amount, 2))
+        @lore[] = '§f\ue451 채굴 강도 '.string(round(@final_amount, 2))
       case 'farming_power':
         @ch_attribute = 'GENERIC_FOLLOW_RANGE'
         @operation = 'ADD_NUMBER'
@@ -197,7 +201,7 @@ proc _get_modified_item(@entry, @item) {
           @final_amount = @amount
         }
         #갑옷일시, 괭이 일시에 따라서 다른 표기
-        @lore[] = '§f\ue40b 경작 강도 '.string(round(@final_amount, 2))
+        @lore[] = '§f\ue452 경작 강도 '.string(round(@final_amount, 2))
       case 'attack_damage':
         @ch_attribute = 'GENERIC_ATTACK_DAMAGE'
         @operation = 'ADD_NUMBER'
@@ -213,7 +217,7 @@ proc _get_modified_item(@entry, @item) {
         } else {
           @final_amount = @amount - @damage_int
         }
-        @lore[] = '§f\ue407 공격 피해 '.@string.string(round(@final_amount + @damage_int, 2))
+        @lore[] = '§f\ue44e 공격 피해 '.@string.string(round(@final_amount + @damage_int, 2))
       case 'attack_speed':
         @ch_attribute = 'GENERIC_ATTACK_SPEED'
         @operation = 'ADD_NUMBER'
@@ -229,7 +233,7 @@ proc _get_modified_item(@entry, @item) {
         } else {
           @final_amount = @amount - @speed_int
         }
-        @lore[] = '§f\ue408 공격 속도 '.@string.string(round(@final_amount + @speed_int, 2))
+        @lore[] = '§f\ue44f 공격 속도 '.@string.string(round(@final_amount + @speed_int, 2))
       case 'max_health':
         @ch_attribute = 'GENERIC_MAX_HEALTH'
         @operation = 'ADD_NUMBER'

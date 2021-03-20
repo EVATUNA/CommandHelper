@@ -54,7 +54,7 @@ proc _new_data(@uuid, @players_data) {
 }
 
 proc _send_resourcepack(@player, @uuid, @players_state) {
-  @resourcepack = 'https://drive.google.com/uc?export=download&id=1WDSOp3NGhZGfy6OhzGPOuY1qFa8tzs4l'
+  @resourcepack = 'https://drive.google.com/uc?export=download&id=1wyVgOhv9hn8L_DhgqveMKqiKlenuqqLm'
   send_resourcepack(@player, @resourcepack)
   @player_state = array(
     'join_spec': array(
@@ -130,6 +130,21 @@ proc _join_event(@player, @uuid, @players_state, @players_data, @server, @bots, 
         _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec, @text)
       })
     }
+    @armor_light_hider = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': color('WHITE').'치장 설정',
+        'enchants': array(
+          'binding_curse': array(
+            'etype': 'BINDING_CURSE',
+            'elevel': 1
+          )
+        ),
+        'model': 2,
+        'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
+      )
+    )
+    set_inventory_item(puuid(), 37, @armor_light_hider)
   } else {
     #if(!array_contains(@server['bots'], @player)) {
       @server['bots'][] = @player
@@ -145,7 +160,7 @@ proc _join_event(@player, @uuid, @players_state, @players_data, @server, @bots, 
 proc _quit_event(@player, @uuid, @players_state, @server, @bots) {
   if(!array_contains(@bots , @player)) {
     if(array_index_exists(@players_state, @uuid)) {
-      @players_state[@uuid]['quit_countdown'] = 10
+      @players_state[@uuid]['quit_countdown'] = 5
     }
   } else {
     if(array_contains(@server['bots'], @player)) {

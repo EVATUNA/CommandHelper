@@ -48,3 +48,21 @@ broadcast(get_inventory_item(puuid(player()), pheld_slot(player())))
 /itemframe = >>>
 spawn_entity('item_frame', 1, ploc())
 <<<
+
+/test $ = >>>
+  @armor_light_hider = array(
+    'name': 'STRUCTURE_VOID',
+    'meta': array(
+      'display': color('WHITE').'치장 설정',
+      'enchants': array(
+        'binding_curse': array(
+          'etype': 'BINDING_CURSE',
+          'elevel': 1
+        )
+      ),
+      'model': 2,
+      'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
+    )
+  )
+  set_inventory_item(puuid(), 37, @armor_light_hider)
+<<<

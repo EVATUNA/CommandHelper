@@ -9,12 +9,12 @@ include('skill/main.ms')
 ## Item Management
 @effective_items = array(
   'armor': array(
-    'LEATHER_CHESTPLATE',
-    'CHAINMAIL_CHESTPLATE',
-    'IRON_CHESTPLATE',
-    'GOLDEN_CHESTPLATE',
-    'DIAMOND_CHESTPLATE',
-    'NETHERITE_CHESTPLATE'
+    'LEATHER_BOOTS',
+    'CHAINMAIL_BOOTS',
+    'IRON_BOOTS',
+    'GOLDEN_BOOTS',
+    'DIAMOND_BOOTS',
+    'NETHERITE_BOOTS'
   ),
   'weapon': array(
     'WOODEN_SWORD',
@@ -50,7 +50,14 @@ include('skill/main.ms')
     'TRIDENT',
     'BOW',
     'CROSS_BOW',
-    'SHIELD'
+    'SHIELD',
+    'WHEAT_SEEDS',
+    'BEETROOT_SEEDS'
+    'POTATO',
+    'CARROT',
+    'PUMPKIN_SEEDS',
+    'MELON_SEEDS',
+    'SWEET_BERRIES'
   )
 )
 
@@ -76,13 +83,13 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
         case '내구성':
           @vanilla_enchants['unbreaking'] = array(
             'etype': 'DURABILITY',
-            'elevel': 4
+            'elevel': 5
           )
           break()
-        case '수선':
+        case '복원':
           @vanilla_enchants['unbreaking'] = array(
             'etype': 'DURABILITY',
-            'elevel': 2
+            'elevel': 1
           )
           @vanilla_enchants['mending'] = array(
             'etype': 'MENDING',
@@ -161,6 +168,65 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
       if(array_size(@lore) > array_size(@modifiers)) {
         @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
         @enchantments['armor'] = @enchantment
+        @vanilla_enchants = array()
+        switch(@enchantment) {
+        case '견교':
+          @vanilla_enchants['unbreaking'] = array(
+            'etype': 'DURABILITY',
+            'elevel': 5
+          )
+          break()
+        case '복원':
+        case '귀속':
+          @vanilla_enchants['unbreaking'] = array(
+            'etype': 'DURABILITY',
+            'elevel': 1
+          )
+          break()
+        case '보호':
+          @vanilla_enchants['protection'] = array(
+            'etype': 'PROTECTION_ENVIRONMENTAL',
+            'elevel': 5
+          )
+          break()
+        case '저항':
+          @vanilla_enchants['protection'] = array(
+            'etype': 'PROTECTION_ENVIRONMENTAL',
+            'elevel': 5
+          )
+          break()
+        case '원소 보호':
+          @vanilla_enchants['fire_protection'] = array(
+            'etype': 'PROTECTION_FIRE',
+            'elevel': 4
+          )
+          break()
+        case '반엔트로피':
+          @vanilla_enchants['fire_protection'] = array(
+            'etype': 'PROTECTION_FIRE',
+            'elevel': 10
+          )
+          break()
+        case '친수성':
+          @vanilla_enchants['respiration'] = array(
+            'etype': 'OXYGEN',
+            'elevel': 3
+          )
+          @vanilla_enchants['aqua_affinity'] = array(
+            'etype': 'WATER_WORKER',
+            'elevel': 1
+          )
+          @vanilla_enchants['depth_strider'] = array(
+            'etype': 'DEPTH_STRIDER',
+            'elevel': 3
+          )
+          break()
+        }
+
+        @items['main_hand']['meta']['enchants'] = @vanilla_enchants
+        set_timeout(0, closure() {
+          set_inventory_item(@uuid, pheld_slot(@player), @items['main_hand'])
+        })
       }
     }
     @players_data[@uuid]['item']['armor'] = @items['armor']
@@ -183,12 +249,13 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
 
 proc _apply_death_penalty(@player, @uuid, @death_penalties_multiply) {
   @inventory = get_inventory(@uuid)
+  @world = 'world' #플레이어의 월드로 수정
   foreach(@key: @item in @inventory) {
-    if(!is_null(@item)) {
-      if(array_index_exists(@death_penalties_multiply['world'], @item['name'])) {
-        @death_penalty_multiply = @death_penalties_multiply['world'][@item['name']]
+    if(!is_null(@item) && @item['name'] != 'STRUCTURE_VOID') {
+      if(array_index_exists(@death_penalties_multiply[@world], @item['name'])) {
+        @death_penalty_multiply = @death_penalties_multiply[@world][@item['name']]
       } else {
-        @death_penalty_multiply = @death_penalties_multiply['world']['default']
+        @death_penalty_multiply = @death_penalties_multiply[@world]['default']
       }
       @max_durability = material_info(@item['name'], 'maxDurability')
       if(@max_durability == 0) {
@@ -253,7 +320,7 @@ bind('inventory_click', null, null, @event, @players_data, @effective_items, @sk
           }
         }
       }
-      if(@clicked_slot == 38) {
+      if(@clicked_slot == 36) {
         @items['armor'] = get_inventory_item(@uuid, @button)
       }
       break()
@@ -264,7 +331,7 @@ bind('inventory_click', null, null, @event, @players_data, @effective_items, @sk
         array_remove(@other_inventory, 0)
         if(array_size(@other_inventory) == 4) {
           if(array_contains(@effective_items['armor'], @slot_item['name'])) {
-            if(@clicked_slot == 38) {
+            if(@clicked_slot == 36) {
               @is_inventory_empty = false
               for(@i = 0, @i <= 35, @i ++) {
                 if(is_null(@inventory[@i])) {
@@ -275,7 +342,7 @@ bind('inventory_click', null, null, @event, @players_data, @effective_items, @sk
               if(@is_inventory_empty) {
                 @items['armor'] = null
               }
-            } else if(is_null(get_inventory_item(@uuid, 38))) {
+            } else if(is_null(get_inventory_item(@uuid, 36))) {
               @items['armor'] = @slot_item
             }
           }
@@ -411,7 +478,7 @@ bind('inventory_click', null, null, @event, @players_data, @effective_items, @sk
       if(pinventory_holder(@player) == @uuid && @clicked_slot == 40 && !is_null(@players_data[@uuid]['item']['off_hand'])) {
         @items['off_hand'] = null
       }
-      if(pinventory_holder(@player) == @uuid && @clicked_slot == 38 && !is_null(@players_data[@uuid]['item']['armor'])) {
+      if(pinventory_holder(@player) == @uuid && @clicked_slot == 36 && !is_null(@players_data[@uuid]['item']['armor'])) {
         @items['armor'] = null
       }
       break()
@@ -433,7 +500,7 @@ bind('inventory_click', null, null, @event, @players_data, @effective_items, @sk
           @items['off_hand'] = null
         }
       }
-      if(pinventory_holder(@player) == @uuid && @clicked_slot == 38) {
+      if(pinventory_holder(@player) == @uuid && @clicked_slot == 36) {
         if(!is_null(@cursor_item) && array_contains(@effective_items['armor'], @cursor_item['name'])) {
           @items['armor'] = @cursor_item
         } else {
@@ -452,7 +519,7 @@ bind('inventory_click', null, null, @event, @players_data, @effective_items, @sk
       if(pinventory_holder(@player) == @uuid && @clicked_slot == 40 && array_contains(@effective_items['weapon'], @slot_item['name'])) {
         @items['off_hand'] = null
       }
-      if(pinventory_holder(@player) == @uuid && @clicked_slot == 38 && array_contains(@effective_items['armor'], @slot_item['name'])) {
+      if(pinventory_holder(@player) == @uuid && @clicked_slot == 36 && array_contains(@effective_items['armor'], @slot_item['name'])) {
         @items['armor'] = null
       }
       break()
@@ -489,7 +556,7 @@ bind('inventory_close', null, null, @event, @players_data, @effective_items, @sk
     } else {
       @items['off_hand'] = null
     }
-    @armor_item = get_inventory_item(@uuid, 38)
+    @armor_item = get_inventory_item(@uuid, 36)
     if(!is_null(@armor_item) && array_contains(@effective_items['armor'], @armor_item['name'])) {
       @items['armor'] = @armor_item
     } else {
@@ -737,12 +804,12 @@ bind('player_interact', null, array('main_hand': 'main_main_hand', 'button': 'ri
           if(!has_bind(@id.'.click')) {
             bind('inventory_click', array('id': @id.'.click'), array('virtual': true, 'player': @player), @event, @essences) {
               @enchantable_armors = array(
-                'LEATHER_CHESTPLATE': 1.5,
-                'CHAINMAIL_CHESTPLATE': 0.5,
-                'IRON_CHESTPLATE': 0.9,
-                'GOLDEN_CHESTPLATE': 2.5,
-                'DIAMOND_CHESTPLATE': 1.0,
-                'NETHERITE_CHESTPLATE': 1.5
+                'LEATHER_BOOTS': 1.5,
+                'CHAINMAIL_BOOTS': 0.5,
+                'IRON_BOOTS': 0.9,
+                'GOLDEN_BOOTS': 2.5,
+                'DIAMOND_BOOTS': 1.0,
+                'NETHERITE_BOOTS': 1.5
               )
               @enchantable_weapons = array(
                 'WOODEN_SWORD': 1.0,
@@ -873,7 +940,7 @@ bind('entity_damage', null, null, @event, @players_data) {
   if(array_index_exists(@event, 'damager') && ponline(@event['damager'])) { //플레이어가 때리는 경우
     @player = @event['damager']
     @puuid = puuid(@player)
-    if(array_index_exists(@players_data, @uuid)) {
+    if(array_index_exists(@players_data, @puuid)) {
       @euuid = @event['id']
       @items = @players_data[@puuid]['item']
       
@@ -1080,7 +1147,8 @@ bind('entity_damage', null, null, @event, @players_data) {
   if(@event['type'] == 'PLAYER') {
     @player = @event['player']
     @puuid = @event['id']
-    if(array_index_exists(@players_data, @uuid)) {
+    if(array_index_exists(@players_data, @puuid)) {
+      @items = @players_data[@puuid]['item']
       if(@event['finalamount'] == 0 && pblocking(@player)) {
         if(!is_null(@items['main_hand']) && @items['main_hand']['name'] == 'SHIELD') {
           @shield_slot = pheld_slot(@player)

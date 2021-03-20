@@ -1563,7 +1563,7 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
       @pickaxe_hardness = @pickaxes_hardness[@players_data[@uuid]['item']['main_hand']['name']]
       if(!is_null(@players_data[@uuid]['item']['main_hand']['meta'])) {
         # 돌 곡괭이 hardness 조정
-        if(@pickaxe_hardness == 0 && @players_data[@uuid]['item']['main_hand']['meta']['model'] >= 8) {
+        if(@pickaxe_hardness == 1 && @players_data[@uuid]['item']['main_hand']['meta']['model'] >= 8) {
           @pickaxe_hardness = 2
         }
         if(array_index_exists(@players_data[@uuid]['item']['main_hand']['meta'], 'modifiers')) {
@@ -1644,7 +1644,11 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
         @entries = @mineral_spec['loot_table']
         @total_weight = 0
         foreach(@key: @entry in @entries) {
-          @entries[@key]['weight'] += @entry['quality'] * @players_data[@uuid]['skill_data']['mining'][@mineral_spec['mastery']][0]
+          if(array_index_exists(@mineral_spec, 'mastery')) {
+            @entries[@key]['weight'] += @entry['quality'] * @players_data[@uuid]['skill_data']['mining'][@mineral_spec['mastery']][0]
+          } else {
+            @entries[@key]['weight'] += @entry['quality']
+          }
           @total_weight += @entry['weight']
         }
         @qty = integer(round(@mineral_spec['default_qty'] + rand() * @extra_qty))
@@ -1689,7 +1693,7 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
     modify_event('drops', array())
   }
 }
-
+  
 proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skills_spec, @text) {
   @crop = @event['block']
   if(array_contains(array_keys(@crops_spec), @crop)) {
@@ -1728,7 +1732,11 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
         @entries = @crop_spec['loot_table']
         @total_weight = 0
         foreach(@key: @entry in @entries) {
-          @entries[@key]['weight'] += @entry['quality'] * @players_data[@uuid]['skill_data']['farming'][@crop_spec['mastery']][0]
+          if(array_index_exists(@crop_spec, 'mastery')) {
+            @entries[@key]['weight'] += @entry['quality'] * @players_data[@uuid]['skill_data']['farming'][@crop_spec['mastery']][0]
+          } else {
+            @entries[@key]['weight'] += @entry['quality']
+          }
           @total_weight += @entry['weight']
         }
         @qty = integer(round(@crop_spec['default_qty'] + rand() * @extra_qty))

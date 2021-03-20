@@ -5,13 +5,8 @@
     "default_qty": 1,
     "default_xp": 1,
     "extra_xp": 0,
-    "mastery": "iron_mining_mastery",
     "skills": {
       "mining": {
-        "iron_mining_mastery": {
-          "default_xp": 1,
-          "extra_xp": 0
-        },
         "ore_selecting": {
           "default_xp": 1,
           "extra_xp": 0
@@ -21,43 +16,10 @@
     "loot_table": [
       {
         "item": {
-          "name": "IRON_INGOT"
+          "name": "COAL"
         },
         "weight": 100,
         "quality": 0
-      },
-      {
-        "item": {
-          "name": "IRON_INGOT",
-          "meta": {
-            "display": "§e중급 철괴",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
-      },
-      {
-        "item": {
-          "name": "IRON_INGOT",
-          "meta": {
-            "display": "§b상급 철괴",
-            "model": 2
-          }
-        },
-        "weight": 5,
-        "quality": 0.5
-      },
-      {
-        "item": {
-          "name": "IRON_INGOT",
-          "meta": {
-            "display": "§d최상급 철괴",
-            "model": 3
-          }
-        },
-        "weight": 0.5,
-        "quality": 0.1
       }
     ]
   },
@@ -67,13 +29,8 @@
     "default_qty": 1,
     "default_xp": 0.125,
     "extra_xp": 1.5,
-    "mastery": "iron_mining_mastery",
     "skills": {
       "mining": {
-        "iron_mining_mastery": {
-          "default_xp": 1,
-          "extra_xp": 0
-        },
         "ore_selecting": {
           "default_xp": 1.25,
           "extra_xp": 0.5
@@ -83,56 +40,23 @@
     "loot_table": [
       {
         "item": {
-          "name": "IRON_INGOT"
+          "name": "QUARTZ"
         },
         "weight": 100,
         "quality": 0
-      },
-      {
-        "item": {
-          "name": "IRON_INGOT",
-          "meta": {
-            "display": "§e중급 철괴",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
-      },
-      {
-        "item": {
-          "name": "IRON_INGOT",
-          "meta": {
-            "display": "§b상급 철괴",
-            "model": 2
-          }
-        },
-        "weight": 5,
-        "quality": 0.5
-      },
-      {
-        "item": {
-          "name": "IRON_INGOT",
-          "meta": {
-            "display": "§d최상급 철괴",
-            "model": 3
-          }
-        },
-        "weight": 0.5,
-        "quality": 0.1
       }
     ]
   },
-  "COPPER_ORE": {
+  "PETRIFIED_OAK_SLAB": {
     "hp": 40,
     "hardness": 2,
     "default_qty": 1,
     "default_xp": 0.125,
     "extra_xp": 1.5,
-    "mastery": "iron_mining_mastery",
+    "mastery": "copper_mining_mastery",
     "skills": {
       "mining": {
-        "iron_mining_mastery": {
+        "copper_mining_mastery": {
           "default_xp": 1,
           "extra_xp": 0
         },
@@ -145,16 +69,16 @@
     "loot_table": [
       {
         "item": {
-          "name": "IRON_INGOT"
+          "name": "GOLD_NUGGET"
         },
         "weight": 100,
         "quality": 0
       },
       {
         "item": {
-          "name": "IRON_INGOT",
+          "name": "GOLD_NUGGET",
           "meta": {
-            "display": "§e중급 철괴",
+            "display": "§e중급 구리 주괴",
             "model": 1
           }
         },
@@ -163,9 +87,9 @@
       },
       {
         "item": {
-          "name": "IRON_INGOT",
+          "name": "GOLD_NUGGET",
           "meta": {
-            "display": "§b상급 철괴",
+            "display": "§b상급 구리 주괴",
             "model": 2
           }
         },
@@ -174,9 +98,9 @@
       },
       {
         "item": {
-          "name": "IRON_INGOT",
+          "name": "GOLD_NUGGET",
           "meta": {
-            "display": "§d최상급 철괴",
+            "display": "§d최상급 구리 주괴",
             "model": 3
           }
         },
@@ -253,13 +177,8 @@
     "default_qty": 4,
     "default_xp": 0.125,
     "extra_xp": 1.5,
-    "mastery": "iron_mining_mastery",
     "skills": {
       "mining": {
-        "iron_mining_mastery": {
-          "default_xp": 1,
-          "extra_xp": 0
-        },
         "ore_selecting": {
           "default_xp": 5,
           "extra_xp": 0
@@ -269,43 +188,10 @@
     "loot_table": [
       {
         "item": {
-          "name": "IRON_INGOT"
+          "name": "LAPIS_LAZULI"
         },
         "weight": 100,
         "quality": 0
-      },
-      {
-        "item": {
-          "name": "IRON_INGOT",
-          "meta": {
-            "display": "§e중급 철괴",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
-      },
-      {
-        "item": {
-          "name": "IRON_INGOT",
-          "meta": {
-            "display": "§b상급 철괴",
-            "model": 2
-          }
-        },
-        "weight": 5,
-        "quality": 0.5
-      },
-      {
-        "item": {
-          "name": "IRON_INGOT",
-          "meta": {
-            "display": "§d최상급 철괴",
-            "model": 3
-          }
-        },
-        "weight": 0.5,
-        "quality": 0.1
       }
     ]
   },
@@ -315,10 +201,10 @@
     "default_qty": 1,
     "default_xp": 0.125,
     "extra_xp": 1.5,
-    "mastery": "iron_mining_mastery",
+    "mastery": "gold_mining_mastery",
     "skills": {
       "mining": {
-        "iron_mining_mastery": {
+        "gold_mining_mastery": {
           "default_xp": 1,
           "extra_xp": 0
         },
@@ -331,16 +217,16 @@
     "loot_table": [
       {
         "item": {
-          "name": "IRON_INGOT"
+          "name": "GOLD_INGOT"
         },
         "weight": 100,
         "quality": 0
       },
       {
         "item": {
-          "name": "IRON_INGOT",
+          "name": "GOLD_INGOT",
           "meta": {
-            "display": "§e중급 철괴",
+            "display": "§e중급 금괴",
             "model": 1
           }
         },
@@ -349,9 +235,9 @@
       },
       {
         "item": {
-          "name": "IRON_INGOT",
+          "name": "GOLD_INGOT",
           "meta": {
-            "display": "§b상급 철괴",
+            "display": "§b상급 금괴",
             "model": 2
           }
         },
@@ -360,9 +246,9 @@
       },
       {
         "item": {
-          "name": "IRON_INGOT",
+          "name": "GOLD_INGOT",
           "meta": {
-            "display": "§d최상급 철괴",
+            "display": "§d최상급 금괴",
             "model": 3
           }
         },
@@ -377,10 +263,10 @@
     "default_qty": 1,
     "default_xp": 0.125,
     "extra_xp": 1.5,
-    "mastery": "iron_mining_mastery",
+    "mastery": "gold_mining_mastery",
     "skills": {
       "mining": {
-        "iron_mining_mastery": {
+        "gold_mining_mastery": {
           "default_xp": 7.25,
           "extra_xp": 0.5
         },
@@ -393,16 +279,16 @@
     "loot_table": [
       {
         "item": {
-          "name": "IRON_INGOT"
+          "name": "GOLD_INGOT"
         },
         "weight": 100,
         "quality": 0
       },
       {
         "item": {
-          "name": "IRON_INGOT",
+          "name": "GOLD_INGOT",
           "meta": {
-            "display": "§e중급 철괴",
+            "display": "§e중급 금괴",
             "model": 1
           }
         },
@@ -411,9 +297,9 @@
       },
       {
         "item": {
-          "name": "IRON_INGOT",
+          "name": "GOLD_INGOT",
           "meta": {
-            "display": "§b상급 철괴",
+            "display": "§b상급 금괴",
             "model": 2
           }
         },
@@ -422,9 +308,9 @@
       },
       {
         "item": {
-          "name": "IRON_INGOT",
+          "name": "GOLD_INGOT",
           "meta": {
-            "display": "§d최상급 철괴",
+            "display": "§d최상급 금괴",
             "model": 3
           }
         },
@@ -439,13 +325,8 @@
     "default_qty": 4,
     "default_xp": 0.125,
     "extra_xp": 1.5,
-    "mastery": "iron_mining_mastery",
     "skills": {
       "mining": {
-        "iron_mining_mastery": {
-          "default_xp": 1,
-          "extra_xp": 0
-        },
         "ore_selecting": {
           "default_xp": 5,
           "extra_xp": 0
@@ -455,43 +336,10 @@
     "loot_table": [
       {
         "item": {
-          "name": "IRON_INGOT"
+          "name": "REDSTONE"
         },
         "weight": 100,
         "quality": 0
-      },
-      {
-        "item": {
-          "name": "IRON_INGOT",
-          "meta": {
-            "display": "§e중급 철괴",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
-      },
-      {
-        "item": {
-          "name": "IRON_INGOT",
-          "meta": {
-            "display": "§b상급 철괴",
-            "model": 2
-          }
-        },
-        "weight": 5,
-        "quality": 0.5
-      },
-      {
-        "item": {
-          "name": "IRON_INGOT",
-          "meta": {
-            "display": "§d최상급 철괴",
-            "model": 3
-          }
-        },
-        "weight": 0.5,
-        "quality": 0.1
       }
     ]
   },
@@ -501,10 +349,10 @@
     "default_qty": 1,
     "default_xp": 0.125,
     "extra_xp": 1.5,
-    "mastery": "iron_mining_mastery",
+    "mastery": "diamond_mining_mastery",
     "skills": {
       "mining": {
-        "iron_mining_mastery": {
+        "diamond_mining_mastery": {
           "default_xp": 1,
           "extra_xp": 0
         },
@@ -517,16 +365,16 @@
     "loot_table": [
       {
         "item": {
-          "name": "IRON_INGOT"
+          "name": "DIAMOND"
         },
         "weight": 100,
         "quality": 0
       },
       {
         "item": {
-          "name": "IRON_INGOT",
+          "name": "DIAMOND",
           "meta": {
-            "display": "§e중급 철괴",
+            "display": "§e중급 다이아몬드",
             "model": 1
           }
         },
@@ -535,9 +383,9 @@
       },
       {
         "item": {
-          "name": "IRON_INGOT",
+          "name": "DIAMOND",
           "meta": {
-            "display": "§b상급 철괴",
+            "display": "§b상급 다이아몬드",
             "model": 2
           }
         },
@@ -546,9 +394,9 @@
       },
       {
         "item": {
-          "name": "IRON_INGOT",
+          "name": "DIAMOND",
           "meta": {
-            "display": "§d최상급 철괴",
+            "display": "§d최상급 다이아몬드",
             "model": 3
           }
         },
@@ -563,13 +411,8 @@
     "default_qty": 1,
     "default_xp": 0.125,
     "extra_xp": 1.5,
-    "mastery": "iron_mining_mastery",
     "skills": {
       "mining": {
-        "iron_mining_mastery": {
-          "default_xp": 15,
-          "extra_xp": 0
-        },
         "ore_selecting": {
           "default_xp": 1,
           "extra_xp": 0
@@ -579,43 +422,10 @@
     "loot_table": [
       {
         "item": {
-          "name": "IRON_INGOT"
+          "name": "EMERALD"
         },
         "weight": 100,
         "quality": 0
-      },
-      {
-        "item": {
-          "name": "IRON_INGOT",
-          "meta": {
-            "display": "§e중급 철괴",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
-      },
-      {
-        "item": {
-          "name": "IRON_INGOT",
-          "meta": {
-            "display": "§b상급 철괴",
-            "model": 2
-          }
-        },
-        "weight": 5,
-        "quality": 0.5
-      },
-      {
-        "item": {
-          "name": "IRON_INGOT",
-          "meta": {
-            "display": "§d최상급 철괴",
-            "model": 3
-          }
-        },
-        "weight": 0.5,
-        "quality": 0.1
       }
     ]
   },
@@ -625,10 +435,10 @@
     "default_qty": 1,
     "default_xp": 0.125,
     "extra_xp": 1.5,
-    "mastery": "iron_mining_mastery",
+    "mastery": "ancient_debris_mining_mastery",
     "skills": {
       "mining": {
-        "iron_mining_mastery": {
+        "ancient_debris_mining_mastery": {
           "default_xp": 1,
           "extra_xp": 0
         },
@@ -641,16 +451,16 @@
     "loot_table": [
       {
         "item": {
-          "name": "IRON_INGOT"
+          "name": "NETHERITE_SCRAP"
         },
         "weight": 100,
         "quality": 0
       },
       {
         "item": {
-          "name": "IRON_INGOT",
+          "name": "NETHERITE_SCRAP",
           "meta": {
-            "display": "§e중급 철괴",
+            "display": "§e중급 네더라이트 주괴",
             "model": 1
           }
         },
@@ -659,9 +469,9 @@
       },
       {
         "item": {
-          "name": "IRON_INGOT",
+          "name": "NETHERITE_SCRAP",
           "meta": {
-            "display": "§b상급 철괴",
+            "display": "§b상급 네더라이트 주괴",
             "model": 2
           }
         },
@@ -670,9 +480,9 @@
       },
       {
         "item": {
-          "name": "IRON_INGOT",
+          "name": "NETHERITE_SCRAP",
           "meta": {
-            "display": "§d최상급 철괴",
+            "display": "§d최상급 네더라이트 주괴",
             "model": 3
           }
         },
