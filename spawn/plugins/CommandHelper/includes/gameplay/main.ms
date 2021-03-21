@@ -86,16 +86,6 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
             'elevel': 5
           )
           break()
-        case '복원':
-          @vanilla_enchants['unbreaking'] = array(
-            'etype': 'DURABILITY',
-            'elevel': 1
-          )
-          @vanilla_enchants['mending'] = array(
-            'etype': 'MENDING',
-            'elevel': 1
-          )
-          break()
         case '효율':
           @vanilla_enchants['efficiency'] = array(
             'etype': 'DIG_SPEED',
@@ -104,28 +94,6 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
           @vanilla_enchants['sharpness'] = array(
             'etype': 'DAMAGE_ALL',
             'elevel': 1
-          )
-          break()
-        case '용력':
-          @vanilla_enchants['efficiency'] = array(
-            'etype': 'DIG_SPEED',
-            'elevel': 5
-          )
-          @vanilla_enchants['sharpness'] = array(
-            'etype': 'DAMAGE_ALL',
-            'elevel': 3
-          )
-          break()
-        case '화염':
-          @vanilla_enchants['fire_aspect'] = array(
-            'etype': 'FIRE_ASPECT',
-            'elevel': 1
-          )
-          break()
-        case '유황불':
-          @vanilla_enchants['fire_aspect'] = array(
-            'etype': 'FIRE_ASPECT',
-            'elevel': 5
           )
           break()
         case '행운':
@@ -729,7 +697,8 @@ bind('player_interact', null, array('main_hand': 'main_main_hand', 'button': 'ri
 
   } else {
     @player = @event['player']
-    if(!psneaking(@player)) {
+    @uuid = puuid(@player)
+    if(!psneaking(@player) || is_null(get_inventory_item(@uuid, pheld_slot(@player))) || is_null(get_inventory_item(@uuid, 40))) {
       switch(@event['block']) {
       case 'ENCHANTING_TABLE':
         cancel()
@@ -803,46 +772,155 @@ bind('player_interact', null, array('main_hand': 'main_main_hand', 'button': 'ri
           }
           if(!has_bind(@id.'.click')) {
             bind('inventory_click', array('id': @id.'.click'), array('virtual': true, 'player': @player), @event, @essences) {
-              @enchantable_armors = array(
-                'LEATHER_BOOTS': 1.5,
-                'CHAINMAIL_BOOTS': 0.5,
-                'IRON_BOOTS': 0.9,
-                'GOLDEN_BOOTS': 2.5,
-                'DIAMOND_BOOTS': 1.0,
-                'NETHERITE_BOOTS': 1.5
-              )
-              @enchantable_weapons = array(
-                'WOODEN_SWORD': 1.0,
-                'WOODEN_SHOVEL': 1.0,
-                'WOODEN_PICKAXE': 1.0,
-                'WOODEN_AXE': 1.0,
-                'WOODEN_HOE': 1.0,
-                'STONE_SWORD': 0.9,
-                'STONE_SHOVEL': 0.9,
-                'STONE_PICKAXE': 0.9,
-                'STONE_AXE': 0.9,
-                'STONE_HOE': 0.9,
-                'IRON_SWORD': 1.4,
-                'IRON_SHOVEL': 1.4,
-                'IRON_PICKAXE': 1.4,
-                'IRON_AXE': 1.4,
-                'IRON_HOE': 1.4,
-                'GOLDEN_SWORD': 2.2,
-                'GOLDEN_SHOVEL': 2.2,
-                'GOLDEN_PICKAXE': 2.2,
-                'GOLDEN_AXE': 2.2,
-                'GOLDEN_HOE': 2.2,
-                'DIAMOND_SWORD': 1.0,
-                'DIAMOND_SHOVEL': 1.0,
-                'DIAMOND_PICKAXE': 1.0,
-                'DIAMOND_AXE': 1.0,
-                'DIAMOND_HOE': 1.0,
-                'NETHERITE_SWORD': 1.5,
-                'NETHERITE_SHOVEL': 1.5,
-                'NETHERITE_PICKAXE': 1.5,
-                'NETHERITE_AXE': 1.5,
-                'NETHERITE_HOE': 1.5,
-                'TRIDENT': 1.0
+              @enchantable_items = array(
+                'LEATHER_BOOTS': array(
+                  'luck': 1.5,
+                  'entries_type': 'armor_entries'
+                ),
+                'CHAINMAIL_BOOTS': array(
+                  'luck': 0.5,
+                  'entries_type': 'armor_entries'
+                ),
+                'IRON_BOOTS': array(
+                  'luck': 0.9,
+                  'entries_type': 'armor_entries'
+                ),
+                'GOLDEN_BOOTS': array(
+                  'luck': 2.5,
+                  'entries_type': 'armor_entries'
+                ),
+                'DIAMOND_BOOTS': array(
+                  'luck': 1.0,
+                  'entries_type': 'armor_entries'
+                ),
+                'NETHERITE_BOOTS': array(
+                  'luck': 1.5,
+                  'entries_type': 'armor_entries'
+                ),
+                'WOODEN_SWORD': array(
+                  'luck': 1.0,
+                  'entries_type': 'weapon_entries'
+                ),
+                'WOODEN_SHOVEL': array(
+                  'luck': 1.0,
+                  'entries_type': 'weapon_entries'
+                ),
+                'WOODEN_PICKAXE': array(
+                  'luck': 1.0,
+                  'entries_type': 'weapon_entries'
+                ),
+                'WOODEN_AXE': array(
+                  'luck': 1.0,
+                  'entries_type': 'weapon_entries'
+                ),
+                'WOODEN_HOE': array(
+                  'luck': 1.0,
+                  'entries_type': 'weapon_entries'
+                ),
+                'STONE_SWORD': array(
+                  'luck': 0.9,
+                  'entries_type': 'weapon_entries'
+                ),
+                'STONE_SHOVEL': array(
+                  'luck': 0.9,
+                  'entries_type': 'weapon_entries'
+                ),
+                'STONE_PICKAXE': array(
+                  'luck': 0.9,
+                  'entries_type': 'weapon_entries'
+                ),
+                'STONE_AXE': array(
+                  'luck': 0.9,
+                  'entries_type': 'weapon_entries'
+                ),
+                'STONE_HOE': array(
+                  'luck': 0.9,
+                  'entries_type': 'weapon_entries'
+                ),
+                'IRON_SWORD': array(
+                  'luck': 1.4,
+                  'entries_type': 'weapon_entries'
+                ),
+                'IRON_SHOVEL': array(
+                  'luck': 0.9,
+                  'entries_type': 'weapon_entries'
+                ),
+                'IRON_PICKAXE': array(
+                  'luck': 0.9,
+                  'entries_type': 'weapon_entries'
+                ),
+                'IRON_AXE': array(
+                  'luck': 0.9,
+                  'entries_type': 'weapon_entries'
+                ),
+                'IRON_HOE': array(
+                  'luck': 0.9,
+                  'entries_type': 'weapon_entries'
+                ),
+                'GOLDEN_SWORD': array(
+                  'luck': 2.2,
+                  'entries_type': 'weapon_entries'
+                ),
+                'GOLDEN_SHOVEL': array(
+                  'luck': 2.2,
+                  'entries_type': 'weapon_entries'
+                ),
+                'GOLDEN_PICKAXE': array(
+                  'luck': 2.2,
+                  'entries_type': 'weapon_entries'
+                ),
+                'GOLDEN_AXE': array(
+                  'luck': 2.2,
+                  'entries_type': 'weapon_entries'
+                ),
+                'GOLDEN_HOE': array(
+                  'luck': 2.2,
+                  'entries_type': 'weapon_entries'
+                ),
+                'DIAMOND_SWORD': array(
+                  'luck': 1.0,
+                  'entries_type': 'weapon_entries'
+                ),
+                'DIAMOND_SHOVEL': array(
+                  'luck': 1.0,
+                  'entries_type': 'weapon_entries'
+                ),
+                'DIAMOND_PICKAXE': array(
+                  'luck': 1.0,
+                  'entries_type': 'weapon_entries'
+                ),
+                'DIAMOND_AXE': array(
+                  'luck': 1.0,
+                  'entries_type': 'weapon_entries'
+                ),
+                'DIAMOND_HOE': array(
+                  'luck': 1.0,
+                  'entries_type': 'weapon_entries'
+                ),
+                'NETHERITE_SWORD': array(
+                  'luck': 1.5,
+                  'entries_type': 'weapon_entries'
+                ),
+                'NETHERITE_SHOVEL': array(
+                  'luck': 1.5,
+                  'entries_type': 'weapon_entries'
+                ),
+                'NETHERITE_PICKAXE': array(
+                  'luck': 1.5,
+                  'entries_type': 'weapon_entries'
+                ),
+                'NETHERITE_AXE': array(
+                  'luck': 1.5,
+                  'entries_type': 'weapon_entries'
+                ),
+                'NETHERITE_HOE': array(
+                  'luck': 1.5,
+                  'entries_type': 'weapon_entries'
+                ),
+                'TRIDENT': array(
+                  'luck': 1.0,
+                  'entries_type': 'weapon_entries'
+                )
               )
               @rawslot = @event['rawslot']
               if(@rawslot >= 0 && @rawslot <= 26) {
@@ -851,19 +929,19 @@ bind('player_interact', null, array('main_hand': 'main_main_hand', 'button': 'ri
                   cancel()
                 }
                 @cursor_item = @event['cursoritem']
-                if(!is_null(@cursor_item) && @cursor_item['name'] == 'ENCHANTED_BOOK' && @rawslot == 22 && @event['action'] == 'SWAP_WITH_CURSOR') {
+                if(!is_null(@cursor_item) && @cursor_item['name'] == 'ENCHANTED_BOOK' && !is_null(@cursor_item['meta']) && !is_null(@cursor_item['meta']['display']) && @rawslot == 22 && @event['action'] == 'SWAP_WITH_CURSOR') {
                   @enchanting_item = @event['inventory'][@rawslot]
+                  @enchantable_item = @enchantable_items[@enchanting_item['name']]
                   @enchanted_item = @enchanting_item
-                  if(!is_null(@enchanting_item) && array_index_exists(@enchantable_weapons, @enchanting_item['name'])) {
+                  if(!is_null(@enchanting_item) && array_index_exists(@enchantable_items, @enchanting_item['name'])) {
                     @essence_name = strip_colors(@cursor_item['meta']['display'])
                     if(array_index_exists(@essences, @essence_name)) {
-                      @entries = @essences[@essence_name]['entries']
-                      @enchanted_item = _get_enchanted_item(@enchanting_item, @entries, @enchantable_weapons[@enchanting_item['name']])
+                      @entries = @essences[@essence_name][@enchantable_item['entries_type']]
+                      @enchanted_item = _get_enchanted_item(@enchanting_item, @entries, @enchantable_item['luck'])
                     }
                     cancel()
                     modify_event('slotitem', @enchanted_item)
                     modify_event('cursoritem', null)
-
                   }
                 }
               }
