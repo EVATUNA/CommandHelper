@@ -2,11 +2,10 @@
   "item": {
     "name": "ENCHANTED_BOOK",
     "meta": {
-      "model": 1,
-      "display": "§f희미한 마법의 정수",
+      "model": 4,
+      "display": "§f강력한 마법의 정수",
       "lore": [
-        "§7그냥 물약처럼 보일 정도로,",
-        "§7집중해야 느껴지는 마법이 담겨져 있습니다.",
+        "§7강대한 마법이 흘러나오고 있습니다.",
         "",
         "§7마법 작업대를 사용하여",
         "§7마법을 부여할 수 있습니다."
@@ -17,7 +16,7 @@
     {
       "weight": 1,
       "name": "내구성",
-      "icon": "\ue40a",
+      "icon": "\ue476",
       "color": "#eee255",
       "descriptions": [
         "도구가 400% 더 오래갑니다."
@@ -26,7 +25,7 @@
     {
       "weight": 1,
       "name": "효율",
-      "icon": "\ue40a",
+      "icon": "\ue477",
       "color": "#eee255",
       "descriptions": [
         "도구의 피해량과 성능이 향상됩니다."
@@ -35,7 +34,7 @@
     {
       "weight": 1,
       "name": "행운",
-      "icon": "\ue40a",
+      "icon": "\ue478",
       "color": "#eee255",
       "descriptions": [
         "특정 블럭을 부수거나 적을 처치할 시,",
@@ -45,7 +44,7 @@
     {
       "weight": 1,
       "name": "경험",
-      "icon": "\ue40a",
+      "icon": "\ue479",
       "color": "#eee255",
       "descriptions": [
         "특정 블럭을 부수거나 적을 처치할 시,",
@@ -55,7 +54,7 @@
     {
       "weight": 1,
       "name": "전격",
-      "icon": "\ue40a",
+      "icon": "\ue47a",
       "color": "#eee255",
       "descriptions": [
         "적 타격시, 10%의 확률로",
@@ -66,7 +65,7 @@
     {
       "weight": 1,
       "name": "천둥",
-      "icon": "\ue40a",
+      "icon": "\ue47b",
       "color": "#eee255",
       "descriptions": [
         "적 타격시, 25%의 확률로",
@@ -79,7 +78,7 @@
     {
       "weight": 1,
       "name": "화염",
-      "icon": "\ue40a",
+      "icon": "\ue47c",
       "color": "#eee255",
       "descriptions": [
         "적 타격시, 10%의 확률로",
@@ -89,7 +88,7 @@
     {
       "weight": 1,
       "name": "유황불",
-      "icon": "\ue40a",
+      "icon": "\ue47d",
       "color": "#eee255",
       "descriptions": [
         "적 타격시, 25%의 확률로",
@@ -102,7 +101,7 @@
     {
       "weight": 1,
       "name": "서리",
-      "icon": "\ue40a",
+      "icon": "\ue47e",
       "color": "#eee255",
       "descriptions": [
         "적 타격시, 10%의 확률로",
@@ -114,7 +113,7 @@
     {
       "weight": 1,
       "name": "빙결",
-      "icon": "\ue40a",
+      "icon": "\ue47f",
       "color": "#eee255",
       "descriptions": [
         "적 타격시, 25%의 확률로",
@@ -127,7 +126,7 @@
     {
       "weight": 1,
       "name": "신성",
-      "icon": "\ue40a",
+      "icon": "\ue480",
       "color": "#eee255",
       "descriptions": [
         "언데드 적 타격시, 10%의 확률로",
@@ -137,7 +136,7 @@
     {
       "weight": 1,
       "name": "퇴마",
-      "icon": "\ue40a",
+      "icon": "\ue481",
       "color": "#eee255",
       "descriptions": [
         "언데드 적 타격시, 25%의 확률로",
@@ -147,7 +146,7 @@
     {
       "weight": 1,
       "name": "독성",
-      "icon": "\ue40a",
+      "icon": "\ue482",
       "color": "#eee255",
       "descriptions": [
         "적 타격시, 10%의 확률로",
@@ -157,7 +156,7 @@
     {
       "weight": 1,
       "name": "맹독",
-      "icon": "\ue40a",
+      "icon": "\ue483",
       "color": "#eee255",
       "descriptions": [
         "적 타격시, 10%의 확률로",
@@ -169,7 +168,7 @@
     {
       "weight": 1,
       "name": "견고",
-      "icon": "\ue40a",
+      "icon": "\ue462",
       "color": "#eee255",
       "descriptions": [
         "방어구가 150% 더 오래갑니다."
@@ -178,7 +177,7 @@
     {
       "weight": 1,
       "name": "복원",
-      "icon": "\ue40a",
+      "icon": "\ue463",
       "color": "#eee255",
       "descriptions": [
         "방어구가 125% 더 오래갑니다.",
@@ -190,7 +189,7 @@
     {
       "weight": 1,
       "name": "귀속",
-      "icon": "\ue40a",
+      "icon": "\ue464",
       "color": "#eee255",
       "descriptions": [
         "방어구가 125% 더 오래갑니다.",
@@ -201,7 +200,7 @@
     {
       "weight": 1,
       "name": "보호",
-      "icon": "\ue40a",
+      "icon": "\ue465",
       "color": "#eee255",
       "descriptions": [
         "물리 피해가 20% 감소됩니다."
@@ -210,7 +209,7 @@
     {
       "weight": 1,
       "name": "원소 보호",
-      "icon": "\ue40a",
+      "icon": "\ue466",
       "color": "#eee255",
       "descriptions": [
         "특수 피해가 32% 감소되며,",
@@ -220,7 +219,7 @@
     {
       "weight": 1,
       "name": "친수성",
-      "icon": "\ue40a",
+      "icon": "\ue467",
       "color": "#eee255",
       "descriptions": [
         "수중 이동 속도 감소 효과와",
@@ -233,7 +232,7 @@
     {
       "weight": 1,
       "name": "반엔트로피",
-      "icon": "\ue40a",
+      "icon": "\ue468",
       "color": "#eee255",
       "descriptions": [
         "화염 피해가 80% 감소하며,",
@@ -243,7 +242,7 @@
     {
       "weight": 1,
       "name": "포화",
-      "icon": "\ue40a",
+      "icon": "\ue469",
       "color": "#eee255",
       "descriptions": [
         "적 타격시, 5%의 확률로",
@@ -253,7 +252,7 @@
     {
       "weight": 1,
       "name": "재생",
-      "icon": "\ue40a",
+      "icon": "\ue46a",
       "color": "#eee255",
       "descriptions": [
         "적 타격시, 5%확률로",
@@ -263,7 +262,7 @@
     {
       "weight": 1,
       "name": "저항",
-      "icon": "\ue40a",
+      "icon": "\ue46b",
       "color": "#eee255",
       "descriptions": [
         "적 타격시, 5%의 확률로",
@@ -273,7 +272,7 @@
     {
       "weight": 1,
       "name": "힘",
-      "icon": "\ue40a",
+      "icon": "\ue46c",
       "color": "#eee255",
       "descriptions": [
         "적 타격시, 5%의 확률로",
@@ -283,7 +282,7 @@
     {
       "weight": 1,
       "name": "날렵함",
-      "icon": "\ue40a",
+      "icon": "\ue46d",
       "color": "#eee255",
       "descriptions": [
         "속도 증가 II 효과가 항상 적용되며,",
@@ -293,7 +292,7 @@
     {
       "weight": 1,
       "name": "깃털",
-      "icon": "\ue40a",
+      "icon": "\ue46e",
       "color": "#eee255",
       "descriptions": [
         "추락 피해가 80% 감소되며,",
@@ -305,7 +304,7 @@
     {
       "weight": 1,
       "name": "심안",
-      "icon": "\ue40a",
+      "icon": "\ue46f",
       "color": "#eee255",
       "descriptions": [
         "실명과 메스꺼움 효과에 면역이 되며",

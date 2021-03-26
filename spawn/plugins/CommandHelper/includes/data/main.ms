@@ -4,7 +4,9 @@ console('EvaData loaded')
 proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
   # cache (cup에 저장 x)
   @players_data[@uuid]['cache'] = array(
-    'resolution_setting': false
+    'resolution_setting': false,
+    'last_weapon_effect': 0,
+    'last_armor_effect': 0
   )
   # setting (cup에 저장)
   @players_data[@uuid]['setting'] = cup_get('SETTING', @uuid)
@@ -28,7 +30,7 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
   @items = array(
     'main_hand': get_inventory_item(@uuid, pheld_slot(@player)),
     'off_hand': get_inventory_item(@uuid, 40),
-    'armor': get_inventory_item(@uuid, 38)
+    'armor': get_inventory_item(@uuid, 36)
   )
   _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text)
 }
@@ -54,7 +56,7 @@ proc _new_data(@uuid, @players_data) {
 }
 
 proc _send_resourcepack(@player, @uuid, @players_state) {
-  @resourcepack = 'https://drive.google.com/uc?export=download&id=1wyVgOhv9hn8L_DhgqveMKqiKlenuqqLm'
+  @resourcepack = 'https://drive.google.com/uc?export=download&id=1Zio8xTFp5vH_eDLzZLRF1pmiZdjXTqk9'
   send_resourcepack(@player, @resourcepack)
   @player_state = array(
     'join_spec': array(
@@ -130,21 +132,6 @@ proc _join_event(@player, @uuid, @players_state, @players_data, @server, @bots, 
         _set_player_state(@player, @uuid, @players_state, @players_data, @skills_spec, @text)
       })
     }
-    @armor_light_hider = array(
-      'name': 'STRUCTURE_VOID',
-      'meta': array(
-        'display': color('WHITE').'치장 설정',
-        'enchants': array(
-          'binding_curse': array(
-            'etype': 'BINDING_CURSE',
-            'elevel': 1
-          )
-        ),
-        'model': 2,
-        'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
-      )
-    )
-    set_inventory_item(puuid(), 37, @armor_light_hider)
   } else {
     #if(!array_contains(@server['bots'], @player)) {
       @server['bots'][] = @player
@@ -203,6 +190,20 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @server, 
   @uuid = puuid(@player)
   modify_event('message', null)
   _quit_event(@player, @uuid, @players_state, @server, @bots)
+}
+
+bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+  if(!array_contains(@bots , @player)) {
+    if(@players_data[@uuid]['item']['enchantments']['armor'] == '깃털') {
+      if(@event['sneaking']) {
+        set_peffect(@player, 'SLOW_FALLING', 0, 0, false, true)
+      } else {
+        set_peffect(@player, 'SLOW_FALLING', 4, 11.5, false, true)
+      }
+    }
+  }
 }
 
 @interval_task = set_interval(1000, closure() { #bungee 완전 로그아웃
@@ -334,7 +335,17 @@ bind('player_quit', null, null, @event, @players_state, @players_data, @server, 
           }
 
           switch(@players_data[@uuid]['item']['enchantments']['armor']) {
+          case '원소 보호':
+            #디버프 시간 감소
+            break()
           case '날렵함':
+            set_peffect(@player, 'SPEED', 1, 11.5, false, true)
+            set_peffect(@player, 'JUMP_BOOST', 1, 11.5, false, true)
+            break()
+          case '깃털':
+            if(!psneaking(@player)) {
+              set_peffect(@player, 'SLOW_FALLING', 4, 11.5, false, true)
+            }
             break()
           case '심안':
             set_peffect(@player, 'NIGHT_VISION', 0, 16.5, false, true)

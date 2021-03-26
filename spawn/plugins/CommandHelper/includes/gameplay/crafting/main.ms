@@ -278,7 +278,7 @@ proc _get_modified_item(@entry, @item) {
         } else {
           @final_amount = @amount
         }
-        @lore[] = '§7ㅁ 방어 '.string(round(@final_amount, 2))
+        @lore[] = '§7\ue453 방어 '.string(round(@final_amount, 2))
       case 'armor_toughness':
         @ch_attribute = 'GENERIC_ARMOR_TOUGHNESS'
         @operation = 'ADD_NUMBER'
@@ -287,7 +287,7 @@ proc _get_modified_item(@entry, @item) {
         } else {
           @final_amount = @amount
         }
-        @lore[] = '§7ㅁ 방어 강도 '.string(round(@final_amount, 2))
+        @lore[] = '§7\ue454 방어 강도 '.string(round(@final_amount, 2))
       default:
         broadcast('알수 없는 어트리뷰트를 발견하였습니다. 즉시 수정하세요.', '*')
       }
