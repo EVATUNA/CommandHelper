@@ -1484,14 +1484,13 @@ bind('player_interact', null, array('main_hand': 'main_main_hand', 'button': 'ri
 }
 
 
-bind('entity_damage', null, null, @event, @players_data) {
+bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text) {
   if(array_index_exists(@event, 'damager') && ponline(@event['damager'])) { //플레이어가 때리는 경우
     @player = @event['damager']
     @puuid = puuid(@player)
     if(array_index_exists(@players_data, @puuid)) {
       @euuid = @event['id']
       @items = @players_data[@puuid]['item']
-      
       @weapons = array(
         'WOODEN_SWORD',
         'WOODEN_SHOVEL',
@@ -1534,130 +1533,235 @@ bind('entity_damage', null, null, @event, @players_data) {
       }
       switch(@items['enchantments']['main_hand']) {
       case '전격':
-        @allowed_entity = array(
-          'MAGMA_CUBE': 0.75,
-          'SILVERFISH': 0.3,
-          'MULE': 1.6,
-          'HOGLIN': 1.4,
-          'HUSK': 1.95,
-          'VINDICATOR': 1.95,
-          'PILLAGER': 1.95,
-          'SHULKER_BULLET': 0.25,
-          'VILLAGER': 1.95,
-          'TURTLE': 0.4,
-          'TRADER_LLAMA': 1.87,
-          'CAVE_SPIDER': 0.5,
-          'SLIME': 0.75,
-          'DROWNED': 1.95,
-          'EVOKER': 1.95,
-          'ENDERMITE': 0.3,
-          #'PLAYER': 1.8,
-          'SALMON': 0.4,
-          'ZOMBIE': 1.95,
-          'STRIDER': 1.7,
-          'PANDA': 1.25,
-          "OCELOT": 0.7,
-          'ENDERMAN': 2.9,
-          'ZOMBIE_VILLAGER': 1.95,
-          'LLAMA': 1.87,
-          'ENDER_DRAGON': 5,
-          'WITCH': 1.95,
-          'WITHER': 3.5,
-          'CREEPER': 1.7,
-          'ILLUSIONER': 1.95,
-          'COD': 0.5,
-          'ZOMBIE_HORSE': 1.4,
-          'RAVAGER': 2.2,
-          'SHULKER': 1,
-          'BEE': 0.6,
-          'PHANTOM': 0.5,
-          'BLAZE': 1.8,
-          'SKELETON_HORSE': 1.6,
-          'COW': 1.4,
-          'WANDERING_TRADER': 1.95,
-          'PIG': 0.9,
-          'ZOGLIN': 1.4,
-          'WOLF': 0.86,
-          'IRON_GOLEM': 2.7,
-          'SHEEP':1.3,
-          'VEX': 0.8,
-          'PIGLIN_BRUTE': 1.95,
-          'POLAR_BEAR': 1.4,
-          'SNOWMAN': 1.9,
-          'SQUID': 0.8,
-          'ELDER_GUARDIAN': 2,
-          'HORSE': 1.4,
-          'PARROT': 0.9,
-          'FOX': 0.6,
-          'STRAY': 1.99,
-          'CAT': 0.7,
-          'RABBIT': 0.5,
-          'DONKEY': 1.6,
-          'ENDER_CRYSTAL': 2,
-          'TROPICAL_FISH': 0.4,
-          'SPIDER': 0.9,
-          'SKELETON': 1.99,
-          'WITHER_SKELETON': 2.4,
-          'MUSHROOM_COW': 1.5,
-          'CHICKEN': 0.7,
-          'ZOMBIFIED_PIGLIN': 1.95,
-          'PUFFERFISH': 0.4,
-          'GUARDIAN': 0.85,
-          'PIGLIN': 1.95,
-          'GHAST': 4,
-          'BAT': 0.9,
-          'DOLPHIN': 0.6
-        )
-        @entity_type = entity_type(@euuid)
-        if(array_contains(array_keys(@allowed_entity), @entity_type)) {
-          @entity_location = entity_loc(@euuid)
-          if((get_highest_block_at(@entity_location)['y'] <= @entity_location['y'] + 2 && (has_thunder(@entity_location['world']) || has_storm(@entity_location['world']))) || get_block(@entity_location) == 'WATER') {
-            @range = 10
-          } else {
-            @range = 5
-          }
-          @entity_location['x'] += rand() / 2 - 0.25
-          @entity_location['y'] += 1 + rand() * @allowed_entity[@entity_type] * 0.5 - @allowed_entity[@entity_type] * 0.25
-          @entity_location['z'] += rand() / 2 - 0.25
-          mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @entity_location['x'], @entity_location['y'], @entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
-          @near_entities = entities_in_radius(@entity_location, @range)
-          #array_remove_values(@near_entities, @puuid)
-          array_remove_values(@near_entities, @euuid)
-          foreach(@near_entity in @near_entities) {
-            @near_entity_type = entity_type(@near_entity)
-            if(array_contains(array_keys(@allowed_entity), @near_entity_type)) {
-              @near_entity_location = entity_loc(@near_entity)
-              @near_entity_location['x'] += rand() / 2 - 0.25
-              @near_entity_location['y'] += 1 + rand() * @allowed_entity[@near_entity_type] * 0.5 - @allowed_entity[@near_entity_type] * 0.25
-              @near_entity_location['z'] += rand() / 2 - 0.25
-              mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @near_entity_location['x'], @near_entity_location['y'], @near_entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
-              @distance = distance(@entity_location,  @near_entity_location)
-              for(@i = 0, @i < distance(@entity_location,  @near_entity_location), @i += 0.25 + rand() * 0.25) {
-                @pos = location_shift(@entity_location,  @near_entity_location, @i)
-                mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @pos['x'], @pos['y'], @pos['z'], 1, 0.0, 0.0, 0.0, 0.0)
+        if(rand() < 0.1) {
+          @allowed_entity = array(
+            'MAGMA_CUBE': 0.75,
+            'SILVERFISH': 0.3,
+            'MULE': 1.6,
+            'HOGLIN': 1.4,
+            'HUSK': 1.95,
+            'VINDICATOR': 1.95,
+            'PILLAGER': 1.95,
+            'SHULKER_BULLET': 0.25,
+            'VILLAGER': 1.95,
+            'TURTLE': 0.4,
+            'TRADER_LLAMA': 1.87,
+            'CAVE_SPIDER': 0.5,
+            'SLIME': 0.75,
+            'DROWNED': 1.95,
+            'EVOKER': 1.95,
+            'ENDERMITE': 0.3,
+            #'PLAYER': 1.8,
+            'SALMON': 0.4,
+            'ZOMBIE': 1.95,
+            'STRIDER': 1.7,
+            'PANDA': 1.25,
+            "OCELOT": 0.7,
+            'ENDERMAN': 2.9,
+            'ZOMBIE_VILLAGER': 1.95,
+            'LLAMA': 1.87,
+            'ENDER_DRAGON': 5,
+            'WITCH': 1.95,
+            'WITHER': 3.5,
+            'CREEPER': 1.7,
+            'ILLUSIONER': 1.95,
+            'COD': 0.5,
+            'ZOMBIE_HORSE': 1.4,
+            'RAVAGER': 2.2,
+            'SHULKER': 1,
+            'BEE': 0.6,
+            'PHANTOM': 0.5,
+            'BLAZE': 1.8,
+            'SKELETON_HORSE': 1.6,
+            'COW': 1.4,
+            'WANDERING_TRADER': 1.95,
+            'PIG': 0.9,
+            'ZOGLIN': 1.4,
+            'WOLF': 0.86,
+            'IRON_GOLEM': 2.7,
+            'SHEEP':1.3,
+            'VEX': 0.8,
+            'PIGLIN_BRUTE': 1.95,
+            'POLAR_BEAR': 1.4,
+            'SNOWMAN': 1.9,
+            'SQUID': 0.8,
+            'ELDER_GUARDIAN': 2,
+            'HORSE': 1.4,
+            'PARROT': 0.9,
+            'FOX': 0.6,
+            'STRAY': 1.99,
+            'CAT': 0.7,
+            'RABBIT': 0.5,
+            'DONKEY': 1.6,
+            'ENDER_CRYSTAL': 2,
+            'TROPICAL_FISH': 0.4,
+            'SPIDER': 0.9,
+            'SKELETON': 1.99,
+            'WITHER_SKELETON': 2.4,
+            'MUSHROOM_COW': 1.5,
+            'CHICKEN': 0.7,
+            'ZOMBIFIED_PIGLIN': 1.95,
+            'PUFFERFISH': 0.4,
+            'GUARDIAN': 0.85,
+            'PIGLIN': 1.95,
+            'GHAST': 4,
+            'BAT': 0.9,
+            'DOLPHIN': 0.6
+          )
+          @entity_type = entity_type(@euuid)
+          if(array_contains(array_keys(@allowed_entity), @entity_type)) {
+            @entity_location = entity_loc(@euuid)
+            if((get_highest_block_at(@entity_location)['y'] <= @entity_location['y'] + 2 && (has_thunder(@entity_location['world']) || has_storm(@entity_location['world']))) || get_block(@entity_location) == 'WATER') {
+              @range = 10
+            } else {
+              @range = 5
+            }
+            @entity_location['x'] += rand() / 2 - 0.25
+            @entity_location['y'] += 1 + rand() * @allowed_entity[@entity_type] * 0.5 - @allowed_entity[@entity_type] * 0.25
+            @entity_location['z'] += rand() / 2 - 0.25
+            mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @entity_location['x'], @entity_location['y'], @entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
+            @near_entities = entities_in_radius(@entity_location, @range)
+            #array_remove_values(@near_entities, @puuid)
+            array_remove_values(@near_entities, @euuid)
+            foreach(@near_entity in @near_entities) {
+              @near_entity_type = entity_type(@near_entity)
+              if(array_contains(array_keys(@allowed_entity), @near_entity_type)) {
+                @near_entity_location = entity_loc(@near_entity)
+                @near_entity_location['x'] += rand() / 2 - 0.25
+                @near_entity_location['y'] += 1 + rand() * @allowed_entity[@near_entity_type] * 0.5 - @allowed_entity[@near_entity_type] * 0.25
+                @near_entity_location['z'] += rand() / 2 - 0.25
+                mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @near_entity_location['x'], @near_entity_location['y'], @near_entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
+                @distance = distance(@entity_location,  @near_entity_location)
+                for(@i = 0, @i < distance(@entity_location,  @near_entity_location), @i += 0.25 + rand() * 0.25) {
+                  @pos = location_shift(@entity_location,  @near_entity_location, @i)
+                  mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @pos['x'], @pos['y'], @pos['z'], 1, 0.0, 0.0, 0.0, 0.0)
+                }
+                damage_entity(@near_entity, 2)
               }
-              damage_entity(@near_entity, 2)
             }
           }
         }
-
-
-
-
-        #_particle(@player, 'minecraft:firework', @pos, array('x': 0.2, 'y': 0.3, 'z': 0.2), 0.05, 3)
-
-
-          #@delta = array(
-          #  'x': sprintf('%.5f', round((@near_entity_location['x'] - @near_pos['x']) / 4, 5)),
-          #  'y': sprintf('%.5f', round((@near_entity_location['y'] - @near_pos['y']) / 4, 5)),
-          #  'z': sprintf('%.5f', round((@near_entity_location['z'] - @near_pos['z']) / 4, 5))
-          #)
-          #_particle(@player, 'minecraft:firework', @pos, @delta, 1, 0)
-          #damage_entity(@near_entity, 3)
-        
         break()
       case '천둥':
-      
+        if(rand() < 0.25) {
+          @allowed_entity = array(
+            'MAGMA_CUBE': 0.75,
+            'SILVERFISH': 0.3,
+            'MULE': 1.6,
+            'HOGLIN': 1.4,
+            'HUSK': 1.95,
+            'VINDICATOR': 1.95,
+            'PILLAGER': 1.95,
+            'SHULKER_BULLET': 0.25,
+            'VILLAGER': 1.95,
+            'TURTLE': 0.4,
+            'TRADER_LLAMA': 1.87,
+            'CAVE_SPIDER': 0.5,
+            'SLIME': 0.75,
+            'DROWNED': 1.95,
+            'EVOKER': 1.95,
+            'ENDERMITE': 0.3,
+            #'PLAYER': 1.8,
+            'SALMON': 0.4,
+            'ZOMBIE': 1.95,
+            'STRIDER': 1.7,
+            'PANDA': 1.25,
+            "OCELOT": 0.7,
+            'ENDERMAN': 2.9,
+            'ZOMBIE_VILLAGER': 1.95,
+            'LLAMA': 1.87,
+            'ENDER_DRAGON': 5,
+            'WITCH': 1.95,
+            'WITHER': 3.5,
+            'CREEPER': 1.7,
+            'ILLUSIONER': 1.95,
+            'COD': 0.5,
+            'ZOMBIE_HORSE': 1.4,
+            'RAVAGER': 2.2,
+            'SHULKER': 1,
+            'BEE': 0.6,
+            'PHANTOM': 0.5,
+            'BLAZE': 1.8,
+            'SKELETON_HORSE': 1.6,
+            'COW': 1.4,
+            'WANDERING_TRADER': 1.95,
+            'PIG': 0.9,
+            'ZOGLIN': 1.4,
+            'WOLF': 0.86,
+            'IRON_GOLEM': 2.7,
+            'SHEEP':1.3,
+            'VEX': 0.8,
+            'PIGLIN_BRUTE': 1.95,
+            'POLAR_BEAR': 1.4,
+            'SNOWMAN': 1.9,
+            'SQUID': 0.8,
+            'ELDER_GUARDIAN': 2,
+            'HORSE': 1.4,
+            'PARROT': 0.9,
+            'FOX': 0.6,
+            'STRAY': 1.99,
+            'CAT': 0.7,
+            'RABBIT': 0.5,
+            'DONKEY': 1.6,
+            'ENDER_CRYSTAL': 2,
+            'TROPICAL_FISH': 0.4,
+            'SPIDER': 0.9,
+            'SKELETON': 1.99,
+            'WITHER_SKELETON': 2.4,
+            'MUSHROOM_COW': 1.5,
+            'CHICKEN': 0.7,
+            'ZOMBIFIED_PIGLIN': 1.95,
+            'PUFFERFISH': 0.4,
+            'GUARDIAN': 0.85,
+            'PIGLIN': 1.95,
+            'GHAST': 4,
+            'BAT': 0.9,
+            'DOLPHIN': 0.6
+          )
+          @entity_type = entity_type(@euuid)
+          if(array_contains(array_keys(@allowed_entity), @entity_type)) {
+            @entity_location = entity_loc(@euuid)
+            @range = 5
+            @has_storm = false
+            if(get_block(@entity_location) == 'WATER') {
+              @range = 10
+            }
+            if(get_highest_block_at(@entity_location)['y'] <= @entity_location['y'] + 2) {
+              if(has_thunder(@entity_location['world'])) {
+                @range = 10
+              } else if(has_storm(@entity_location['world'])) {
+                @range = 10
+                @has_storm = true
+              }
+            }
+            if(@has_storm) {
+              lightning(@entity_location)
+            }
+            @entity_location['x'] += rand() / 2 - 0.25
+            @entity_location['y'] += 1 + rand() * @allowed_entity[@entity_type] * 0.5 - @allowed_entity[@entity_type] * 0.25
+            @entity_location['z'] += rand() / 2 - 0.25
+            mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @entity_location['x'], @entity_location['y'], @entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
+            @near_entities = entities_in_radius(@entity_location, @range)
+            #array_remove_values(@near_entities, @puuid)
+            array_remove_values(@near_entities, @euuid)
+            foreach(@near_entity in @near_entities) {
+              @near_entity_type = entity_type(@near_entity)
+              if(array_contains(array_keys(@allowed_entity), @near_entity_type)) {
+                @near_entity_location = entity_loc(@near_entity)
+                @near_entity_location['x'] += rand() / 2 - 0.25
+                @near_entity_location['y'] += 1 + rand() * @allowed_entity[@near_entity_type] * 0.5 - @allowed_entity[@near_entity_type] * 0.25
+                @near_entity_location['z'] += rand() / 2 - 0.25
+                mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @near_entity_location['x'], @near_entity_location['y'], @near_entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
+                @distance = distance(@entity_location,  @near_entity_location)
+                for(@i = 0, @i < distance(@entity_location,  @near_entity_location), @i += 0.25 + rand() * 0.25) {
+                  @pos = location_shift(@entity_location,  @near_entity_location, @i)
+                  mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @pos['x'], @pos['y'], @pos['z'], 1, 0.0, 0.0, 0.0, 0.0)
+                }
+                damage_entity(@near_entity, 2)
+              }
+            }
+          }
+        }
         break()
       case '화염':
         if(rand() < 0.1) {
@@ -1704,7 +1808,6 @@ bind('entity_damage', null, null, @event, @players_data) {
           'ZOMBIFIED_PIGLIN'
         )
         if(array_contains(@undead_entities, entity_type(@euuid)) && rand() < 0.1) {
-          broadcast(A)
           set_mob_effect(@euuid, 'INSTANT_HEALTH', 1, 0.1, false, true)
         }
         break()
@@ -1725,7 +1828,6 @@ bind('entity_damage', null, null, @event, @players_data) {
           'ZOMBIFIED_PIGLIN'
         )
         if(array_contains(@undead_entities, entity_type(@euuid)) && rand() < 0.25) {
-          broadcast(A)
           set_mob_effect(@euuid, 'INSTANT_HEALTH', 2, 0.1, false, true)
         }
         break()
@@ -1740,7 +1842,59 @@ bind('entity_damage', null, null, @event, @players_data) {
         }
         break()
       default:
-
+        break()
+      }
+      switch(@items['enchantments']['armor']) {
+      case '복원':
+        if(rand() < 0.1) {
+          broadcast(@items)
+          if(!is_null(@items['main_hand']) && !is_null(@items['main_hand']['meta']) && @items['main_hand']['meta']['damage'] > 0) {
+            if(@items['armor']['meta']['damage'] > 0) {
+              if(rand() < 0.5) {
+                @items['main_hand']['meta']['damage'] -= 1
+                set_inventory_item(@puuid, pheld_slot(@player), @items['main_hand'])
+                _update_item(@player, @puuid, array('main_hand': @items['main_hand']), @players_data, @skills_spec, @text)
+              } else {
+                @items['armor']['meta']['damage'] -= 1
+                _update_item(@player, @puuid, array('armor': @items['armor']), @players_data, @skills_spec, @text)
+                set_inventory_item(@puuid, 36, @items['armor'])
+              }
+            } else {
+              @items['main_hand']['meta']['damage'] -= 1
+              _update_item(@player, @puuid, array('main_hand': @items['main_hand']), @players_data, @skills_spec, @text)
+              set_inventory_item(@puuid, pheld_slot(@player), @items['main_hand'])
+            }
+          } else {
+            if(@items['armor']['meta']['damage'] > 0) {
+              @items['armor']['meta']['damage'] -= 1
+              _update_item(@player, @puuid, array('armor': @items['armor']), @players_data, @skills_spec, @text)
+              set_inventory_item(@puuid, 36, @items['armor'])
+            }
+          }
+        }
+        break()
+      case '포화':
+        if(rand() < 0.1) {
+          set_mob_effect(@puuid, 'SATURATION', 0, 0.05, false, true)
+        }
+        break()
+      case '재생':
+        if(rand() < 0.1) {
+          set_mob_effect(@puuid, 'REGENERATION', 2, 1, false, true)
+        }
+        break()
+      case '저항':
+        if(rand() < 0.1) {
+          set_mob_effect(@puuid, 'RESISTANCE', 2, 5, false, true)
+        }
+        break()
+      case '힘':
+        if(rand() < 0.1) {
+          set_mob_effect(@puuid, 'STRENGTH', 1, 5, false, true)
+        }
+        break()
+      default:
+        break()
       }
     }
   }

@@ -11,4 +11,3 @@ include('includes/chat/main.ms')
 ## Final Include
 # 이벤트, 테스크 바인드(프로시저 불러오기)
 include('includes/data/main.ms')
-
