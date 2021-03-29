@@ -340,9 +340,124 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
 
 }
 
-#proc _send_action_msg(@player, @player_data, @mining_data, @text) {
-
-#}
+proc _set_indicator(@player, @uuid, @players_data, @text) {
+  @indicator_data = @players_data[@uuid]['cache']['indicator']
+  if(!is_null(@indicator_data)) {
+    switch(@indicator_data['block']) {
+    case 'COAL_ORE':
+      @icon = '\ue4c7'
+      break()
+    case 'PETRIFIED_OAK_SLAB':
+      @icon = '\ue4c8'
+      break()
+    case 'IRON_ORE':
+      @icon = '\ue4c9'
+      break()
+    case 'LAPIS_ORE':
+      @icon = '\ue4ca'
+      break()
+    case 'GOLD_ORE':
+      @icon = '\ue4cb'
+      break()
+    case 'NETHER_QUARTZ_ORE':
+      @icon = '\ue4cc'
+      break()
+    case 'NETHER_GOLD_ORE':
+      @icon = '\ue4d6'
+      break()
+    case 'REDSTONE_ORE':
+      @icon = '\ue4cd'
+      break()
+    case 'EMERALD_ORE':
+      @icon = '\ue4ce'
+      break()
+    case 'DIAMOND_ORE':
+      @icon = '\ue4cf'
+      break()
+    case 'ANCIENT_DEBRIS':
+      @icon = '\ue4d0'
+      break()
+    case 'FARMLAND':
+      @icon = '\ue4da'
+      break()
+    }
+    @percentage = integer((1- @indicator_data['hp'] / @indicator_data['max_hp']) * 100)
+    switch(@percentage) {
+    case 100:
+      @ui = '\ue4c6'
+      break()
+    case 95..100:
+      @ui = '\ue4c5'
+      break()
+    case 90..95:
+      @ui = '\ue4c4'
+      break()
+    case 85..90:
+      @ui = '\ue4c3'
+      break()
+    case 80..85:
+      @ui = '\ue4c2'
+      break()
+    case 75..80:
+      @ui = '\ue4c1'
+      break()
+    case 70..75:
+      @ui = '\ue4c0'
+      break()
+    case 65..70:
+      @ui = '\ue4bf'
+      break()
+    case 60..65:
+      @ui = '\ue4be'
+      break()
+    case 55..60:
+      @ui = '\ue4bd'
+      break()
+    case 50..55:
+      @ui = '\ue4bc'
+      break()
+    case 45..50:
+      @ui = '\ue4bb'
+      break()
+    case 40..45:
+      @ui = '\ue4ba'
+      break()
+    case 35..40:
+      @ui = '\ue4b9'
+      break()
+    case 30..35:
+      @ui = '\ue4b8'
+      break()
+    case 25..30:
+      @ui = '\ue4b7'
+      break()
+    case 20..25:
+      @ui = '\ue4b6'
+      break()
+    case 15..20:
+      @ui = '\ue4b5'
+      break()
+    case 10..15:
+      @ui = '\ue4b4'
+      break()
+    case 5..10:
+      @ui = '\ue4b3'
+      break()
+    case 0..5:
+      @ui = '\ue4b2'
+      break()
+    }
+    @indicator_bossbar_data = array(
+      'title': @ui.@text['space_fonts']['space.-19'].@icon.@text['space_fonts']['space.-450'].@text['space_fonts']['space.'.@players_data[@uuid]['setting'][12]].@text['space_fonts']['space.'.@players_data[@uuid]['setting'][12]]
+    )
+    update_bar('indicator.'.@uuid, @indicator_bossbar_data)
+  } else {
+    @indicator_bossbar_data = array(
+      'title': ''
+    )
+    update_bar('indicator.'.@uuid, @indicator_bossbar_data)
+  }
+}
 
 proc _all_players(@bots) {
   @players = all_players()
@@ -398,9 +513,4 @@ proc _paging(@array, @size) {
 
 proc _multiply_value(@value, @multiply, @deviation) {
   return(@value * @multiply + @value * @deviation * 0.5 - @value * @deviation * rand())
-}
-
-#확장으로 대채될 예정
-proc _particle(@player, @particle, @pos, @delta, @speed, @count) {
-  sudo(@player, '/particle'@particle @pos['x'] @pos['y'] @pos['z'] @delta['x'] @delta['y'] @delta['z'] @speed @count 'force')
 }

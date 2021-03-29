@@ -6,7 +6,9 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
   @players_data[@uuid]['cache'] = array(
     'resolution_setting': false,
     'last_weapon_effect': 0,
-    'last_armor_effect': 0
+    'last_armor_effect': 0,
+    'indicator': null,
+    'tips': array()
   )
   # setting (cup에 저장)
   @players_data[@uuid]['setting'] = cup_get('SETTING', @uuid)
@@ -15,6 +17,25 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
   }
   # skill (cup에 저장)
   _load_skills(@uuid, @players_data, @skills_spec)
+  # bossbar (cup에 저장 x)
+  @bossbars = get_bars()
+  @indicator_id = 'indicator.'.@uuid
+  @tip_id = 'tip.'.@uuid
+  if(!array_contains(@bossbars, @indicator_id)) {
+    @indicator_bossbar_data = array(
+      'title': '',
+      'percent': 0
+    )
+    create_bar(@indicator_id, @indicator_bossbar_data)
+    bar_add_player(@indicator_id, @player)
+  }
+  if(!array_contains(@bossbars, @tip_id)) {
+    @tip_bossbar_data = array(
+      'title': '',
+      'percent': 0
+    )
+    create_bar(@tip_id, @tip_bossbar_data)
+  }
   # item (cup에 저장 x)
   @players_data[@uuid]['item'] = array(
     'is_inv_open': false,
@@ -245,7 +266,14 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
               }
             }
           }
-
+          if(!is_null(@players_data[@uuid]['cache']['indicator'])) {
+            if(@players_data[@uuid]['cache']['indicator']['countdown'] > 0) {
+              @players_data[@uuid]['cache']['indicator']['countdown'] -=1
+            } else {
+              @players_data[@uuid]['cache']['indicator'] = null
+            }
+            _set_indicator(@player, @uuid, @players_data, @text)
+          }
           #_countdown_skill() {}로 아래 코드 대체
           
           #combat_combat_inclination

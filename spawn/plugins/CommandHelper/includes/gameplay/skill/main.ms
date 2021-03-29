@@ -1630,7 +1630,12 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
           }
           _update_item(@player, @uuid, array('main_hand': @item), @players_data, @skills_spec, @text)
         }
-        #인디케이터 3초
+        @indicator_data = array(
+          'block': @mineral,
+          'max_hp': @max_hp,
+          'hp': @hp,
+          'countdown': 7
+        )
       } else {
         array_remove(@hp_blocks, @id)
         play_named_sound(@location, array(
@@ -1684,7 +1689,12 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
             _add_epxerience(@uuid, @skill, @players_data[@uuid]['skill_data'][@category][@skill], @xp_data['default_xp'], @xp_data['extra_xp'])
           }
         }
-        #인디케이터 1초
+        @indicator_data = array(
+          'block': @mineral,
+          'max_hp': @max_hp,
+          'hp': @hp,
+          'countdown': 1
+        )
       }
     } else {
       if(array_index_exists(@hp_blocks, @id)) {
@@ -1692,9 +1702,16 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
       } else {
         @hp = @minerals_spec[@mineral]['hp']
       }
-      #인디케이터 3초
+      @indicator_data = array(
+        'block': @mineral,
+        'max_hp': @max_hp,
+        'hp': @hp,
+        'countdown': 7
+      )
       cancel()
     }
+    @players_data[@uuid]['cache']['indicator'] = @indicator_data
+    _set_indicator(@player, @uuid, @players_data, @text)
     modify_event('drops', array())
   }
 }
@@ -1914,12 +1931,12 @@ proc _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @ski
   if(@event['action'] == 'right_click_block' && array_contains(array('GRASS_BLOCK', 'DIRT'), @event['block']) && !is_null(@event['item']) && array_index_exists(@event, 'location')) {
     @location = array('x': @event['location']['x'], 'y': @event['location']['y'], 'z': @event['location']['z'], 'world': @event['location']['world'])
     @hoes_cooldown = array(
-      'WOODEN_HOE': 40, #30
-      'STONE_HOE': 28, #21
-      'IRON_HOE': 20, #15
-      'DIAMOND_HOE': 12, #9
-      'NETHERITE_HOE': 8, #6
-      'GOLDEN_HOE': 4 #3
+      'WOODEN_HOE': 40,
+      'STONE_HOE': 28,
+      'IRON_HOE': 20,
+      'DIAMOND_HOE': 12,
+      'NETHERITE_HOE': 8,
+      'GOLDEN_HOE': 4
     )
     if(array_contains(array_keys(@hoes_cooldown), @event['item']['name']) && array_contains(array('AIR', 'CAVE_AIR', 'VOID_AIR'), get_block(array('x': @location['x'], 'y': @location['y'] + 1, 'z': @location['z'], 'world': @location['world'])))) {
       if(@event['hand'] == 'main_hand') {
@@ -1937,9 +1954,8 @@ proc _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @ski
         foreach(@hoe:@hoe_cooldown in @hoes_cooldown) {
           if(@hoe_cooldown > @hoes_cooldown[@item['name']]) {
             set_pcooldown(@player, @hoe, @hoe_cooldown)
-            #40 28
           } else {
-            set_pcooldown(@player, @hoe, integer(@hoes_cooldown[@item['name']] * @cooldown_multiply)) #효율 인첸트 존재시 쿨타임 감소
+            set_pcooldown(@player, @hoe, integer(@hoes_cooldown[@item['name']] * @cooldown_multiply))
           }
         }
         @sowing_power = 1
@@ -1970,7 +1986,14 @@ proc _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @ski
         if(@hp_blocks[@id]['hp'] > 0) {
           @hp_blocks[@id]['reset_countdown'] = 3
           @hp = @hp_blocks[@id]['hp']
-          # @hp를 HUB에 표시
+          @indicator_data = array(
+            'block': 'FARMLAND',
+            'max_hp': @max_hp,
+            'hp': @hp,
+            'countdown': 3
+          )
+          @players_data[@uuid]['cache']['indicator'] = @indicator_data
+          _set_indicator(@player, @uuid, @players_data, @text)
           cancel()
           if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
             @damage = 0
@@ -2004,7 +2027,14 @@ proc _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @ski
           }
         } else {
           @hp = 0
-          # @hp를 HUB에 표시
+          @indicator_data = array(
+            'block': 'FARMLAND',
+            'max_hp': @max_hp,
+            'hp': @hp,
+            'countdown': 1
+          )
+          @players_data[@uuid]['cache']['indicator'] = @indicator_data
+          _set_indicator(@player, @uuid, @players_data, @text)
         }
       }
     }
