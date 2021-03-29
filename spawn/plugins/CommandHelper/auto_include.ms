@@ -339,7 +339,11 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
   }
 
 }
-  
+
+#proc _send_action_msg(@player, @player_data, @mining_data, @text) {
+
+#}
+
 proc _all_players(@bots) {
   @players = all_players()
   foreach(@bot in @bots) {

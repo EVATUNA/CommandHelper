@@ -680,12 +680,12 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
 
 @death_penalties_multiply = array(
   'world': array(
-    'default': array('multiply': 0.8, 'deviation': 0.15),
-    'DIAMOND': array('multiply': 0.5, 'deviation': 0.2)
+    'default': array('multiply': 0.9, 'deviation': 0.05),
+    #'DIAMOND': array('multiply': 0.5, 'deviation': 0.2)
   )
 )
 
-proc _apply_death_penalty(@player, @uuid, @death_penalties_multiply) {
+proc _apply_death_penalty(@player, @uuid, @death_penalties_multiply, @players_data) {
   @inventory = get_inventory(@uuid)
   @world = 'world' #플레이어의 월드로 수정
   foreach(@key: @item in @inventory) {
@@ -694,6 +694,9 @@ proc _apply_death_penalty(@player, @uuid, @death_penalties_multiply) {
         @death_penalty_multiply = @death_penalties_multiply[@world][@item['name']]
       } else {
         @death_penalty_multiply = @death_penalties_multiply[@world]['default']
+      }
+      if(@players_data[@uuid]['item']['enchantments']['armor'] == '귀속') {
+        @death_penalty_multiply = (@death_penalty_multiply + 1) / 2
       }
       @max_durability = material_info(@item['name'], 'maxDurability')
       if(@max_durability == 0) {
@@ -1531,9 +1534,19 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text) {
           set_timeout(0, closure( set_entity_immunity_ticks(@euuid, @tick) ))
         }
       }
+      @time = time()
+      @weapon_chance_multiply = (@time - @players_data[@puuid]['cache']['last_weapon_effect']) / 5000
+      if(@weapon_chance_multiply > 1) {
+        @weapon_chance_multiply = 1
+      }
+      @armor_chance_multiply = (@time - @players_data[@puuid]['cache']['last_armor_effect']) / 5000
+      if(@armor_chance_multiply > 1) {
+        @armor_chance_multiply = 1
+      }
       switch(@items['enchantments']['main_hand']) {
       case '전격':
-        if(rand() < 0.1) {
+        if(rand() < 0.1 * @weapon_chance_multiply) {
+          @players_data[@puuid]['cache']['last_weapon_effect'] = @time
           @allowed_entity = array(
             'MAGMA_CUBE': 0.75,
             'SILVERFISH': 0.3,
@@ -1643,7 +1656,8 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text) {
         }
         break()
       case '천둥':
-        if(rand() < 0.25) {
+        if(rand() < 0.25 * @weapon_chance_multiply) {
+          @players_data[@puuid]['cache']['last_weapon_effect'] = @time
           @allowed_entity = array(
             'MAGMA_CUBE': 0.75,
             'SILVERFISH': 0.3,
@@ -1764,12 +1778,16 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text) {
         }
         break()
       case '화염':
-        if(rand() < 0.1) {
+        if(rand() < 0.1 * @weapon_chance_multiply) {
+          @players_data[@puuid]['cache']['last_weapon_effect'] = @time
           set_entity_onfire(@euuid, entity_onfire(@euuid) + 5)
         }
         break()
       case '유황불':
-        if(rand() < 0.25) {
+        broadcast(@weapon_chance_multiply)
+        if(rand() < 0.25 * @weapon_chance_multiply) {
+          broadcast(A)
+          @players_data[@puuid]['cache']['last_weapon_effect'] = @time
           if(entity_onfire(@euuid) > 0) {
             set_mob_effect(@euuid, 'WEAKNESS', 0, 3, false, true)
           }
@@ -1777,16 +1795,19 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text) {
         }
         break()
       case '냉기':
-        if(rand() < 0.1) {
+        if(rand() < 0.1 * @weapon_chance_multiply) {
+          @players_data[@puuid]['cache']['last_weapon_effect'] = @time
           set_mob_effect(@euuid, 'SLOWNESS', 1, 10, false, true)
         }
         #0.25 필드 효과 반감
         break()
       case '빙결':
-        if(rand() < 0.25) {
+        if(rand() < 0.25 * @weapon_chance_multiply) {
+          @players_data[@puuid]['cache']['last_weapon_effect'] = @time
           set_mob_effect(@euuid, 'SLOWNESS', 1, 10, false, true)
         }
-        if(rand() < 0.025) {
+        if(rand() < 0.025 * @weapon_chance_multiply) {
+          @players_data[@puuid]['cache']['last_weapon_effect'] = @time
           set_mob_effect(@euuid, 'SLOWNESS', 5, 4, false, true)
         }
         #1.0 필드 효과 반감
@@ -1807,7 +1828,8 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text) {
           'ZOMBIE_VILLAGER',
           'ZOMBIFIED_PIGLIN'
         )
-        if(array_contains(@undead_entities, entity_type(@euuid)) && rand() < 0.1) {
+        if(array_contains(@undead_entities, entity_type(@euuid)) && rand() < 0.1 * @weapon_chance_multiply) {
+          @players_data[@puuid]['cache']['last_weapon_effect'] = @time
           set_mob_effect(@euuid, 'INSTANT_HEALTH', 1, 0.1, false, true)
         }
         break()
@@ -1827,17 +1849,20 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text) {
           'ZOMBIE_VILLAGER',
           'ZOMBIFIED_PIGLIN'
         )
-        if(array_contains(@undead_entities, entity_type(@euuid)) && rand() < 0.25) {
+        if(array_contains(@undead_entities, entity_type(@euuid)) && rand() < 0.25 * @weapon_chance_multiply) {
+          @players_data[@puuid]['cache']['last_weapon_effect'] = @time
           set_mob_effect(@euuid, 'INSTANT_HEALTH', 2, 0.1, false, true)
         }
         break()
       case '독성':
-        if(rand() < 0.1) {
+        if(rand() < 0.1 * @weapon_chance_multiply) {
+          @players_data[@puuid]['cache']['last_weapon_effect'] = @time
           set_mob_effect(@euuid, 'POISON', 0, 5, false, true)
         }
         break()
       case '맹독':
-        if(rand() < 0.1) {
+        if(rand() < 0.1 * @weapon_chance_multiply) {
+          @players_data[@puuid]['cache']['last_weapon_effect'] = @time
           set_mob_effect(@euuid, 'POISON', 4, 5, false, true)
         }
         break()
@@ -1846,8 +1871,8 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text) {
       }
       switch(@items['enchantments']['armor']) {
       case '복원':
-        if(rand() < 0.1) {
-          broadcast(@items)
+        if(rand() < 0.1 * @armor_chance_multiply) {
+          @players_data[@puuid]['cache']['last_armor_effect'] = @time
           if(!is_null(@items['main_hand']) && !is_null(@items['main_hand']['meta']) && @items['main_hand']['meta']['damage'] > 0) {
             if(@items['armor']['meta']['damage'] > 0) {
               if(rand() < 0.5) {
@@ -1874,22 +1899,26 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text) {
         }
         break()
       case '포화':
-        if(rand() < 0.1) {
+        if(rand() < 0.1 * @armor_chance_multiply) {
+          @players_data[@puuid]['cache']['last_armor_effect'] = @time
           set_mob_effect(@puuid, 'SATURATION', 0, 0.05, false, true)
         }
         break()
       case '재생':
-        if(rand() < 0.1) {
+        if(rand() < 0.1 * @armor_chance_multiply) {
+          @players_data[@puuid]['cache']['last_armor_effect'] = @time
           set_mob_effect(@puuid, 'REGENERATION', 2, 1, false, true)
         }
         break()
       case '저항':
-        if(rand() < 0.1) {
+        if(rand() < 0.1 * @armor_chance_multiply) {
+          @players_data[@puuid]['cache']['last_armor_effect'] = @time
           set_mob_effect(@puuid, 'RESISTANCE', 2, 5, false, true)
         }
         break()
       case '힘':
-        if(rand() < 0.1) {
+        if(rand() < 0.1 * @armor_chance_multiply) {
+          @players_data[@puuid]['cache']['last_armor_effect'] = @time
           set_mob_effect(@puuid, 'STRENGTH', 1, 5, false, true)
         }
         break()
@@ -1912,7 +1941,15 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text) {
         set_timeout(1, closure() {
           @damaged_item = get_inventory_item(@puuid, @shield_slot)
           if(@damaged_item['name'] == 'SHIELD') {
-            set_inventory_item(@puuid, @shield_slot, array('name': 'CLOCK', 'qty: -1', 'meta': null))
+            @dummy_item = array(
+              'name': 'CLOCK',
+              'qty': 1,
+              'meta': array(
+                'model': 1,
+                'display': ' '
+              )
+            )
+            set_inventory_item(@puuid, @shield_slot, @dummy_item)
             set_timeout(1, closure() {set_inventory_item(@puuid, @shield_slot, @damaged_item)})
           }
         })
@@ -1942,33 +1979,19 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text) {
   }
 }
 
-bind('exp_change', null, null, @event, @players_data) {
+bind('player_death', null, null, @event, @death_penalties_multiply, @players_data) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid)) {
-    foreach(@slot: @enchantment in @players_data[@uuid]['item']['enchantments']) {
-      switch(@enchantment) {
-      case '풍요':
-        break()
-      case '치유':
-        break()
-      case '저항':
-        break()
-      case '친수성':
-        break()
-      case '반엔트로피':
-        break()
-      case '용력':
-        break()
-      default:
-        #broadcast('A') #/summon minecraft:experience_orb ~ ~ ~ {Value:10}
-      }
-    }
-  }
+  _apply_death_penalty(@player, @uuid, @death_penalties_multiply, @players_data)
 }
 
-bind('player_death', null, null, @event, @death_penalties_multiply) {
-  @player = @event['player']
-  @uuid = puuid(@player)
-  _apply_death_penalty(@player, @uuid, @death_penalties_multiply)
+bind('entity_death', null, null, @event, @players_data) {
+  if(array_index_exists(@event['cause'],'damager') && ponline(@event['cause']['damager'])) {
+    @player = @event['cause']['damager']
+    @uuid = puuid(@player)
+    if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
+      broadcast(integer(@event['xp'] * 1.5))
+      modify_event('xp', @event['xp'] * 2)
+    }
+  }
 }

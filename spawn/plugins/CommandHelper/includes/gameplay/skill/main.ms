@@ -1639,8 +1639,10 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
           'volume': 0.4,
           'pitch': 1.5
         ), @player)
-        #@extra_qty 배수: * (풍년 + 행운 or 축복 인첸)
-        @extra_qty = @players_data[@uuid]['skill_data']['mining']['ore_selecting'][0] + 0
+        @extra_qty = @players_data[@uuid]['skill_data']['mining']['ore_selecting'][0]
+        if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '행운') {
+          @extra_qty += 1.5
+        }
         @entries = @mineral_spec['loot_table']
         @total_weight = 0
         foreach(@key: @entry in @entries) {
@@ -1665,8 +1667,11 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
             }
           }
         }
-        #경험 인첸트 있을시 엑스트라xp 수치 조정
-        @xp = integer(round(@mineral_spec['default_xp'] + rand() * @mineral_spec['extra_xp']))
+        if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
+          @xp = integer(round((@mineral_spec['default_xp'] + rand() * @mineral_spec['extra_xp']) * 2))
+        } else {
+          @xp = integer(round(@mineral_spec['default_xp'] + rand() * @mineral_spec['extra_xp']))
+        }
         if(@xp > 0) {
           spawn_entity('EXPERIENCE_ORB', 1, @location, closure(@euuid) {
             set_entity_spec(@euuid, array('amount': @xp))
@@ -1727,8 +1732,10 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
       }
       if(!@is_placed) {
         break_block(@near_location['location'])
-        #@extra_qty 배수: * (풍년 + 행운 or 축복 인첸)
-        @extra_qty = @players_data[@uuid]['skill_data']['farming']['plenty'][0] + 0
+        @extra_qty = @players_data[@uuid]['skill_data']['farming']['plenty'][0]
+        if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '행운') {
+          @extra_qty += 1.5
+        }
         @entries = @crop_spec['loot_table']
         @total_weight = 0
         foreach(@key: @entry in @entries) {
@@ -1753,8 +1760,11 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
             }
           }
         }
-        #경험 인첸트 있을시 엑스트라xp 수치 조정
-        @xp = integer(round(@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']))
+        if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
+          @xp = integer(round((@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']) * 2))
+        } else {
+          @xp = integer(round(@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']))
+        }
         if(@xp > 0) {
           spawn_entity('EXPERIENCE_ORB', 1, @center_location, closure(@euuid) {
             set_entity_spec(@euuid, array('amount': @xp))
@@ -1856,8 +1866,10 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
           _update_item(@player, @uuid, array('main_hand': @item), @players_data, @skills_spec, @text)
         #}
         if(@age == @crop_spec['max_age']) {
-          #@extra_qty 배수: * (풍년 + 행운 or 축복 인첸)
-          @extra_qty = @players_data[@uuid]['skill_data']['farming']['plenty'][0] + 0
+          @extra_qty = @players_data[@uuid]['skill_data']['farming']['plenty'][0]
+          if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '행운') {
+            @extra_qty += 1.5
+          }
           @entries = @crop_spec['loot_table']
           @total_weight = 0
           foreach(@key: @entry in @entries) {
@@ -1917,13 +1929,17 @@ proc _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @ski
       }
       @item = @players_data[@uuid]['item'][@event['hand']]
       if(pcooldown(@player, @item['name']) == 0) {
-        #효율 인첸트가 되어있을시 쿨타임 * 0.75
+        if(@players_data[@uuid]['item']['enchantments'][@event['hand']] == '효율') {
+          @cooldown_multiply = 0.75
+        } else {
+          @cooldown_multiply = 1
+        }
         foreach(@hoe:@hoe_cooldown in @hoes_cooldown) {
           if(@hoe_cooldown > @hoes_cooldown[@item['name']]) {
             set_pcooldown(@player, @hoe, @hoe_cooldown)
             #40 28
           } else {
-            set_pcooldown(@player, @hoe, @hoes_cooldown[@item['name']]) #효율 인첸트 존재시 쿨타임 감소
+            set_pcooldown(@player, @hoe, integer(@hoes_cooldown[@item['name']] * @cooldown_multiply)) #효율 인첸트 존재시 쿨타임 감소
           }
         }
         @sowing_power = 1

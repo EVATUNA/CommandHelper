@@ -224,6 +224,28 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
         @player = @player_state['player']
         if(array_index_exists(@players_data, @uuid)) {
           _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
+          if(@players_data[@uuid]['item']['enchantments']['armor'] == '원소 보호') {
+            @debuff_effects = array(
+              'blindness': 'BLINDNESS',
+              'hunger': 'HUNGER',
+              'levitation': 'LEVITATION',
+              'mining_fatigue': 'MINING_FATIGUE',
+              'nausea': 'NAUSEA',
+              'poison': 'POISON',
+              'slowness': 'SLOWNESS',
+              'unluck': 'BAD_LUCK',
+              'weakness': 'WEAKNESS',
+              'wither': 'WITHER'
+            )
+            foreach(@effect: @effect_data in get_peffect(@player)) {
+              if(array_contains(array_keys(@debuff_effects), @effect) && rand() < 0.6) {
+                @effect_data['seconds'] -= 1
+                set_peffect(@player, @debuff_effects[@effect], @effect_data['strength'], 0, @effect_data['ambient'], @effect_data['particles'])
+                set_peffect(@player, @debuff_effects[@effect], @effect_data['strength'], @effect_data['seconds'], @effect_data['ambient'], @effect_data['particles'])
+              }
+            }
+          }
+
           #_countdown_skill() {}로 아래 코드 대체
           
           #combat_combat_inclination
@@ -474,7 +496,17 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @skills_spec, @text)
     }
   }
-
+  @armors = array(
+    'LEATHER_BOOTS',
+    'CHAINMAIL_BOOTS',
+    'IRON_BOOTS',
+    'GOLDEN_BOOTS',
+    'DIAMOND_BOOTS',
+    'NETHERITE_BOOTS'
+  )
+  if(is_null(get_inventory_item(@uuid, 36)) && !is_null(@event['item']) && array_contains(@armors, @event['item']['name']) && array_contains(array('right_click_block', 'right_click_air'), @event['action'])) {
+    _update_item(@player, @uuid, array('armor': @event['item']), @players_data, @skills_spec, @text)
+  }
   if(@event['action'] == 'right_click_block') {
     # cancel right click harvest berry
     if(@event['block'] == 'SWEET_BERRY_BUSH') {
@@ -483,7 +515,6 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         cancel()
       }
     }
-    
     # cancel bone mealing
     if(!is_null(@event['item']) && @event['item']['name'] == 'BONE_MEAL' && array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
       @data = get_blockdata(@event['location'])
@@ -494,7 +525,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         @delta = array('x': 0.25, 'y': 0.125, 'z': 0.25)
         @uuid = puuid(@player)
         mom_playerparticle(@uuid, 'VILLAGER_HAPPY', @pos['x'], @pos['y'], @pos['z'], 15, @delta['x'], @delta['y'], @delta['z'], 0.0)
-        #_particle(@player, 'happy_villager', @pos, @delta, 0, 15)
+        _add_epxerience(@uuid, 'fertile_touch', @players_data[@uuid]['skill_data']['sowing_method']['fertile_touch'], 1, 0)
         set_timeout(0, closure( set_blockdata(@event['location'], @data) ))
       } else {
         cancel()
@@ -528,6 +559,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
           if(@event['item']['qty'] > 0) {
             set_inventory_item(@uuid, @slot, @event['item'])
             pgive_item(@player, array('name': 'GLASS_BOTTLE'))
+            _add_epxerience(@uuid, 'wet_hands', @players_data[@uuid]['skill_data']['sowing_method']['wet_hands'], 1, 0)
           } else {
             set_inventory_item(@uuid, @slot, array('name': 'GLASS_BOTTLE'))
           }
