@@ -21,14 +21,15 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
   @bossbars = get_bars()
   @indicator_id = 'indicator.'.@uuid
   @tip_id = 'tip.'.@uuid
-  if(!array_contains(@bossbars, @indicator_id)) {
-    @indicator_bossbar_data = array(
-      'title': '',
-      'percent': 0
-    )
-    create_bar(@indicator_id, @indicator_bossbar_data)
-    bar_add_player(@indicator_id, @player)
+  if(array_contains(@bossbars, @indicator_id)) {
+    remove_bar(@indicator_id)
   }
+  @indicator_bossbar_data = array(
+    'title': '',
+    'percent': 0
+  )
+  create_bar(@indicator_id, @indicator_bossbar_data)
+  bar_add_player(@indicator_id, @player)
   if(!array_contains(@bossbars, @tip_id)) {
     @tip_bossbar_data = array(
       'title': '',
@@ -77,7 +78,7 @@ proc _new_data(@uuid, @players_data) {
 }
 
 proc _send_resourcepack(@player, @uuid, @players_state) {
-  @resourcepack = 'https://drive.google.com/uc?export=download&id=1Zio8xTFp5vH_eDLzZLRF1pmiZdjXTqk9'
+  @resourcepack = 'https://drive.google.com/uc?export=download&id=12F7Yi7oQV4Aycyf_-dFUe5HiXMdY7iGe'
   send_resourcepack(@player, @resourcepack)
   @player_state = array(
     'join_spec': array(
@@ -548,11 +549,10 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       @data = get_blockdata(@event['location'])
       if(@data['age'] == 0) {
         @data['age'] = 1
-        cancel()
         @pos = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.2, 'z': @event['location']['z'] + 0.5)
         @delta = array('x': 0.25, 'y': 0.125, 'z': 0.25)
         @uuid = puuid(@player)
-        mom_playerparticle(@uuid, 'VILLAGER_HAPPY', @pos['x'], @pos['y'], @pos['z'], 15, @delta['x'], @delta['y'], @delta['z'], 0.0)
+        #mom_playerparticle(@uuid, 'VILLAGER_HAPPY', @pos['x'], @pos['y'], @pos['z'], 15, @delta['x'], @delta['y'], @delta['z'], 0.0)
         _add_epxerience(@uuid, 'fertile_touch', @players_data[@uuid]['skill_data']['sowing_method']['fertile_touch'], 1, 0)
         set_timeout(0, closure( set_blockdata(@event['location'], @data) ))
       } else {
@@ -577,6 +577,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         play_named_sound(@event['location'], array('sound': 'minecraft:item.bottle.empty', 'category': 'NEUTRAL', 'volum': 1))
         @data['moisture'] = 6
         set_blockdata(@event['location'], @data)
+        _add_epxerience(@uuid, 'wet_hands', @players_data[@uuid]['skill_data']['sowing_method']['wet_hands'], 1, 0)
         if(@event['hand'] =='main_hand') {
           @slot = pheld_slot(@player)
         } else {
@@ -587,7 +588,6 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
           if(@event['item']['qty'] > 0) {
             set_inventory_item(@uuid, @slot, @event['item'])
             pgive_item(@player, array('name': 'GLASS_BOTTLE'))
-            _add_epxerience(@uuid, 'wet_hands', @players_data[@uuid]['skill_data']['sowing_method']['wet_hands'], 1, 0)
           } else {
             set_inventory_item(@uuid, @slot, array('name': 'GLASS_BOTTLE'))
           }
