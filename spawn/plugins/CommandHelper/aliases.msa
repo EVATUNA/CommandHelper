@@ -49,7 +49,7 @@ broadcast(get_inventory_item(puuid(player()), pheld_slot(player())))
 spawn_entity('item_frame', 1, ploc())
 <<<
 
-/test $ = >>>
+/testasd $ = >>>
   @armor_light_hider = array(
     'name': 'STRUCTURE_VOID',
     'meta': array(
@@ -65,4 +65,31 @@ spawn_entity('item_frame', 1, ploc())
     )
   )
   set_inventory_item(puuid(), 37, @armor_light_hider)
+<<<
+
+/lista = >>>
+foreach(@uuid in bukkitlinked_get_all_players()) {
+  broadcast(@uuid bukkitlinked_get_player_name(@uuid))
+  #broadcast(bukkitlinked_is_player_op(@uuid))
+  #broadcast(moori_get_player_guild_id(@uuid))
+  #broadcast(moori_get_player_guild_role(@uuid))
+}
+<<<
+
+/u $a = >>>
+broadcast(puuid($a))
+<<<
+
+/uu $a = >>>
+broadcast(bukkitlinked_get_player_name($a))
+<<<
+
+/aguild = >>>
+broadcast(moori_get_guild_all_members(moori_get_player_guild_id(puuid())))
+<<<
+
+/test $a = >>>
+  broadcast(string_multiply('뷁', integer($a)))
+  @data_array = byte_array()
+  ba_put_string(@data_array, string_multiply('뷁', integer($a)))
 <<<

@@ -1,17 +1,12 @@
 ## Initial Including Data
-@server = array(
-  'name': 'spawn', //wild resident guest
-  'loaded': false,
-  'bots': array('aaaa__', 'dohun1') #'dohun1','aaaa__'
-)
+@server = 'spawn'
+@resourcepack = 'https://drive.google.com/uc?export=download&id=1fFXChwt073_Tniwy40-9zc44pBXrdhPF'
 @bots = array(
-  'LopLove',
-  #'dohun1',
-  '1L_Bottle'
+  'b5ee7eb3-f4e8-4ab4-82e4-e97c60a6b8c1',
+  'c45537c6-39d3-459e-9a48-86f938a9c0dd'
 )
-@players_state = array()
+@reconnectable_players = array()
 @players_data = array()
-@hp_blocks = array()
 @text = array()
 async_read('files/font_space.json', closure(@value) {
   @text['space_fonts'] = json_decode(@value)
@@ -21,6 +16,7 @@ async_read('files/general_emoji.json', closure(@value) {
 })
 
 ## Gameplay Data
+@hp_blocks = array()
 @minerals_spec = array()
 async_read('files/minerals_spec.json', closure(@value) {
   foreach(@mineral: @spec in json_decode(@value)) {
@@ -460,11 +456,11 @@ proc _set_indicator(@player, @uuid, @players_data, @text) {
 }
 
 proc _all_players(@bots) {
-  @players = all_players()
+  @players_uuid = bukkitlinked_get_all_players()
   foreach(@bot in @bots) {
-    array_remove_values(@players, @bot)
+    array_remove_values(@players_uuid, @bot)
   }
-  return(@players)
+  return(@players_uuid)
 }
 
 proc _send_plugin_message(@request_bot, @channel_messages) {
@@ -475,7 +471,7 @@ proc _send_plugin_message(@request_bot, @channel_messages) {
   send_plugin_message(@request_bot, 'BungeeCord', @byte_array)
 }
 
-proc _bungeecord_foward(@request_bot, @identifier, @data) {
+proc _bungeecord_foward(@player, @identifier, @data) {
   @data_array = byte_array()
   ba_put_string(@data_array, json_encode(@data))
   @byte_array = byte_array()
@@ -484,19 +480,7 @@ proc _bungeecord_foward(@request_bot, @identifier, @data) {
   ba_put_string(@byte_array, @identifier)
   ba_put_short(@byte_array, array_size(@data_array))
   ba_put_bytes(@byte_array, @data_array)
-  send_plugin_message(@request_bot, 'BungeeCord', @byte_array)
-}
-
-proc _bungeecord_foward_to_bot(@request_bot, @receive_bot, @identifier, @data) {
-  @data_array = byte_array()
-  ba_put_string(@data_array, json_encode(@data))
-  @byte_array = byte_array()
-  ba_put_string(@byte_array, 'ForwardToPlayer')
-  ba_put_string(@byte_array, @receive_bot)
-  ba_put_string(@byte_array, @identifier)
-  ba_put_short(@byte_array, array_size(@data_array))
-  ba_put_bytes(@byte_array, @data_array)
-  send_plugin_message(@request_bot, 'BungeeCord', @byte_array)
+  send_plugin_message(@player, 'BungeeCord', @byte_array)
 }
 
 proc _paging(@array, @size) {

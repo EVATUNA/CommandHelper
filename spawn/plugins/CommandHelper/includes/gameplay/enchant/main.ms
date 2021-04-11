@@ -43,7 +43,8 @@ proc _get_enchanted_item(@enchanting_item, @entries, @luck) {
     @lore_size = array_size(@enchanting_item['meta']['modifiers'])
   } else {
     @lore_size = 0
-  } 
+  }
+  @enchanted_item['meta']['lore'] = array_get(@enchanting_item['meta']['lore'], cslice(0, @lore_size - 1))
   if(!is_null(@final_entry)) {
     @enchanted_item['meta']['lore'][@lore_size] = ''
     @enchanted_item['meta']['lore'][@lore_size + 1] = '§f'.@final_entry['icon'].' '.hexcolor(@final_entry['color']).@final_entry['name']
@@ -53,4 +54,49 @@ proc _get_enchanted_item(@enchanting_item, @entries, @luck) {
     }
   }
   return(@enchanted_item)
+}
+
+proc _apply_passive_armor_enchantment(@player, @player_data) {
+  switch(@player_data['item']['enchantments']['armor']) {
+  case '원소 보호':
+    @debuff_effects = array(
+      'blindness': 'BLINDNESS',
+      'hunger': 'HUNGER',
+      'levitation': 'LEVITATION',
+      'mining_fatigue': 'MINING_FATIGUE',
+      'nausea': 'NAUSEA',
+      'poison': 'POISON',
+      'slowness': 'SLOWNESS',
+      'unluck': 'BAD_LUCK',
+      'weakness': 'WEAKNESS',
+      'wither': 'WITHER'
+    )
+    foreach(@effect: @effect_data in get_peffect(@player)) {
+      if(array_contains(array_keys(@debuff_effects), @effect) && rand() < 0.6) {
+        @effect_data['seconds'] -= 1
+        set_peffect(@player, @debuff_effects[@effect], @effect_data['strength'], 0, @effect_data['ambient'], @effect_data['particles'])
+        set_peffect(@player, @debuff_effects[@effect], @effect_data['strength'], @effect_data['seconds'], @effect_data['ambient'], @effect_data['particles'])
+      }
+    }
+    break()
+  case '날렵함':
+    set_peffect(@player, 'SPEED', 1, 11.5, false, true)
+    set_peffect(@player, 'JUMP_BOOST', 1, 11.5, false, true)
+    break()
+  case '깃털':
+    if(!psneaking(@player)) {
+      set_peffect(@player, 'SLOW_FALLING', 4, 11.5, false, true)
+    }
+    break()
+  case '심안':
+    set_peffect(@player, 'NIGHT_VISION', 0, 16.5, false, true)
+    @effects = get_peffect(@player)
+    if(array_index_exists(@effects, 'blindness')) {
+      set_peffect(@player, 'BLINDNESS', 0, 0, false, true)
+    }
+    if(array_index_exists(@effects, 'nausea')) {
+      set_peffect(@player, 'NAUSEA', 0, 0, false, true)
+    }
+    break()
+  }
 }

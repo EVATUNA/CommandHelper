@@ -1181,28 +1181,32 @@ bind('player_interact', null, array('main_hand': 'main_main_hand', 'button': 'ri
             set_pcooldown(@player, 'CAVE_AIR', 30)
             @task = array('tick': 10, 'id': null)
             @id = set_interval(100 , closure() {
-              if(@task['tick'] > 0) {
-                @ploc = ploc(@player)
-                play_named_sound(@location, array('sound': 'minecraft:entity.player.levelup', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
-                @pos = array(
-                  'x': @ploc['x'] + rand() / 2 - 0.25,
-                  'y': @ploc['y'] + rand() * 1.5 + 1,
-                  'z': @ploc['z'] + rand() / 2 - 0.25
-                )
-                @delta = array(
-                  'x': (@location['x'] - @pos['x']) / 2,
-                  'y': (@location['y'] - @pos['y']) / 2,
-                  'z': (@location['z'] - @pos['z']) / 2
-                )
-                mom_playerparticle(@uuid, 'TOTEM', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 1.0)
-                @task['tick'] -= 1
+              if(ponline(@player)) {
+                if(@task['tick'] > 0) {
+                  @ploc = ploc(@player)
+                  play_named_sound(@location, array('sound': 'minecraft:entity.player.levelup', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
+                  @pos = array(
+                    'x': @ploc['x'] + rand() / 2 - 0.25,
+                    'y': @ploc['y'] + rand() * 1.5 + 1,
+                    'z': @ploc['z'] + rand() / 2 - 0.25
+                  )
+                  @delta = array(
+                    'x': (@location['x'] - @pos['x']) / 2,
+                    'y': (@location['y'] - @pos['y']) / 2,
+                    'z': (@location['z'] - @pos['z']) / 2
+                  )
+                  mom_playerparticle(@uuid, 'TOTEM', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 1.0)
+                  @task['tick'] -= 1
+                } else {
+                  clear_task()
+                  play_named_sound(@location, array('sound': 'minecraft:block.enchantment_table.use', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
+                  set_plevel(@player, plevel(@player) - 30)
+                  @essence_name = array_rand(array(/*'희미한 마법의 정수', */'미약한 마법의 정수', '농축된 마법의 정수'/*, '강력한 마법의 정수', '찬란한 마법의 정수'*/), 1, false)[0]
+                  #broadcast(@essence_name)
+                  drop_item(@location, @essences[@essence_name]['item'], false)
+                }
               } else {
                 clear_task()
-                play_named_sound(@location, array('sound': 'minecraft:block.enchantment_table.use', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
-                set_plevel(@player, plevel(@player) - 30)
-                @essence_name = array_rand(array(/*'희미한 마법의 정수', */'미약한 마법의 정수', '농축된 마법의 정수'/*, '강력한 마법의 정수', '찬란한 마법의 정수'*/), 1, false)[0]
-                #broadcast(@essence_name)
-                drop_item(@location, @essences[@essence_name]['item'], false)
               }
             })
             @task['id'] = @id
@@ -1402,7 +1406,8 @@ bind('player_interact', null, array('main_hand': 'main_main_hand', 'button': 'ri
                   cancel()
                 }
                 @cursor_item = @event['cursoritem']
-                if(!is_null(@cursor_item) && @cursor_item['name'] == 'ENCHANTED_BOOK' && !is_null(@cursor_item['meta']) && !is_null(@cursor_item['meta']['display']) && @rawslot == 22 && @event['action'] == 'SWAP_WITH_CURSOR') {
+                if(!is_null(@cursor_item) && @cursor_item['name'] == 'EXPERIENCE_BOTTLE' && !is_null(@cursor_item['meta']) && !is_null(@cursor_item['meta']['display']) && @rawslot == 22 && @event['action'] == 'SWAP_WITH_CURSOR') {
+                  @cursor_item['qty'] -= 1
                   @enchanting_item = @event['inventory'][@rawslot]
                   @enchantable_item = @enchantable_items[@enchanting_item['name']]
                   @enchanted_item = @enchanting_item
@@ -1414,7 +1419,7 @@ bind('player_interact', null, array('main_hand': 'main_main_hand', 'button': 'ri
                     }
                     cancel()
                     modify_event('slotitem', @enchanted_item)
-                    modify_event('cursoritem', null)
+                    modify_event('cursoritem', @cursor_item)
                   }
                 }
               }
@@ -1819,6 +1824,12 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text) {
                 set_inventory_item(@puuid, 36, @items['armor'])
               }
             }
+          }
+          break()
+        case '친수성':
+          if(rand() < 0.1 * @armor_chance_multiply) {
+            @players_data[@puuid]['cache']['last_armor_effect'] = @time
+            set_mob_effect(@puuid, 'WATER_BREATHING', 0, 5, false, true)
           }
           break()
         case '포화':
