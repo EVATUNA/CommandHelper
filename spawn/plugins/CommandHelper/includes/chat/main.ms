@@ -23,63 +23,6 @@ proc _tellraw(@player, @raw) {
   }
 }
 
-proc _whisper(@strings) {
-  @messages = array(
-    array('text': '')
-  )
-  foreach(@key: @string in parse_args(@strings)) {
-    if(@player_state['player'] == @mentioned_message && @player_state['quit_countdown'] == -1 && @player_state['is_op']) {
-      @is_modified_message = true
-      @message = array(
-        'text': @string,
-        'color': 'blue'
-      )
-      @mentioned_players[] = @mentioned_message
-      #채팅부분에 멘션 메시지 색 설정 클릭시 귓말vs채팅에 호출
-    }
-  }
-}
-
-proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @bots) {
-  @enko = @setting[1]
-  if(@enko) {
-    @modified_message = _convert_eng_to_kor(@unmodified_message)
-    if(@modified_message){
-      @reg = reg_match_all('\\[([^\\]]*)\\]', @unmodified_message)
-      foreach(@arr in @reg){
-        @converted = _convert_eng_to_kor(@arr[0])
-        @modified_message = replace(@modified_message, @converted, @arr[1])
-      }
-    } else {
-      @modified_message = @unmodified_message
-    }
-  } else {
-    @modified_message = @unmodified_message
-  }
-  @raw = array(
-    array(
-      'text': '\ue4db '
-    ),
-    array(
-      'text': @modified_message,
-      'color': 'yellow'
-    )
-  )
-  @receiver_uuids = _all_players(@bots)
-  foreach(@receiver_uuid in @receiver_uuids) {
-    @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
-    if(ponline(@receiver_name)) {
-      tellraw(@receiver_name, @raw)
-      play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
-    } else {
-      @data = array(
-        'raw': @raw
-      )
-      _bungeecord_foward(@sender_name, 'ch_broadcast', @data)
-    }
-  }
-}
-
 proc _en_to_ko(@unconverted_message) {
   @converted_message = _convert_eng_to_kor(@unconverted_message)
   if(@converted_message){
@@ -1084,6 +1027,46 @@ bind('async_player_chat', null , null, @event, @players_data, @bots) {
   }
 }
 
+proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @bots) {
+  @enko = @setting[1]
+  if(@enko) {
+    @modified_message = _convert_eng_to_kor(@unmodified_message)
+    if(@modified_message){
+      @reg = reg_match_all('\\[([^\\]]*)\\]', @unmodified_message)
+      foreach(@arr in @reg){
+        @converted = _convert_eng_to_kor(@arr[0])
+        @modified_message = replace(@modified_message, @converted, @arr[1])
+      }
+    } else {
+      @modified_message = @unmodified_message
+    }
+  } else {
+    @modified_message = @unmodified_message
+  }
+  @raw = array(
+    array(
+      'text': '\ue4db '
+    ),
+    array(
+      'text': @modified_message,
+      'color': 'yellow'
+    )
+  )
+  @receiver_uuids = _all_players(@bots)
+  foreach(@receiver_uuid in @receiver_uuids) {
+    @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
+    if(ponline(@receiver_name)) {
+      tellraw(@receiver_name, @raw)
+      play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+    } else {
+      @data = array(
+        'raw': @raw
+      )
+      _bungeecord_foward(@sender_name, 'ch_broadcast', @data)
+    }
+  }
+}
+
 register_command('broadcast', array(
   'description': 'can broadcast',
   'usage': '/broadcast <msg>',
@@ -1098,6 +1081,289 @@ register_command('broadcast', array(
       _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @bots)
     } else {
       tmsg(@player, color('red')'/'.@command'<message>')
+    }
+  }
+))
+
+proc _whisper(@data) {
+  #변수 선언
+  @sender_name = @data['sender_name']
+  @sender_uuid = @data['sender_uuid']
+  @sender_setting = @data['sender_setting']
+  @target_name = @data['target_name']
+  @target_uuid = @data['target_uuid']
+  @unmodified_message = @data['message']
+  #리시버 설정
+  @receivers = @data['receivers']
+  #메시지 생성 부분
+  @modified_message = array(
+    array('text': '')
+  )
+  foreach(@key: @string in parse_args(@unmodified_message)) {
+    @is_modified_message = false
+    if(string_starts_with(@string, './')) {
+      @string = replace(@string, './', '/')
+      @string = replace(@string, '_', ' ')
+      @is_modified_message = true
+      @message = array(
+        'text': @string,
+        'color': 'red',
+        'clickEvent': array(
+          'action': 'suggest_command',
+          'value': @string
+        )
+      )
+    } else if(string_starts_with(@string, 'https://') || string_starts_with(@string, 'http://')) {
+      @is_modified_message = true
+      @message = array(
+        'text': @string,
+        'color': 'blue',
+        'clickEvent': array(
+          'action': 'open_url',
+          'value': @string
+        )
+      )
+    }
+    if(@is_modified_message) {
+      @pre_message = @modified_message[array_size(@modified_message) -1]
+      if(array_size(@modified_message) != 1) {
+        if(array_index_exists(@pre_message, 'color')) {
+          @modified_message[] = array(
+            'text': ' '
+          )
+        } else {
+          @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '
+        }
+      }
+      @modified_message[] = @message
+    } else {
+      @pre_message = @modified_message[array_size(@modified_message) -1]
+      if(array_size(@modified_message) == 1) {
+        @modified_message[] = array(
+          'text': @string
+        )
+      } else {
+        if(array_index_exists(@pre_message, 'color')) {
+          @modified_message[] = array(
+            'text': ' '.@string
+          )
+        } else {
+          @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '.@string
+        }
+      }
+    }
+  }
+  #이름 부분
+  @target_raw = array(
+    array(
+      'text': 'From ',
+      'color': 'gray',
+    ),
+    array(
+      'text': @sender_name,
+      'hoverEvent': array(
+        'action': 'show_text',
+        'value': array(
+          '좌클릭 시, 유저에게 귓속말을 보냅니다'
+        )
+      ),
+      'clickEvent': array(
+        'action': 'suggest_command',
+        'value': '/w'@sender_name''
+      )
+    ),
+    array(
+      'text': ': ',
+    ),
+    @modified_message
+  )
+  @observer_raw = array(
+    array(
+      'text': @sender_name.' To '.@target_name,
+      'color': 'gray',
+    ),
+    array(
+      'text': ': ',
+    ),
+    @modified_message
+  )
+  # 메시지 보내기
+  foreach(@receiver_uuid: @receiver_data in @receivers) {
+    @receiver_name = @receiver_data['name']
+    if(ponline(@receiver_name)) {
+      if(@receiver_data['is_target']) {
+        _tellraw(@receiver_name, @target_raw)
+        play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+      } else {
+        _tellraw(@receiver_name, @observer_raw)
+        play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+      }
+    }
+  }
+}
+
+register_command('whisper', array(
+  'description': 'can whisper',
+  'usage': '/whisper <player> <msg>',
+  'aliases': array('w', 'm', 'msg', 'tell'),
+  'tabcompleter': closure(@command, @player, @args) {
+    if(array_size(@args) == 1) {
+      @online_players = array()
+      foreach(@target_uuid in _all_players(@bots)) {
+        @online_players[] = bukkitlinked_get_player_name(@target_uuid)
+      }
+      array_remove_values(@online_players, @player)
+      @input = @args[-1]
+      return(array_filter(@online_players, closure(@key, @value) {
+        return(length(@input) <= length(@value) && equals_ic(@input, substr(@value, 0, length(@input))))
+      }))
+    } else {
+      return(array())
+    }
+  },
+  'executor': closure(@command, @player, @args) {
+    @sender_name = @player
+    @sender_uuid = puuid(@sender_name)
+    if(array_index_exists(@players_data, @sender_uuid)) {
+      if(array_size(@args) > 1) {
+        @data = array(
+          'sender_name': @sender_name,
+          'sender_uuid': @sender_uuid,
+          'sender_setting': @players_data[@sender_uuid]['setting']
+        )
+        @is_target_exists = false
+        @all_players_uuid = _all_players(@bots)
+        array_remove_values(@all_players_uuid, @sender_uuid)
+        @receivers = array()
+        foreach(@receiver_uuid in @all_players_uuid) {
+          @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
+          if(@receiver_name == @args[0]) {
+            @is_target_exists = true
+            @receivers[@receiver_uuid] = array(
+              'name': @receiver_name,
+              'is_target': true
+            )
+            @data['target_name'] = @receiver_name
+            @data['target_uuid'] = @receiver_uuid
+          } else {
+            if(ponline(@receiver_name) && array_index_exists(@players_data, @receiver_uuid)) {
+              @receiver_setting = @players_data[@receiver_uuid]['setting']
+              if(@receiver_setting[8]) {
+                @receivers[@receiver_uuid] = array(
+                  'name': @receiver_name,
+                  'is_target': false
+                )
+              }
+            } else {
+              @receiver_setting = cup_get('SETTING', @receiver_uuid)
+              if(!is_null(@receiver_setting) && @receiver_setting[8]) {
+                @receivers[@receiver_uuid] = array(
+                  'name': @receiver_name,
+                  'is_target': false
+                )
+              }
+            }
+          }
+        }
+        @data['receivers'] = @receivers
+        if(@is_target_exists) {
+          if(@data['sender_setting'][1]) {
+            @data['message'] = _en_to_ko(array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' '))
+          } else {
+            @data['message'] = array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' ')
+          }
+          _bungeecord_foward(@sender_name, 'ch_whisper', @data)
+          @modified_message = array(
+            array('text': '')
+          )
+          foreach(@key: @string in parse_args(@data['message'])) {
+            @is_modified_message = false
+            if(string_starts_with(@string, './')) {
+              @string = replace(@string, './', '/')
+              @string = replace(@string, '_', ' ')
+              @is_modified_message = true
+              @message = array(
+                'text': @string,
+                'color': 'red',
+                'clickEvent': array(
+                  'action': 'suggest_command',
+                  'value': @string
+                )
+              )
+            } else if(string_starts_with(@string, 'https://') || string_starts_with(@string, 'http://')) {
+              @is_modified_message = true
+              @message = array(
+                'text': @string,
+                'color': 'blue',
+                'clickEvent': array(
+                  'action': 'open_url',
+                  'value': @string
+                )
+              )
+            }
+            if(@is_modified_message) {
+              @pre_message = @modified_message[array_size(@modified_message) -1]
+              if(array_size(@modified_message) != 1) {
+                if(array_index_exists(@pre_message, 'color')) {
+                  @modified_message[] = array(
+                    'text': ' '
+                  )
+                } else {
+                  @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '
+                }
+              }
+              @modified_message[] = @message
+            } else {
+              @pre_message = @modified_message[array_size(@modified_message) -1]
+              if(array_size(@modified_message) == 1) {
+                @modified_message[] = array(
+                  'text': @string
+                )
+              } else {
+                if(array_index_exists(@pre_message, 'color')) {
+                  @modified_message[] = array(
+                    'text': ' '.@string
+                  )
+                } else {
+                  @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '.@string
+                }
+              }
+            }
+          }
+          #이름 부분
+          @sender_raw = array(
+            array(
+              'text': 'To ',
+              'color': 'gray',
+            ),
+            array(
+              'text': @data['target_name'],
+              'hoverEvent': array(
+                'action': 'show_text',
+                'value': array(
+                  '좌클릭 시, 유저에게 귓속말을 보냅니다'
+                )
+              ),
+              'clickEvent': array(
+                'action': 'suggest_command',
+                'value': '/w'@data['target_name']''
+              )
+            ),
+            array(
+              'text': ': ',
+            ),
+            @modified_message
+          )
+          #센더에게 tellraw
+          _tellraw(@sender_name, @sender_raw)
+          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+          _whisper(@data)
+        } else {
+          tmsg(@player, color('gray').'플레이어를 찾을 수 없습니다.')
+        }
+      } else {
+        tmsg(@player, color('red')'/'.@command'<player> <message>')
+      }
     }
   }
 ))
@@ -1217,47 +1483,6 @@ register_command('resolution', array(
       _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
       cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
       break()
-    }
-  }
-))
-
-register_command('whisper', array(
-  'description': 'can whisper',
-  'usage': '/whisper <player> <msg>',
-  'aliases': array('w', 'm', 'msg', 'tell'),
-  'tabcompleter': closure(@command, @player, @args) { return(array()) },
-  'executor': closure(@command, @player, @args) {
-    @sender = @player
-    @sender_uuid = puuid(@sender)
-    @receiver = @args[0]
-    @receiver_uuid = puuid(@receiver)
-    if(array_size(@args) > 1) { #다른 플레이어에게 메시지를 보낼시 && @sender != @receiver
-      if(ponline(@receiver)) {
-        @imploded_message = array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' ')
-        @setting = @players_data[@sender_uuid]['setting']
-        @enko = @setting[1]
-        if(@enko) {
-          @message = _convert_eng_to_kor(@imploded_message)
-          if(@message){
-            @reg = reg_match_all('\\[([^\\]]*)\\]', @imploded_message)
-            foreach(@arr in @reg){
-              @converted = _convert_eng_to_kor(@arr[0])
-              @message = replace(@message, @converted, @arr[1])
-            }
-          } else {
-            @message = @imploded_message
-          }
-        } else {
-          @message = @imploded_message
-        }
-
-        broadcast(@message)
-      } else if(true) {
-
-        #bungee
-      }
-    } else {
-      tmsg(@player, color('red')'/'.@command'<player> <message>')
     }
   }
 ))

@@ -1,0 +1,16 @@
+clicked:
+  1:
+    name: STONE
+    meta:
+      data:
+        detail: false
+        price:
+          purchase: 1
+          sell: 5
+        opengui:
+          type: 'main'
+        display:
+          title: '테스트 타이틀'
+          lore:
+            - 테스트 로어
+            - 테스트 로어 2

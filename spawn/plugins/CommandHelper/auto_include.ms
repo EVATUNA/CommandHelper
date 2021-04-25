@@ -1,6 +1,9 @@
 ## Initial Including Data
-@server = 'spawn'
-@resourcepack = 'https://drive.google.com/uc?export=download&id=1fFXChwt073_Tniwy40-9zc44pBXrdhPF'
+@server = array(
+  'name': 'spawn',
+  'resourcepack': get_value('resourcepack')
+)
+
 @bots = array(
   'b5ee7eb3-f4e8-4ab4-82e4-e97c60a6b8c1',
   'c45537c6-39d3-459e-9a48-86f938a9c0dd'
@@ -80,7 +83,7 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
       @category = 'combat_method'
       @skill = @player_data['skill_manager'][2]
     }
-    if(@skill != '' && array_index_exists(@player_data['active_skill'][@category], @skill)) {
+    if(@skill != '' && array_index_exists(@player_data['active_skill'], @category) && array_index_exists(@player_data['active_skill'][@category], @skill)) {
       @level = @player_data['skill_data'][@category][@skill][0]
       if(@skills_spec[@category][@skill]['levels'][@level]['active']['count'] == 0) {
         if(@player_data['active_skill'][@category][@skill][1] > 0) {
@@ -165,9 +168,11 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
       } else {
         @max_cooldown = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
         @remain_cooldown = @max_cooldown - @player_data['active_skill'][@category][@skill][0]
+        @skill_count = @player_data['active_skill'][@category][@skill][2]
         @index = integer(@remain_cooldown / @max_cooldown * 10)
-        switch(@skills_spec[@category][@skill]['levels'][@level]['active']['count']) {
-        case 1:
+        #broadcast(@skill_count @index @player_data['active_skill'][@category][@skill] @max_cooldown)
+        switch(@skill_count) {
+        case 0:
           switch(@index) {
           case 0:
             @hotbar = '\ue406'
@@ -204,7 +209,7 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
             break()
           }
           break()
-        case 2:
+        case 1:
           switch(@index) {
           case 0:
             @hotbar = '\ue41b'
@@ -241,7 +246,7 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
             break()
           }
           break()
-        case 3:
+        case 2:
           switch(@index) {
           case 0:
             @hotbar = '\ue425'
@@ -277,6 +282,10 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
             @hotbar = '\ue42f'
             break()
           }
+          break()
+        case 3:
+          @hotbar = '\ue42f'
+          break()
         }
       }
       switch(@skill) {
@@ -498,3 +507,31 @@ proc _paging(@array, @size) {
 proc _multiply_value(@value, @multiply, @deviation) {
   return(@value * @multiply + @value * @deviation * 0.5 - @value * @deviation * rand())
 }
+
+register_command('resourceurl', array(
+  'description': 'You can set resourcepack download url.',
+  'permission': '*',
+  'usage': '/resourceurl <url>',
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    if(pisop(@player)) {
+      if(array_size(@args) == 1) {
+        store_value('resourcepack', @args[0])
+        @server['resourcepack'] = @args[0]
+        @data = array(
+          'url': @args[0]
+        )
+        _bungeecord_foward(@player, 'ch_resourcepack_url_update', @data)
+        return(true)
+      } else {
+        return(false)
+      }
+    } else {
+      return(false)
+    }
+  }
+))
+
+
+array proc _clone(array @arr) { return(array_deep_clone(@arr)) }
+boolean proc _existsGui(string @guiid) { return(array_contains(get_virtual_inventories(), @guiid)) }

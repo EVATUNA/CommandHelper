@@ -72,7 +72,7 @@ proc _new_data(@uuid, @players_data) {
   cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
 }
 
-proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @resourcepack) {
+proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @server) {
   @join_spec = array(
     'location': ploc(@player),
     'effects': get_peffect(@player),
@@ -88,7 +88,7 @@ proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @res
     @join_spec['gamemode'] = 'SURVIVAL'
   }
   set_pmode(@player, 'SPECTATOR')
-  send_resourcepack(@player, @resourcepack)
+  send_resourcepack(@player, @server['resourcepack'])
   title(@player, '§a예§7를 눌러주세요!', '§7서버 리소스팩 사용은 필수입니다.', 0, 99999999, 0)
   @resource_pack_event_id = 'pack_download_checker.'.@uuid
   if(has_bind(@resource_pack_event_id)) { unbind(@resource_pack_event_id) }
@@ -126,10 +126,10 @@ proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @
   })
 }
 
-proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @bots, @skills_spec, @text, @resourcepack) {
+proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @bots, @skills_spec, @text, @server) {
   if(!array_contains(@bots, @uuid)) {
     if(!array_index_exists(@reconnectable_players, @uuid)) {
-      _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @resourcepack)
+      _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @server)
     } else {
       #set_timeout(500, closure() {
         _load_data(@player, @uuid, @players_data, @skills_spec, @text)
@@ -172,12 +172,12 @@ foreach(@player in all_players()) { #조인 이벤트로 변경 리로드 명령
   }
 }
 
-bind('player_join', null, null, @event, @reconnectable_players, @players_data, @bots, @skills_spec, @text, @resourcepack) {
+bind('player_join', null, null, @event, @reconnectable_players, @players_data, @bots, @skills_spec, @text, @server) {
   @player = @event['player']
   @uuid = puuid(@player)
   modify_event('join_message', null)
   set_timeout(100, closure() {
-    _join_event(@player, @uuid, @reconnectable_players, @players_data, @bots, @skills_spec, @text, @resourcepack)
+    _join_event(@player, @uuid, @reconnectable_players, @players_data, @bots, @skills_spec, @text, @server)
   })
 }
 
@@ -229,17 +229,16 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
     #combat_method
     @category = 'combat_method'
     @skill = @players_data[@uuid]['skill_manager'][2]
-
-    if(@skill != '') {
+    if(@skill != '' && array_index_exists(@player_data['active_skill'], @category) && array_index_exists(@player_data['active_skill'][@category], @skill)) {
       @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
       @active_skill = @players_data[@uuid]['active_skill'][@category][@skill]
       switch(@skill) {
       case 'sweeping':
-        if(@active_skill[2] != 1) {
+        if(@active_skill[2] == 0) {
           if(@active_skill[1] > 0) {
             @active_skill[1] -= 1
             if(@active_skill[1] == 0) {
-              @active_skill[0] = @skills_spec['combat_method'][@skill]['levels'][@level]['active']['cooldown']
+              @active_skill[0] = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
               remove_entity_attribute_modifier(@uuid, 'GENERIC_ATTACK_SPEED', 'sweeping_active')
             }
           } else {
@@ -252,20 +251,21 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
         }
         break()
       case 'knockback':
-        if(@active_skill[2] < 3) { #최대 갯수보다 충전 갯수 작을 시
+        if(@active_skill[2] < 3) {
           if(@active_skill[0] > 0) {
             @active_skill[0] -= 1
           } else {
             @active_skill[2] += 1
+            @active_skill[0] = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
           }
         }
         break()
       case 'cleaving':
-        if(@active_skill[2] != 1) {
+        if(@active_skill[2] == 0) {
           if(@active_skill[1] > 0) {
             @active_skill[1] -= 1
             if(@active_skill[1] == 0) {
-              #지속시간 종료
+              @active_skill[0] = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
             }
           } else {
             if(@active_skill[0] > 0) {
@@ -276,24 +276,20 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
           }
         }
         break()
-      #case 'blocking':
-      #  break()
       }
     }
 
     #harvesting_method
     @category = 'harvesting_method'
     @skill = @players_data[@uuid]['skill_manager'][3]
-
-    if(@skill != '') {
+    if(@skill != '' && array_index_exists(@player_data['active_skill'], @category) && array_index_exists(@player_data['active_skill'][@category], @skill)) {
       @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
       @active_skill = @players_data[@uuid]['active_skill'][@category][@skill]
-      #broadcast(@category @skill @active_skill)
-      if(@active_skill[2] != 1) {
+      if(@active_skill[2] == 0) {
         if(@active_skill[1] > 0) {
           @active_skill[1] -= 1
           if(@active_skill[1] == 0) {
-            #지속시간 종료
+            @active_skill[0] = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
           }
         } else {
           if(@active_skill[0] > 0) {
@@ -308,15 +304,14 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
     #sowing_method
     @category = 'sowing_method'
     @skill = @players_data[@uuid]['skill_manager'][4]
-
-    if(@skill != '') {
+    if(@skill != '' && array_index_exists(@player_data['active_skill'], @category) && array_index_exists(@player_data['active_skill'][@category], @skill)) {
       @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
       @active_skill = @players_data[@uuid]['active_skill'][@category][@skill]
-      if(@active_skill[2] != 1) {
+      if(@active_skill[2] == 0) {
         if(@active_skill[1] > 0) {
           @active_skill[1] -= 1
           if(@active_skill[1] == 0) {
-            #지속시간 종료
+            @active_skill[0] = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
           }
         } else {
           if(@active_skill[0] > 0) {
@@ -344,7 +339,7 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
   }
 })
 
-bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @reconnectable_players, @players_data, @bots) {
+bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @reconnectable_players, @players_data, @server, @bots) {
   @identifier_size = -1
   foreach(@key: @byte in @event['bytes']) {
     #broadcast(@key @byte )
@@ -358,39 +353,46 @@ bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @r
   }
   #
   if(@identifier_size != -1) {
-    @data = array(
-      'identifier': string(ba_get_bytes(@event['bytes'], @identifier_size, 2)),
-      'value': json_decode(string(ba_get_bytes(@event['bytes'], array_size(@event['bytes']) - @identifier_size - 6, @identifier_size + 6)))
-    )
-    switch(@data['identifier']) {
-    case 'ch_player_quit':
-      @uuid = @data['value']['uuid']
-      @reconnectable_players[@uuid] = 10
-      break()
-    case 'ch_default_chat':
-      _default_chat(@data['value'], @players_data, @bots)
-      break()
-    case 'ch_local_chat':
-      _local_chat(@data['value'], @players_data, @bots)
-      break()
-    case 'ch_guild_chat':
-      _guild_chat(@data['value'], @players_data, @bots)
-      break()
-    case 'ch_admin_chat':
-      _admin_chat(@data['value'], @players_data, @bots)
-      break()
-    case 'ch_whisper':
-      break()
-    case 'ch_broadcast':
-      @receiver_uuids = _all_players(@bots)
-      foreach(@receiver_uuid in @receiver_uuids) {
-        @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
-        if(ponline(@receiver_name)) {
-          tellraw(@receiver_name, @data['value']['raw'])
-          play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+    @value_string = string(ba_get_bytes(@event['bytes'], array_size(@event['bytes']) - @identifier_size - 6, @identifier_size + 6))
+    if(string_ends_with(@value_string, '}')) {
+      @data = array(
+        'identifier': string(ba_get_bytes(@event['bytes'], @identifier_size, 2)),
+        'value': json_decode(@value_string)
+      )
+      switch(@data['identifier']) {
+      case 'ch_player_quit':
+        @uuid = @data['value']['uuid']
+        @reconnectable_players[@uuid] = 10
+        break()
+      case 'ch_default_chat':
+        _default_chat(@data['value'], @players_data, @bots)
+        break()
+      case 'ch_local_chat':
+        _local_chat(@data['value'], @players_data, @bots)
+        break()
+      case 'ch_guild_chat':
+        _guild_chat(@data['value'], @players_data, @bots)
+        break()
+      case 'ch_admin_chat':
+        _admin_chat(@data['value'], @players_data, @bots)
+        break()
+      case 'ch_whisper':
+        _whisper(@data['value'])
+        break()
+      case 'ch_broadcast':
+        @receiver_uuids = _all_players(@bots)
+        foreach(@receiver_uuid in @receiver_uuids) {
+          @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
+          if(ponline(@receiver_name)) {
+            tellraw(@receiver_name, @data['value']['raw'])
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+          }
         }
+        break()
+      case 'ch_resourcepack_url_update':
+        @server['resourcepack'] = @data['value']['url']
+        store_value('resourcepack', @data['value']['url'])
       }
-      break()
     }
   }
 }
@@ -406,6 +408,22 @@ bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spe
     @is_mining_allowed = true
     if(@is_mining_allowed) {
       _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @minerals_spec, @skills_spec, @text)
+      @stones = array(
+        'STONE': 1,
+        'GRANITE': 1,
+        'DIORITE': 1,
+        'ANDESITE': 1,
+        'BASALT': 1,
+        'BLACKSTONE': 1.25,
+        'NETHERRACK': 0.75
+      )
+      if(array_index_exists(@stones, @event['block'])) {
+        @default_xp = integer(@stones[@event['block']])
+        @extra_xp = @stones[@event['block']] - @default_xp
+        @skill = 'tough_shoulder'
+        @skill_data = @players_data[@uuid]['skill_data']['mining'][@skill]
+        _add_epxerience(@uuid, @skill, @skill_data, @default_xp, @extra_xp)
+      }
     }
   }
 }
@@ -523,6 +541,7 @@ bind('block_grow', null, null, @event) {
     }
   }
 }
+
 bind('block_fade', null, null, @event) {
   if(@event['block'] == 'FARMLAND') {
     @upper_location = array('x': @event['location']['x'], 'y': @event['location']['y'] + 1, 'z': @event['location']['z'], 'world': @event['location']['world'])

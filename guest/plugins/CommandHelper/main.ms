@@ -3,6 +3,12 @@ if(!is_channel_registered('BungeeCord')) {
   register_channel('BungeeCord')
 }
 
+## Resourcepack Link Setting
+@server = array(
+  'name': 'guest',
+  'resourcepack': get_value('resourcepack')
+)
+
 ## BungeeCord Data Sender
 proc _bungeecord_foward(@player, @identifier, @data) {
   @data_array = byte_array()
@@ -16,44 +22,20 @@ proc _bungeecord_foward(@player, @identifier, @data) {
   send_plugin_message(@player, 'BungeeCord', @byte_array)
 }
 
-## Resourcepack Link Setting
-@resourcepack = 'https://drive.google.com/uc?export=download&id=1fFXChwt073_Tniwy40-9zc44pBXrdhPF'
-@resourcepack_setting_command = array(
-  'description': 'You can set resourcepack download url.',
-  'permission': '*',
-  'usage': '/resourceurl <msg>',
-  'tabcompleter': closure(@command, @player, @args) { return(array()) },
-  'executor': closure(@command, @player, @args) {
-    if(pisop(@player)) {
-      if(array_size(@args) == 1) {
-        @resourcepack = @args[0]
-        return(true)
-      } else {
-        return(false)
-      }
-    } else {
-      return(false)
-    }
-  }
-)
-register_command('resourceurl', @resourcepack_setting_command)
-
 ## Resourcepack Downloader
-@resourcepack_download_command = array(
+register_command('resourcepackstart', array(
   'description': 'You can download resourcepack',
   'usage': '/resourcepackstart',
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
     if(array_size(@args) == 0) {
-      send_resourcepack(@player, @resourcepack)
-      #모든 서버의 리소스팩 다운로드 링크 설정하도록 바꾸기
+      send_resourcepack(@player, @server['resourcepack'])
       return(true)
     } else {
       return(false)
     }
   }
-)
-register_command('resourcepackstart', @resourcepack_download_command)
+))
 
 ## Resourcepack Download Checker
 bind('resource_pack_status', null,, null, @event) {
@@ -77,7 +59,7 @@ bind('resource_pack_status', null,, null, @event) {
 }
 
 ## Server Move Checker
-@resourcepack_download_command = array(
+register_command('moveserver', array(
   'description': 'move to spawn server',
   'usage': '/moveserver',
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
@@ -92,5 +74,28 @@ bind('resource_pack_status', null,, null, @event) {
       return(false)
     }
   }
-)
-register_command('moveserver', @resourcepack_download_command)
+))
+
+register_command('resourceurl', array(
+  'description': 'You can set resourcepack download url.',
+  'permission': '*',
+  'usage': '/resourceurl <url>',
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    if(pisop(@player)) {
+      if(array_size(@args) == 1) {
+        store_value('resourcepack', @args[0])
+        @server['resourcepack'] = @args[0]
+        @data = array(
+          'url': @args[0]
+        )
+        _bungeecord_foward(@player, 'ch_resourcepack_url_update', @data)
+        return(true)
+      } else {
+        return(false)
+      }
+    } else {
+      return(false)
+    }
+  }
+))

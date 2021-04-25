@@ -1,0 +1,16 @@
+clicked: ## 판매 아이템 목록
+  1: ## 슬롯
+    name: STONE ## 아이템의 TYPE
+    meta:
+      data:
+        detail: false ## 아이템 meta값까지 확실히 비교할건지
+        price: ## 구매, 판매 금액
+          purchase: 1
+          sell: 5
+        opengui: ## 클릭시 열 gui type
+          type: 'main'
+        display: ## 표시할 display, lore (이 값의 아이템의 구매되는것이 아님. gui에서만의 표기)
+          title: '테스트 타이틀'
+          lore:
+            - 테스트 로어
+            - 테스트 로어 2

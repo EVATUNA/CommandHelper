@@ -16,15 +16,15 @@ async_read('skills_spec.json', closure(@value) {
 proc _load_skill_data(@uuid, @category, @skill, @is_default, @players_data, @skills_spec) {
   @skill_data = cup_get('SKILL_DATA', @uuid.'_'.@skill)
   if(@is_default) {
-    if(is_null(@skill_data)) {
+    #if(is_null(@skill_data)) {
       @skill_data = array(
-        1,
-        10,
+        0,
+        0,
         3,
         @skills_spec[@category][@skill]['levels'][0]['max_experience']
       )
       cup_set('SKILL_DATA', @uuid.'_'.@skill, @skill_data)
-    }
+    #}
     @players_data[@uuid]['skill_data'][@category][@skill] = @skill_data
   } else {
     /* 나중에 아래 코드로 바꿔야 함 지금은 어떤 전투 특성이든 모두 배우게 되어있음
@@ -35,7 +35,7 @@ proc _load_skill_data(@uuid, @category, @skill, @is_default, @players_data, @ski
     if(is_null(@skill_data)) {
       @skill_data = array(
         1,
-        10,
+        0,
         3,
         @skills_spec[@category][@skill]['levels'][0]['max_experience']
       )
@@ -47,7 +47,7 @@ proc _load_skill_data(@uuid, @category, @skill, @is_default, @players_data, @ski
 
 proc _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills_spec) {
   @active_skill = cup_get('ACTIVE_SKILL', @uuid.'_'.@skill)
-  if(is_null(@active_skill)) {
+  #if(!is_null(@active_skill)) { #if(is_null(@active_skill)) {로 돌려놔야 함
     @active_skill = array(
       @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown'],
       0,
@@ -55,7 +55,7 @@ proc _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills
       0
     )
     cup_set('ACTIVE_SKILL', @uuid.'_'.@skill, @active_skill)
-  }
+  #}
   @players_data[@uuid]['active_skill'][@category][@skill] = @active_skill
 }
 
@@ -1562,9 +1562,8 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
     if(!is_null(@players_data[@uuid]['item']['main_hand']) && array_contains(array_keys(@pickaxes_hardness), @players_data[@uuid]['item']['main_hand']['name'])) {
       @pickaxe_hardness = @pickaxes_hardness[@players_data[@uuid]['item']['main_hand']['name']]
       if(!is_null(@players_data[@uuid]['item']['main_hand']['meta'])) {
-        # 돌 곡괭이 hardness 조정
         if(@pickaxe_hardness == 1 && @players_data[@uuid]['item']['main_hand']['meta']['model'] >= 8) {
-          @pickaxe_hardness = 2
+          @pickaxe_hardness = 2 // 돌 곡괭이 hardness 조정
         }
         if(array_index_exists(@players_data[@uuid]['item']['main_hand']['meta'], 'modifiers')) {
           foreach(@modifier in @players_data[@uuid]['item']['main_hand']['meta']['modifiers']) {
@@ -1577,7 +1576,6 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
       }
     }
     @location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.5, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
-    #@drop_items = array()
     @id = array_implode(array(integer(@location['x']), integer(@location['y']), integer(@location['z']), @location['world']), '.')
     @max_hp = @minerals_spec[@mineral]['hp']
     if(@pickaxe_hardness >= @minerals_spec[@mineral]['hardness']) {
@@ -1595,6 +1593,10 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
         )
       }
       @hp_blocks[@id]['hp'] -= @mining_power
+      @ore_selecting_xp = @mining_power * @minerals_spec[@mineral]['hardness'] * 0.1
+      @ore_selecting_default_xp = integer(@ore_selecting_xp)
+      @ore_selecting_extra_xp = @ore_selecting_xp - @ore_selecting_default_xp
+      _add_epxerience(@uuid, 'ore_selecting', @players_data[@uuid]['skill_data']['mining']['ore_selecting'], @ore_selecting_default_xp, @ore_selecting_extra_xp)
       if(@hp_blocks[@id]['hp'] < 0) {
         @hp_blocks[@id]['hp'] = 0
       }
@@ -1803,20 +1805,20 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
       @item = @players_data[@uuid]['item']['main_hand']
       @slot = pheld_slot(@player)
       if(!is_null(@item) && array_contains(array('WOODEN_HOE', 'STONE_HOE', 'GOLDEN_HOE', 'IRON_HOE', 'DIAMOND_HOE', 'NETHERITE_HOE'), @item['name'])) {
-        #if(@harvesting_method != '' && @players_data[@uuid]['active_skill']['harvesting_method'][@harvesting_method][1] > 0) {
-          @max_durability = material_info(@item['name'], 'maxDurability')
-          if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
-            @damage = 0
-            @item['meta'] = array()
-          } else {
-            @damage = @item['meta']['damage']
-          }
-          if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'enchants') || !array_index_exists(@item['meta']['enchants'], 'unbreaking')) {
-            @unbreaking_level = 0
-          } else {
-            @unbreaking_level = @item['meta']['enchants']['unbreaking']['elevel']
-          }
-          @breaking_chance = 1 / (@unbreaking_level + 1)
+        @max_durability = material_info(@item['name'], 'maxDurability')
+        if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
+          @damage = 0
+          @item['meta'] = array()
+        } else {
+          @damage = @item['meta']['damage']
+        }
+        if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'enchants') || !array_index_exists(@item['meta']['enchants'], 'unbreaking')) {
+          @unbreaking_level = 0
+        } else {
+          @unbreaking_level = @item['meta']['enchants']['unbreaking']['elevel']
+        }
+        @breaking_chance = 1 / (@unbreaking_level + 1)
+        if(@harvesting_method != '' && @players_data[@uuid]['active_skill']['harvesting_method'][@harvesting_method][1] > 0) {
           switch(@harvesting_method) {
           case 'wide_hand':
             if(@age == @crop_spec['max_age']) {
@@ -1872,16 +1874,23 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
             }
             break()
           }
-          if(@max_durability > @damage) {
-            @item['meta']['damage'] = @damage
-            set_inventory_item(puuid(@player), @slot, @item)
-          } else {
-            play_entity_effect(puuid(@player), 'BREAK_EQUIPMENT_MAIN_HAND')
-            @item = null
-            set_inventory_item(puuid(@player), @slot, @item)
+        } else {
+          if(@age == @crop_spec['max_age']) {
+            if(rand() < @breaking_chance) {
+              @damage += 1
+            }
+            @locations[] = @center_location
           }
-          _update_item(@player, @uuid, array('main_hand': @item), @players_data, @skills_spec, @text)
-        #}
+        }
+        if(@max_durability > @damage) {
+          @item['meta']['damage'] = @damage
+          set_inventory_item(puuid(@player), @slot, @item)
+        } else {
+          play_entity_effect(puuid(@player), 'BREAK_EQUIPMENT_MAIN_HAND')
+          @item = null
+          set_inventory_item(puuid(@player), @slot, @item)
+        }
+        _update_item(@player, @uuid, array('main_hand': @item), @players_data, @skills_spec, @text)
         if(@age == @crop_spec['max_age']) {
           @extra_qty = @players_data[@uuid]['skill_data']['farming']['plenty'][0]
           if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '행운') {

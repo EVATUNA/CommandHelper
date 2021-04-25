@@ -49,7 +49,7 @@ include('skill/main.ms')
     'NETHERITE_HOE',
     'TRIDENT',
     'BOW',
-    'CROSS_BOW',
+    'CROSSBOW',
     'SHIELD',
     'WHEAT_SEEDS',
     'BEETROOT_SEEDS'
@@ -1045,20 +1045,50 @@ bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_s
       }
     } else {
       cancel()
-      #combat_method
-      #든 아이템에 따라 카테고리와 스킬 바꾸기
-      #스위치
-      @category = 'combat_method'
-      @skill = @players_data[@uuid]['skill_manager'][2]
-      if(@skill != '') {
+      @main_hand_item = @players_data[@uuid]['item']['main_hand']
+      @hoes = array(
+        'WOODEN_HOE',
+        'STONE_HOE',
+        'IRON_HOE',
+        'GOLDEN_HOE',
+        'DIAMOND_HOE',
+        'NETHERITE_HOE'
+      )
+      @seeds = array(
+        'WHEAT_SEEDS',
+        'BEETROOT_SEEDS'
+        'POTATO',
+        'CARROT',
+        'PUMPKIN_SEEDS',
+        'MELON_SEEDS',
+        'SWEET_BERRIES'
+      )
+      if(!is_null(@main_hand_item)) {
+        if(array_contains(@hoes, @main_hand_item['name'])) {
+          @category = 'harvesting_method'
+          @skill = @players_data[@uuid]['skill_manager'][3]
+        } else if(array_contains(@seeds, @main_hand_item['name'])) {
+          @category = 'sowing_method'
+          @skill = @players_data[@uuid]['skill_manager'][4]
+        } else {
+          @category = 'combat_method'
+          @skill = @players_data[@uuid]['skill_manager'][2]
+        }
+        if(@skill == '') {
+          @category = 'combat_method'
+          @skill = @players_data[@uuid]['skill_manager'][2]
+        }
+      } else {
+        @category = 'combat_method'
+        @skill = @players_data[@uuid]['skill_manager'][2]
+      }
+      if(@skill != '' && array_index_exists(@players_data[@uuid]['active_skill'], @category) && array_index_exists(@players_data[@uuid]['active_skill'][@category], @skill)) {
         @active_skill = @players_data[@uuid]['active_skill'][@category][@skill]
-        @level = @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-        @level = 3
+        @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
         switch(@skill) {
         case 'sweeping':
-          #broadcast(@active_skill)
           if(@active_skill[2] == 1) {
-            @active_attack_speed = @skills_spec['combat_method'][@skill]['levels'][@level]['active']['attack_speed']
+            @active_attack_speed = @skills_spec[@category][@skill]['levels'][@level]['active']['attack_speed']
             @modifier = array(
               'attribute': 'GENERIC_ATTACK_SPEED',
               'operation': 'ADD_SCALAR',
@@ -1067,11 +1097,10 @@ bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_s
             )
             add_entity_attribute_modifier(@uuid, @modifier)
             @active_skill[2] = 0
-            @active_skill[1] = @skills_spec['combat_method'][@skill]['levels'][@level]['active']['duration']
+            @active_skill[1] = @skills_spec[@category][@skill]['levels'][@level]['active']['duration']
           }
           break()
         case 'knockback':
-          #broadcast(@active_skill)
           if(@active_skill[2] > 0) {
             @old_ploc = ploc(@player)
             set_timeout(200, closure() {
@@ -1082,22 +1111,17 @@ bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_s
               play_named_sound(ploc(@player), array('sound': 'entity.bat.takeoff', 'category': 'NEUTRAL', 'volume': 0.3, 'pitch': 1))
             })
             @active_skill[2] -= 1
-            @active_skill[0] = 5
+            _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
           }
           break()
-        case 'cleaving':
+        default:
           if(@active_skill[2] == 1) {
-            #broadcast(스킬발동)
             @active_skill[2] = 0
-            @active_skill[1] = 15
+            @active_skill[1] = @skills_spec[@category][@skill]['levels'][@level]['active']['duration']
           }
           break()
-        #case 'blocking':
-        #  break()
         }
       }
-
-
     }
   }
 }
@@ -1491,373 +1515,449 @@ bind('player_interact', null, array('main_hand': 'main_main_hand', 'button': 'ri
   }
 }
 
+bind('projectile_launch', null,, array('shootertype': 'PLAYER'), @event, @players_data) {
+  @uuid = @event['shooter']
+  @player = player(@uuid)
+  @projectile = @event['id']
+  if(@event['type'] == 'ARROW' || @event['type'] == 'SPECTRAL_ARROW') {
+    @main_hand_item = @players_data[@uuid]['item']['main_hand']
+    @off_hand_item = @players_data[@uuid]['item']['off_hand']
+    if(!is_null(@main_hand_item) && array_contains(array('BOW', 'CROSSBOW'), @main_hand_item['name'])) {
+      set_mob_name(@projectile, @main_hand_item['name'])
+    } else if(!is_null(@off_hand_item) && array_contains(array('BOW', 'CROSSBOW'), @off_hand_item['name'])) {
+      set_mob_name(@projectile, @off_hand_item['name'])
+    }
+  }
+}
 
 bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text) {
-  if(array_index_exists(@event, 'damager') && ponline(@event['damager'])) { //플레이어가 때리는 경우
-    @player = @event['damager']
-    @puuid = puuid(@player)
-    if(array_index_exists(@players_data, @puuid)) {
-      @euuid = @event['id']
-      @items = @players_data[@puuid]['item']
-      @weapons = array(
-        'WOODEN_SWORD',
-        'WOODEN_SHOVEL',
-        'WOODEN_PICKAXE',
-        'WOODEN_AXE',
-        'WOODEN_HOE',
-        'STONE_SWORD',
-        'STONE_SHOVEL',
-        'STONE_PICKAXE',
-        'STONE_AXE',
-        'STONE_HOE',
-        'IRON_SWORD',
-        'IRON_SHOVEL',
-        'IRON_PICKAXE',
-        'IRON_AXE',
-        'IRON_HOE',
-        'GOLDEN_SWORD',
-        'GOLDEN_SHOVEL',
-        'GOLDEN_PICKAXE',
-        'GOLDEN_AXE',
-        'GOLDEN_HOE',
-        'DIAMOND_SWORD',
-        'DIAMOND_SHOVEL',
-        'DIAMOND_PICKAXE',
-        'DIAMOND_AXE',
-        'DIAMOND_HOE',
-        'NETHERITE_SWORD',
-        'NETHERITE_SHOVEL',
-        'NETHERITE_PICKAXE',
-        'NETHERITE_AXE',
-        'NETHERITE_HOE',
-        'TRIDENT'
-      )
-      @allowed_entity = array(
-        'MAGMA_CUBE': 0.75,
-        'SILVERFISH': 0.3,
-        'MULE': 1.6,
-        'HOGLIN': 1.4,
-        'HUSK': 1.95,
-        'VINDICATOR': 1.95,
-        'PILLAGER': 1.95,
-        'SHULKER_BULLET': 0.25,
-        'VILLAGER': 1.95,
-        'TURTLE': 0.4,
-        'TRADER_LLAMA': 1.87,
-        'CAVE_SPIDER': 0.5,
-        'SLIME': 0.75,
-        'DROWNED': 1.95,
-        'EVOKER': 1.95,
-        'ENDERMITE': 0.3,
-        'PLAYER': 1.8,
-        'SALMON': 0.4,
-        'ZOMBIE': 1.95,
-        'STRIDER': 1.7,
-        'PANDA': 1.25,
-        "OCELOT": 0.7,
-        'ENDERMAN': 2.9,
-        'ZOMBIE_VILLAGER': 1.95,
-        'LLAMA': 1.87,
-        'ENDER_DRAGON': 5,
-        'WITCH': 1.95,
-        'WITHER': 3.5,
-        'CREEPER': 1.7,
-        'ILLUSIONER': 1.95,
-        'COD': 0.5,
-        'ZOMBIE_HORSE': 1.4,
-        'RAVAGER': 2.2,
-        'SHULKER': 1,
-        'BEE': 0.6,
-        'PHANTOM': 0.5,
-        'BLAZE': 1.8,
-        'SKELETON_HORSE': 1.6,
-        'COW': 1.4,
-        'WANDERING_TRADER': 1.95,
-        'PIG': 0.9,
-        'ZOGLIN': 1.4,
-        'WOLF': 0.86,
-        'IRON_GOLEM': 2.7,
-        'SHEEP':1.3,
-        'VEX': 0.8,
-        'PIGLIN_BRUTE': 1.95,
-        'POLAR_BEAR': 1.4,
-        'SNOWMAN': 1.9,
-        'SQUID': 0.8,
-        'ELDER_GUARDIAN': 2,
-        'HORSE': 1.4,
-        'PARROT': 0.9,
-        'FOX': 0.6,
-        'STRAY': 1.99,
-        'CAT': 0.7,
-        'RABBIT': 0.5,
-        'DONKEY': 1.6,
-        'ENDER_CRYSTAL': 2,
-        'TROPICAL_FISH': 0.4,
-        'SPIDER': 0.9,
-        'SKELETON': 1.99,
-        'WITHER_SKELETON': 2.4,
-        'MUSHROOM_COW': 1.5,
-        'CHICKEN': 0.7,
-        'ZOMBIFIED_PIGLIN': 1.95,
-        'PUFFERFISH': 0.4,
-        'GUARDIAN': 0.85,
-        'PIGLIN': 1.95,
-        'GHAST': 4,
-        'BAT': 0.9,
-        'DOLPHIN': 0.6
-      )
-      @entity_type = entity_type(@euuid)
-      if(pattack_cooldown(@player) == 1 && array_contains(array_keys(@allowed_entity), @entity_type)) {
-        if(!is_null(@items['main_hand']) && array_contains(@weapons, @items['main_hand']['name'])) {
-          @attack_speed = entity_attribute_value(@puuid, 'GENERIC_ATTACK_SPEED')
-          @tick = integer(1/ @attack_speed * 20)
-          if(@tick < 20) {
-            set_timeout(0, closure( set_entity_immunity_ticks(@euuid, @tick) ))
+  @allowed_entity = array(
+    'MAGMA_CUBE': 0.75,
+    'SILVERFISH': 0.3,
+    'MULE': 1.6,
+    'HOGLIN': 1.4,
+    'HUSK': 1.95,
+    'VINDICATOR': 1.95,
+    'PILLAGER': 1.95,
+    'SHULKER_BULLET': 0.25,
+    'VILLAGER': 1.95,
+    'TURTLE': 0.4,
+    'TRADER_LLAMA': 1.87,
+    'CAVE_SPIDER': 0.5,
+    'SLIME': 0.75,
+    'DROWNED': 1.95,
+    'EVOKER': 1.95,
+    'ENDERMITE': 0.3,
+    'PLAYER': 1.8,
+    'SALMON': 0.4,
+    'ZOMBIE': 1.95,
+    'STRIDER': 1.7,
+    'PANDA': 1.25,
+    "OCELOT": 0.7,
+    'ENDERMAN': 2.9,
+    'ZOMBIE_VILLAGER': 1.95,
+    'LLAMA': 1.87,
+    'ENDER_DRAGON': 5,
+    'WITCH': 1.95,
+    'WITHER': 3.5,
+    'CREEPER': 1.7,
+    'ILLUSIONER': 1.95,
+    'COD': 0.5,
+    'ZOMBIE_HORSE': 1.4,
+    'RAVAGER': 2.2,
+    'SHULKER': 1,
+    'BEE': 0.6,
+    'PHANTOM': 0.5,
+    'BLAZE': 1.8,
+    'SKELETON_HORSE': 1.6,
+    'COW': 1.4,
+    'WANDERING_TRADER': 1.95,
+    'PIG': 0.9,
+    'ZOGLIN': 1.4,
+    'WOLF': 0.86,
+    'IRON_GOLEM': 2.7,
+    'SHEEP':1.3,
+    'VEX': 0.8,
+    'PIGLIN_BRUTE': 1.95,
+    'POLAR_BEAR': 1.4,
+    'SNOWMAN': 1.9,
+    'SQUID': 0.8,
+    'ELDER_GUARDIAN': 2,
+    'HORSE': 1.4,
+    'PARROT': 0.9,
+    'FOX': 0.6,
+    'STRAY': 1.99,
+    'CAT': 0.7,
+    'RABBIT': 0.5,
+    'DONKEY': 1.6,
+    'ENDER_CRYSTAL': 2,
+    'TROPICAL_FISH': 0.4,
+    'SPIDER': 0.9,
+    'SKELETON': 1.99,
+    'WITHER_SKELETON': 2.4,
+    'MUSHROOM_COW': 1.5,
+    'CHICKEN': 0.7,
+    'ZOMBIFIED_PIGLIN': 1.95,
+    'PUFFERFISH': 0.4,
+    'GUARDIAN': 0.85,
+    'PIGLIN': 1.95,
+    'GHAST': 4,
+    'BAT': 0.9,
+    'DOLPHIN': 0.6
+  )
+  if(array_index_exists(@event, 'damager')) {
+    if(array_index_exists(@event, 'shooter') && is_string(@event['shooter']) && ponline(@event['shooter'])) { //플레이어가 투사체 발사 한 경우
+      @player = @event['shooter']
+      @puuid = puuid(@player)
+      if(array_index_exists(@players_data, @puuid)) {
+        @euuid = @event['id']
+        @entity_type = entity_type(@euuid)
+        @projectile = @event['damager']
+        switch(entity_type(@projectile)) {
+        case 'ARROW':
+        case 'SPECTRAL_ARROW':
+          @xp = @event['amount'] * @allowed_entity[@entity_type]
+          @default_xp = integer(@xp)
+          @extra_xp = @xp - @default_xp
+          switch(get_mob_name(@projectile)) {
+          case 'BOW':
+            @skill = 'bow_mastery'
+            @skill_data = @players_data[@puuid]['skill_data']['subcombat'][@skill]
+            _add_epxerience(@puuid, @skill, @skill_data, @default_xp, @extra_xp)
+            break()
+          case 'CROSSBOW':
+            @skill = 'crossbow_mastery'
+            @skill_data = @players_data[@puuid]['skill_data']['combat_method'][@skill]
+            _add_epxerience(@puuid, @skill, @skill_data, @default_xp, @extra_xp)
+            break()
           }
+          break()
         }
-        @time = time()
-        @weapon_chance_multiply = (@time - @players_data[@puuid]['cache']['last_weapon_effect']) / 5000
-        if(@weapon_chance_multiply > 1) {
-          @weapon_chance_multiply = 1
-        }
-        @armor_chance_multiply = (@time - @players_data[@puuid]['cache']['last_armor_effect']) / 5000
-        if(@armor_chance_multiply > 1) {
-          @armor_chance_multiply = 1
-        }
-        switch(@items['enchantments']['main_hand']) {
-        case '전격':
-          if(rand() < 0.1 * @weapon_chance_multiply) {
-            @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-            @entity_location = entity_loc(@euuid)
-            if((get_highest_block_at(@entity_location)['y'] <= @entity_location['y'] + 2 && (has_thunder(@entity_location['world']) || has_storm(@entity_location['world']))) || get_block(@entity_location) == 'WATER') {
-              @range = 10
-            } else {
+      }
+    }
+    if(ponline(@event['damager'])) { //플레이어가 때리는 경우
+      @player = @event['damager']
+      @puuid = puuid(@player)
+      if(array_index_exists(@players_data, @puuid)) {
+        @euuid = @event['id']
+        @entity_type = entity_type(@euuid)
+        @items = @players_data[@puuid]['item']
+        @weapons = array(
+          'WOODEN_SWORD',
+          'WOODEN_SHOVEL',
+          'WOODEN_PICKAXE',
+          'WOODEN_AXE',
+          'WOODEN_HOE',
+          'STONE_SWORD',
+          'STONE_SHOVEL',
+          'STONE_PICKAXE',
+          'STONE_AXE',
+          'STONE_HOE',
+          'IRON_SWORD',
+          'IRON_SHOVEL',
+          'IRON_PICKAXE',
+          'IRON_AXE',
+          'IRON_HOE',
+          'GOLDEN_SWORD',
+          'GOLDEN_SHOVEL',
+          'GOLDEN_PICKAXE',
+          'GOLDEN_AXE',
+          'GOLDEN_HOE',
+          'DIAMOND_SWORD',
+          'DIAMOND_SHOVEL',
+          'DIAMOND_PICKAXE',
+          'DIAMOND_AXE',
+          'DIAMOND_HOE',
+          'NETHERITE_SWORD',
+          'NETHERITE_SHOVEL',
+          'NETHERITE_PICKAXE',
+          'NETHERITE_AXE',
+          'NETHERITE_HOE',
+          'TRIDENT'
+        )
+        if(pattack_cooldown(@player) == 1 && array_contains(array_keys(@allowed_entity), @entity_type)) {
+          @skill = @players_data[@puuid]['skill_manager'][2]
+          @event_damage = @event['amount']
+          @attribute_damage = entity_attribute_value(@puuid, 'GENERIC_ATTACK_DAMAGE')
+          if(@skill == 'cleaving') {
+            @cleaving_level = @players_data[@puuid]['skill_data']['combat_method']['cleaving'][0]
+            @multiply = @skills_spec['combat_method']['cleaving']['levels'][@cleaving_level]['passive']['crit_multiply']
+            @modified_damage = @attribute_damage * @multiply
+            if(round(@event_damage, 5) == round(@attribute_damage * 1.5, 5)) {
+              modify_event('amount', @modified_damage)
+              @event['amount'] = @modified_damage
+            } else if(@players_data[@puuid]['active_skill']['combat_method']['cleaving'][1] > 0) {
+              modify_event('amount', @modified_damage)
+              @event['amount'] = @modified_damage
+            }
+          }
+          @xp = @event_damage * @allowed_entity[@entity_type]
+          @default_xp = integer(@xp)
+          @extra_xp = @xp - @default_xp
+          if(round(@event_damage, 5) == round(@attribute_damage * 1.5, 5)) {
+            @skill = 'sweeping'
+            @skill_data = @players_data[@puuid]['skill_data']['combat_method'][@skill]
+            _add_epxerience(@puuid, @skill, @skill_data, @default_xp, @extra_xp)
+          } else if(psprinting(@player)) {
+            @skill = 'knockback'
+            @skill_data = @players_data[@puuid]['skill_data']['combat_method'][@skill]
+            _add_epxerience(@puuid, @skill, @skill_data, @default_xp, @extra_xp)
+          } else {
+            @skill = 'cleaving'
+            @skill_data = @players_data[@puuid]['skill_data']['combat_method'][@skill]
+            _add_epxerience(@puuid, @skill, @skill_data, @default_xp, @extra_xp)
+          }
+          if(!is_null(@items['main_hand']) && array_contains(@weapons, @items['main_hand']['name'])) {
+            @attack_speed = entity_attribute_value(@puuid, 'GENERIC_ATTACK_SPEED')
+            @tick = integer(1/ @attack_speed * 20)
+            if(@tick < 20) {
+              set_timeout(0, closure( set_entity_immunity_ticks(@euuid, @tick) ))
+            }
+          }
+          @time = time()
+          @weapon_chance_multiply = (@time - @players_data[@puuid]['cache']['last_weapon_effect']) / 5000
+          if(@weapon_chance_multiply > 1) {
+            @weapon_chance_multiply = 1
+          }
+          @armor_chance_multiply = (@time - @players_data[@puuid]['cache']['last_armor_effect']) / 5000
+          if(@armor_chance_multiply > 1) {
+            @armor_chance_multiply = 1
+          }
+          switch(@items['enchantments']['main_hand']) {
+          case '전격':
+            if(rand() < 0.1 * @weapon_chance_multiply) {
+              @players_data[@puuid]['cache']['last_weapon_effect'] = @time
+              @entity_location = entity_loc(@euuid)
+              if((get_highest_block_at(@entity_location)['y'] <= @entity_location['y'] + 2 && (has_thunder(@entity_location['world']) || has_storm(@entity_location['world']))) || get_block(@entity_location) == 'WATER') {
+                @range = 10
+              } else {
+                @range = 5
+              }
+              @entity_location['x'] += rand() / 2 - 0.25
+              @entity_location['y'] += 1 + rand() * @allowed_entity[@entity_type] * 0.5 - @allowed_entity[@entity_type] * 0.25
+              @entity_location['z'] += rand() / 2 - 0.25
+              mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @entity_location['x'], @entity_location['y'], @entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
+              @near_entities = entities_in_radius(@entity_location, @range)
+              #
+              #
+              #array_remove_values(@near_entities, @puuid)
+              array_remove_values(@near_entities, @euuid)
+              foreach(@near_entity in @near_entities) {
+                @near_entity_type = entity_type(@near_entity)
+                if(array_contains(array_keys(@allowed_entity), @near_entity_type)) {
+                  @near_entity_location = entity_loc(@near_entity)
+                  @near_entity_location['x'] += rand() / 2 - 0.25
+                  @near_entity_location['y'] += 1 + rand() * @allowed_entity[@near_entity_type] * 0.5 - @allowed_entity[@near_entity_type] * 0.25
+                  @near_entity_location['z'] += rand() / 2 - 0.25
+                  mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @near_entity_location['x'], @near_entity_location['y'], @near_entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
+                  @distance = distance(@entity_location,  @near_entity_location)
+                  for(@i = 0, @i < distance(@entity_location,  @near_entity_location), @i += 0.25 + rand() * 0.25) {
+                    @pos = location_shift(@entity_location,  @near_entity_location, @i)
+                    mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @pos['x'], @pos['y'], @pos['z'], 1, 0.0, 0.0, 0.0, 0.0)
+                  }
+                  damage_entity(@near_entity, 2)
+                }
+              }
+            }
+            break()
+          case '천둥':
+            if(rand() < 0.25 * @weapon_chance_multiply) {
+              @players_data[@puuid]['cache']['last_weapon_effect'] = @time
+              @entity_location = entity_loc(@euuid)
               @range = 5
-            }
-            @entity_location['x'] += rand() / 2 - 0.25
-            @entity_location['y'] += 1 + rand() * @allowed_entity[@entity_type] * 0.5 - @allowed_entity[@entity_type] * 0.25
-            @entity_location['z'] += rand() / 2 - 0.25
-            mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @entity_location['x'], @entity_location['y'], @entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
-            @near_entities = entities_in_radius(@entity_location, @range)
-            #
-            #
-            #array_remove_values(@near_entities, @puuid)
-            array_remove_values(@near_entities, @euuid)
-            foreach(@near_entity in @near_entities) {
-              @near_entity_type = entity_type(@near_entity)
-              if(array_contains(array_keys(@allowed_entity), @near_entity_type)) {
-                @near_entity_location = entity_loc(@near_entity)
-                @near_entity_location['x'] += rand() / 2 - 0.25
-                @near_entity_location['y'] += 1 + rand() * @allowed_entity[@near_entity_type] * 0.5 - @allowed_entity[@near_entity_type] * 0.25
-                @near_entity_location['z'] += rand() / 2 - 0.25
-                mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @near_entity_location['x'], @near_entity_location['y'], @near_entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
-                @distance = distance(@entity_location,  @near_entity_location)
-                for(@i = 0, @i < distance(@entity_location,  @near_entity_location), @i += 0.25 + rand() * 0.25) {
-                  @pos = location_shift(@entity_location,  @near_entity_location, @i)
-                  mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @pos['x'], @pos['y'], @pos['z'], 1, 0.0, 0.0, 0.0, 0.0)
-                }
-                damage_entity(@near_entity, 2)
-              }
-            }
-          }
-          break()
-        case '천둥':
-          if(rand() < 0.25 * @weapon_chance_multiply) {
-            @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-            @entity_location = entity_loc(@euuid)
-            @range = 5
-            @has_storm = false
-            if(get_block(@entity_location) == 'WATER') {
-              @range = 10
-            }
-            if(get_highest_block_at(@entity_location)['y'] <= @entity_location['y'] + 2) {
-              if(has_thunder(@entity_location['world'])) {
+              @has_storm = false
+              if(get_block(@entity_location) == 'WATER') {
                 @range = 10
-              } else if(has_storm(@entity_location['world'])) {
-                @range = 10
-                @has_storm = true
               }
-            }
-            if(@has_storm) {
-              lightning(@entity_location)
-            }
-            @entity_location['x'] += rand() / 2 - 0.25
-            @entity_location['y'] += 1 + rand() * @allowed_entity[@entity_type] * 0.5 - @allowed_entity[@entity_type] * 0.25
-            @entity_location['z'] += rand() / 2 - 0.25
-            mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @entity_location['x'], @entity_location['y'], @entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
-            @near_entities = entities_in_radius(@entity_location, @range)
-            #array_remove_values(@near_entities, @puuid)
-            array_remove_values(@near_entities, @euuid)
-            foreach(@near_entity in @near_entities) {
-              @near_entity_type = entity_type(@near_entity)
-              if(array_contains(array_keys(@allowed_entity), @near_entity_type)) {
-                @near_entity_location = entity_loc(@near_entity)
-                @near_entity_location['x'] += rand() / 2 - 0.25
-                @near_entity_location['y'] += 1 + rand() * @allowed_entity[@near_entity_type] * 0.5 - @allowed_entity[@near_entity_type] * 0.25
-                @near_entity_location['z'] += rand() / 2 - 0.25
-                mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @near_entity_location['x'], @near_entity_location['y'], @near_entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
-                @distance = distance(@entity_location,  @near_entity_location)
-                for(@i = 0, @i < distance(@entity_location,  @near_entity_location), @i += 0.25 + rand() * 0.25) {
-                  @pos = location_shift(@entity_location,  @near_entity_location, @i)
-                  mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @pos['x'], @pos['y'], @pos['z'], 1, 0.0, 0.0, 0.0, 0.0)
+              if(get_highest_block_at(@entity_location)['y'] <= @entity_location['y'] + 2) {
+                if(has_thunder(@entity_location['world'])) {
+                  @range = 10
+                } else if(has_storm(@entity_location['world'])) {
+                  @range = 10
+                  @has_storm = true
                 }
-                damage_entity(@near_entity, 2)
+              }
+              if(@has_storm) {
+                lightning(@entity_location)
+              }
+              @entity_location['x'] += rand() / 2 - 0.25
+              @entity_location['y'] += 1 + rand() * @allowed_entity[@entity_type] * 0.5 - @allowed_entity[@entity_type] * 0.25
+              @entity_location['z'] += rand() / 2 - 0.25
+              mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @entity_location['x'], @entity_location['y'], @entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
+              @near_entities = entities_in_radius(@entity_location, @range)
+              #array_remove_values(@near_entities, @puuid)
+              array_remove_values(@near_entities, @euuid)
+              foreach(@near_entity in @near_entities) {
+                @near_entity_type = entity_type(@near_entity)
+                if(array_contains(array_keys(@allowed_entity), @near_entity_type)) {
+                  @near_entity_location = entity_loc(@near_entity)
+                  @near_entity_location['x'] += rand() / 2 - 0.25
+                  @near_entity_location['y'] += 1 + rand() * @allowed_entity[@near_entity_type] * 0.5 - @allowed_entity[@near_entity_type] * 0.25
+                  @near_entity_location['z'] += rand() / 2 - 0.25
+                  mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @near_entity_location['x'], @near_entity_location['y'], @near_entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
+                  @distance = distance(@entity_location,  @near_entity_location)
+                  for(@i = 0, @i < distance(@entity_location,  @near_entity_location), @i += 0.25 + rand() * 0.25) {
+                    @pos = location_shift(@entity_location,  @near_entity_location, @i)
+                    mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @pos['x'], @pos['y'], @pos['z'], 1, 0.0, 0.0, 0.0, 0.0)
+                  }
+                  damage_entity(@near_entity, 2)
+                }
               }
             }
-          }
-          break()
-        case '화염':
-          if(rand() < 0.1 * @weapon_chance_multiply) {
-            @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-            set_entity_onfire(@euuid, entity_onfire(@euuid) + 5)
-          }
-          break()
-        case '유황불':
-          broadcast(@weapon_chance_multiply)
-          if(rand() < 0.25 * @weapon_chance_multiply) {
-            @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-            if(entity_onfire(@euuid) > 0) {
-              set_mob_effect(@euuid, 'WEAKNESS', 0, 3, false, true)
+            break()
+          case '화염':
+            if(rand() < 0.1 * @weapon_chance_multiply) {
+              @players_data[@puuid]['cache']['last_weapon_effect'] = @time
+              set_entity_onfire(@euuid, entity_onfire(@euuid) + 5)
             }
-            set_entity_onfire(@euuid, entity_onfire(@euuid) + 5)
+            break()
+          case '유황불':
+            broadcast(@weapon_chance_multiply)
+            if(rand() < 0.25 * @weapon_chance_multiply) {
+              @players_data[@puuid]['cache']['last_weapon_effect'] = @time
+              if(entity_onfire(@euuid) > 0) {
+                set_mob_effect(@euuid, 'WEAKNESS', 0, 3, false, true)
+              }
+              set_entity_onfire(@euuid, entity_onfire(@euuid) + 5)
+            }
+            break()
+          case '냉기':
+            if(rand() < 0.1 * @weapon_chance_multiply) {
+              @players_data[@puuid]['cache']['last_weapon_effect'] = @time
+              set_mob_effect(@euuid, 'SLOWNESS', 1, 10, false, true)
+            }
+            #0.25 필드 효과 반감
+            break()
+          case '빙결':
+            if(rand() < 0.25 * @weapon_chance_multiply) {
+              @players_data[@puuid]['cache']['last_weapon_effect'] = @time
+              set_mob_effect(@euuid, 'SLOWNESS', 1, 10, false, true)
+            }
+            if(rand() < 0.025 * @weapon_chance_multiply) {
+              @players_data[@puuid]['cache']['last_weapon_effect'] = @time
+              set_mob_effect(@euuid, 'SLOWNESS', 5, 4, false, true)
+            }
+            #1.0 필드 효과 반감
+            break()
+          case '신성':
+            @undead_entities = array(
+              'DROWNED',
+              'HUSK',
+              'PHANTOM',
+              'SKELETON',
+              'SKELETON_HORSE',
+              'STRAY',
+              'WITHER',
+              'WITHER_SKELETON',
+              'ZOGLIN',
+              'ZOMBIE',
+              'ZOMBIE_HORSE',
+              'ZOMBIE_VILLAGER',
+              'ZOMBIFIED_PIGLIN'
+            )
+            if(array_contains(@undead_entities, entity_type(@euuid)) && rand() < 0.1 * @weapon_chance_multiply) {
+              @players_data[@puuid]['cache']['last_weapon_effect'] = @time
+              set_mob_effect(@euuid, 'INSTANT_HEALTH', 1, 0.1, false, true)
+            }
+            break()
+          case '퇴마':
+            @undead_entities = array(
+              'DROWNED',
+              'HUSK',
+              'PHANTOM',
+              'SKELETON',
+              'SKELETON_HORSE',
+              'STRAY',
+              'WITHER',
+              'WITHER_SKELETON',
+              'ZOGLIN',
+              'ZOMBIE',
+              'ZOMBIE_HORSE',
+              'ZOMBIE_VILLAGER',
+              'ZOMBIFIED_PIGLIN'
+            )
+            if(array_contains(@undead_entities, entity_type(@euuid)) && rand() < 0.25 * @weapon_chance_multiply) {
+              @players_data[@puuid]['cache']['last_weapon_effect'] = @time
+              set_mob_effect(@euuid, 'INSTANT_HEALTH', 2, 0.1, false, true)
+            }
+            break()
+          case '독성':
+            if(rand() < 0.1 * @weapon_chance_multiply) {
+              @players_data[@puuid]['cache']['last_weapon_effect'] = @time
+              set_mob_effect(@euuid, 'POISON', 0, 5, false, true)
+            }
+            break()
+          case '맹독':
+            if(rand() < 0.1 * @weapon_chance_multiply) {
+              @players_data[@puuid]['cache']['last_weapon_effect'] = @time
+              set_mob_effect(@euuid, 'POISON', 4, 5, false, true)
+            }
+            break()
+          default:
+            break()
           }
-          break()
-        case '냉기':
-          if(rand() < 0.1 * @weapon_chance_multiply) {
-            @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-            set_mob_effect(@euuid, 'SLOWNESS', 1, 10, false, true)
-          }
-          #0.25 필드 효과 반감
-          break()
-        case '빙결':
-          if(rand() < 0.25 * @weapon_chance_multiply) {
-            @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-            set_mob_effect(@euuid, 'SLOWNESS', 1, 10, false, true)
-          }
-          if(rand() < 0.025 * @weapon_chance_multiply) {
-            @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-            set_mob_effect(@euuid, 'SLOWNESS', 5, 4, false, true)
-          }
-          #1.0 필드 효과 반감
-          break()
-        case '신성':
-          @undead_entities = array(
-            'DROWNED',
-            'HUSK',
-            'PHANTOM',
-            'SKELETON',
-            'SKELETON_HORSE',
-            'STRAY',
-            'WITHER',
-            'WITHER_SKELETON',
-            'ZOGLIN',
-            'ZOMBIE',
-            'ZOMBIE_HORSE',
-            'ZOMBIE_VILLAGER',
-            'ZOMBIFIED_PIGLIN'
-          )
-          if(array_contains(@undead_entities, entity_type(@euuid)) && rand() < 0.1 * @weapon_chance_multiply) {
-            @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-            set_mob_effect(@euuid, 'INSTANT_HEALTH', 1, 0.1, false, true)
-          }
-          break()
-        case '퇴마':
-          @undead_entities = array(
-            'DROWNED',
-            'HUSK',
-            'PHANTOM',
-            'SKELETON',
-            'SKELETON_HORSE',
-            'STRAY',
-            'WITHER',
-            'WITHER_SKELETON',
-            'ZOGLIN',
-            'ZOMBIE',
-            'ZOMBIE_HORSE',
-            'ZOMBIE_VILLAGER',
-            'ZOMBIFIED_PIGLIN'
-          )
-          if(array_contains(@undead_entities, entity_type(@euuid)) && rand() < 0.25 * @weapon_chance_multiply) {
-            @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-            set_mob_effect(@euuid, 'INSTANT_HEALTH', 2, 0.1, false, true)
-          }
-          break()
-        case '독성':
-          if(rand() < 0.1 * @weapon_chance_multiply) {
-            @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-            set_mob_effect(@euuid, 'POISON', 0, 5, false, true)
-          }
-          break()
-        case '맹독':
-          if(rand() < 0.1 * @weapon_chance_multiply) {
-            @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-            set_mob_effect(@euuid, 'POISON', 4, 5, false, true)
-          }
-          break()
-        default:
-          break()
-        }
-        switch(@items['enchantments']['armor']) {
-        case '복원':
-          if(rand() < 0.1 * @armor_chance_multiply) {
-            @players_data[@puuid]['cache']['last_armor_effect'] = @time
-            if(!is_null(@items['main_hand']) && !is_null(@items['main_hand']['meta']) && @items['main_hand']['meta']['damage'] > 0) {
-              if(@items['armor']['meta']['damage'] > 0) {
-                if(rand() < 0.5) {
-                  @items['main_hand']['meta']['damage'] -= 1
-                  set_inventory_item(@puuid, pheld_slot(@player), @items['main_hand'])
-                  _update_item(@player, @puuid, array('main_hand': @items['main_hand']), @players_data, @skills_spec, @text)
+          switch(@items['enchantments']['armor']) {
+          case '복원':
+            if(rand() < 0.1 * @armor_chance_multiply) {
+              @players_data[@puuid]['cache']['last_armor_effect'] = @time
+              if(!is_null(@items['main_hand']) && !is_null(@items['main_hand']['meta']) && @items['main_hand']['meta']['damage'] > 0) {
+                if(@items['armor']['meta']['damage'] > 0) {
+                  if(rand() < 0.5) {
+                    @items['main_hand']['meta']['damage'] -= 1
+                    set_inventory_item(@puuid, pheld_slot(@player), @items['main_hand'])
+                    _update_item(@player, @puuid, array('main_hand': @items['main_hand']), @players_data, @skills_spec, @text)
+                  } else {
+                    @items['armor']['meta']['damage'] -= 1
+                    _update_item(@player, @puuid, array('armor': @items['armor']), @players_data, @skills_spec, @text)
+                    set_inventory_item(@puuid, 36, @items['armor'])
+                  }
                 } else {
+                  @items['main_hand']['meta']['damage'] -= 1
+                  _update_item(@player, @puuid, array('main_hand': @items['main_hand']), @players_data, @skills_spec, @text)
+                  set_inventory_item(@puuid, pheld_slot(@player), @items['main_hand'])
+                }
+              } else {
+                if(@items['armor']['meta']['damage'] > 0) {
                   @items['armor']['meta']['damage'] -= 1
                   _update_item(@player, @puuid, array('armor': @items['armor']), @players_data, @skills_spec, @text)
                   set_inventory_item(@puuid, 36, @items['armor'])
                 }
-              } else {
-                @items['main_hand']['meta']['damage'] -= 1
-                _update_item(@player, @puuid, array('main_hand': @items['main_hand']), @players_data, @skills_spec, @text)
-                set_inventory_item(@puuid, pheld_slot(@player), @items['main_hand'])
-              }
-            } else {
-              if(@items['armor']['meta']['damage'] > 0) {
-                @items['armor']['meta']['damage'] -= 1
-                _update_item(@player, @puuid, array('armor': @items['armor']), @players_data, @skills_spec, @text)
-                set_inventory_item(@puuid, 36, @items['armor'])
               }
             }
+            break()
+          case '친수성':
+            if(rand() < 0.1 * @armor_chance_multiply) {
+              @players_data[@puuid]['cache']['last_armor_effect'] = @time
+              set_mob_effect(@puuid, 'WATER_BREATHING', 0, 5, false, true)
+            }
+            break()
+          case '포화':
+            if(rand() < 0.1 * @armor_chance_multiply) {
+              @players_data[@puuid]['cache']['last_armor_effect'] = @time
+              set_mob_effect(@puuid, 'SATURATION', 0, 0.05, false, true)
+            }
+            break()
+          case '재생':
+            if(rand() < 0.1 * @armor_chance_multiply) {
+              @players_data[@puuid]['cache']['last_armor_effect'] = @time
+              set_mob_effect(@puuid, 'REGENERATION', 2, 1, false, true)
+            }
+            break()
+          case '저항':
+            if(rand() < 0.1 * @armor_chance_multiply) {
+              @players_data[@puuid]['cache']['last_armor_effect'] = @time
+              set_mob_effect(@puuid, 'RESISTANCE', 2, 5, false, true)
+            }
+            break()
+          case '힘':
+            if(rand() < 0.1 * @armor_chance_multiply) {
+              @players_data[@puuid]['cache']['last_armor_effect'] = @time
+              set_mob_effect(@puuid, 'STRENGTH', 1, 5, false, true)
+            }
+            break()
+          default:
+            break()
           }
-          break()
-        case '친수성':
-          if(rand() < 0.1 * @armor_chance_multiply) {
-            @players_data[@puuid]['cache']['last_armor_effect'] = @time
-            set_mob_effect(@puuid, 'WATER_BREATHING', 0, 5, false, true)
-          }
-          break()
-        case '포화':
-          if(rand() < 0.1 * @armor_chance_multiply) {
-            @players_data[@puuid]['cache']['last_armor_effect'] = @time
-            set_mob_effect(@puuid, 'SATURATION', 0, 0.05, false, true)
-          }
-          break()
-        case '재생':
-          if(rand() < 0.1 * @armor_chance_multiply) {
-            @players_data[@puuid]['cache']['last_armor_effect'] = @time
-            set_mob_effect(@puuid, 'REGENERATION', 2, 1, false, true)
-          }
-          break()
-        case '저항':
-          if(rand() < 0.1 * @armor_chance_multiply) {
-            @players_data[@puuid]['cache']['last_armor_effect'] = @time
-            set_mob_effect(@puuid, 'RESISTANCE', 2, 5, false, true)
-          }
-          break()
-        case '힘':
-          if(rand() < 0.1 * @armor_chance_multiply) {
-            @players_data[@puuid]['cache']['last_armor_effect'] = @time
-            set_mob_effect(@puuid, 'STRENGTH', 1, 5, false, true)
-          }
-          break()
-        default:
-          break()
         }
       }
     }
@@ -1888,29 +1988,26 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text) {
             set_timeout(1, closure() {set_inventory_item(@puuid, @shield_slot, @damaged_item)})
           }
         })
-
-        #@mastry_type = 'shield'
-        #@masteries = import(@player.'.masteries')
-        #@skill_level = integer(@masteries[@mastry_type] / 500)
-        #if(@skill_level > 3) {
-        #  @skill_level = 3
-        #}
-        @skill_level = 1
-        
-        set_pcooldown(@player, 'SHIELD', integer(@event['amount'] * (5 - @skill_level)))
-        #set_timeout(0, closure() {
-          #play_entity_effect(puuid(@player), 'SHIELD_BLOCK')#SHIELD_BLOCK
-          #set_pcooldown(@player, 'SHIELD', integer(@event['amount'] * (5 - @skill_level)))
-        #})
-        #@defense_damage = @event['amount']
-        #@adding_mastry_xp = @defense_damage / 20
-        #if(@skill_level < 3) {
-        #  if(@adding_mastry_xp > 0) {
-        #    _add_mastry(@player, @mastry_type, @adding_mastry_xp)
-        #  }
-        #}
+        @skill_data = @players_data[@puuid]['skill_data']['combat_method']['blocking']
+        @level = @skill_data[0]
+        set_pcooldown(@player, 'SHIELD', integer(@event['amount'] * (5 - @level)))
+        @default_xp = integer(@event['amount'])
+        @extra_xp = @event['amount'] - @default_xp
+        _add_epxerience(@puuid, @skill, @skill_data, @default_xp, @extra_xp)
       }
     }
+  }
+}
+
+bind('entity_regain_health', null, null, @event, @players_data) {
+  if(entity_type(@event['id']) == 'PLAYER') {
+    @player = @event['player']
+    @uuid = @event['id']
+    @skill = 'health_traing'
+    @skill_data = @players_data[@uuid]['skill_data']['subcombat'][@skill]
+    @default_xp = integer(@event['amount'])
+    @extra_xp = @event['amount'] - @default_xp
+    _add_epxerience(@uuid, @skill, @skill_data, @default_xp, @extra_xp)
   }
 }
 
@@ -1929,4 +2026,18 @@ bind('entity_death', null, null, @event, @players_data) {
       modify_event('xp', @event['xp'] * 2)
     }
   }
+}
+
+bind('creature_spawn', null, null, @event) {
+  #broadcast(@event)
+  @uuid = @event['id']
+  set_equipment_droprates(@uuid, array(
+    'HELMET': 0,
+    'CHESTPLATE': 0,
+    'LEGGINGS': 0,
+    'BOOTS': 0,
+    'WEAPON': 0,
+    'OFF_HAND': 0
+  ))
+  #broadcast(entity_type(@uuid) get_equipment_droprates(@uuid))
 }
