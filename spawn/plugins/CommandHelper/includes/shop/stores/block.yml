@@ -1,0 +1,49 @@
+PRODUCTS:
+  0:
+    name: OAK_LOG
+    meta:
+      price:
+        sell: 0.25
+      detail: NONE
+  1:
+    name: SPRUCE_LOG
+    meta:
+      price:
+        sell: 0.25
+      detail: NONE
+  2:
+    name: BIRCH_LOG
+    meta:
+      price:
+        sell: 0.25
+      detail: NONE
+  3:
+    name: JUNGLE_LOG
+    meta:
+      price:
+        sell: 0.25
+      detail: NONE
+  4:
+    name: ACACIA_LOG
+    meta:
+      price:
+        sell: 0.25
+      detail: NONE
+  5:
+    name: DARK_OAK_LOG
+    meta:
+      price:
+        sell: 0.0625
+      detail: NONE
+  6:
+    name: CRIMSON_STEM
+    meta:
+      price:
+        sell: 0.28125
+      detail: NONE
+  7:
+    name: WARPED_STEM
+    meta:
+      price:
+        sell: 0.28125
+      detail: NONE

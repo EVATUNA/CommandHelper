@@ -1,0 +1,211 @@
+PRODUCTS: ## 판매 아이템 목록
+  0:
+    name: COAL
+    meta:
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: NONE
+  1:
+    name: LAPIS_LAZULI
+    meta:
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: NONE
+  2:
+    name: EMERALD
+    meta:
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: NONE
+  3:
+    name: QUARTZ
+    meta:
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: NONE
+  4:
+    name: REDSTONE
+    meta:
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: NONE
+  9:
+    name: GOLD_NUGGET
+    meta:
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  10:
+    name: GOLD_NUGGET
+    meta:
+      display: "§e중급 구리 주괴"
+      model: 1
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  11:
+    name: GOLD_NUGGET
+    meta:
+      display: "§b상급 구리 주괴"
+      model: 2
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  12:
+    name: GOLD_NUGGET
+    meta:
+      display: "§d최상급 구리 주괴"
+      model: 3
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  18:
+    name: IRON_INGOT
+    meta:
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  19:
+    name: IRON_INGOT
+    meta:
+      display: "§e중급 철괴"
+      model: 1
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  20:
+    name: IRON_INGOT
+    meta:
+      display: "§b상급 철괴"
+      model: 2
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  21:
+    name: IRON_INGOT
+    meta:
+      display: "§d최상급 철괴"
+      model: 3
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  27:
+    name: GOLD_INGOT
+    meta:
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  28:
+    name: GOLD_INGOT
+    meta:
+      display: "§e중급 금괴"
+      model: 1
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  29:
+    name: GOLD_INGOT
+    meta:
+      display: "§b상급 금괴"
+      model: 2
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  30:
+    name: GOLD_INGOT
+    meta:
+      display: "§d최상급 금괴"
+      model: 3
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  36:
+    name: DIAMOND
+    meta:
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  37:
+    name: DIAMOND
+    meta:
+      display: "§e중급 다이아몬드"
+      model: 1
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  38:
+    name: DIAMOND
+    meta:
+      display: "§b상급 다이아몬드"
+      model: 2
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  39:
+    name: DIAMOND
+    meta:
+      display: "§d최상급 다이아몬드"
+      model: 3
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  45:
+    name: NETHERITE_INGOT
+    meta:
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  46:
+    name: NETHERITE_INGOT
+    meta:
+      display: "§e중급 네더라이트 주괴"
+      model: 1
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  47:
+    name: NETHERITE_INGOT
+    meta:
+      display: "§b상급 네더라이트 주괴"
+      model: 2
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  48:
+    name: NETHERITE_INGOT
+    meta:
+      display: "§d최상급 네더라이트 주괴"
+      model: 3
+      price:
+        buy: 1.0
+        sell: 1.0
+      detail: DISPLAY
+  53:
+    name: END_PORTAL_FRAME
+    meta:
+      opengui: "test"
+      display: "§bTEST로 이동"

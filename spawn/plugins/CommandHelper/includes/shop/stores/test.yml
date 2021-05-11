@@ -1,0 +1,6 @@
+PRODUCTS: ## 판매 아이템 목록
+  53: ## 슬롯
+    name: END_PORTAL_FRAME ## 아이템의 TYPE
+    meta:
+      opengui: "main"
+      display: "§bMAIN로 이동"

@@ -10,9 +10,9 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
     'tips': array()
   )
   @players_data[@uuid]['setting'] = cup_get('SETTING', @uuid)
-  #if(is_null(@players_data[@uuid]['setting'])) {
+  if(is_null(@players_data[@uuid]['setting'])) {
     _new_data(@uuid, @players_data)
-  #}
+  }
   _load_skills(@uuid, @players_data, @skills_spec)
   @bossbars = get_bars()
   @indicator_id = 'indicator.'.@uuid
@@ -136,6 +136,8 @@ proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @bots, @
         array_remove(@reconnectable_players, @uuid)
       #})
     }
+  } else {
+    set_pmode(@player, 'SPECTATOR')
   }
 }
 
@@ -203,6 +205,7 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
 }
 
 @interval_task = set_interval(1000, closure() {
+  #broadcast(@players_data)
   _countdown_reconnectable_players(@reconnectable_players)
   foreach(@uuid: @player_data in @players_data) {
     @player = player(@uuid)
@@ -325,6 +328,26 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
 
     #apply enchantment effects
     _apply_passive_armor_enchantment(@player, @player_data)
+
+    #apply nether field effects
+    if(@server['name'] == 'nether') {
+      if(array_contains(array('SURVIVAL', 'ADVENTURE'), pmode(@player)) && !array_index_exists(get_peffect(@player), 'fire_resistance') && entity_onfire(@uuid) < 20) {
+        switch(@player_data['item']['enchantments']['armor']) {
+        case '반엔트로피':
+          break()
+        case '원소 보호':
+          if(rand() < 0.2) {
+            set_entity_onfire(@uuid, entity_onfire(@uuid) + 3)
+          }
+          break()
+        default:
+          if(rand() < 0.3) {
+            set_entity_onfire(@uuid, entity_onfire(@uuid) + 4)
+          }
+          break()
+        }
+      }
+    }
   }
 })
 
@@ -397,7 +420,7 @@ bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @r
   }
 }
 
-bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spec, @crops_spec, @skills_spec, @text) {
+bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spec, @crops_spec, @skills_spec, @text, @server) {
   @player = @event['player']
   @uuid = puuid(@player)
   if(!is_cancelled() && pmode(@player) == 'SURVIVAL') {
@@ -423,6 +446,83 @@ bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spe
         @skill = 'tough_shoulder'
         @skill_data = @players_data[@uuid]['skill_data']['mining'][@skill]
         _add_epxerience(@uuid, @skill, @skill_data, @default_xp, @extra_xp)
+      }
+
+      if(@server['name'] == 'nether') {
+        if(array_contains(array('SURVIVAL', 'ADVENTURE'), pmode(@player))) {
+          @location = array('x': @event['location']['x'], 'y': @event['location']['y'], 'z': @event['location']['z'], 'world': @event['location']['world'])
+          switch(@players_data[@uuid]['item']['enchantments']['main_hand']) {
+          case '빙결':
+            @probability = 0
+            break()
+          case '냉기':
+            @probability = 0.25
+            break()
+          default:
+            @probability = 0.5
+            break()
+          }
+          switch(@event['block']) {
+          case 'ANCIENT_DEBRIS':
+            @probability *= 1
+            switch(rand(0, 6)) {
+            case 0:
+              @location['x'] += 1
+              break()
+            case 1:
+              @location['x'] -= 1
+              break()
+            case 2:
+              @location['y'] += 1
+              break()
+            case 3:
+              @location['y'] -= 1
+              break()
+            case 4:
+              @location['z'] += 1
+              break()
+            case 5:
+              @location['z'] -= 1
+              break()
+            }
+            break()
+          case 'MAGMA_BLOCK':
+            @probability *= 1.5
+            break()
+          case 'NETHERRACK':
+          case 'BALCKSTONE':
+            @probability *= 0.1
+            break()
+          case 'CRIMSON_NYLIUM':
+          case 'WARPED_NYLIUM':
+            @probability *= 0.05
+            break()
+          default:
+            @probability *= 0
+            break()
+          }
+          if(rand() < @probability) {
+            @meltable_blocks = array(
+              'AIR',
+              'CAVE_AIR',
+              'NETHERRACK',
+              'BALCKSTONE',
+              'CRIMSON_NYLIUM',
+              'WARPED_NYLIUM',
+              'MAGMA_BLOCK'
+            )
+            set_timeout(1, closure() {
+              if(array_contains(@meltable_blocks, get_block(@location))) {
+                set_blockdata(@location, array('block': 'lava', 'level': 0))
+              }
+            })
+            set_timeout(500, closure() {
+              if(array_contains(@meltable_blocks, get_block(@location))) {
+                set_blockdata(@location, array('block': 'lava', 'level': 1))
+              }
+            })
+          }
+        }
       }
     }
   }

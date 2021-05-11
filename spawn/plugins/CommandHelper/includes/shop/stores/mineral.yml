@@ -1,0 +1,61 @@
+PRODUCTS:
+  2:
+    name: COAL
+    meta:
+      price:
+        sell: 0.46875
+      detail: NONE
+  3:
+    name: QUARTZ
+    meta:
+      price:
+        sell: 0.390625
+      detail: NONE
+  4:
+    name: LAPIS_LAZULI
+    meta:
+      price:
+        sell: 0.546875
+      detail: NONE
+  5:
+    name: REDSTONE
+    meta:
+      price:
+        sell: 0.625
+      detail: NONE
+  6:
+    name: EMERALD
+    meta:
+      price:
+        sell: 2.65625
+      detail: NONE
+  11:
+    name: GOLD_NUGGET
+    meta:
+      price:
+        sell: 0.703125
+      detail: NONE
+  12:
+    name: IRON_INGOT
+    meta:
+      price:
+        sell: 0.859375
+      detail: NONE
+  13:
+    name: GOLD_INGOT
+    meta:
+      price:
+        sell: 0.9375
+      detail: NONE
+  14:
+    name: DIAMOND
+    meta:
+      price:
+        sell: 1.875
+      detail: NONE
+  15:
+    name: NETHERITE_INGOT
+    meta:
+      price:
+        sell: 4.6875
+      detail: NONE

@@ -1,12 +1,14 @@
 ## Initial Including Data
 @server = array(
-  'name': 'spawn',
+  'name': 'nether',
   'resourcepack': get_value('resourcepack')
 )
 
 @bots = array(
-  'b5ee7eb3-f4e8-4ab4-82e4-e97c60a6b8c1',
-  'c45537c6-39d3-459e-9a48-86f938a9c0dd'
+  'c45537c6-39d3-459e-9a48-86f938a9c0dd', #dohun1
+  'b5ee7eb3-f4e8-4ab4-82e4-e97c60a6b8c1', #Loplove
+  'ff1cb130-7152-4609-8cbc-76884c7444bd', #Geralt_w
+  '5c499342-2909-4571-8c45-7833a076b1dd'  #AppleCrepe
 )
 @reconnectable_players = array()
 @players_data = array()

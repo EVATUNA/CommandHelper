@@ -1,0 +1,121 @@
+PRODUCTS:
+  0:
+    name: PORKCHOP
+    meta:
+      price:
+        sell: 0.688
+      detail: NONE
+  1:
+    name: BEEF
+    meta:
+      price:
+        sell: 0.297
+      detail: NONE
+  2:
+    name: MUTTON
+    meta:
+      price:
+        sell: 0.703
+      detail: NONE
+  3:
+    name: CHICKEN
+    meta:
+      price:
+        sell: 0.297
+      detail: NONE
+  4:
+    name: RABBIT
+    meta:
+      price:
+        sell: 0.624
+      detail: NONE
+  5:
+    name: RABBIT_HIDE
+    meta:
+      price:
+        sell: 0.752
+      detail: NONE
+  6:
+    name: RABBIT_FOOT
+    meta:
+      price:
+        sell: 3.124
+      detail: NONE
+  7:
+    name: LEATHER
+    meta:
+      price:
+        sell: 1.56
+      detail: NONE
+  8:
+    name: FEATHER
+    meta:
+      price:
+        sell: 0.4
+      detail: NONE
+  9:
+    name: EGG
+    meta:
+      price:
+        sell: 0.4
+      detail: NONE
+  10:
+    name: WHITE_WOOL
+    meta:
+      price:
+        sell: 0.312
+      detail: NONE
+  18:
+    name: BLAZE_POWDER
+    meta:
+      price:
+        sell: 1.094
+      detail: NONE
+  19:
+    name: MAGMA_CREAM
+    meta:
+      price:
+        sell: 1.016
+      detail: NONE
+  20:
+    name: SLIME_BALL
+    meta:
+      price:
+        sell: 0.937
+      detail: NONE
+  21:
+    name: GHAST_TEAR
+    meta:
+      price:
+        sell: 1.563
+      detail: NONE
+  22:
+    name: ROTTEN_FLESH
+    meta:
+      price:
+        sell: 0.781
+      detail: NONE
+  23:
+    name: GUNPOWDER
+    meta:
+      price:
+        sell: 1.016
+      detail: NONE
+  24:
+    name: STRING
+    meta:
+      price:
+        sell: 0.86
+      detail: NONE
+  25:
+    name: ENDER_PEARL
+    meta:
+      price:
+        sell: 1.25
+      detail: NONE
+  26:
+    name: SPIDER_ETE
+    meta:
+      price:
+        sell: 0.937
+      detail: NONE

@@ -89,6 +89,7 @@
 				{
 					"max_experience": 1000,
 					"passive": {
+						"knockback": 0
 					},
 					"active": {
 						"cooldown": 40,
@@ -100,6 +101,7 @@
 				{
 					"max_experience": 2000,
 					"passive": {
+						"knockback": 1
 					},
 					"active": {
 						"cooldown": 40,
@@ -111,9 +113,10 @@
 				{
 					"max_experience": 4000,
 					"passive": {
+						"knockback": 1
 					},
 					"active": {
-						"cooldown": 35,
+						"cooldown": 40,
 						"duration": 1,
 						"count": 2,
 						"energy": 0
@@ -122,6 +125,7 @@
 				{
 					"max_experience": 8000,
 					"passive": {
+						"knockback": 2
 					},
 					"active": {
 						"cooldown": 35,
@@ -133,6 +137,7 @@
 				{
 					"max_experience": 16000,
 					"passive": {
+						"knockback": 2
 					},
 					"active": {
 						"cooldown": 30,
@@ -144,6 +149,7 @@
 				{
 					"max_experience": 1000,
 					"passive": {
+						"knockback": 3
 					},
 					"active": {
 						"cooldown": 30,

@@ -16,7 +16,7 @@ async_read('skills_spec.json', closure(@value) {
 proc _load_skill_data(@uuid, @category, @skill, @is_default, @players_data, @skills_spec) {
   @skill_data = cup_get('SKILL_DATA', @uuid.'_'.@skill)
   if(@is_default) {
-    #if(is_null(@skill_data)) {
+    if(is_null(@skill_data)) {
       @skill_data = array(
         0,
         0,
@@ -24,7 +24,7 @@ proc _load_skill_data(@uuid, @category, @skill, @is_default, @players_data, @ski
         @skills_spec[@category][@skill]['levels'][0]['max_experience']
       )
       cup_set('SKILL_DATA', @uuid.'_'.@skill, @skill_data)
-    #}
+    }
     @players_data[@uuid]['skill_data'][@category][@skill] = @skill_data
   } else {
     /* 나중에 아래 코드로 바꿔야 함 지금은 어떤 전투 특성이든 모두 배우게 되어있음

@@ -319,6 +319,68 @@
       }
     ]
   },
+  "GILDED_BLACKSTONE": {
+    "hp": 50,
+    "hardness": 4,
+    "default_qty": 1,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "mastery": "gold_mining_mastery",
+    "skills": {
+      "mining": {
+        "gold_mining_mastery": {
+          "default_xp": 7.25,
+          "extra_xp": 0.5
+        },
+        "ore_selecting": {
+          "default_xp": 1,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "GOLD_INGOT"
+        },
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "item": {
+          "name": "GOLD_INGOT",
+          "meta": {
+            "display": "§e중급 금괴",
+            "model": 1
+          }
+        },
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "item": {
+          "name": "GOLD_INGOT",
+          "meta": {
+            "display": "§b상급 금괴",
+            "model": 2
+          }
+        },
+        "weight": 5,
+        "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "GOLD_INGOT",
+          "meta": {
+            "display": "§d최상급 금괴",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
+      }
+    ]
+  },
   "REDSTONE_ORE": {
     "hp": 70,
     "hardness": 4,

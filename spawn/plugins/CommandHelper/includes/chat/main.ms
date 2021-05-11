@@ -2,6 +2,30 @@
 console('EvaChat loaded')
 include('eng_to_kor_translater.ms')
 
+@log_data = array()
+if(@server['name'] == 'main') {
+  @date = simple_date('yyyy-MM-dd')
+  @log_data = array(
+    'date': @date,
+    'path': 'logs/'.@date.'.log'
+  )
+
+  if(!file_exists(@log_data['path'])) {
+    create_file(@log_data['path'])
+  }
+
+  @cron_task = set_cron('0 0 * * *', closure() {
+    @date = simple_date('yyyy-MM-dd')
+    @log_data['date'] = @date
+    @log_data['path'] = 'logs/'.@date.'.log'
+  })
+  
+  proc _logging(@log_data, @type, @text) {
+    @log = string('['.simple_date('HH:mm:ss') @type.'] '.@text.'\n')
+    write_file(@log_data['path'], @log, 'APPEND')
+  }
+}
+
 @emoji_data = array(
   'player': array(),
   'guild': array()
@@ -37,12 +61,17 @@ proc _en_to_ko(@unconverted_message) {
   return(@converted_message)
 }
 
-proc _default_chat(@data, @players_data, @bots) {
+proc _default_chat(@data, @players_data, @bots, @log_data) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
   @sender_setting = @data['sender_setting']
   @unmodified_message = @data['message']
+  #로깅
+  if(is_proc('_logging')) {
+    @text = string(@sender_name.':'@unmodified_message)
+    _logging(@log_data, 'DEFAULT', @text)
+  }
   #리시버 설정
   @receivers = array()
   foreach(@receiver_uuid in _all_players(@bots)) {
@@ -97,7 +126,7 @@ proc _default_chat(@data, @players_data, @bots) {
       )
     ),
     array(
-      'text': ': ',
+      'text': ' :: ',
     )
   )
   #메시지 생성 부분
@@ -122,7 +151,7 @@ proc _default_chat(@data, @players_data, @bots) {
                 @is_modified_message = true
                 @message = array(
                   'text': @string,
-                  'color': '#80c8ff',
+                  'color': 'red',
                   'insertion': @string.' ',
                   'hoverEvent': array(
                     'action': 'show_text',
@@ -143,7 +172,7 @@ proc _default_chat(@data, @players_data, @bots) {
             @is_modified_message = true
             @message = array(
               'text': @string,
-              'color': '#80c8ff',
+              'color': 'red',
               'insertion': @string.' ',
               'hoverEvent': array(
                 'action': 'show_text',
@@ -166,7 +195,7 @@ proc _default_chat(@data, @players_data, @bots) {
               @is_modified_message = true
               @message = array(
                 'text': @string,
-                'color': '#80c8ff',
+                'color': 'red',
                 'hoverEvent': array(
                   'action': 'show_text',
                   'value': array(
@@ -194,7 +223,7 @@ proc _default_chat(@data, @players_data, @bots) {
       @is_modified_message = true
       @message = array(
         'text': @string,
-        'color': 'red',
+        'color': 'yellow',
         'clickEvent': array(
           'action': 'suggest_command',
           'value': @string
@@ -260,7 +289,7 @@ proc _default_chat(@data, @players_data, @bots) {
   }
 }
 
-proc _guild_chat(@data, @players_data, @bots) {
+proc _guild_chat(@data, @players_data, @bots, @log_data) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -268,6 +297,11 @@ proc _guild_chat(@data, @players_data, @bots) {
   @sender_guild = @data['sender_guild']
   @unmodified_message = @data['message']
   @guild_owner = null
+  #로깅
+  if(is_proc('_logging')) {
+    @text = string(@sender_name.':'@unmodified_message)
+    _logging(@log_data, 'GUILD', @text)
+  }
   #리시버 설정
   @receivers = array()
   foreach(@receiver_uuid in _all_players(@bots)) {
@@ -346,7 +380,7 @@ proc _guild_chat(@data, @players_data, @bots) {
       )
     ),
     array(
-      'text': ': ',
+      'text': ' :: ',
     )
   )
   #메시지 생성 부분
@@ -371,7 +405,7 @@ proc _guild_chat(@data, @players_data, @bots) {
                 @is_modified_message = true
                 @message = array(
                   'text': @string,
-                  'color': '#80c8ff',
+                  'color': 'red',
                   'insertion': @string.' ',
                   'hoverEvent': array(
                     'action': 'show_text',
@@ -392,7 +426,7 @@ proc _guild_chat(@data, @players_data, @bots) {
             @is_modified_message = true
             @message = array(
               'text': @string,
-              'color': '#80c8ff',
+              'color': 'red',
               'insertion': @string.' ',
               'hoverEvent': array(
                 'action': 'show_text',
@@ -415,7 +449,7 @@ proc _guild_chat(@data, @players_data, @bots) {
               @is_modified_message = true
               @message = array(
                 'text': @string,
-                'color': '#80c8ff',
+                'color': 'red',
                 'hoverEvent': array(
                   'action': 'show_text',
                   'value': array(
@@ -441,7 +475,7 @@ proc _guild_chat(@data, @players_data, @bots) {
               @is_modified_message = true
               @message = array(
                 'text': @string,
-                'color': '#80c8ff',
+                'color': 'red',
                 'hoverEvent': array(
                   'action': 'show_text',
                   'value': array(
@@ -469,7 +503,7 @@ proc _guild_chat(@data, @players_data, @bots) {
                 @receivers[@guild_owner['uuid']]['is_mentioned'] = true
                 @message = array(
                   'text': @string,
-                  'color': '#80c8ff',
+                  'color': 'red',
                   'hoverEvent': array(
                     'action': 'show_text',
                     'value': array(
@@ -481,7 +515,7 @@ proc _guild_chat(@data, @players_data, @bots) {
                 @guild_owner_name = 'name': bukkitlinked_get_player_name(moori_get_guild_all_members(@sender_guild)[0])
                 @message = array(
                   'text': @string,
-                  'color': '#80c8ff',
+                  'color': 'red',
                   'hoverEvent': array(
                     'action': 'show_text',
                     'value': array(
@@ -505,7 +539,7 @@ proc _guild_chat(@data, @players_data, @bots) {
       @is_modified_message = true
       @message = array(
         'text': @string,
-        'color': 'red',
+        'color': 'yellow',
         'clickEvent': array(
           'action': 'suggest_command',
           'value': @string
@@ -571,7 +605,7 @@ proc _guild_chat(@data, @players_data, @bots) {
   }
 }
 
-proc _local_chat(@data, @players_data, @bots) {
+proc _local_chat(@data, @players_data, @bots, @log_data) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -579,6 +613,11 @@ proc _local_chat(@data, @players_data, @bots) {
   @is_server_same = @data['is_server_same']
   @near_players = @data['near_players']
   @unmodified_message = @data['message']
+  #로깅
+  if(is_proc('_logging')) {
+    @text = string(@sender_name.':'@unmodified_message)
+    _logging(@log_data, 'LOCAL', @text)
+  }
   #리시버 설정
   @receivers = array()
   foreach(@receiver_uuid in _all_players(@bots)) {
@@ -610,8 +649,12 @@ proc _local_chat(@data, @players_data, @bots) {
   #이름 부분
   @name = array(
     array(
+      'text': '',
+      'color': '#ffd6bf'
+    ),
+    array(
       'text': @sender_setting[11].' ',
-      'color': '#ffd6bf',
+      'color': '#ffffff',
     ),
     array(
       'text': @sender_name,
@@ -629,7 +672,7 @@ proc _local_chat(@data, @players_data, @bots) {
       )
     ),
     array(
-      'text': ': ',
+      'text': ' :: ',
     )
   )
   #메시지 생성 부분
@@ -654,7 +697,7 @@ proc _local_chat(@data, @players_data, @bots) {
                 @is_modified_message = true
                 @message = array(
                   'text': @string,
-                  'color': '#80c8ff',
+                  'color': 'red',
                   'insertion': @string.' ',
                   'hoverEvent': array(
                     'action': 'show_text',
@@ -675,7 +718,7 @@ proc _local_chat(@data, @players_data, @bots) {
             @is_modified_message = true
             @message = array(
               'text': @string,
-              'color': '#80c8ff',
+              'color': 'red',
               'insertion': @string.' ',
               'hoverEvent': array(
                 'action': 'show_text',
@@ -698,7 +741,7 @@ proc _local_chat(@data, @players_data, @bots) {
       @is_modified_message = true
       @message = array(
         'text': @string,
-        'color': 'red',
+        'color': 'yellow',
         'clickEvent': array(
           'action': 'suggest_command',
           'value': @string
@@ -764,12 +807,17 @@ proc _local_chat(@data, @players_data, @bots) {
   }
 }
 
-proc _admin_chat(@data, @players_data, @bots) {
+proc _admin_chat(@data, @players_data, @bots, @log_data) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
   @sender_setting = @data['sender_setting']
   @unmodified_message = @data['message']
+  #로깅
+  if(is_proc('_logging')) {
+    @text = string(@sender_name.':'@unmodified_message)
+    _logging(@log_data, 'ADMIN', @text)
+  }
   #리시버 설정
   @receivers = array()
   foreach(@receiver_uuid in _all_players(@bots)) {
@@ -803,8 +851,12 @@ proc _admin_chat(@data, @players_data, @bots) {
   #이름 부분
   @name = array(
     array(
-      'text': @sender_setting[11].' ',
+      'text': '',
       'color': '#fdc4d5',
+    ),
+    array(
+      'text': @sender_setting[11].' ',
+      'color': '#ffffff',
     ),
     array(
       'text': @sender_name,
@@ -822,7 +874,7 @@ proc _admin_chat(@data, @players_data, @bots) {
       )
     ),
     array(
-      'text': ': ',
+      'text': ' :: ',
     )
   )
   #메시지 생성 부분
@@ -847,7 +899,7 @@ proc _admin_chat(@data, @players_data, @bots) {
                 @is_modified_message = true
                 @message = array(
                   'text': @string,
-                  'color': '#80c8ff',
+                  'color': 'red',
                   'insertion': @string.' ',
                   'hoverEvent': array(
                     'action': 'show_text',
@@ -868,7 +920,7 @@ proc _admin_chat(@data, @players_data, @bots) {
             @is_modified_message = true
             @message = array(
               'text': @string,
-              'color': '#80c8ff',
+              'color': 'red',
               'insertion': @string.' ',
               'hoverEvent': array(
                 'action': 'show_text',
@@ -891,7 +943,7 @@ proc _admin_chat(@data, @players_data, @bots) {
               @is_modified_message = true
               @message = array(
                 'text': @string,
-                'color': '#80c8ff',
+                'color': 'red',
                 'hoverEvent': array(
                   'action': 'show_text',
                   'value': array(
@@ -917,7 +969,7 @@ proc _admin_chat(@data, @players_data, @bots) {
       @is_modified_message = true
       @message = array(
         'text': @string,
-        'color': 'red',
+        'color': 'yellow',
         'clickEvent': array(
           'action': 'suggest_command',
           'value': @string
@@ -983,7 +1035,7 @@ proc _admin_chat(@data, @players_data, @bots) {
   }
 }
 
-bind('async_player_chat', null , null, @event, @players_data, @bots) {
+bind('async_player_chat', null , null, @event, @players_data, @bots, @log_data) {
   cancel()
   @data = array(
     'sender_name': @event['player'],
@@ -999,14 +1051,14 @@ bind('async_player_chat', null , null, @event, @players_data, @bots) {
     switch(@players_data[@data['sender_uuid']]['setting'][0]) {
     case 'default':
       _bungeecord_foward(@data['sender_name'], 'ch_default_chat', @data)
-      _default_chat(@data, @players_data, @bots)
+      _default_chat(@data, @players_data, @bots, @log_data)
       break()
     case 'guild':
       @sender_guild = moori_get_player_guild_id(@data['sender_uuid'])
       if(!is_null(@sender_guild)) {
         @data['sender_guild'] = @sender_guild
         _bungeecord_foward(@data['sender_name'], 'ch_guild_chat', @data)
-        _guild_chat(@data, @players_data, @bots)
+        _guild_chat(@data, @players_data, @bots, @log_data)
       } else {
         @players_data[@sender_uuid]['setting'][0] = 'default'
         cup_set('SETTING', @sender_uuid, @players_data[@sender_uuid]['setting'])
@@ -1017,17 +1069,17 @@ bind('async_player_chat', null , null, @event, @players_data, @bots) {
       @data['is_server_same'] = false
       _bungeecord_foward(@data['sender_name'], 'ch_local_chat', @data)
       @data['is_server_same'] = true
-      _local_chat(@data, @players_data, @bots)
+      _local_chat(@data, @players_data, @bots, @log_data)
       break()
     case 'admin':
       _bungeecord_foward(@data['sender_name'], 'ch_admin_chat', @data)
-      _admin_chat(@data, @players_data, @bots)
+      _admin_chat(@data, @players_data, @bots, @log_data)
       break()
     }
   }
 }
 
-proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @bots) {
+proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @bots, @log_data) {
   @enko = @setting[1]
   if(@enko) {
     @modified_message = _convert_eng_to_kor(@unmodified_message)
@@ -1043,13 +1095,17 @@ proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @bots
   } else {
     @modified_message = @unmodified_message
   }
+  if(is_proc('_logging')) {
+    @text = string(@unmodified_message)
+    _logging(@log_data, 'BROADCAST', @text)
+  }
   @raw = array(
     array(
       'text': '\ue4db '
     ),
     array(
       'text': @modified_message,
-      'color': 'yellow'
+      'color': '#80c8ff'
     )
   )
   @receiver_uuids = _all_players(@bots)
@@ -1078,9 +1134,9 @@ register_command('broadcast', array(
     if(array_index_exists(@players_data, @sender_uuid) && array_size(@args) > 0) {
       @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
       @setting = @players_data[@sender_uuid]['setting']
-      _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @bots)
+      _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @bots, @log_data)
     } else {
-      tmsg(@player, color('red')'/'.@command'<message>')
+      tmsg(@player, color('yellow')'/'.@command'<message>')
     }
   }
 ))
@@ -1095,6 +1151,11 @@ proc _whisper(@data) {
   @unmodified_message = @data['message']
   #리시버 설정
   @receivers = @data['receivers']
+  #로깅
+  if(is_proc('_logging')) {
+    @text = string(@sender_name'→'@target_name.':'@unmodified_message)
+    _logging(@log_data, 'WHISPER', @text)
+  }
   #메시지 생성 부분
   @modified_message = array(
     array('text': '')
@@ -1107,7 +1168,7 @@ proc _whisper(@data) {
       @is_modified_message = true
       @message = array(
         'text': @string,
-        'color': 'red',
+        'color': 'yellow',
         'clickEvent': array(
           'action': 'suggest_command',
           'value': @string
@@ -1173,7 +1234,7 @@ proc _whisper(@data) {
       )
     ),
     array(
-      'text': ': ',
+      'text': ' :: ',
     ),
     @modified_message
   )
@@ -1183,7 +1244,7 @@ proc _whisper(@data) {
       'color': 'gray',
     ),
     array(
-      'text': ': ',
+      'text': ' :: ',
     ),
     @modified_message
   )
@@ -1284,7 +1345,7 @@ register_command('whisper', array(
               @is_modified_message = true
               @message = array(
                 'text': @string,
-                'color': 'red',
+                'color': 'yellow',
                 'clickEvent': array(
                   'action': 'suggest_command',
                   'value': @string
@@ -1350,7 +1411,7 @@ register_command('whisper', array(
               )
             ),
             array(
-              'text': ': ',
+              'text': ' :: ',
             ),
             @modified_message
           )
@@ -1359,10 +1420,10 @@ register_command('whisper', array(
           play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
           _whisper(@data)
         } else {
-          tmsg(@player, color('gray').'플레이어를 찾을 수 없습니다.')
+          tmsg(@player, '\ue4de'color('gray').'플레이어를 찾을 수 없습니다.')
         }
       } else {
-        tmsg(@player, color('red')'/'.@command'<player> <message>')
+        tmsg(@player, '\ue4dd'color('yellow').'/'.@command'<플레이어> <할 말>'.color('gray').'을 통해 귓속말을 보낼 수 있습니다.')
       }
     }
   }

@@ -93,3 +93,21 @@ broadcast(moori_get_guild_all_members(moori_get_player_guild_id(puuid())))
   @data_array = byte_array()
   ba_put_string(@data_array, string_multiply('뷁', integer($a)))
 <<<
+
+/vanish $1 = >>>
+raw_set_pvanish($1, true, player())
+<<<
+
+/comony = >>>
+  broadcast(acc_balance(player()))
+<<<
+
+/acomony $1 = >>>
+  acc_add(player(), double($1))
+<<<
+
+/scomony $1 = >>>
+  acc_subtract(player(), double($1))
+<<<
+ 
+
