@@ -420,6 +420,49 @@ bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @r
   }
 }
 
+bind('block_place', null, null, @event, @players_data, @skills_spec, @server) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+  if(!is_cancelled() && pmode(@player) == 'SURVIVAL') {
+    @is_farming_allowed = true
+    if(@is_farming_allowed) {
+      @crop = @event['block']
+      @crops = array(
+        'WHEAT',
+        'BEETROOTS',
+        'POTATOS',
+        'CARROTS',
+        'SWEET_BERRY_BUSH',
+        'PUMPKIN_STEM',
+        'MELON_STEM'
+      )
+      if(array_contains(@crops, @event['block'])) {
+        @sowing_method = @players_data[@uuid]['skill_manager'][4]
+        if(@sowing_method != '' && @players_data[@uuid]['active_skill']['sowing_method'][@sowing_method][1] > 0) {
+          switch(@sowing_method) {
+          case 'wet_hands':
+            @farmland_location = array_deep_clone(@event['location'])
+            @farmland_location['y'] -= 1
+            @farmland_blockdata = get_blockdata(@farmland_location)
+            if(@farmland_blockdata['block'] == 'farmland') {
+              @farmland_blockdata['moisture'] = 6
+              set_blockdata(@farmland_location, @farmland_blockdata)
+            }
+            break()
+          case 'fertile_touch':
+            @crop_location = array_deep_clone(@event['location'])
+            @crop_blockdata = get_blockdata(@crop_location)
+            @crop_blockdata['age'] = 1
+            set_blockdata(@crop_location, @crop_blockdata)
+            break()
+          }
+        }
+        broadcast(@event)
+      }
+    }
+  }
+}
+
 bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spec, @crops_spec, @skills_spec, @text, @server) {
   @player = @event['player']
   @uuid = puuid(@player)

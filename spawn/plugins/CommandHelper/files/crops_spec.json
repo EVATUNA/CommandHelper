@@ -239,7 +239,7 @@
       }
     ]
   },
-  "SWEET_BERRIES": {
+  "SWEET_BERRY_BUSH": {
     "max_age": 3,
     "default_qty": 2,
     "default_xp": -0.25,
