@@ -1,6 +1,6 @@
 ## Initial Including Data
 @server = array(
-  'name': 'nether',
+  'name': 'main',
   'resourcepack': get_value('resourcepack')
 )
 

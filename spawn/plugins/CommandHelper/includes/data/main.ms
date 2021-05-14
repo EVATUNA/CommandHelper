@@ -433,12 +433,15 @@ bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spe
       _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @minerals_spec, @skills_spec, @text)
       @stones = array(
         'STONE': 1,
-        'GRANITE': 1,
-        'DIORITE': 1,
-        'ANDESITE': 1,
-        'BASALT': 1,
-        'BLACKSTONE': 1.25,
-        'NETHERRACK': 0.75
+        'GRANITE': 0.25,
+        'DIORITE': 0.25,
+        'ANDESITE': 0.25,
+        'BASALT': 0.5,
+        'BLACKSTONE': 1,
+        'NETHERRACK': 0.25,
+        'CRIMSON_NYLIUM': 0.25,
+        'WARPED_NYLIUM': 0.25,
+        'MAGMA_BLOCK': 0.5
       )
       if(array_index_exists(@stones, @event['block'])) {
         @default_xp = integer(@stones[@event['block']])
