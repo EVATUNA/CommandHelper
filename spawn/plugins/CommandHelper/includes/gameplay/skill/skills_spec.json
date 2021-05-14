@@ -243,31 +243,37 @@
 				{
 					"max_experience": 500,
 					"passive": {
+						"unbreaking": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
+						"unbreaking": 1
 					}
 				},
 				{
 					"max_experience": 2000,
 					"passive": {
+						"unbreaking": 2
 					}
 				},
 				{
 					"max_experience": 4000,
 					"passive": {
+						"unbreaking": 3
 					}
 				},
 				{
 					"max_experience": 8000,
 					"passive": {
+						"unbreaking": 4
 					}
 				},
 				{
 					"max_experience": 16000,
 					"passive": {
+						"unbreaking": 5
 					}
 				}
 			]
@@ -320,31 +326,43 @@
 				{
 					"max_experience": 500,
 					"passive": {
+						"power": 0,
+						"unbreaking": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
+						"power": 1,
+						"unbreaking": 1
 					}
 				},
 				{
 					"max_experience": 2000,
 					"passive": {
+						"power": 2,
+						"unbreaking": 2
 					}
 				},
 				{
 					"max_experience": 4000,
 					"passive": {
+						"power": 3,
+						"unbreaking": 3
 					}
 				},
 				{
 					"max_experience": 8000,
 					"passive": {
+						"power": 4,
+						"unbreaking": 4
 					}
 				},
 				{
 					"max_experience": 16000,
 					"passive": {
+						"power": 5,
+						"unbreaking": 5
 					}
 				}
 			]
@@ -355,31 +373,43 @@
 				{
 					"max_experience": 500,
 					"passive": {
+						"quick_charge": 0,
+						"unbreaking": 0
 					}
 				},
 				{
 					"max_experience": 1000,
 					"passive": {
+						"quick_charge": 1,
+						"unbreaking": 1
 					}
 				},
 				{
 					"max_experience": 2000,
 					"passive": {
+						"quick_charge": 1,
+						"unbreaking": 2
 					}
 				},
 				{
 					"max_experience": 4000,
 					"passive": {
+						"quick_charge": 2,
+						"unbreaking": 3
 					}
 				},
 				{
 					"max_experience": 8000,
 					"passive": {
+						"quick_charge": 2,
+						"unbreaking": 4
 					}
 				},
 				{
 					"max_experience": 16000,
 					"passive": {
+						"quick_charge": 3,
+						"unbreaking": 5
 					}
 				}
 			]

@@ -66,48 +66,102 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
   @enchantments = @players_data[@uuid]['item']['enchantments']
   if(array_index_exists(@items, 'main_hand')) {
     @enchantments['main_hand'] = null
-    if(!is_null(@items['main_hand']) && !is_null(@items['main_hand']['meta']) && !is_null(@items['main_hand']['meta']['modifiers']) && !is_null(@items['main_hand']['meta']['lore'])) {
-      @modifiers = @items['main_hand']['meta']['modifiers']
-      @lore = @items['main_hand']['meta']['lore']
-      if(array_size(@lore) > array_size(@modifiers)) {
-        @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
-        @enchantments['main_hand'] = @enchantment
-        @vanilla_enchants = array()
-        if(@items['main_hand']['name'] == 'TRIDENT') {
-          @vanilla_enchants['loyalty'] = array(
-            'etype': 'LOYALTY',
-            'elevel': 5
-          )
-        }
-        switch(@enchantment) {
-        case '내구성':
+    if(!is_null(@items['main_hand'])) {
+      @vanilla_enchants = array()
+      switch(@items['main_hand']['name']) {
+      case 'SHIELD':
+        @category = 'combat_method'
+        @skill = @skill = @players_data[@uuid]['skill_manager'][2]
+        if(@skill = 'blocking') {
+          @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+          @unbreaking = @skills_spec[@category][@skill]['levels'][@level]['passive']['unbreaking']
           @vanilla_enchants['unbreaking'] = array(
             'etype': 'DURABILITY',
-            'elevel': 5
+            'elevel': @unbreaking
           )
-          break()
-        case '효율':
-          @vanilla_enchants['efficiency'] = array(
-            'etype': 'DIG_SPEED',
-            'elevel': 3
-          )
-          @vanilla_enchants['sharpness'] = array(
-            'etype': 'DAMAGE_ALL',
-            'elevel': 1
-          )
-          break()
-        case '행운':
-          @vanilla_enchants['fortune'] = array(
-            'etype': 'LOOT_BONUS_BLOCKS',
-            'elevel': 2
-          )
-          @vanilla_enchants['looting'] = array(
-            'etype': 'LOOT_BONUS_MOBS',
-            'elevel': 2
-          )
-          break()
         }
-
+        break()
+      case 'TRIDENT':
+        @vanilla_enchants['loyalty'] = array(
+          'etype': 'LOYALTY',
+          'elevel': 5
+        )
+        break()
+      case 'BOW':
+        @skill = 'bow_mastery'
+        @category = 'subcombat'
+        @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+        if(@level > 0) {
+          @power = @skills_spec[@category][@skill]['levels'][@level]['passive']['power']
+          @vanilla_enchants['power'] = array(
+            'etype': 'ARROW_DAMAGE',
+            'elevel': @power
+          )
+          @unbreaking = @skills_spec[@category][@skill]['levels'][@level]['passive']['unbreaking']
+          @vanilla_enchants['unbreaking'] = array(
+            'etype': 'DURABILITY',
+            'elevel': @unbreaking
+          )
+        }
+        break()
+      case 'CROSSBOW':
+        @skill = 'crossbow_mastery'
+        @category = 'subcombat'
+        @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+        if(@level > 0) {
+          @quick_charge = @skills_spec[@category][@skill]['levels'][@level]['passive']['quick_charge']
+          @vanilla_enchants['quick_charge'] = array(
+            'etype': 'QUICK_CHARGE',
+            'elevel': @quick_charge
+          )
+          @unbreaking = @skills_spec[@category][@skill]['levels'][@level]['passive']['unbreaking']
+          @vanilla_enchants['unbreaking'] = array(
+            'etype': 'DURABILITY',
+            'elevel': @unbreaking
+          )
+        }
+        break()
+      }
+      if(!is_null(@items['main_hand']['meta']) && !is_null(@items['main_hand']['meta']['modifiers']) && !is_null(@items['main_hand']['meta']['lore'])) {
+        @modifiers = @items['main_hand']['meta']['modifiers']
+        @lore = @items['main_hand']['meta']['lore']
+        if(array_size(@lore) > array_size(@modifiers)) {
+          @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
+          @enchantments['main_hand'] = @enchantment
+          switch(@enchantment) {
+          case '내구성':
+            @vanilla_enchants['unbreaking'] = array(
+              'etype': 'DURABILITY',
+              'elevel': 5
+            )
+            break()
+          case '효율':
+            @vanilla_enchants['efficiency'] = array(
+              'etype': 'DIG_SPEED',
+              'elevel': 3
+            )
+            @vanilla_enchants['sharpness'] = array(
+              'etype': 'DAMAGE_ALL',
+              'elevel': 1
+            )
+            break()
+          case '행운':
+            @vanilla_enchants['fortune'] = array(
+              'etype': 'LOOT_BONUS_BLOCKS',
+              'elevel': 2
+            )
+            @vanilla_enchants['looting'] = array(
+              'etype': 'LOOT_BONUS_MOBS',
+              'elevel': 2
+            )
+            break()
+          }
+        }
+      }
+      if(array_size(@vanilla_enchants) > 0) {
+        if(!@items['main_hand']['meta']) {
+          @items['main_hand']['meta'] = array('flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES'))
+        }
         @items['main_hand']['meta']['enchants'] = @vanilla_enchants
         set_timeout(0, closure() {
           set_inventory_item(@uuid, pheld_slot(@player), @items['main_hand'])
@@ -118,12 +172,78 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
   }
   if(array_index_exists(@items, 'off_hand')) {
     @enchantments['off_hand'] = null
-    if(!is_null(@items['off_hand']) && !is_null(@items['off_hand']['meta']) && !is_null(@items['off_hand']['meta']['modifiers']) && !is_null(@items['off_hand']['meta']['lore'])) {
-      @modifiers = @items['off_hand']['meta']['modifiers']
-      @lore = @items['off_hand']['meta']['lore']
-      if(array_size(@lore) > array_size(@modifiers)) {
-        @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
-        @enchantments['off_hand'] = @enchantment
+    if(!is_null(@items['off_hand'])) {
+      @vanilla_enchants = array()
+      switch(@items['off_hand']['name']) {
+      case 'SHIELD':
+        @category = 'combat_method'
+        @skill = @skill = @players_data[@uuid]['skill_manager'][2]
+        if(@skill = 'blocking') {
+          @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+          @unbreaking = @skills_spec[@category][@skill]['levels'][@level]['passive']['unbreaking']
+          @vanilla_enchants['unbreaking'] = array(
+            'etype': 'DURABILITY',
+            'elevel': @unbreaking
+          )
+        }
+        break()
+      case 'TRIDENT':
+        @vanilla_enchants['loyalty'] = array(
+          'etype': 'LOYALTY',
+          'elevel': 5
+        )
+        break()
+      case 'BOW':
+        @skill = 'bow_mastery'
+        @category = 'subcombat'
+        @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+        if(@level > 0) {
+          @power = @skills_spec[@category][@skill]['levels'][@level]['passive']['power']
+          @vanilla_enchants['power'] = array(
+            'etype': 'ARROW_DAMAGE',
+            'elevel': @power
+          )
+          @unbreaking = @skills_spec[@category][@skill]['levels'][@level]['passive']['unbreaking']
+          @vanilla_enchants['unbreaking'] = array(
+            'etype': 'DURABILITY',
+            'elevel': @unbreaking
+          )
+        }
+        break()
+      case 'CROSSBOW':
+        @skill = 'crossbow_mastery'
+        @category = 'subcombat'
+        @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
+        if(@level > 0) {
+          @quick_charge = @skills_spec[@category][@skill]['levels'][@level]['passive']['quick_charge']
+          @vanilla_enchants['quick_charge'] = array(
+            'etype': 'QUICK_CHARGE',
+            'elevel': @quick_charge
+          )
+          @unbreaking = @skills_spec[@category][@skill]['levels'][@level]['passive']['unbreaking']
+          @vanilla_enchants['unbreaking'] = array(
+            'etype': 'DURABILITY',
+            'elevel': @unbreaking
+          )
+        }
+        break()
+      }
+      if(!is_null(@items['off_hand']['meta']) && !is_null(@items['off_hand']['meta']['modifiers']) && !is_null(@items['off_hand']['meta']['lore'])) {
+        @modifiers = @items['off_hand']['meta']['modifiers']
+        @lore = @items['off_hand']['meta']['lore']
+        if(array_size(@lore) > array_size(@modifiers)) {
+          @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
+          @enchantments['off_hand'] = @enchantment
+        }
+      }
+      if(array_size(@vanilla_enchants) > 0) {
+        if(!@items['off_hand']['meta']) {
+          @items['off_hand']['meta'] = array('flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES'))
+        }
+        @items['off_hand']['meta']['enchants'] = @vanilla_enchants
+        set_timeout(0, closure() {
+          set_inventory_item(@uuid, 40, @items['off_hand'])
+        })
       }
     }
     @players_data[@uuid]['item']['off_hand'] = @items['off_hand']
@@ -1033,21 +1153,27 @@ bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_s
   if(array_index_exists(@players_data, @uuid)) {
     if(psneaking()) {
       @items = array()
-      @off_hand_item = get_inventory_item(@uuid, 40)
-      if(!is_null(@off_hand_item) && array_contains(@effective_items['weapon'], @off_hand_item['name'])) {
-        @items['main_hand'] = @off_hand_item
-      } else if(!is_null(@players_data[@uuid]['item']['main_hand'])) {
-        @items['main_hand'] = null
-      }
       @main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
-      if(!is_null(@main_hand_item) && array_contains(@effective_items['weapon'], @main_hand_item['name'])) {
-        @items['off_hand'] = @main_hand_item
-      } else if(!is_null(@players_data[@uuid]['item']['off_hand'])) {
-        @items['off_hand'] = null
-      }
-      if(array_size(@items) > 0) {
-        _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text)
-      }
+      @off_hand_item = get_inventory_item(@uuid, 40)
+      set_timeout(1, closure() {
+        @new_main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
+        @new_off_hand_item = get_inventory_item(@uuid, 40)
+        if(@main_hand_item != @new_main_hand_item && @off_hand_item != @new_off_hand_item) {
+          if(!is_null(@main_hand_item) && array_contains(@effective_items['weapon'], @main_hand_item['name'])) {
+            @items['off_hand'] = @main_hand_item
+          } else if(!is_null(@players_data[@uuid]['item']['off_hand'])) {
+            @items['off_hand'] = null
+          }
+          if(!is_null(@off_hand_item) && array_contains(@effective_items['weapon'], @off_hand_item['name'])) {
+            @items['main_hand'] = @off_hand_item
+          } else if(!is_null(@players_data[@uuid]['item']['main_hand'])) {
+            @items['main_hand'] = null
+          }
+          if(array_size(@items) > 0) {
+            _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text)
+          }
+        }
+      })
     } else {
       cancel()
       @main_hand_item = @players_data[@uuid]['item']['main_hand']
