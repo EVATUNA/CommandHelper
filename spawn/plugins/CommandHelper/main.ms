@@ -8,6 +8,8 @@ if(!is_channel_registered('BungeeCord')) {
 include('includes/gameplay/main.ms')
 include('includes/chat/main.ms')
 include('includes/shop/main.ms')
+include('includes/autoquiz/main.ms')
+include('includes/helpCommand/cmd.ms')
 
 ## Final Include
 # 이벤트, 테스크 바인드(프로시저 불러오기)
