@@ -510,6 +510,24 @@ proc _multiply_value(@value, @multiply, @deviation) {
   return(@value * @multiply + @value * @deviation * 0.5 - @value * @deviation * rand())
 }
 
+proc _getArgsExact(@argarray, @arg) {
+   if(!is_numeric(@arg)){
+      @arg = to_lower(@arg)
+   }
+   @result = @argarray
+   if(!@arg || @arg == '') {
+      return(@result)
+   }
+   if(array_contains_ic(@result, @arg)) {
+      return(array(@arg))
+   }
+   return(array_filter(@result, closure(@key, @value) {
+      if(!is_numeric(@value)){
+         return(string_starts_with(to_lower(@value), @arg))
+      }
+   }))
+}
+
 register_command('resourceurl', array(
   'description': 'You can set resourcepack download url.',
   'permission': '*',
