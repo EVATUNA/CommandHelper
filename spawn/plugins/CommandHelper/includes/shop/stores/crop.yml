@@ -2,42 +2,56 @@ PRODUCTS:
   10:
     name: WHEAT
     meta:
+      display: §f밀
+      model: 1
       price:
         sell: 0.28
       detail: NONE
   11:
     name: BEETROOT
     meta:
+      display: §f사탕무
+      model: 1
       price:
         sell: 0.26
       detail: NONE
   12:
     name: POTATO
     meta:
+      display: §f감자
+      model: 1
       price:
         sell: 0.14
       detail: NONE
   13:
     name: CARROT
     meta:
+      display: §f당근
+      model: 1
       price:
         sell: 0.13
       detail: NONE
   14:
     name: SWEET_BERRIES
     meta:
+      display: §f크랜베리
+      model: 1
       price:
         sell: 0.09
       detail: NONE
   15:
     name: PUMPKIN
     meta:
+      display: §f호박
+      model: 1
       price:
         sell: 0.03
       detail: NONE
   16:
     name: MELON
     meta:
+      display: §f수박
+      model: 1
       price:
         sell: 0.035
       detail: NONE
@@ -83,3 +97,33 @@ PRODUCTS:
       price:
         sell: 0.13
       detail: NONE
+  50:
+    name: IRON_INGOT
+    meta:
+      display: §f광물 판매
+      lore:
+      - §7좌클릭 시, 광물 판매 페이지를 엽니다.
+      model: 2
+      opengui: mineral
+  51:
+    name: WHEAT
+    meta:
+      display: §f농작물 판매
+      lore:
+      - §7좌클릭 시, 농작물 판매 페이지를 엽니다.
+      model: 1
+      opengui: crop
+  52:
+    name: PORKCHOP
+    meta:
+      display: §f전리품 판매
+      lore:
+      - §7좌클릭 시, 전리품 판매 페이지를 엽니다.
+      opengui: mob_loot
+  53:
+    name: OAK_LOG
+    meta:
+      display: §f블럭 판매
+      lore:
+      - §7좌클릭 시, 블럭 판매 페이지를 엽니다.
+      opengui: block

@@ -366,3 +366,19 @@ bind('inventory_click', array('id': 'crafting'), array('slottype': 'RESULT'), @e
     }
   }
 }
+
+## additional recipes
+@triming_small_fish = array(
+  'key': 'triming_small_fish',
+  'type': 'SHAPELESS',
+  'result': array( 'name': 'COD' ),
+  'ingredients': array('COD')
+)
+add_recipe(@triming_small_fish)
+@triming_big_fish = array(
+  'key': 'triming_big_fish',
+  'type': 'SHAPELESS',
+  'result': array( 'name': 'SALMON' ),
+  'ingredients': array('SALMON')
+)
+add_recipe(@triming_big_fish)

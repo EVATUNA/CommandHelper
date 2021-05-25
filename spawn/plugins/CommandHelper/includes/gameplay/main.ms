@@ -367,7 +367,7 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
         @decoration_armors[37] = array(
           'name': 'LEATHER_LEGGINGS',
           'meta': array(
-            'display': color('WHITE').'치장 설정',
+            'display': color('WHITE').'유틸 GUI',
             'enchants': array(
               'binding_curse': array(
                 'etype': 'BINDING_CURSE',
@@ -437,7 +437,7 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
         @decoration_armors[37] = array(
           'name': 'CHAINMAIL_LEGGINGS',
           'meta': array(
-            'display': color('WHITE').'치장 설정',
+            'display': color('WHITE').'유틸 GUI',
             'enchants': array(
               'binding_curse': array(
                 'etype': 'BINDING_CURSE',
@@ -507,7 +507,7 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
         @decoration_armors[37] = array(
           'name': 'IRON_LEGGINGS',
           'meta': array(
-            'display': color('WHITE').'치장 설정',
+            'display': color('WHITE').'유틸 GUI',
             'enchants': array(
               'binding_curse': array(
                 'etype': 'BINDING_CURSE',
@@ -577,7 +577,7 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
         @decoration_armors[37] = array(
           'name': 'GOLDEN_LEGGINGS',
           'meta': array(
-            'display': color('WHITE').'치장 설정',
+            'display': color('WHITE').'유틸 GUI',
             'enchants': array(
               'binding_curse': array(
                 'etype': 'BINDING_CURSE',
@@ -647,7 +647,7 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
         @decoration_armors[37] = array(
           'name': 'DIAMOND_LEGGINGS',
           'meta': array(
-            'display': color('WHITE').'치장 설정',
+            'display': color('WHITE').'유틸 GUI',
             'enchants': array(
               'binding_curse': array(
                 'etype': 'BINDING_CURSE',
@@ -717,7 +717,7 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
         @decoration_armors[37] = array(
           'name': 'NETHERITE_LEGGINGS',
           'meta': array(
-            'display': color('WHITE').'치장 설정',
+            'display': color('WHITE').'유틸 GUI',
             'enchants': array(
               'binding_curse': array(
                 'etype': 'BINDING_CURSE',
@@ -775,7 +775,7 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
       set_inventory_item(@uuid, 37, array(
         'name': 'STRUCTURE_VOID',
         'meta': array(
-          'display': color('WHITE').'치장 설정',
+          'display': color('WHITE').'유틸 GUI',
           'model': 2,
           'enchants': array(
             'binding_curse': array(
@@ -1099,7 +1099,7 @@ bind('inventory_click', null, null, @event, @players_data, @effective_items, @sk
 bind('inventory_open', null, null, @event, @players_data) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid)) {
+  if(array_index_exists(@players_data, @uuid) && ponline(@player)) {
     @players_data[@uuid]['item']['is_inv_open'] = true
   }
 }
@@ -1107,7 +1107,7 @@ bind('inventory_open', null, null, @event, @players_data) {
 bind('inventory_close', null, null, @event, @players_data, @effective_items, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid)) {
+  if(array_index_exists(@players_data, @uuid) && ponline(@player)) {
     @players_data[@uuid]['item']['is_inv_open'] = false
     @items = array()
     @main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
@@ -1137,7 +1137,7 @@ bind('inventory_close', null, null, @event, @players_data, @effective_items, @sk
 bind('item_held', null, null, @event, @players_data, @effective_items, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid)) {
+  if(array_index_exists(@players_data, @uuid) && ponline(@player)) {
     @held_item = get_inventory_item(@uuid, @event['to'])
     if(!is_null(@held_item) && array_contains(@effective_items['weapon'], @held_item['name'])) {
       _update_item(@player, @uuid, array('main_hand': @held_item), @players_data, @skills_spec, @text)
@@ -1150,7 +1150,7 @@ bind('item_held', null, null, @event, @players_data, @effective_items, @skills_s
 bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid)) {
+  if(array_index_exists(@players_data, @uuid) && ponline(@player)) {
     if(psneaking()) {
       @items = array()
       @main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
@@ -1260,7 +1260,7 @@ bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_s
 bind('item_drop', null, null, @event, @players_data, @effective_items, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid)) {
+  if(array_index_exists(@players_data, @uuid) && ponline(@player)) {
     if(!@players_data[@uuid]['item']['is_inv_open']) {
       @held_item = @event['item']
       if(array_contains(@effective_items['weapon'], @held_item['name'])) {
@@ -1273,7 +1273,7 @@ bind('item_drop', null, null, @event, @players_data, @effective_items, @skills_s
 bind('item_pickup', null, null, @event, @players_data, @effective_items, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid)) {
+  if(array_index_exists(@players_data, @uuid) && ponline(@player)) {
     @held_slot = pheld_slot(@player)
     @inventory = get_inventory(@uuid)
     if(array_contains(@effective_items['weapon'], @event['item']['name']) && is_null(@inventory[@held_slot])) {
@@ -1294,7 +1294,7 @@ bind('item_pickup', null, null, @event, @players_data, @effective_items, @skills
 bind('item_damage', null, null, @event, @players_data, @effective_items, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid)) {
+  if(array_index_exists(@players_data, @uuid) && ponline(@player)) {
     @item = @event['item']
     @max_durability = material_info(@item['name'], 'maxDurability')
     if(is_null(@item['meta'])) {
@@ -1313,334 +1313,6 @@ bind('item_damage', null, null, @event, @players_data, @effective_items, @skills
         } else if(@item == @off_hand_item) {
           _update_item(@player, @uuid, array('off_hand': null), @players_data, @skills_spec, @text)
         }
-      }
-    }
-  }
-}
-
-## Gui Management
-## Enchant, Repair
-bind('player_interact', null, array('main_hand': 'main_main_hand', 'button': 'right'), @event, @essences, @text) {
-  if(is_cancelled()) {
-
-  } else {
-    @player = @event['player']
-    @uuid = puuid(@player)
-    if(!psneaking(@player) || is_null(get_inventory_item(@uuid, pheld_slot(@player))) || is_null(get_inventory_item(@uuid, 40))) {
-      switch(@event['block']) {
-      case 'ENCHANTING_TABLE':
-        cancel()
-        @location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 1.01, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
-        if(plevel(@player) >= 30) {
-          if(pcooldown(@player, 'CAVE_AIR') == 0) {
-            set_pcooldown(@player, 'CAVE_AIR', 30)
-            @task = array('tick': 10, 'id': null)
-            @id = set_interval(100 , closure() {
-              if(ponline(@player)) {
-                if(@task['tick'] > 0) {
-                  @ploc = ploc(@player)
-                  play_named_sound(@location, array('sound': 'minecraft:entity.player.levelup', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
-                  @pos = array(
-                    'x': @ploc['x'] + rand() / 2 - 0.25,
-                    'y': @ploc['y'] + rand() * 1.5 + 1,
-                    'z': @ploc['z'] + rand() / 2 - 0.25
-                  )
-                  @delta = array(
-                    'x': (@location['x'] - @pos['x']) / 2,
-                    'y': (@location['y'] - @pos['y']) / 2,
-                    'z': (@location['z'] - @pos['z']) / 2
-                  )
-                  mom_playerparticle(@uuid, 'TOTEM', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 1.0)
-                  @task['tick'] -= 1
-                } else {
-                  clear_task()
-                  play_named_sound(@location, array('sound': 'minecraft:block.enchantment_table.use', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
-                  set_plevel(@player, plevel(@player) - 30)
-                  @essence_name = array_rand(array(/*'희미한 마법의 정수', */'미약한 마법의 정수', '농축된 마법의 정수'/*, '강력한 마법의 정수', '찬란한 마법의 정수'*/), 1, false)[0]
-                  #broadcast(@essence_name)
-                  drop_item(@location, @essences[@essence_name]['item'], false)
-                }
-              } else {
-                clear_task()
-              }
-            })
-            @task['id'] = @id
-          }
-        }
-        break()
-      case 'SMITHING_TABLE':
-        cancel()
-        @id = 'enchant_table.'.@player
-        if(!array_contains(get_virtual_inventories(), @id)) {
-          @title = @text['space_fonts']['space.-8'].'§f\ue3fb'.@text['space_fonts']['space.-169'].hexcolor('#404040').'마법 작업대'
-          @dummy_item = array(
-            'name': 'STRUCTURE_VOID',
-            'meta': array(
-              'display': ' ',
-              'model': 1
-            )
-          )
-          @inventory = array()
-          for(@i = 0, @i < 27, @i++){
-            @inventory[@i] = @dummy_item
-          }
-          @inventory[22] = null
-          create_virtual_inventory(@id, 'CHEST', @title, @inventory)
-          if(!has_bind(@id.'.close')) {
-            bind('inventory_close', array('id': @id.'.close'), array('virtual': true, 'player': @player), @event, @player, @id) {
-              @item = @event['inventory'][22]
-              if(!is_null(@item)) {
-                @item['qty'] = pgive_item(@player, @item)
-                @ploc = ploc(@player)
-                @ploc['y'] += 1
-                drop_item(@ploc, @item, false)
-              }
-              unbind(@id.'.close')
-              unbind(@id.'.click')
-              set_timeout(1, closure() {
-                delete_virtual_inventory(@event['holder'])
-              })
-            }
-          }
-          if(!has_bind(@id.'.click')) {
-            bind('inventory_click', array('id': @id.'.click'), array('virtual': true, 'player': @player), @event, @essences) {
-              @enchantable_items = array(
-                'LEATHER_BOOTS': array(
-                  'luck': 1.5,
-                  'entries_type': 'armor_entries'
-                ),
-                'CHAINMAIL_BOOTS': array(
-                  'luck': 0.5,
-                  'entries_type': 'armor_entries'
-                ),
-                'IRON_BOOTS': array(
-                  'luck': 0.9,
-                  'entries_type': 'armor_entries'
-                ),
-                'GOLDEN_BOOTS': array(
-                  'luck': 2.5,
-                  'entries_type': 'armor_entries'
-                ),
-                'DIAMOND_BOOTS': array(
-                  'luck': 1.0,
-                  'entries_type': 'armor_entries'
-                ),
-                'NETHERITE_BOOTS': array(
-                  'luck': 1.5,
-                  'entries_type': 'armor_entries'
-                ),
-                'WOODEN_SWORD': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'WOODEN_SHOVEL': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'WOODEN_PICKAXE': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'WOODEN_AXE': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'WOODEN_HOE': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'STONE_SWORD': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'STONE_SHOVEL': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'STONE_PICKAXE': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'STONE_AXE': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'STONE_HOE': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'IRON_SWORD': array(
-                  'luck': 1.4,
-                  'entries_type': 'weapon_entries'
-                ),
-                'IRON_SHOVEL': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'IRON_PICKAXE': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'IRON_AXE': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'IRON_HOE': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'GOLDEN_SWORD': array(
-                  'luck': 2.2,
-                  'entries_type': 'weapon_entries'
-                ),
-                'GOLDEN_SHOVEL': array(
-                  'luck': 2.2,
-                  'entries_type': 'weapon_entries'
-                ),
-                'GOLDEN_PICKAXE': array(
-                  'luck': 2.2,
-                  'entries_type': 'weapon_entries'
-                ),
-                'GOLDEN_AXE': array(
-                  'luck': 2.2,
-                  'entries_type': 'weapon_entries'
-                ),
-                'GOLDEN_HOE': array(
-                  'luck': 2.2,
-                  'entries_type': 'weapon_entries'
-                ),
-                'DIAMOND_SWORD': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'DIAMOND_SHOVEL': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'DIAMOND_PICKAXE': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'DIAMOND_AXE': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'DIAMOND_HOE': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'NETHERITE_SWORD': array(
-                  'luck': 1.5,
-                  'entries_type': 'weapon_entries'
-                ),
-                'NETHERITE_SHOVEL': array(
-                  'luck': 1.5,
-                  'entries_type': 'weapon_entries'
-                ),
-                'NETHERITE_PICKAXE': array(
-                  'luck': 1.5,
-                  'entries_type': 'weapon_entries'
-                ),
-                'NETHERITE_AXE': array(
-                  'luck': 1.5,
-                  'entries_type': 'weapon_entries'
-                ),
-                'NETHERITE_HOE': array(
-                  'luck': 1.5,
-                  'entries_type': 'weapon_entries'
-                ),
-                'TRIDENT': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                )
-              )
-              @rawslot = @event['rawslot']
-              if(@rawslot >= 0 && @rawslot <= 26) {
-                @clicked_item = @event['inventory'][@rawslot]
-                if(!is_null(@clicked_item) && @clicked_item['name'] == 'STRUCTURE_VOID') {
-                  cancel()
-                }
-                @cursor_item = @event['cursoritem']
-                if(!is_null(@cursor_item) && @cursor_item['name'] == 'EXPERIENCE_BOTTLE' && !is_null(@cursor_item['meta']) && !is_null(@cursor_item['meta']['display']) && @rawslot == 22 && @event['action'] == 'SWAP_WITH_CURSOR') {
-                  @cursor_item['qty'] -= 1
-                  @enchanting_item = @event['inventory'][@rawslot]
-                  @enchantable_item = @enchantable_items[@enchanting_item['name']]
-                  @enchanted_item = @enchanting_item
-                  if(!is_null(@enchanting_item) && array_index_exists(@enchantable_items, @enchanting_item['name'])) {
-                    @essence_name = strip_colors(@cursor_item['meta']['display'])
-                    if(array_index_exists(@essences, @essence_name)) {
-                      @entries = @essences[@essence_name][@enchantable_item['entries_type']]
-                      @enchanted_item = _get_enchanted_item(@enchanting_item, @entries, @enchantable_item['luck'])
-                    }
-                    cancel()
-                    modify_event('slotitem', @enchanted_item)
-                    modify_event('cursoritem', @cursor_item)
-                  }
-                }
-              }
-            }
-          }
-        }
-        popen_inventory(@player, @id)
-        break()
-
-      case 'ANVIL':
-      case 'CHIPPED_ANVIL':
-      case 'DAMAGED_ANVIL':
-        cancel()
-        @id = 'anvil.'.@player
-        if(!array_contains(get_virtual_inventories(), @id)) {
-          @title = @text['space_fonts']['space.-8'].'§f\ue3fc'.@text['space_fonts']['space.-169'].hexcolor('#404040').'모루'
-          @dummy_item = array(
-            'name': 'STRUCTURE_VOID',
-            'meta': array(
-              'display': ' ',
-              'model': 1
-            )
-          )
-          @inventory = array()
-          for(@i = 0, @i < 27, @i++){
-            @inventory[@i] = @dummy_item
-          }
-          @inventory[2] = null
-          @inventory[20] = null
-          delete_virtual_inventory(@id)
-          create_virtual_inventory(@id, 'CHEST', @title, @inventory)
-          if(!has_bind(@id.'.close')) {
-            bind('inventory_close', array('id': @id.'.close'), array('virtual': true, 'player': @player), @event, @player, @id) {
-              @repair_item = @event['inventory'][2]
-              @ploc = ploc(@player)
-              @ploc['y'] += 1
-              if(!is_null(@repair_item)) {
-                @repair_item['qty'] = pgive_item(@player, @repair_item)
-                drop_item(@ploc, @repair_item, false)
-              }
-              @ore_item = @event['inventory'][20]
-              if(!is_null(@ore_item)) {
-                @ore_item['qty'] = pgive_item(@player, @ore_item)
-                drop_item(@ploc, @ore_item, false)
-              }
-              unbind(@id.'.close')
-              unbind(@id.'.click')
-              set_timeout(1, closure() {
-                delete_virtual_inventory(@event['holder'])
-              })
-            }
-          }
-          if(!has_bind(@id.'.click')) {
-            bind('inventory_click', array('id': @id.'.click'), array('virtual': true, 'player': @player), @event) {
-              @rawslot = @event['rawslot']
-              if(@rawslot >= 0 && @rawslot <= 26) {
-                @clicked_item = @event['inventory'][@rawslot]
-                if(!is_null(@clicked_item) && @clicked_item['name'] == 'STRUCTURE_VOID') {
-                  cancel()
-                }
-              }
-            }
-          }
-        }
-        popen_inventory(@player, @id)
-        break()
       }
     }
   }

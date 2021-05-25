@@ -100,3 +100,108 @@ proc _apply_passive_armor_enchantment(@player, @player_data) {
     break()
   }
 }
+
+proc _preset_item_armorstand(@item_location) {
+  @item_armorstands = entities_in_radius(@item_location, 0, 'ARMOR_STAND')
+  if(array_size(@item_armorstands) == 0) {
+    @item_armorstand = spawn_entity('ARMOR_STAND', 1, @item_location, closure(@item_armorstand) {
+      set_entity_spec(@item_armorstand, array(
+        'gravity': false,
+        'marker': true,
+        'visible': false,
+        'poses': array(
+          'poseHead': array(
+            'x': to_radians(90),
+            'y': to_radians(0),
+            'z': to_radians(0)
+          )
+        )
+      ))
+      set_mob_name(@item_armorstand, '0')
+      add_scoreboard_tag(@item_armorstand, 'enchanted_item')
+    })[0]
+  } else {
+    @is_item_armorstand_exists = false
+    foreach(@unknown_armorstand in @item_armorstands) {
+      if(!@is_item_armorstand_exists && array_size(get_scoreboard_tags(@unknown_armorstand)) == 1 && get_scoreboard_tags(@unknown_armorstand)[0] == 'enchanted_item') {
+        @item_armorstand = @unknown_armorstand
+        @is_item_armorstand_exists = true
+      } else {
+        #broadcast('B 아이템 아머스탠드 이외의 아머스탠드 감지!')
+      }
+    }
+    if(!@is_item_armorstand_exists) {
+      @item_armorstand = spawn_entity('ARMOR_STAND', 1, @item_location, closure(@item_armorstand) {
+        set_entity_spec(@item_armorstand, array(
+          'gravity': false,
+          'marker': true,
+          'visible': false,
+          'poses': array(
+            'poseHead': array(
+              'x': to_radians(90),
+              'y': to_radians(0),
+              'z': to_radians(0)
+            )
+          )
+        ))
+        set_mob_name(@item_armorstand, '0')
+        add_scoreboard_tag(@item_armorstand, 'enchanted_item')
+      })[0]
+    }
+  }
+  return(@item_armorstand)
+}
+
+proc _preset_essence_armorstand(@essence_location) {
+  @essence_armorstands = entities_in_radius(@essence_location, 0, 'ARMOR_STAND')
+  if(array_size(@essence_armorstands) == 0) {
+    @essence_armorstand = spawn_entity('ARMOR_STAND', 1, @essence_location, closure(@essence_armorstand) {
+      set_entity_spec(@essence_armorstand, array(
+        'gravity': false,
+        'marker': true,
+        'visible': false,
+        'poses': array(
+          'poseHead': array(
+            'x': to_radians(0),
+            'y': to_radians(0),
+            'z': to_radians(90)
+          )
+        )
+      ))
+      add_scoreboard_tag(@essence_armorstand, 'enchanted_essence')
+    })[0]
+  } else {
+    @is_essence_armorstand_exists = false
+    foreach(@unknown_armorstand in @essence_armorstands) {
+      if(!@is_essence_armorstand_exists && array_size(get_scoreboard_tags(@unknown_armorstand)) == 1 && get_scoreboard_tags(@unknown_armorstand)[0] == 'enchanted_essence') {
+        @essence_armorstand = @unknown_armorstand
+        @is_essence_armorstand_exists = true
+      } else {
+        #broadcast('B 아이템 아머스탠드 이외의 아머스탠드 감지!')
+      }
+    }
+    if(!@is_essence_armorstand_exists) {
+      @essence_armorstand = spawn_entity('ARMOR_STAND', 1, @essence_location, closure(@essence_armorstand) {
+        set_entity_spec(@essence_armorstand, array(
+          'gravity': false,
+          'marker': true,
+          'visible': false,
+          'poses': array(
+            'poseHead': array(
+              'x': to_radians(0),
+              'y': to_radians(0),
+              'z': to_radians(90)
+            )
+          )
+        ))
+        add_scoreboard_tag(@essence_armorstand, 'enchanted_essence')
+      })[0]
+    }
+  }
+  set_timeout(1, closure() {
+    set_mob_equipment(@essence_armorstand, array(
+      'HELMET': null
+    ))
+  })
+  return(@essence_armorstand)
+}

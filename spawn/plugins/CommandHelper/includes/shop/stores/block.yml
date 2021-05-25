@@ -47,3 +47,33 @@ PRODUCTS:
       price:
         sell: 0.28125
       detail: NONE
+  50:
+    name: IRON_INGOT
+    meta:
+      display: §f광물 판매
+      lore:
+      - §7좌클릭 시, 광물 판매 페이지를 엽니다.
+      model: 2
+      opengui: mineral
+  51:
+    name: WHEAT
+    meta:
+      display: §f농작물 판매
+      lore:
+      - §7좌클릭 시, 농작물 판매 페이지를 엽니다.
+      model: 1
+      opengui: crop
+  52:
+    name: PORKCHOP
+    meta:
+      display: §f전리품 판매
+      lore:
+      - §7좌클릭 시, 전리품 판매 페이지를 엽니다.
+      opengui: mob_loot
+  53:
+    name: OAK_LOG
+    meta:
+      display: §f블럭 판매
+      lore:
+      - §7좌클릭 시, 블럭 판매 페이지를 엽니다.
+      opengui: block

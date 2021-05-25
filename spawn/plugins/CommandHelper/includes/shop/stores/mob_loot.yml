@@ -1,121 +1,151 @@
 PRODUCTS:
-  0:
+  10:
     name: PORKCHOP
     meta:
       price:
         sell: 0.688
       detail: NONE
-  1:
+  11:
     name: BEEF
     meta:
       price:
         sell: 0.297
       detail: NONE
-  2:
+  12:
     name: MUTTON
     meta:
       price:
         sell: 0.703
       detail: NONE
-  3:
+  13:
     name: CHICKEN
     meta:
       price:
         sell: 0.297
       detail: NONE
-  4:
+  14:
     name: RABBIT
     meta:
       price:
         sell: 0.624
       detail: NONE
-  5:
-    name: RABBIT_HIDE
-    meta:
-      price:
-        sell: 0.752
-      detail: NONE
-  6:
-    name: RABBIT_FOOT
-    meta:
-      price:
-        sell: 3.124
-      detail: NONE
-  7:
+  19:
     name: LEATHER
     meta:
       price:
         sell: 1.56
       detail: NONE
-  8:
-    name: FEATHER
-    meta:
-      price:
-        sell: 0.4
-      detail: NONE
-  9:
-    name: EGG
-    meta:
-      price:
-        sell: 0.4
-      detail: NONE
-  10:
+  20:
     name: WHITE_WOOL
     meta:
       price:
         sell: 0.312
       detail: NONE
-  18:
-    name: BLAZE_POWDER
-    meta:
-      price:
-        sell: 1.094
-      detail: NONE
-  19:
-    name: MAGMA_CREAM
-    meta:
-      price:
-        sell: 1.016
-      detail: NONE
-  20:
-    name: SLIME_BALL
-    meta:
-      price:
-        sell: 0.937
-      detail: NONE
   21:
-    name: GHAST_TEAR
+    name: FEATHER
     meta:
       price:
-        sell: 1.563
+        sell: 0.4
       detail: NONE
   22:
+    name: EGG
+    meta:
+      price:
+        sell: 0.4
+      detail: NONE
+  23:
+    name: RABBIT_HIDE
+    meta:
+      price:
+        sell: 0.752
+      detail: NONE
+  24:
+    name: RABBIT_FOOT
+    meta:
+      price:
+        sell: 3.124
+      detail: NONE
+  28:
     name: ROTTEN_FLESH
     meta:
       price:
         sell: 0.781
       detail: NONE
-  23:
-    name: GUNPOWDER
-    meta:
-      price:
-        sell: 1.016
-      detail: NONE
-  24:
+  29:
     name: STRING
     meta:
       price:
         sell: 0.86
       detail: NONE
-  25:
+  30:
+    name: SPIDER_EYE
+    meta:
+      price:
+        sell: 0.937
+      detail: NONE
+  31:
+    name: GUNPOWDER
+    meta:
+      price:
+        sell: 1.016
+      detail: NONE
+  32:
     name: ENDER_PEARL
     meta:
       price:
         sell: 1.25
       detail: NONE
-  26:
-    name: SPIDER_ETE
+  33:
+    name: SLIME_BALL
     meta:
       price:
         sell: 0.937
       detail: NONE
+  37:
+    name: BLAZE_POWDER
+    meta:
+      price:
+        sell: 1.094
+      detail: NONE
+  38:
+    name: MAGMA_CREAM
+    meta:
+      price:
+        sell: 1.016
+      detail: NONE
+  39:
+    name: GHAST_TEAR
+    meta:
+      price:
+        sell: 1.563
+      detail: NONE
+  50:
+    name: IRON_INGOT
+    meta:
+      display: §f광물 판매
+      lore:
+      - §7좌클릭 시, 광물 판매 페이지를 엽니다.
+      model: 2
+      opengui: mineral
+  51:
+    name: WHEAT
+    meta:
+      display: §f농작물 판매
+      lore:
+      - §7좌클릭 시, 농작물 판매 페이지를 엽니다.
+      model: 1
+      opengui: crop
+  52:
+    name: PORKCHOP
+    meta:
+      display: §f전리품 판매
+      lore:
+      - §7좌클릭 시, 전리품 판매 페이지를 엽니다.
+      opengui: mob_loot
+  53:
+    name: OAK_LOG
+    meta:
+      display: §f블럭 판매
+      lore:
+      - §7좌클릭 시, 블럭 판매 페이지를 엽니다.
+      opengui: block

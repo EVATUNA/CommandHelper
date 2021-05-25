@@ -37,314 +37,321 @@ async_read('files/crops_spec.json', closure(@value) {
 
 ## Initial Including Procedure
 proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
-  if(@player_data['cache'] ) {
-    switch(@player_data['setting'][1]) {
-    case true:
-      switch(@player_data['setting'][0]) {
-      case 'general':
-        @channel = '\ue3fd'
-      case 'guild':
-        @channel = '\ue3ff'
-      case 'local':
-        @channel = '\ue401'
-      case 'admin':
-        @channel = '\ue403'
-      default:
-        @channel = '\ue3fd'
-      }
-    case false:
+  switch(@player_data['setting'][1]) {
+  case true:
     switch(@player_data['setting'][0]) {
-      case 'general':
-        @channel = '\ue3fe'
-      case 'guild':
-        @channel = '\ue400'
-      case 'local':
-        @channel = '\ue402'
-      case 'admin':
-        @channel = '\ue404'
-      default:
-        @channel = '\ue3fe'
-      }
+    case 'general':
+      @channel = '\ue3fd'
+    case 'guild':
+      @channel = '\ue3ff'
+    case 'local':
+      @channel = '\ue401'
+    case 'admin':
+      @channel = '\ue403'
+    default:
+      @channel = '\ue3fd'
     }
-    #hub 표사
-    #broadcast(@player_data['skill_manager'][2])
+  case false:
+  switch(@player_data['setting'][0]) {
+    case 'general':
+      @channel = '\ue3fe'
+    case 'guild':
+      @channel = '\ue400'
+    case 'local':
+      @channel = '\ue402'
+    case 'admin':
+      @channel = '\ue404'
+    default:
+      @channel = '\ue3fe'
+    }
+  }
+  #hub 표사
+  #broadcast(@player_data['skill_manager'][2])
 
-    @item = pinv(@player, pheld_slot(@player))
-    if(!is_null(@item)) {
-      if(array_contains(array('WOODEN_HOE', 'STONE_HOE', 'IRON_HOE', 'GOLDEN_HOE', 'DIAMOND_HOE', 'NETHERITE_HOE'), @item['name']) && @player_data['skill_manager'][3] != '') {
-        @category = 'harvesting_method'
-        @skill = @player_data['skill_manager'][3]
-      } else if(array_contains(array('WHEAT_SEEDS', 'BEETROOT_SEEDS', 'POTATO', 'CARROT', 'PUMPKIN_SEEDS', 'MELON_SEEDS', 'SWEET_BERRIES'), @item['name']) && @player_data['skill_manager'][4] != '') {
-        @category = 'sowing_method'
-        @skill = @player_data['skill_manager'][4]
-      } else {
-        @category = 'combat_method'
-        @skill = @player_data['skill_manager'][2]
-      }
+  @item = pinv(@player, pheld_slot(@player))
+  if(!is_null(@item)) {
+    if(array_contains(array('WOODEN_HOE', 'STONE_HOE', 'IRON_HOE', 'GOLDEN_HOE', 'DIAMOND_HOE', 'NETHERITE_HOE'), @item['name']) && @player_data['skill_manager'][3] != '') {
+      @category = 'harvesting_method'
+      @skill = @player_data['skill_manager'][3]
+    } else if(array_contains(array('WHEAT_SEEDS', 'BEETROOT_SEEDS', 'POTATO', 'CARROT', 'PUMPKIN_SEEDS', 'MELON_SEEDS', 'SWEET_BERRIES'), @item['name']) && @player_data['skill_manager'][4] != '') {
+      @category = 'sowing_method'
+      @skill = @player_data['skill_manager'][4]
     } else {
       @category = 'combat_method'
       @skill = @player_data['skill_manager'][2]
     }
-    if(@skill != '' && array_index_exists(@player_data['active_skill'], @category) && array_index_exists(@player_data['active_skill'][@category], @skill)) {
-      @level = @player_data['skill_data'][@category][@skill][0]
-      if(@skills_spec[@category][@skill]['levels'][@level]['active']['count'] == 0) {
-        if(@player_data['active_skill'][@category][@skill][1] > 0) {
-          @max_duration = @skills_spec[@category][@skill]['levels'][@level]['active']['duration']
-          @duration = @player_data['active_skill'][@category][@skill][1]
-          @index = integer(@duration / @max_duration * 10)
-          switch(@index) {
-          case 0:
-            @hotbar = '\ue406'
-            break()
-          case 1:
-            @hotbar = '\ue408'
-            break()
-          case 2:
-            @hotbar = '\ue409'
-            break()
-          case 3:
-            @hotbar = '\ue40a'
-            break()
-          case 4:
-            @hotbar = '\ue40b'
-            break()
-          case 5:
-            @hotbar = '\ue40c'
-            break()
-          case 6:
-            @hotbar = '\ue40d'
-            break()
-          case 7:
-            @hotbar = '\ue40e'
-            break()
-          case 8:
-            @hotbar = '\ue40f'
-            break()
-          case 9:
-            @hotbar = '\ue410'
-            break()
-          case 10:
-            @hotbar = '\ue411'
-            break()
-          }
-        } else {
-          @max_cooldown = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
-          @remain_cooldown = @max_cooldown - @player_data['active_skill'][@category][@skill][0]
-          @index = integer(@remain_cooldown / @max_cooldown * 10)
-          switch(@index) {
-          case 0:
-            @hotbar = '\ue406'
-            break()
-          case 1:
-            @hotbar = '\ue408'
-            break()
-          case 2:
-            @hotbar = '\ue409'
-            break()
-          case 3:
-            @hotbar = '\ue40a'
-            break()
-          case 4:
-            @hotbar = '\ue40b'
-            break()
-          case 5:
-            @hotbar = '\ue40c'
-            break()
-          case 6:
-            @hotbar = '\ue40d'
-            break()
-          case 7:
-            @hotbar = '\ue40e'
-            break()
-          case 8:
-            @hotbar = '\ue40f'
-            break()
-          case 9:
-            @hotbar = '\ue410'
-            break()
-          case 10:
-            @hotbar = '\ue411'
-            break()
-          }
+  } else {
+    @category = 'combat_method'
+    @skill = @player_data['skill_manager'][2]
+  }
+  if(@skill != '' && array_index_exists(@player_data['active_skill'], @category) && array_index_exists(@player_data['active_skill'][@category], @skill)) {
+    @level = @player_data['skill_data'][@category][@skill][0]
+    if(@skills_spec[@category][@skill]['levels'][@level]['active']['count'] == 0) {
+      if(@player_data['active_skill'][@category][@skill][1] > 0) {
+        @max_duration = @skills_spec[@category][@skill]['levels'][@level]['active']['duration']
+        @duration = @player_data['active_skill'][@category][@skill][1]
+        @index = integer(@duration / @max_duration * 10)
+        switch(@index) {
+        case 0:
+          @hotbar = '\ue406'
+          break()
+        case 1:
+          @hotbar = '\ue408'
+          break()
+        case 2:
+          @hotbar = '\ue409'
+          break()
+        case 3:
+          @hotbar = '\ue40a'
+          break()
+        case 4:
+          @hotbar = '\ue40b'
+          break()
+        case 5:
+          @hotbar = '\ue40c'
+          break()
+        case 6:
+          @hotbar = '\ue40d'
+          break()
+        case 7:
+          @hotbar = '\ue40e'
+          break()
+        case 8:
+          @hotbar = '\ue40f'
+          break()
+        case 9:
+          @hotbar = '\ue410'
+          break()
+        case 10:
+          @hotbar = '\ue411'
+          break()
         }
       } else {
         @max_cooldown = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
         @remain_cooldown = @max_cooldown - @player_data['active_skill'][@category][@skill][0]
-        @skill_count = @player_data['active_skill'][@category][@skill][2]
         @index = integer(@remain_cooldown / @max_cooldown * 10)
-        #broadcast(@skill_count @index @player_data['active_skill'][@category][@skill] @max_cooldown)
-        switch(@skill_count) {
+        switch(@index) {
         case 0:
-          switch(@index) {
-          case 0:
-            @hotbar = '\ue406'
-            break()
-          case 1:
-            @hotbar = '\ue412'
-            break()
-          case 2:
-            @hotbar = '\ue413'
-            break()
-          case 3:
-            @hotbar = '\ue414'
-            break()
-          case 4:
-            @hotbar = '\ue415'
-            break()
-          case 5:
-            @hotbar = '\ue416'
-            break()
-          case 6:
-            @hotbar = '\ue417'
-            break()
-          case 7:
-            @hotbar = '\ue418'
-            break()
-          case 8:
-            @hotbar = '\ue419'
-            break()
-          case 9:
-            @hotbar = '\ue41a'
-            break()
-          case 10:
-            @hotbar = '\ue41b'
-            break()
-          }
+          @hotbar = '\ue406'
           break()
         case 1:
-          switch(@index) {
-          case 0:
-            @hotbar = '\ue41b'
-            break()
-          case 1:
-            @hotbar = '\ue41c'
-            break()
-          case 2:
-            @hotbar = '\ue41d'
-            break()
-          case 3:
-            @hotbar = '\ue41e'
-            break()
-          case 4:
-            @hotbar = '\ue41f'
-            break()
-          case 5:
-            @hotbar = '\ue420'
-            break()
-          case 6:
-            @hotbar = '\ue421'
-            break()
-          case 7:
-            @hotbar = '\ue422'
-            break()
-          case 8:
-            @hotbar = '\ue423'
-            break()
-          case 9:
-            @hotbar = '\ue424'
-            break()
-          case 10:
-            @hotbar = '\ue425'
-            break()
-          }
+          @hotbar = '\ue408'
           break()
         case 2:
-          switch(@index) {
-          case 0:
-            @hotbar = '\ue425'
-            break()
-          case 1:
-            @hotbar = '\ue426'
-            break()
-          case 2:
-            @hotbar = '\ue427'
-            break()
-          case 3:
-            @hotbar = '\ue428'
-            break()
-          case 4:
-            @hotbar = '\ue429'
-            break()
-          case 5:
-            @hotbar = '\ue42a'
-            break()
-          case 6:
-            @hotbar = '\ue42b'
-            break()
-          case 7:
-            @hotbar = '\ue42c'
-            break()
-          case 8:
-            @hotbar = '\ue42d'
-            break()
-          case 9:
-            @hotbar = '\ue42e'
-            break()
-          case 10:
-            @hotbar = '\ue42f'
-            break()
-          }
+          @hotbar = '\ue409'
           break()
         case 3:
-          @hotbar = '\ue42f'
+          @hotbar = '\ue40a'
+          break()
+        case 4:
+          @hotbar = '\ue40b'
+          break()
+        case 5:
+          @hotbar = '\ue40c'
+          break()
+        case 6:
+          @hotbar = '\ue40d'
+          break()
+        case 7:
+          @hotbar = '\ue40e'
+          break()
+        case 8:
+          @hotbar = '\ue40f'
+          break()
+        case 9:
+          @hotbar = '\ue410'
+          break()
+        case 10:
+          @hotbar = '\ue411'
           break()
         }
       }
-      switch(@skill) {
-      case 'sweeping':
-        @icon = '\ue431'
+    } else {
+      @max_cooldown = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
+      @remain_cooldown = @max_cooldown - @player_data['active_skill'][@category][@skill][0]
+      @skill_count = @player_data['active_skill'][@category][@skill][2]
+      @index = integer(@remain_cooldown / @max_cooldown * 10)
+      #broadcast(@skill_count @index @player_data['active_skill'][@category][@skill] @max_cooldown)
+      switch(@skill_count) {
+      case 0:
+        switch(@index) {
+        case 0:
+          @hotbar = '\ue406'
+          break()
+        case 1:
+          @hotbar = '\ue412'
+          break()
+        case 2:
+          @hotbar = '\ue413'
+          break()
+        case 3:
+          @hotbar = '\ue414'
+          break()
+        case 4:
+          @hotbar = '\ue415'
+          break()
+        case 5:
+          @hotbar = '\ue416'
+          break()
+        case 6:
+          @hotbar = '\ue417'
+          break()
+        case 7:
+          @hotbar = '\ue418'
+          break()
+        case 8:
+          @hotbar = '\ue419'
+          break()
+        case 9:
+          @hotbar = '\ue41a'
+          break()
+        case 10:
+          @hotbar = '\ue41b'
+          break()
+        }
         break()
-      case 'knockback':
-        @icon = '\ue432'
+      case 1:
+        switch(@index) {
+        case 0:
+          @hotbar = '\ue41b'
+          break()
+        case 1:
+          @hotbar = '\ue41c'
+          break()
+        case 2:
+          @hotbar = '\ue41d'
+          break()
+        case 3:
+          @hotbar = '\ue41e'
+          break()
+        case 4:
+          @hotbar = '\ue41f'
+          break()
+        case 5:
+          @hotbar = '\ue420'
+          break()
+        case 6:
+          @hotbar = '\ue421'
+          break()
+        case 7:
+          @hotbar = '\ue422'
+          break()
+        case 8:
+          @hotbar = '\ue423'
+          break()
+        case 9:
+          @hotbar = '\ue424'
+          break()
+        case 10:
+          @hotbar = '\ue425'
+          break()
+        }
         break()
-      case 'cleaving':
-        @icon = '\ue433'
+      case 2:
+        switch(@index) {
+        case 0:
+          @hotbar = '\ue425'
+          break()
+        case 1:
+          @hotbar = '\ue426'
+          break()
+        case 2:
+          @hotbar = '\ue427'
+          break()
+        case 3:
+          @hotbar = '\ue428'
+          break()
+        case 4:
+          @hotbar = '\ue429'
+          break()
+        case 5:
+          @hotbar = '\ue42a'
+          break()
+        case 6:
+          @hotbar = '\ue42b'
+          break()
+        case 7:
+          @hotbar = '\ue42c'
+          break()
+        case 8:
+          @hotbar = '\ue42d'
+          break()
+        case 9:
+          @hotbar = '\ue42e'
+          break()
+        case 10:
+          @hotbar = '\ue42f'
+          break()
+        }
         break()
-      case 'blocking':
-        @icon = '\ue434'
-        break()
-      case 'wide_hand':
-        @icon = '\ue435'
-        break()
-      case 'golden_finger':
-        @icon = '\ue436'
-        break()
-      case 'wet_hands':
-        @icon = '\ue437'
-        break()
-      case 'fertile_touch':
-        @icon = '\ue438'
-        break()
-      default:
-        @icon = '\ue430'
+      case 3:
+        @hotbar = '\ue42f'
         break()
       }
-    } else {
-      @hotbar = @text['space_fonts']['space.23']
-      @icon = @text['space_fonts']['space.17']
     }
-    if(@player_data['setting'][13]) {
-      @left_hotbar = @text['space_fonts']['space.23']
-      @left_icon = @text['space_fonts']['space.17']
-      @right_hotbar = @hotbar
-      @right_icon = @icon
-    } else {
-      @left_hotbar = @hotbar
-      @left_icon = @icon
-      @right_hotbar = @text['space_fonts']['space.23']
-      @right_icon = @text['space_fonts']['space.17']
+    switch(@skill) {
+    case 'sweeping':
+      @icon = '\ue431'
+      break()
+    case 'knockback':
+      @icon = '\ue432'
+      break()
+    case 'cleaving':
+      @icon = '\ue433'
+      break()
+    case 'blocking':
+      @icon = '\ue434'
+      break()
+    case 'wide_hand':
+      @icon = '\ue435'
+      break()
+    case 'golden_finger':
+      @icon = '\ue436'
+      break()
+    case 'wet_hands':
+      @icon = '\ue437'
+      break()
+    case 'fertile_touch':
+      @icon = '\ue438'
+      break()
+    default:
+      @icon = '\ue430'
+      break()
     }
-    #196
-    action_msg(@player, @text['space_fonts']['space.5'].@channel.@text['space_fonts']['space.-71'].@text['space_fonts']['space.'.(@player_data['setting'][12] - 330)].@left_hotbar.@text['space_fonts']['space.-20'].@left_icon.@text['space_fonts']['space.2'].@text['space_fonts']['space.196'].@right_hotbar.@text['space_fonts']['space.-20'].@right_icon.@text['space_fonts']['space.2'].@text['space_fonts']['space.'.(@player_data['setting'][12] - 330)])
-    #action_msg(@player, @text['space_fonts']['space.5'].@channel.@text['space_fonts']['space.-65'].@text['space_fonts']['space.'.@player_data['setting'][12]])
   } else {
-    #해상도 설정
-    #141496 #ff6464
-    #\ue405 /tellraw aaaa__ "\ue405\uF800 A"
-    action_msg(@player, hexcolor('#ff6464').'\ue3f8'.@text['space_fonts']['space.-1'].hexcolor('#ffffff').'\ue3f8'.'\uF800'.@text['space_fonts']['space.'.@player_data['setting'][12]].hexcolor('#ff6464').'\ue3f8'.@text['space_fonts']['space.-1'])
-    #action_msg(@player, hexcolor('#ff6464').'|'.@text['space_fonts']['space.-1'].hexcolor('#64ffff').'|'.@text['space_fonts']['space.-2'].@text['space_fonts']['space.'.@player_data['setting'][12]].@text['space_fonts']['space.-1'].hexcolor('#64ffff').'|'.@text['space_fonts']['space.-1'].hexcolor('#ff6464').'|'.@text['space_fonts']['space.-1'])
+    @hotbar = @text['space_fonts']['space.23']
+    @icon = @text['space_fonts']['space.17']
   }
-
+  if(@player_data['setting'][13]) {
+    @left_hotbar = @text['space_fonts']['space.23']
+    @left_icon = @text['space_fonts']['space.17']
+    @right_hotbar = @hotbar
+    @right_icon = @icon
+  } else {
+    @left_hotbar = @hotbar
+    @left_icon = @icon
+    @right_hotbar = @text['space_fonts']['space.23']
+    @right_icon = @text['space_fonts']['space.17']
+  }
+  @left_surface = '§c\ue3f8§r'.@text['space_fonts']['space.-8'].'\ue006'.@text['space_fonts']['space.-7'].'\ue007'.@text['space_fonts']['space.-1']
+  @right_surface = '§c\ue3f8§r'.@text['space_fonts']['space.-1']
+  @resolution = @player_data['setting'][12]
+  if(@resolution % 2 == 0) {
+    @left_resolution = integer(@resolution / 2)
+    @right_resolution = integer(@resolution / 2)
+  } else {
+    @left_resolution = integer(@resolution / 2)
+    @right_resolution = integer(@resolution / 2 + 1)
+  }
+  @left_quota = integer(@left_resolution / 1024)
+  @right_quota = integer(@right_resolution / 1024)
+  @left_rest = @left_resolution % 1024
+  @right_rest = @right_resolution % 1024
+  @left_void = string_multiply(@text['space_fonts']['space.1024'], @left_quota).@text['space_fonts']['space.'.@left_rest]
+  @right_void = string_multiply(@text['space_fonts']['space.1024'], @right_quota).@text['space_fonts']['space.'.@right_rest]
+  @chat_hud = @text['space_fonts']['space.2'].@channel.@text['space_fonts']['space.-67']
+  @skill_hud = @text['space_fonts']['space.-118'].@text['space_fonts']['space.-2'].@left_hotbar.@text['space_fonts']['space.-20'].@left_icon.@text['space_fonts']['space.198'].@right_hotbar.@text['space_fonts']['space.-20'].@right_icon.@text['space_fonts']['space.-118']
+  action_msg(@player, @left_surface.@chat_hud.@left_void.@skill_hud.@right_void.@right_surface)
 }
 
 proc _set_indicator(@player, @uuid, @players_data, @text) {

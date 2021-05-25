@@ -202,7 +202,7 @@ proc _setupFrame(@storeName, @player, @stores) { ## gui 열 때 구성시켜주�
     @hereItemMeta = @products[@itemId]
     if(array_index_exists(@hereItemMeta, 'meta')) {
       if(array_index_exists(@hereItemMeta['meta'], 'opengui')) {
-        _itemMetaAddLore(@itemMeta, '§f왼 클릭시 해당 창으로 이동합니다.')
+        #_itemMetaAddLore(@itemMeta, '§f왼 클릭시 해당 창으로 이동합니다.')
       } else if(array_index_exists(@hereItemMeta['meta'], 'price')) {
         if(@tradeInfo['type'] == 'BUY') {
           if(array_index_exists(@hereItemMeta['meta']['price'], 'buy')) {

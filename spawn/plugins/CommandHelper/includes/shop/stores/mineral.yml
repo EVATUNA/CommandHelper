@@ -1,61 +1,101 @@
 PRODUCTS:
-  2:
-    name: COAL
-    meta:
-      price:
-        sell: 0.46875
-      detail: NONE
-  3:
-    name: QUARTZ
-    meta:
-      price:
-        sell: 0.390625
-      detail: NONE
-  4:
-    name: LAPIS_LAZULI
-    meta:
-      price:
-        sell: 0.546875
-      detail: NONE
-  5:
-    name: REDSTONE
-    meta:
-      price:
-        sell: 0.625
-      detail: NONE
-  6:
-    name: EMERALD
-    meta:
-      price:
-        sell: 2.65625
-      detail: NONE
   11:
     name: GOLD_NUGGET
     meta:
+      display: §f구리 주괴
+      model: 2
       price:
         sell: 0.703125
       detail: NONE
   12:
     name: IRON_INGOT
     meta:
+      display: §f철괴
+      model: 2
       price:
         sell: 0.859375
       detail: NONE
   13:
     name: GOLD_INGOT
     meta:
+      display: §f금괴
+      model: 2
       price:
         sell: 0.9375
       detail: NONE
   14:
     name: DIAMOND
     meta:
+      display: §f다이아몬드
+      model: 2
       price:
         sell: 1.875
       detail: NONE
   15:
     name: NETHERITE_INGOT
     meta:
+      display: §f네더라이트 주괴
+      model: 2
       price:
         sell: 4.6875
       detail: NONE
+  29:
+    name: COAL
+    meta:
+      price:
+        sell: 0.46875
+      detail: NONE
+  30:
+    name: QUARTZ
+    meta:
+      price:
+        sell: 0.390625
+      detail: NONE
+  31:
+    name: LAPIS_LAZULI
+    meta:
+      price:
+        sell: 0.546875
+      detail: NONE
+  32:
+    name: REDSTONE
+    meta:
+      price:
+        sell: 0.625
+      detail: NONE
+  33:
+    name: EMERALD
+    meta:
+      price:
+        sell: 2.65625
+      detail: NONE
+  50:
+    name: IRON_INGOT
+    meta:
+      display: §f광물 판매
+      lore:
+      - §7좌클릭 시, 광물 판매 페이지를 엽니다.
+      model: 2
+      opengui: mineral
+  51:
+    name: WHEAT
+    meta:
+      display: §f농작물 판매
+      lore:
+      - §7좌클릭 시, 농작물 판매 페이지를 엽니다.
+      model: 1
+      opengui: crop
+  52:
+    name: PORKCHOP
+    meta:
+      display: §f전리품 판매
+      lore:
+      - §7좌클릭 시, 전리품 판매 페이지를 엽니다.
+      opengui: mob_loot
+  53:
+    name: OAK_LOG
+    meta:
+      display: §f블럭 판매
+      lore:
+      - §7좌클릭 시, 블럭 판매 페이지를 엽니다.
+      opengui: block

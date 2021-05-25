@@ -4,25 +4,17 @@ include('eng_to_kor_translater.ms')
 
 @log_data = array()
 if(@server['name'] == 'main') {
-  @date = simple_date('yyyy-MM-dd')
-  @log_data = array(
-    'date': @date,
-    'path': 'logs/'.@date.'.log'
-  )
-
-  if(!file_exists(@log_data['path'])) {
-    create_file(@log_data['path'])
+  proc _logging_message(@type, @uuid, @player, @message) {
+    @time = simple_date('yyyy-MM-dd HH:mm:ss')
+    @message = replace(@message, '\\', '\\\\')
+    @message = replace(@message, '\'', '\\\'')
+    unsafe_query('evatuna', "INSERT INTO log_chat(`time`, `type`, `uuid`, `name`, `message`) VALUES (\'".@time."\', \'".@type."\', \'".@uuid."\', \'".@player."\', \'".@message."\')")
   }
-
-  @cron_task = set_cron('0 0 * * *', closure() {
-    @date = simple_date('yyyy-MM-dd')
-    @log_data['date'] = @date
-    @log_data['path'] = 'logs/'.@date.'.log'
-  })
-  
-  proc _logging(@log_data, @type, @text) {
-    @log = string('['.simple_date('HH:mm:ss') @type.'] '.@text.'\n')
-    write_file(@log_data['path'], @log, 'APPEND')
+  proc _logging_whisper(@type, @sender_uuid, @sender_name, @receiver_uuid, @receiver_name, @message) {
+    @time = simple_date('yyyy-MM-dd HH:mm:ss')
+    @message = replace(@message, '\\', '\\\\')
+    @message = replace(@message, '\'', '\\\'')
+    unsafe_query('evatuna', "INSERT INTO log_whisper(`time`, `sender_uuid`, `sender_name`, `receiver_uuid`, `receiver_name`, `message`) VALUES (\'".@time."\', \'".@sender_uuid."\', \'".@sender_name."\', \'".@receiver_uuid."\', \'".@receiver_name."\', \'".@message."\')")
   }
 }
 
@@ -68,9 +60,8 @@ proc _default_chat(@data, @players_data, @bots, @log_data) {
   @sender_setting = @data['sender_setting']
   @unmodified_message = @data['message']
   #로깅
-  if(is_proc('_logging')) {
-    @text = string(@sender_name.':'@unmodified_message)
-    _logging(@log_data, 'DEFAULT', @text)
+  if(is_proc('_logging_message')) {
+    _logging_message('default', @sender_uuid, @sender_name, @unmodified_message)
   }
   #리시버 설정
   @receivers = array()
@@ -298,9 +289,8 @@ proc _guild_chat(@data, @players_data, @bots, @log_data) {
   @unmodified_message = @data['message']
   @guild_owner = null
   #로깅
-  if(is_proc('_logging')) {
-    @text = string(@sender_name.':'@unmodified_message)
-    _logging(@log_data, 'GUILD', @text)
+  if(is_proc('_logging_message')) {
+    _logging_message('guild', @sender_uuid, @sender_name, @unmodified_message)
   }
   #리시버 설정
   @receivers = array()
@@ -614,9 +604,8 @@ proc _local_chat(@data, @players_data, @bots, @log_data) {
   @near_players = @data['near_players']
   @unmodified_message = @data['message']
   #로깅
-  if(is_proc('_logging')) {
-    @text = string(@sender_name.':'@unmodified_message)
-    _logging(@log_data, 'LOCAL', @text)
+  if(is_proc('_logging_message')) {
+    _logging_message('local', @sender_uuid, @sender_name, @unmodified_message)
   }
   #리시버 설정
   @receivers = array()
@@ -814,9 +803,8 @@ proc _admin_chat(@data, @players_data, @bots, @log_data) {
   @sender_setting = @data['sender_setting']
   @unmodified_message = @data['message']
   #로깅
-  if(is_proc('_logging')) {
-    @text = string(@sender_name.':'@unmodified_message)
-    _logging(@log_data, 'ADMIN', @text)
+  if(is_proc('_logging_message')) {
+    _logging_message('admin', @sender_uuid, @sender_name, @unmodified_message)
   }
   #리시버 설정
   @receivers = array()
@@ -1095,9 +1083,8 @@ proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @bots
   } else {
     @modified_message = @unmodified_message
   }
-  if(is_proc('_logging')) {
-    @text = string(@unmodified_message)
-    _logging(@log_data, 'BROADCAST', @text)
+  if(is_proc('_logging_message')) {
+    _logging_message('broadcast', @sender_uuid, @sender_name, @unmodified_message)
   }
   @raw = array(
     array(
@@ -1129,19 +1116,31 @@ register_command('broadcast', array(
   'aliases': array('say'),
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
-    @sender_name = @player
-    @sender_uuid = puuid(@sender_name)
-    if(array_index_exists(@players_data, @sender_uuid) && array_size(@args) > 0) {
-      @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
-      @setting = @players_data[@sender_uuid]['setting']
-      _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @bots, @log_data)
+    if(ponline(@player)) {
+      @sender_name = @player
+      @sender_uuid = puuid(@sender_name)
+      if(array_index_exists(@players_data, @sender_uuid) && array_size(@args) > 0) {
+        @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
+        @setting = @players_data[@sender_uuid]['setting']
+        _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @bots, @log_data)
+      } else {
+        tmsg(@player, color('yellow')'/'.@command'<message>')
+      }
     } else {
-      tmsg(@player, color('yellow')'/'.@command'<message>')
+      @sender_name = 'console'
+      @sender_uuid = 'console'
+      if(array_size(@args) > 0) {
+        @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
+        @setting = array('broadcast', false)
+        _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @bots, @log_data)
+      } else {
+        console(color('yellow')'/'.@command'<message>')
+      }
     }
   }
 ))
 
-proc _whisper(@data) {
+proc _whisper(@data, @log_data) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1152,9 +1151,8 @@ proc _whisper(@data) {
   #리시버 설정
   @receivers = @data['receivers']
   #로깅
-  if(is_proc('_logging')) {
-    @text = string(@sender_name'→'@target_name.':'@unmodified_message)
-    _logging(@log_data, 'WHISPER', @text)
+  if(is_proc('_logging_whisper')) {
+    _logging_whisper('whisper', @sender_uuid, @sender_name, @target_uuid, @target_name, @unmodified_message)
   }
   #메시지 생성 부분
   @modified_message = array(
@@ -1418,132 +1416,13 @@ register_command('whisper', array(
           #센더에게 tellraw
           _tellraw(@sender_name, @sender_raw)
           play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
-          _whisper(@data)
+          _whisper(@data, @log_data)
         } else {
           tmsg(@player, '\ue4de'color('gray').'플레이어를 찾을 수 없습니다.')
         }
       } else {
         tmsg(@player, '\ue4dd'color('yellow').'/'.@command'<플레이어> <할 말>'.color('gray').'을 통해 귓속말을 보낼 수 있습니다.')
       }
-    }
-  }
-))
-
-register_command('enko', array(
-  'description': 'can select chating type',
-  'usage': '/enko',
-  'tabcompleter': closure(@command, @player, @args) { return(array()) },
-  'executor': closure(@command, @player, @args) {
-    @uuid = puuid(@player)
-    if(array_index_exists(@players_data, @uuid)) {
-      if(@players_data[@uuid]['setting'][1]) {
-        @players_data[@uuid]['setting'][1] = false
-        cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-        _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
-      } else {
-        @players_data[@uuid]['setting'][1] = true
-        cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-        _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
-      }
-    }
-  }
-))
-
-register_command('ch', array(
-  'description': 'can select channel',
-  'usage': '/ch [channel]',
-  'tabcompleter': closure(@command, @player, @args) {
-    if(array_size(@args) == 0) {
-      @return = array('default', 'local', 'guild', 'admin')
-    } else {
-      @return = array()
-    }
-    return(@return)
-  },
-  'executor': closure(@command, @player, @args) {
-    @uuid = puuid(@player)
-    if(array_index_exists(@players_data, @uuid)) {
-      if(array_size(@args) == 0) {
-        switch(@players_data[@uuid]['setting'][0]) {
-        case 'local':
-          if(!is_null(moori_get_player_guild_id(@uuid))) {
-            @players_data[@uuid]['setting'][0] = 'guild'
-          } else {
-            if(pisop(@player)) {
-              @players_data[@uuid]['setting'][0] = 'admin'
-            } else {
-              @players_data[@uuid]['setting'][0] = 'default'
-            }
-          }
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-          break()
-        case 'guild':
-          if(pisop(@player)) {
-            @players_data[@uuid]['setting'][0] = 'admin'
-          } else {
-            @players_data[@uuid]['setting'][0] = 'default'
-          }
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-          break()
-        case 'admin':
-          @players_data[@uuid]['setting'][0] = 'default'
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-          break()
-        default:
-          @players_data[@uuid]['setting'][0] = 'local'
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-          break()
-        }
-        _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
-      } else if(array_size(@args) == 1) {
-        switch(@args[0]) {
-        case 'local':
-          @players_data[@uuid]['setting'][0] = 'local'
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-          break()
-        case 'guild':
-          if(!is_null(moori_get_player_guild_id(@uuid))) {
-            @players_data[@uuid]['setting'][0] = 'guild'
-            cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-          }
-          break()
-        case 'admin':
-          if(pisop(@player)) {
-            @players_data[@uuid]['setting'][0] = 'admin'
-            cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-          }
-          break()
-        default:
-          @players_data[@uuid]['setting'][0] = 'default'
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-          break()
-        }
-        _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
-      }
-    }
-  }
-))
-
-register_command('resolution', array(
-  'description': 'can set resolution',
-  'usage': '/resolution [resolution]',
-  'tabcompleter': closure(@command, @player, @args) { return(array()) },
-  'executor': closure(@command, @player, @args) {
-    @uuid = puuid(@player)
-    switch(array_size(@args)) {
-    case 0:
-      if(@players_data[@uuid]['cache']) {
-        @players_data[@uuid]['cache'] = false
-      } else {
-        @players_data[@uuid]['cache'] = true
-      }
-      _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
-      break()
-    case 1:
-      @players_data[@uuid]['setting'][12] = integer(@args[0])
-      _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
-      cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-      break()
     }
   }
 ))
