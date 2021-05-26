@@ -541,6 +541,6 @@ register_command('resourceurl', array(
   }
 ))
 
-
+# 상점 리코딩 후 제거 예정
 array proc _clone(array @arr) { return(array_deep_clone(@arr)) }
 boolean proc _existsGui(string @guiid) { return(array_contains(get_virtual_inventories(), @guiid)) }
