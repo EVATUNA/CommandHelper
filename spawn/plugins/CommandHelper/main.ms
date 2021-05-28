@@ -1,8 +1,3 @@
-## Channel Register
-if(!is_channel_registered('BungeeCord')) {
-  register_channel('BungeeCord')
-}
-
 ## Includes
 # 데이터 처리, 프로시저 등록
 include('includes/gameplay/main.ms')

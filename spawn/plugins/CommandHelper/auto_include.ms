@@ -333,8 +333,8 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
     @right_hotbar = @text['space_fonts']['space.23']
     @right_icon = @text['space_fonts']['space.17']
   }
-  @left_surface = '§c\ue3f8§r'.@text['space_fonts']['space.-8'].'\ue006'.@text['space_fonts']['space.-7'].'\ue007'.@text['space_fonts']['space.-1']
-  @right_surface = '§c\ue3f8§r'.@text['space_fonts']['space.-1']
+  @left_surface = '§c\ue3f8§r'.@text['space_fonts']['space.-8'].'\ue006'.@text['space_fonts']['space.-8'].'\ue007'.@text['space_fonts']['space.-1']
+  @right_surface = '§c\ue3f8§r'.@text['space_fonts']['space.-2']
   @resolution = @player_data['setting'][12]
   if(@resolution % 2 == 0) {
     @left_resolution = integer(@resolution / 2)
@@ -461,8 +461,22 @@ proc _set_indicator(@player, @uuid, @players_data, @text) {
       @ui = '\ue4b2'
       break()
     }
+    @resolution = @players_data[@uuid]['setting'][12]
+    if(@resolution % 2 == 0) {
+      @left_resolution = integer(@resolution / 2)
+      @right_resolution = integer(@resolution / 2)
+    } else {
+      @left_resolution = integer(@resolution / 2)
+      @right_resolution = integer(@resolution / 2 + 1)
+    }
+    @left_quota = integer(@left_resolution / 1024)
+    @right_quota = integer(@right_resolution / 1024)
+    @left_rest = @left_resolution % 1024
+    @right_rest = @right_resolution % 1024
+    @left_void = string_multiply(@text['space_fonts']['space.1024'], @left_quota).@text['space_fonts']['space.'.@left_rest]
+    @right_void = string_multiply(@text['space_fonts']['space.1024'], @right_quota).@text['space_fonts']['space.'.@right_rest]
     @indicator_bossbar_data = array(
-      'title': @ui.@text['space_fonts']['space.-19'].@icon.@text['space_fonts']['space.-450'].@text['space_fonts']['space.'.@players_data[@uuid]['setting'][12]].@text['space_fonts']['space.'.@players_data[@uuid]['setting'][12]]
+      'title': @text['space_fonts']['space.2'].@ui.@text['space_fonts']['space.-19'].@icon.@text['space_fonts']['space.-21'].@left_void.@right_void
     )
     update_bar('indicator.'.@uuid, @indicator_bossbar_data)
   } else {

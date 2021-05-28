@@ -19,7 +19,7 @@ bind('inventory_close', null, array('virtual': true), @event) {
 
 proc _show_gui(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure) {
   @id = @player.'.'.@gui_id.'.'.time()
-  create_virtual_inventory(@id, @type, @texture_layer.@message, @inventory)
+  create_virtual_inventory(@id, @type, color('white').@texture_layer.hexcolor('#404040').@message, @inventory)
   @closure_arguments = array_merge(array(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id), array_get(@arguments, cslice(7, array_size(@arguments) - 1)))
   #기본 클로저 인수: closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id) @id 뒤에 추가로 기입 가능
   execute_array(@closure_arguments, @closure)

@@ -194,7 +194,7 @@ proc _combat_page(@player, @player_skill, @mastery_info, @text) {
   if(!is_null(@selected_combat_method)) {
     foreach(@combat_method_info in @combat_methods_info) {
       if(@selected_combat_method['name'] == @combat_method_info['name']) {
-        @desription = @selected_combat_method['name'].' 전투 방식을 사용중입니다.\n\n§c좌 클릭시, 전투 방식 선택창을 열어\n모든 전투 방식의 숙련 레벨과\n숙련 경험치를 확인 할 수 있으며\n전투 방식을 변경 할 수 있습니다.'
+        @desription = @selected_combat_method['name'].' 전투 방식을 사용중입니다.\n\n§c좌클릭 시, 전투 방식 선택창을 열어\n모든 전투 방식의 숙련 레벨과\n숙련 경험치를 확인 할 수 있으며\n전투 방식을 변경 할 수 있습니다.'
         @raw[0][] = array(
           'text': @text['space_fonts']['space.18'],
           'color': 'white',
@@ -223,7 +223,7 @@ proc _combat_page(@player, @player_skill, @mastery_info, @text) {
       }
     }
   } else {
-    @desription = '사용중인 전투 방식이 없습니다.\n\n§c좌 클릭시, 전투 방식 선택창을 열어\n모든 전투 방식의 숙련 레벨과\n숙련경험치를 확인 할 수 있으며\n전투 방식을 변경 할 수 있습니다.'
+    @desription = '사용중인 전투 방식이 없습니다.\n\n§c좌클릭 시, 전투 방식 선택창을 열어\n모든 전투 방식의 숙련 레벨과\n숙련경험치를 확인 할 수 있으며\n전투 방식을 변경 할 수 있습니다.'
     @raw[0][] = array(
       'text': @text['space_fonts']['space.18'],
       'color': 'white',
@@ -262,7 +262,7 @@ proc _combat_page(@player, @player_skill, @mastery_info, @text) {
   if(array_size(@selected_combat_inclinations) > 0) {
     foreach(@combat_inclination_info in @combat_inclinations_info) {
       if(array_contains(@selected_combat_inclinations, @combat_inclination_info['name'])) {
-        @desription = @combat_inclination_info['name'].' 특성을 적용중입니다.\n\n§c좌 클릭시, 전투 특성 선택창을 열어\n습득한 모든 전투 특성을 확인 할 수 있으며\n특성 변경이 가능합니다.'
+        @desription = @combat_inclination_info['name'].' 특성을 적용중입니다.\n\n§c좌클릭 시, 전투 특성 선택창을 열어\n습득한 모든 전투 특성을 확인 할 수 있으며\n특성 변경이 가능합니다.'
         @raw[0][] = array(
           'text': @text['space_fonts']['space.18'],
           'color': 'white',
@@ -294,7 +294,7 @@ proc _combat_page(@player, @player_skill, @mastery_info, @text) {
       }
     }
   }
-  @desription = '해당 슬롯에 적용된 특성이 없습니다.\n\n§c좌 클릭시, 전투 특성 선택창을 열어\n습득한 모든 전투 특성을 확인 할 수 있으며\n특성 변경이 가능합니다.'
+  @desription = '해당 슬롯에 적용된 특성이 없습니다.\n\n§c좌클릭 시, 전투 특성 선택창을 열어\n습득한 모든 전투 특성을 확인 할 수 있으며\n특성 변경이 가능합니다.'
   for(@i = 0, @i < @unselected_slot_size, @i++) {
     @raw[0][] = array(
       'text': @text['space_fonts']['space.18'],

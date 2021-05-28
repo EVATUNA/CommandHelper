@@ -161,8 +161,8 @@ proc _help_commnad(@command, @player, @args, @prefix) {
   }
 }
 
-unregister_command('minecraft:help')
-unregister_command('bukkit:help')
+#unregister_command('minecraft:help')
+#unregister_command('bukkit:help')
 register_command('help', array(
   'aliases': array('command', 'commands', 'cmd', 'cmds', '도움말', '명령어', '헬프', '커맨드'),
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
@@ -204,7 +204,7 @@ register_command('help', array(
 ### 관리자 명령어 (모든 서버에서 작동되도록 수정 해야함)
 ###
 /*
-proc _admincmdArgs() { return(array('hga','event','vote','autoquiz')); }
+proc _admincmdArgs() { return(array('hga','event','vote','autoquiz')) }
 register_command('admincmd', array(
   permission: 'admin.use',
   noPermMsg: color('RED').'권한이 부족합니다.',
@@ -541,6 +541,8 @@ register_command('whisper', array(
 
 # 유틸
 proc _util_command(@command, @player, @args, @prefix, @text) {
+  @texture_layer = @text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-162'].@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-162'].@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-162']
+  @message = '유틸'
   @inventory = array()
   for(@index = 0, @index < 27, @index++) {
     @inventory[@index] = array(
@@ -561,7 +563,7 @@ proc _util_command(@command, @player, @args, @prefix, @text) {
   @inventory[16]['meta']['display'] = '§f설정'
   @inventory[16]['meta']['lore'] = array('§7좌클릭 시, 설정 GUI를 엽니다.')
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player'; @player, 'virtual': true), @event, @player) {
+    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @id) {
       cancel()
       if(@event['action'] == 'PICKUP_ALL') {
         switch(@event['rawslot']) {
@@ -591,7 +593,7 @@ register_command('util', array(
 ))
 # 설정
 proc _setting_command(@command, @player, @args, @prefix, @text) {
-  @texture_layer = ''
+  @texture_layer = @text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-162'].@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-162'].@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-162']
   @message = '설정'
   @inventory = array()
   for(@index = 0, @index < 27, @index++) {
@@ -604,19 +606,19 @@ proc _setting_command(@command, @player, @args, @prefix, @text) {
     )
   }
   @inventory[0]['meta']['model'] = 4
-  @inventory[11]['meta']['display'] = '§f채팅 설정'
-  @inventory[11]['meta']['lore'] = array('§7좌클릭 시, 채팅 설정 GUI를 엽니다.')
-  @inventory[15]['meta']['display'] = '§f화면 설정'
-  @inventory[15]['meta']['lore'] = array('§7좌클릭 시, 화면 설정 GUI를 엽니다.')
+  @inventory[12]['meta']['display'] = '§f채팅 설정'
+  @inventory[12]['meta']['lore'] = array('§c준 비 중')
+  @inventory[14]['meta']['display'] = '§f화면 설정'
+  @inventory[14]['meta']['lore'] = array('§7좌클릭 시, 화면 설정 GUI를 엽니다.')
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player'; @player, 'virtual': true), @event, @player, @texture_layer, @message, @inventory, @closure, @uuid, @text) {
+    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @texture_layer, @message, @inventory, @closure, @uuid, @text) {
       cancel()
       if(@event['action'] == 'PICKUP_ALL') {
         switch(@event['rawslot']) {
-        case 11:
+        case 12:
           runas(@player, '/chat')
           break()
-        case 15:
+        case 14:
           runas(@player, '/screen')
           break()
         }
@@ -634,7 +636,15 @@ register_command('setting', array(
 ))
 # 화면 설정 (GUI)
 proc _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @skills_spec, @text) {
-  @texture_layer = ''
+  @is_using_right_hand = @players_data[@uuid]['setting'][13]
+  if(@is_using_right_hand) {
+    @left_skill_hud = '\uec1b'
+    @right_skill_hud = '\uec1c'
+  } else {
+    @left_skill_hud = '\uec1c'
+    @right_skill_hud = '\uec1b'
+  }
+  @texture_layer = @text['space_fonts']['space.-8'].'\uebff'.@text['space_fonts']['space.-169'].'\uec00'.@text['space_fonts']['space.-80'].@left_skill_hud.@text['space_fonts']['space.85'].@right_skill_hud.@text['space_fonts']['space.-146']
   @message = 'HUD 표시 너비 설정 :: '.@players_data[@uuid]['setting'][12]
   @inventory = array()
   for(@index = 0, @index < 27, @index++) {
@@ -789,7 +799,8 @@ proc _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @s
   )
 
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_spec, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player'; @player, 'virtual': true), @event, @player, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_spec, @text) {
+    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_spec, @text) {
+      @is_using_right_hand = @players_data[@uuid]['setting'][13]
       cancel()
       if(@event['action'] == 'PICKUP_ALL') {
         @is_size_changed = false
@@ -816,6 +827,27 @@ proc _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @s
         case 7:
           @new_resolution = @players_data[@uuid]['setting'][12] + 100
           break()
+        case 19:
+          @new_is_using_right_hand = false
+          #@players_data[@uuid]['setting'][13] = true
+          break()
+        case 25:
+          @new_is_using_right_hand = true
+          #@players_data[@uuid]['setting'][13] = false
+          break()
+        }
+        if(@is_using_right_hand != @new_is_using_right_hand) {
+          @players_data[@uuid]['setting'][13] = @new_is_using_right_hand
+          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          if(@new_is_using_right_hand) {
+            @left_skill_hud = '\uec1b'
+            @right_skill_hud = '\uec1c'
+          } else {
+            @left_skill_hud = '\uec1c'
+            @right_skill_hud = '\uec1b'
+          }
+          @texture_layer = @text['space_fonts']['space.-8'].'\uebff'.@text['space_fonts']['space.-169'].'\uec00'.@text['space_fonts']['space.-80'].@left_skill_hud.@text['space_fonts']['space.85'].@right_skill_hud.@text['space_fonts']['space.-146']
+          @is_size_changed = true
         }
         if(@new_resolution < 256) {
           @new_resolution = 256
@@ -824,6 +856,7 @@ proc _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @s
         }
         if(@new_resolution != @players_data[@uuid]['setting'][12]) {
           @players_data[@uuid]['setting'][12] = @new_resolution
+          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           @is_size_changed = true
         }
         if(@is_size_changed) {
@@ -977,7 +1010,7 @@ register_command('hud', array(
     )
   )
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_spec, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player'; @player, 'virtual': true), @event, @player, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_spec, @text) {
+    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_spec, @text) {
       cancel()
       if(@event['action'] == 'PICKUP_ALL') {
         switch(@event['rawslot']) {
@@ -989,3 +1022,157 @@ register_command('hud', array(
   }
   _show_gui(@player, 'chat_setting', 27, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_spec, @text)
 */
+# 워프
+proc _warp_command(@command, @player, @args, @prefix, @text, @server) {
+  if(@server['name'] == 'main') {
+    @random_teleport = @text['space_fonts']['space.-1'].'\uec09'.@text['space_fonts']['space.-1'].'\uec10'.@text['space_fonts']['space.-1'].'\uec17'
+    @random_teleport_item = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': '§f랜덤 텔레포트',
+        'lore': array('§7좌클릭 시, 랜덤 텔레포트 GUI를 엽니다.'),
+        'model': 1
+      )
+    )
+  } else {
+    @random_teleport = @text['space_fonts']['space.-1'].'\uec0c'.@text['space_fonts']['space.-1'].'\uec13'.@text['space_fonts']['space.-1'].'\uec1a'
+    @random_teleport_item = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': '§f랜덤 텔레포트',
+        'lore': array('§c해당 월드에선 사용하실 수 없습니다.'),
+        'model': 1
+      )
+    )
+  }
+  @texture_layer = @text['space_fonts']['space.-1'].'\uec03'.@text['space_fonts']['space.-1'].'\uec04'.@text['space_fonts']['space.-1'].'\uec05'.@text['space_fonts']['space.-1'].'\uec06'.@text['space_fonts']['space.-1'].'\uec07'.@text['space_fonts']['space.-1'].'\uec08'.@random_teleport.@text['space_fonts']['space.-162']
+  @message = '어디로 갈까요..?'
+  @spawn_item = array(
+    'name': 'STRUCTURE_VOID',
+    'meta': array(
+      'display': '§f스폰',
+      'lore': array('§7좌클릭 시, 스폰으로 이동합니다.'),
+      'model': 1
+    )
+  )
+  @home_item = array(
+    'name': 'STRUCTURE_VOID',
+    'meta': array(
+      'display': '§f홈',
+      'lore': array('§7좌클릭 시, 홈으로 이동합니다.'),
+      'model': 1
+    )
+  )
+  @inventory = array(
+    0: @spawn_item,
+    1: @spawn_item,
+    2: @spawn_item,
+    3: @home_item,
+    4: @home_item,
+    5: @home_item,
+    6: @random_teleport_item,
+    7: @random_teleport_item,
+    8: @random_teleport_item,
+    9: @spawn_item,
+    10: @spawn_item,
+    11: @spawn_item,
+    12: @home_item,
+    13: @home_item,
+    14: @home_item,
+    15: @random_teleport_item,
+    16: @random_teleport_item,
+    17: @random_teleport_item,
+    18: @spawn_item,
+    19: @spawn_item,
+    20: @spawn_item,
+    21: @home_item,
+    22: @home_item,
+    23: @home_item,
+    24: @random_teleport_item,
+    25: @random_teleport_item,
+    26: @random_teleport_item,
+  )
+  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @server) {
+    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @server) {
+      cancel()
+      if(@event['action'] == 'PICKUP_ALL') {
+        switch(@event['rawslot']) {
+        case 0..2:
+        case 9..11:
+        case 18..20:
+          runas(@player, '/spawn')
+          break()
+        case 3..5:
+        case 12..14:
+        case 21..23:
+          runas(@player, '/home')
+          break()
+        case 6..8:
+        case 15..17:
+        case 24..26:
+          if(@server['name'] == 'main') {
+            runas(@player, '/randomteleport')
+          }
+          break()
+        }
+      }
+    }
+  }
+  _show_gui(@player, 'setting', 27, @texture_layer, @message, @inventory, @closure, @server)
+}
+register_command('warp', array(
+  'aliases': array('워프'),
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    @uuid = puuid(@player)
+    _warp_command(@command, @player, @args, @prefix, @text, @server)
+  }
+))
+###
+### 어드민 명령어
+###
+proc _setbadge_command(@command, @player, @args, @prefix, @players_data) {
+  if(array_size(@args) == 2) {
+    @target_name = @args[0]
+    if(ponline(@target_name)) {
+      @target_uuid = puuid(@target_name)
+      @badge = char_from_unicode(parse_int(replace(@args[1], '\\u', ''), 16))
+      @players_data[@target_uuid]['setting'][11] = @badge
+      cup_set('SETTING', @target_uuid, @players_data[@target_uuid]['setting'])
+    }
+  }
+}
+register_command('setbadge', array(
+  permission: 'setbadge',
+  'tabcompleter': closure(@command, @player, @args) {
+    if(array_size(@args) == 0) {
+      @return = all_players()
+    } else {
+      @return = array()
+    }
+    return(@return)
+  },
+  'executor': closure(@command, @player, @args) {
+    _setbadge_command(@command, @player, @args, @prefix, @players_data)
+  }
+))
+proc _chatobserver_command(@command, @player, @args, @prefix, @players_data) {
+  @uuid = puuid(@player)
+  @chat_observer_mode = @players_data[@uuid]['setting'][8]
+  if(@chat_observer_mode == true) {
+    @players_data[@uuid]['setting'][8] = false
+    cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+    msg(감시 오프)
+  } else {
+    @players_data[@uuid]['setting'][8] = true
+    cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+    msg(감시 온)
+  }
+}
+register_command('chatobserver', array(
+  permission: 'chatobserver',
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    _chatobserver_command(@command, @player, @args, @prefix, @players_data)
+  }
+))

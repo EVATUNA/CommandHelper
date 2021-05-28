@@ -1019,6 +1019,11 @@
 			"default_max_level": 3,
 			"levels": [
 				{
+					"max_experience": 50,
+					"passive": {
+					}
+				},
+				{
 					"max_experience": 100,
 					"passive": {
 					}
@@ -1040,122 +1045,12 @@
 				},
 				{
 					"max_experience": 1600,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 3200,
 					"passive": {
 					}
 				}
 			]
 		},
 	"iron_mining_mastery": {
-			"default_max_level": 3,
-			"levels": [
-				{
-					"max_experience": 100,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 200,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 400,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 800,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 1600,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 3200,
-					"passive": {
-					}
-				}
-			]
-		},
-	"gold_mining_mastery": {
-			"default_max_level": 3,
-			"levels": [
-				{
-					"max_experience": 100,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 200,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 400,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 800,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 1600,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 3200,
-					"passive": {
-					}
-				}
-			]
-		},
-	"diamond_mining_mastery": {
-			"default_max_level": 3,
-			"levels": [
-				{
-					"max_experience": 100,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 200,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 400,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 800,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 1600,
-					"passive": {
-					}
-				},
-				{
-					"max_experience": 3200,
-					"passive": {
-					}
-				}
-			]
-		},
-	"ancient_debris_mining_mastery": {
 			"default_max_level": 3,
 			"levels": [
 				{
@@ -1184,7 +1079,112 @@
 					}
 				},
 				{
-					"max_experience": 3200,
+					"max_experience": 1600,
+					"passive": {
+					}
+				}
+			]
+		},
+	"gold_mining_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 50,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 100,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 200,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 400,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 800,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1600,
+					"passive": {
+					}
+				}
+			]
+		},
+	"diamond_mining_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 50,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 100,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 200,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 400,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 800,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 1600,
+					"passive": {
+					}
+				}
+			]
+		},
+	"ancient_debris_mining_mastery": {
+			"default_max_level": 3,
+			"levels": [
+				{
+					"max_experience": 25,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 50,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 100,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 200,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 400,
+					"passive": {
+					}
+				},
+				{
+					"max_experience": 800,
 					"passive": {
 					}
 				}

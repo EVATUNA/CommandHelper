@@ -65,7 +65,7 @@ proc _new_data(@uuid, @players_data) {
     false,
     true,
     true,
-    array('\ue4e3', '\ue4e4', '\ue4e5', '\ue4e6')[rand(0, 4)], #테스트 코드
+    array('\uf01e', '\uf01f', '\uf020', '\uf021')[rand(0, 4)], #테스트 코드
     427,
     true
   )
@@ -128,6 +128,7 @@ proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @
 
 proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @bots, @skills_spec, @text, @server) {
   if(!array_contains(@bots, @uuid)) {
+    #broadcast('봇아님' @player)
     if(!array_index_exists(@reconnectable_players, @uuid)) {
       _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @server)
     } else {
@@ -137,7 +138,14 @@ proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @bots, @
       #})
     }
   } else {
-    set_pmode(@player, 'SPECTATOR')
+    #broadcast('봇임' @player)
+    ## Channel Register
+    if(!is_channel_registered('BungeeCord')) {
+      register_channel('BungeeCord')
+    }
+    set_timeout(10, closure() {
+      set_pmode(@player, 'SPECTATOR')
+    })
   }
 }
 
@@ -168,8 +176,18 @@ proc _countdown_reconnectable_players(@reconnectable_players) {
 foreach(@player in all_players()) { #조인 이벤트로 변경 리로드 명령어
   @uuid = puuid(@player)
   if(!array_contains(@bots, @uuid)) {
-    set_timeout(1000, closure() {
+    #broadcast('봇아님' @player)
+    set_timeout(1, closure() {
       _load_data(@player, @uuid, @players_data, @skills_spec, @text)
+    })
+  } else {
+    #broadcast('봇임' @player)
+    ## Channel Register
+    if(!is_channel_registered('BungeeCord')) {
+      register_channel('BungeeCord')
+    }
+    set_timeout(10, closure() {
+      set_pmode(@player, 'SPECTATOR')
     })
   }
 }
@@ -365,58 +383,60 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
 })
 
 bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @reconnectable_players, @players_data, @server, @bots, @log_data) {
-  @identifier_size = -1
-  foreach(@key: @byte in @event['bytes']) {
-    #broadcast(@key @byte )
-    if(@key != 0) {
-      #if(@byte == 0) {
-      if(@byte == 123) {
-        @identifier_size = @key - 6 #-2
-        break()
+  if(ponline(@event['player'])) {
+    @identifier_size = -1
+    foreach(@key: @byte in @event['bytes']) {
+      #broadcast(@key @byte )
+      if(@key != 0) {
+        #if(@byte == 0) {
+        if(@byte == 123) {
+          @identifier_size = @key - 6 #-2
+          break()
+        }
       }
     }
-  }
-  #
-  if(@identifier_size != -1) {
-    @value_string = string(ba_get_bytes(@event['bytes'], array_size(@event['bytes']) - @identifier_size - 6, @identifier_size + 6))
-    if(string_ends_with(@value_string, '}')) {
-      @data = array(
-        'identifier': string(ba_get_bytes(@event['bytes'], @identifier_size, 2)),
-        'value': json_decode(@value_string)
-      )
-      switch(@data['identifier']) {
-      case 'ch_player_quit':
-        @uuid = @data['value']['uuid']
-        @reconnectable_players[@uuid] = 10
-        break()
-      case 'ch_default_chat':
-        _default_chat(@data['value'], @players_data, @bots)
-        break()
-      case 'ch_local_chat':
-        _local_chat(@data['value'], @players_data, @bots)
-        break()
-      case 'ch_guild_chat':
-        _guild_chat(@data['value'], @players_data, @bots)
-        break()
-      case 'ch_admin_chat':
-        _admin_chat(@data['value'], @players_data, @bots)
-        break()
-      case 'ch_whisper':
-        _whisper(@data['value'], @log_data)
-        break()
-      case 'ch_broadcast':
-        @receiver_uuids = _all_players(@bots)
-        foreach(@receiver_uuid in @receiver_uuids) {
-          @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
-          if(ponline(@receiver_name)) {
-            tellraw(@receiver_name, @data['value']['raw'])
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+    #
+    if(@identifier_size != -1) {
+      @value_string = string(ba_get_bytes(@event['bytes'], array_size(@event['bytes']) - @identifier_size - 6, @identifier_size + 6))
+      if(string_ends_with(@value_string, '}')) {
+        @data = array(
+          'identifier': string(ba_get_bytes(@event['bytes'], @identifier_size, 2)),
+          'value': json_decode(@value_string)
+        )
+        switch(@data['identifier']) {
+        case 'ch_player_quit':
+          @uuid = @data['value']['uuid']
+          @reconnectable_players[@uuid] = 10
+          break()
+        case 'ch_default_chat':
+          _default_chat(@data['value'], @players_data, @bots)
+          break()
+        case 'ch_local_chat':
+          _local_chat(@data['value'], @players_data, @bots)
+          break()
+        case 'ch_guild_chat':
+          _guild_chat(@data['value'], @players_data, @bots)
+          break()
+        case 'ch_admin_chat':
+          _admin_chat(@data['value'], @players_data, @bots)
+          break()
+        case 'ch_whisper':
+          _whisper(@data['value'], @log_data)
+          break()
+        case 'ch_broadcast':
+          @receiver_uuids = _all_players(@bots)
+          foreach(@receiver_uuid in @receiver_uuids) {
+            @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
+            if(ponline(@receiver_name)) {
+              tellraw(@receiver_name, @data['value']['raw'])
+              play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+            }
           }
+          break()
+        case 'ch_resourcepack_url_update':
+          @server['resourcepack'] = @data['value']['url']
+          store_value('resourcepack', @data['value']['url'])
         }
-        break()
-      case 'ch_resourcepack_url_update':
-        @server['resourcepack'] = @data['value']['url']
-        store_value('resourcepack', @data['value']['url'])
       }
     }
   }
@@ -466,7 +486,7 @@ bind('block_place', null, null, @event, @players_data, @skills_spec, @server) {
 }
 
 bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spec, @crops_spec, @skills_spec, @text, @server) {
-  set_timeout(1, closure() {
+  #set_timeout(1, closure() {
     @player = @event['player']
     @uuid = puuid(@player)
     if(!is_cancelled() && pmode(@player) == 'SURVIVAL') {
@@ -474,8 +494,8 @@ bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spe
       if(@is_farming_allowed) {
         _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skills_spec, @text)
       }
-      @is_mining_allowed = true
-      if(@is_mining_allowed) {
+      #@is_mining_allowed = true
+      if(@server['name'] != 'main') {
         _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @minerals_spec, @skills_spec, @text)
         @stones = array(
           'STONE': 1,
@@ -574,7 +594,7 @@ bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spe
         }
       }
     }
-  })
+  #})
 }
 
 bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_spec, @essences, @server, @text) {
@@ -616,10 +636,10 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         @gui_id = 'enchant_table.'.@location['x'].'.'.@location['y'].'.'.@location['z']
         # 인첸트 되는 아이템 위치 설정
         @item_location = array_deep_clone(@location)
-        @item_location['x'] -= 0.25
+        @item_location['x'] += 1.25
         @item_location['z'] += 0.5
         @item_location['y'] -= 0.7
-        @item_location['yaw'] = -90
+        @item_location['yaw'] = 90
         @item_armorstand = _preset_item_armorstand(@item_location)
         # 마법의 정수 위치 설정
         @essence_location = array_deep_clone(@location)
@@ -658,11 +678,11 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
             'helmet': null
           ))
           @item['qty'] = pgive_item(@player, @item)
-          @item_location = array_deep_clone(@location)
-          @item_location['x'] += 0.5
-          @item_location['z'] += 0.5
-          @item_location['y'] += 1
-          drop_item(@item_location, @item, false)
+          @drop_location = array_deep_clone(@location)
+          @drop_location['x'] += 0.5
+          @drop_location['z'] += 0.5
+          @drop_location['y'] += 1
+          drop_item(@drop_location, @item, false)
           export(@gui_id, '')
           set_mob_name(@item_armorstand, '')
         }
@@ -688,7 +708,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
           # 이벤트 세팅
           @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @essences, @location, @uuid, @item_armorstand, @essence_armorstand, @text) {
             #인첸트 안하고 그냥 인벤 닫을시
-            bind('inventory_close', array('id': 'close'.@id), array('player'; @player, 'virtual': true), @event, @player, @uuid, @gui_id, @item_armorstand, @essence_armorstand) {
+            bind('inventory_close', array('id': 'close'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @item_armorstand, @essence_armorstand) {
               @item = @event['inventory'][22]
               if(!is_null(@item)) {
                 @item['qty'] = pgive_item(@player, @item)
@@ -699,10 +719,10 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
               export(@gui_id, '')
               set_mob_name(@item_armorstand, '')
               set_mob_name(@essence_armorstand, '')
-              broadcast(초기화 완료)
+              #broadcast(초기화 완료)
             }
             #인첸트 할시
-            bind('inventory_click', array('id': 'click'.@id), array('player'; @player, 'virtual': true), @event, @player, @uuid, @id, @location, @item_armorstand, @essence_armorstand, @essences) {
+            bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @id, @location, @item_armorstand, @essence_armorstand, @essences) {
               @enchantable_items = array(
                 'LEATHER_BOOTS': array(
                   'luck': 1.5,
@@ -898,20 +918,20 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
                       @cursor_item['qty'] = 1
                       set_mob_equipment(@essence_armorstand, array( 'helmet': @cursor_item ))
                       @interval = array('tick': 20, 'id': null)
-                      @interval_id = set_interval(100 , closure() {
+                      @interval_id = set_interval(150 , closure() {
                         if(@interval['tick'] > 0) {
                           play_named_sound(@location, array('sound': 'minecraft:entity.player.levelup', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
-                          @pos = array(
-                            'x': @location['x'] + 0.5 + rand() / 5 - 0.1,
-                            'y': @location['y'] + 2.1 + rand() / 5 - 0.1,
-                            'z': @location['z'] + 0.5 + rand() / 5 - 0.1
-                          )
-                          @delta = array(
-                            'x': rand() / 5 - 0.1,
-                            'y': -1.0,
-                            'z': rand() / 5 - 0.1
-                          )
-                          mom_playerparticle(@uuid, 'TOTEM', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 1.0)
+                          @particle_location = array_deep_clone(@location)
+                          @particle_location['x'] += (0.5 + rand() / 5 - 0.1)
+                          @particle_location['y'] += (2.15 + rand() / 5 - 0.1)
+                          @particle_location['z'] += (0.5 + rand() / 5 - 0.1)
+                          spawn_particle(@particle_location, 'TOTEM')
+                          #@delta = array(
+                          #  'x': rand() / 5 - 0.1,
+                          #  'y': -1.0,
+                          #  'z': rand() / 5 - 0.1
+                          #)
+                          #mom_playerparticle(@uuid, 'TOTEM', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 1.0)
                           @interval['tick'] -= 1
                         } else {
                           clear_task()
@@ -1078,7 +1098,8 @@ bind('block_fade', null, null, @event) {
 
 bind('inventory_click', null, null, @event) {
   @player = @event['player']
-  if(ponline(@player) && pmode(@player) == 'SURVIVAL' && @event['leftclick'] && !@event['shiftclick'] && @event['inventorytype'] == 'CRAFTING' && @event['rawslot'] == 7) {
+
+  if(ponline(@player) && pmode(@player) == 'SURVIVAL' && @event['leftclick'] && !@event['shiftclick'] && @event['inventorytype'] == 'CRAFTING' && @event['rawslot'] == 7 && is_null(@event['cursoritem'])) {
     runas(@player, '/util')
   }
 }
@@ -1087,8 +1108,12 @@ bind('player_interact_entity', null, array('clicked': 'PLAYER', 'hand': 'main_ha
   @player = @event['player']
   @uuid = puuid(@player)
   switch(@event['data']) {
-  case '편돌이주노':
+  case '편돌이튜나':
     _showGui(@player, 'crop', @stores)
     break()
   }
 }
+
+#if(@server['name'] == 'main') {
+
+#}
