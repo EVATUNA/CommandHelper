@@ -317,50 +317,53 @@ bind('inventory_click', array('id': 'crafting'), array('slottype': 'RESULT'), @e
     array_remove(@inventory, 40)
     @result_item = @event['slotitem'] #조합결과 템
     if(!is_null(@result_item) && !is_null(@result_item['meta']) && array_index_exists(@result_item['meta'], 'display')) {
-      @crafting = @craftings[strip_colors(@result_item['meta']['display'])]
-      @recipe = @crafting['recipe']
-      @ranking_craftable = false
-      if(!is_null(@event['cursoritem'])) {
-        if(array_contains(array('SHIFT_LEFT', 'SHIFT_RIGHT'), @event['clicktype']) && array_contains(@inventory, null)) {
-          cancel()
-        } else if(array_contains(array('DROP', 'CONTROL_DROP'), @event['clicktype'])) {
-          @ranking_craftable = false
-        } else {
-          @ranking_craftable = false
-        }
-      } else {
-        if(array_contains(array('SHIFT_LEFT', 'SHIFT_RIGHT'), @event['clicktype']) && array_contains(@inventory, null)) {
+      @item_display = strip_colors(@result_item['meta']['display'])
+      if(array_index_exists(@craftings, @item_display)) {
+        @crafting = @craftings[@item_display]
+        @recipe = @crafting['recipe']
+        @ranking_craftable = false
+        if(!is_null(@event['cursoritem'])) {
+          if(array_contains(array('SHIFT_LEFT', 'SHIFT_RIGHT'), @event['clicktype']) && array_contains(@inventory, null)) {
             cancel()
-        } else if(array_contains(array('DROP', 'CONTROL_DROP'), @event['clicktype'])) {
-          @ranking_craftable = true
-        } else if(array_contains(array('LEFT', 'RIGHT'), @event['clicktype'])) {
-          @ranking_craftable = true
-        } else if(@event['clicktype'] == 'NUMBER_KEY') {
-          @button = @event['hotbarbutton']
-          @hotbar = array(0: @inventory[0], 1: @inventory[1], 2: @inventory[2], 3: @inventory[3], 4: @inventory[4], 5: @inventory[5], 6: @inventory[6], 7: @inventory[7], 8: @inventory[8])
-          if(is_null(@hotbar[@event['hotbarbutton']])) {
-            @ranking_craftable = true
+          } else if(array_contains(array('DROP', 'CONTROL_DROP'), @event['clicktype'])) {
+            @ranking_craftable = false
           } else {
             @ranking_craftable = false
           }
-        }
-      }
-      if(@ranking_craftable) {
-        @ingredient_items = array()
-        foreach(@key: @ingredient_item in @event['inventory']) {
-          if(@key != 0 && !is_null(@ingredient_item)) {
-            @ingredient_items[] = @ingredient_item
+        } else {
+          if(array_contains(array('SHIFT_LEFT', 'SHIFT_RIGHT'), @event['clicktype']) && array_contains(@inventory, null)) {
+              cancel()
+          } else if(array_contains(array('DROP', 'CONTROL_DROP'), @event['clicktype'])) {
+            @ranking_craftable = true
+          } else if(array_contains(array('LEFT', 'RIGHT'), @event['clicktype'])) {
+            @ranking_craftable = true
+          } else if(@event['clicktype'] == 'NUMBER_KEY') {
+            @button = @event['hotbarbutton']
+            @hotbar = array(0: @inventory[0], 1: @inventory[1], 2: @inventory[2], 3: @inventory[3], 4: @inventory[4], 5: @inventory[5], 6: @inventory[6], 7: @inventory[7], 8: @inventory[8])
+            if(is_null(@hotbar[@event['hotbarbutton']])) {
+              @ranking_craftable = true
+            } else {
+              @ranking_craftable = false
+            }
           }
         }
-        @result_item_rank = _get_result_item_rank(@recipe['ingredients_weight'], @ingredient_items) //레시피에 포함된 재료템들 등급에 따라 결과물 등급"수치" 결정
-        @luck = entity_attribute_value(puuid(@player), 'GENERIC_LUCK') //제작 스킬 생길시 제작 스킬에 따른 럭 보너스 더하기
-        @first_entry = @crafting['pool']
-        if(array_index_exists(@first_entry, 'type')) {
-          @final_entry = _get_final_entry_from_first_entry(@first_entry, @result_item_rank, @luck)
-          @modified_item = _get_modified_item(@final_entry, @result_item)
-          modify_event('slotitem', @modified_item)
-        } else {
-          broadcast('잘못된 json!', '*') #타입을 작성하지 않음
+        if(@ranking_craftable) {
+          @ingredient_items = array()
+          foreach(@key: @ingredient_item in @event['inventory']) {
+            if(@key != 0 && !is_null(@ingredient_item)) {
+              @ingredient_items[] = @ingredient_item
+            }
+          }
+          @result_item_rank = _get_result_item_rank(@recipe['ingredients_weight'], @ingredient_items) //레시피에 포함된 재료템들 등급에 따라 결과물 등급"수치" 결정
+          @luck = entity_attribute_value(puuid(@player), 'GENERIC_LUCK') //제작 스킬 생길시 제작 스킬에 따른 럭 보너스 더하기
+          @first_entry = @crafting['pool']
+          if(array_index_exists(@first_entry, 'type')) {
+            @final_entry = _get_final_entry_from_first_entry(@first_entry, @result_item_rank, @luck)
+            @modified_item = _get_modified_item(@final_entry, @result_item)
+            modify_event('slotitem', @modified_item)
+          } else {
+            broadcast('잘못된 json!', '*') #타입을 작성하지 않음
+          }
         }
       }
     }

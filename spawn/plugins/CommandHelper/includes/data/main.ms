@@ -32,6 +32,7 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
       'percent': 0
     )
     create_bar(@tip_id, @tip_bossbar_data)
+    bar_add_player(@tip_id, @player)
   }
   @players_data[@uuid]['item'] = array(
     'is_inv_open': false,
@@ -50,6 +51,7 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
     'armor': get_inventory_item(@uuid, 36)
   )
   _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text)
+  _load_tip_data(@player, @uuid, @players_data)
 }
 
 proc _new_data(@uuid, @players_data) {
@@ -129,6 +131,7 @@ proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @
 proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @bots, @skills_spec, @text, @server) {
   if(!array_contains(@bots, @uuid)) {
     #broadcast('봇아님' @player)
+    sudo(@player, '/recipe give '.@player.' *')
     if(!array_index_exists(@reconnectable_players, @uuid)) {
       _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @server)
     } else {
@@ -149,7 +152,6 @@ proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @bots, @
   }
 }
 
-#게스트 서버에도 적용해야 함
 proc _quit_event(@player, @uuid, @players_data, @bots) {
   if(!array_contains(@bots , @uuid)) {
     @all_players = all_players()
@@ -158,6 +160,7 @@ proc _quit_event(@player, @uuid, @players_data, @bots) {
       'uuid': @uuid
     )
     _bungeecord_foward(@all_players[0], 'ch_player_quit', @data)
+    _update_tip_data(@uuid, @players_data)
     array_remove(@players_data, @uuid)
   }
 }
@@ -238,6 +241,14 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
           @players_data[@uuid]['cache']['indicator'] = null
         }
         _set_indicator(@player, @uuid, @players_data, @text)
+      }
+      if(array_size(@players_data[@uuid]['cache']['tips']) > 0) {
+        if(@players_data[@uuid]['cache']['tips'][0]['countdown'] > 0) {
+          @players_data[@uuid]['cache']['tips'][0]['countdown'] -= 1
+        } else {
+          array_remove(@players_data[@uuid]['cache']['tips'], 0)
+        }
+        _set_tips(@player, @uuid, @players_data)
       }
 
       #_countdown_skill() {}로 아래 코드 대체
@@ -1104,16 +1115,31 @@ bind('inventory_click', null, null, @event) {
   }
 }
 
-bind('player_interact_entity', null, array('clicked': 'PLAYER', 'hand': 'main_hand'), @event, @stores) {
-  @player = @event['player']
-  @uuid = puuid(@player)
-  switch(@event['data']) {
-  case '편돌이튜나':
-    _showGui(@player, 'crop', @stores)
-    break()
+
+if(@server['name'] == 'main') {
+  bind('player_interact_entity', null, array('clicked': 'PLAYER', 'hand': 'main_hand'), @event, @stores) {
+    @player = @event['player']
+    @uuid = puuid(@player)
+    switch(@event['data']) {
+    case '편돌이튜나':
+      _showGui(@player, 'crop', @stores)
+      break()
+    }
+  }
+
+  bind('player_move', null, array('world': 'spawn'), @event) {
+    @portal = array(
+      'min_x': 482.5,
+      'min_y': 64.0,
+      'min_z': 361.5,
+      'max_x': 487.5,
+      'max_y': 68.0,
+      'max_z': 365.5
+    )
+    if(@event['to']['x'] > @portal['min_x'] && @event['to']['x'] < @portal['max_x'] && @event['to']['y'] > @portal['min_y'] && @event['to']['y'] < @portal['max_y'] && @event['to']['z'] > @portal['min_z'] && @event['to']['z'] < @portal['max_z']) {
+      if(!(@event['from']['x'] > @portal['min_x'] && @event['from']['x'] < @portal['max_x'] && @event['from']['y'] > @portal['min_y'] && @event['from']['y'] < @portal['max_y'] && @event['from']['z'] > @portal['min_z'] && @event['from']['z'] < @portal['max_z'])) {
+        runas(@event['player'], '/randomteleport')
+      }
+    }
   }
 }
-
-#if(@server['name'] == 'main') {
-
-#}

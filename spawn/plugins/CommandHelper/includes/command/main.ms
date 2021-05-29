@@ -1162,11 +1162,11 @@ proc _chatobserver_command(@command, @player, @args, @prefix, @players_data) {
   if(@chat_observer_mode == true) {
     @players_data[@uuid]['setting'][8] = false
     cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-    msg(감시 오프)
+    msg('감시 오프')
   } else {
     @players_data[@uuid]['setting'][8] = true
     cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-    msg(감시 온)
+    msg('감시 온')
   }
 }
 register_command('chatobserver', array(
@@ -1174,5 +1174,17 @@ register_command('chatobserver', array(
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
     _chatobserver_command(@command, @player, @args, @prefix, @players_data)
+  }
+))
+
+register_command('sendtip', array(
+  permission: 'sendtip',
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    @uuid = puuid(@player)
+    @message = @args[0]
+    @countdown = 3
+    @is_warn = false
+    _add_tips(@player, @uuid, @players_data, @message, @countdown, @is_warn)
   }
 ))

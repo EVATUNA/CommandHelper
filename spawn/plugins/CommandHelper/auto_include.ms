@@ -1,6 +1,6 @@
 ## Initial Including Data
 @server = array(
-  'name': 'main',
+  'name': 'over',
   'resourcepack': get_value('resourcepack')
 )
 
@@ -352,6 +352,33 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
   @chat_hud = @text['space_fonts']['space.2'].@channel.@text['space_fonts']['space.-67']
   @skill_hud = @text['space_fonts']['space.-118'].@text['space_fonts']['space.-2'].@left_hotbar.@text['space_fonts']['space.-20'].@left_icon.@text['space_fonts']['space.198'].@right_hotbar.@text['space_fonts']['space.-20'].@right_icon.@text['space_fonts']['space.-118']
   action_msg(@player, @left_surface.@chat_hud.@left_void.@skill_hud.@right_void.@right_surface)
+}
+
+proc _set_tips(@player, @uuid, @players_data) {
+  @tips = @players_data[@uuid]['cache']['tips']
+  if(array_size(@tips) > 0) {
+    @tip_message = @tips[0]['message']
+  } else {
+    @tip_message = ''
+  }
+  @tip_bossbar_data = array(
+    'title': @tip_message
+  )
+  update_bar('tip.'.@uuid, @tip_bossbar_data)
+}
+
+proc _add_tips(@player, @uuid, @players_data, @message, @countdown, @is_warn) {
+  @tips = @players_data[@uuid]['cache']['tips']
+  @tip = array(
+    'message': @message,
+    'countdown': @countdown,
+    'is_warn': @is_warn
+  )
+  if(@is_warn) {
+    array_insert(@tips, @tip, 0)
+  } else {
+    @tips[] = @tip
+  }
 }
 
 proc _set_indicator(@player, @uuid, @players_data, @text) {
