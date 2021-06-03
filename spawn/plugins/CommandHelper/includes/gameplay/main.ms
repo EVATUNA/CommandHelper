@@ -813,6 +813,14 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
 
 proc _apply_death_penalty(@player, @uuid, @death_penalties_multiply, @players_data, @server_name) {
   @inventory = get_inventory(@uuid)
+  modify_event('death_message', null)
+  if(@server_name != 'main') {
+    if(@players_data[@uuid]['item']['enchantments']['armor'] == '귀속') {
+      tmsg(@player, '💀 §7데스패널티로 약 '.integer(round((1 - @death_penalties_multiply[@server_name]['default']['multiply']) * 50)).'%의 아이템이 소실되었습니다..')
+    } else {
+      tmsg(@player, '💀 §7데스패널티로 약 '.integer(round((1 - @death_penalties_multiply[@server_name]['default']['multiply']) * 100)).'%의 아이템이 소실되었습니다..')
+    }
+  }
   foreach(@key: @item in @inventory) {
     if(!is_null(@item) && @item['name'] != 'STRUCTURE_VOID') {
       if(array_index_exists(@death_penalties_multiply[@server_name], @item['name'])) {
@@ -821,7 +829,8 @@ proc _apply_death_penalty(@player, @uuid, @death_penalties_multiply, @players_da
         @death_penalty_multiply = @death_penalties_multiply[@server_name]['default']
       }
       if(@players_data[@uuid]['item']['enchantments']['armor'] == '귀속') {
-        @death_penalty_multiply = (@death_penalty_multiply + 1) / 2
+        @death_penalty_multiply['multiply'] = (@death_penalty_multiply['multiply'] + 1) / 2
+        @death_penalty_multiply['deviation'] = (@death_penalty_multiply['deviation'] + 1) / 2
       }
       @max_durability = material_info(@item['name'], 'maxDurability')
       if(@max_durability == 0) {

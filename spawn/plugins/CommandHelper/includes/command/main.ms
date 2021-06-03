@@ -5,171 +5,181 @@
   'warn': '\ue4dd',
   'info': '\ue4e3'
 )
-
-###
-### 서버 정보 명령어
-###
-
-proc _info_command(@command, @player, @args, @prefix) {
-  msg(@prefix['info'].' §b서버 정보')
-  msg(' §7서버명: §f에바참치 §7(§fEvatuna§7)')
-  msg(' §7서버 장르: 야생')
-  msg(' §7총 관리자: 앨리스(§btele§f: @alicearcade, §7dis§f: AA_2#1787)')
-  msg(' §7공식 이메일: support@evatuna.fish')
-  msg(' §7공식 홈페이지 : §7/site')
-  msg(' §7공식 카페 : §a(네이버)§7/cafe')
-  msg(' §7공식 디스코드: §7/discord')
-  msg(' §7마인리스트: §7/vote')
-  msg(' §7서버오픈일: 2021년 06월 01일')
+# 명령어 proc
+proc _is_command_registered(@command) {
+  return(array_index_exists(get_commands(), @command))
 }
-
-register_command('cafe', array(
-  'executor': closure(@cmd, @sender, @cArgs){
-    msg('\ue4dc §aNaverCafe §r : https://cafe.evatuna.fish')
+set_timeout(1000, closure() {
+  ###
+  ### 서버 정보 명령어
+  ###
+  proc _info_command(@command, @player, @args, @prefix) {
+    msg(@prefix['info'].' §b서버 정보')
+    msg(' §7서버명: §f에바참치 §7(§fEvatuna§7)')
+    msg(' §7서버 장르: 야생')
+    msg(' §7총 관리자: 앨리스(§btele§f: @alicearcade, §7dis§f: AA_2#1787)')
+    msg(' §7공식 이메일: support@evatuna.fish')
+    msg(' §7공식 홈페이지 : §7/site')
+    msg(' §7공식 카페 : §a(네이버)§7/cafe')
+    msg(' §7공식 디스코드: §7/discord')
+    msg(' §7마인리스트: §7/vote')
+    msg(' §7서버오픈일: 2021년 06월 03일')
   }
-))
-register_command('discord', array(
-  'executor': closure(@cmd, @sender, @cArgs){
-    msg('\ue4dc §7Discord §r : https://discord.evatuna.fish/')
-  }
-))
-register_command('site', array(
-  'executor': closure(@cmd, @sender, @cArgs){
-    msg('\ue4dc §9EvatunaOffical §r : https://evatuna.fish/')
-  }
-))
-register_command('info', array(
-  'aliases': array('about', 'version', 'ver', '서버', '서버정보'),
-  'tabcompleter': closure(@command, @player, @args) {
-    return(array())
-  },
-  'executor': closure(@command, @player, @args) {
-    _info_command(@command, @player, @args, @prefix)
-  }
-))
-
-###
-### 도움말 명령어
-###
-
-proc _help_message(@player, @real_command, @sub_commands, @args, @description) {
-  if(is_null(@args)) {
-    @command_text = '/'.@real_command,
-  } else {
-    @command_text = '/'.@real_command.' '.@args,
-  }
-  @raw = array(
-    array(
-      'text': ' ',
-      'color': 'gray'
-    ),
-    array(
-      'text': @command_text,
-      'color': 'yellow',
-      'clickEvent': array(
-        'action': 'suggest_command',
-        'value': '/'.@real_command.' '
-      )
-    ),
-    array(
-      'text': ' - '.@description
-    )
-  )
-  if(is_array(@sub_commands) && array_size(@sub_commands) > 0) {
-    @hover = array(
-      array(
-        'text': '대안 명령어:'
-      )
-    )
-    foreach(@sub_command in @sub_commands) {
-      @hover[] = array(
-        'text': '\n/'.@sub_command,
-        'color': 'yellow'
-      )
+  if(_is_command_registered('info')) { unregister_command('info') }
+  if(_is_command_registered('version')) { unregister_command('version') }
+  register_command('info', array(
+    'aliases': array('about', 'version', 'ver', '서버', '서버정보'),
+    'tabcompleter': closure(@command, @player, @args) {
+      return(array())
+    },
+    'executor': closure(@command, @player, @args) {
+      _info_command(@command, @player, @args, @prefix)
     }
-    @raw[1]['hoverEvent'] = array(
-      'action': 'show_text',
-      'value': @hover
-    )
-  }
-  _tellraw(@player, @raw)
-}
-proc _help_commnad(@command, @player, @args, @prefix) {
-  # 페이지 구하기
-  switch(array_size(@args)) {
-  case 0:
-    @page = 1
-    break()
-  case 1:
-    if(is_integral(@args[0])) {
-      @page = integer(@args[0])
+  ))
+
+  register_command('cafe', array(
+    'executor': closure(@cmd, @sender, @cArgs){
+      msg(@prefix['info']'§aNaverCafe §r : https://cafe.evatuna.fish')
+    }
+  ))
+  register_command('discord', array(
+    'executor': closure(@cmd, @sender, @cArgs){
+      msg(@prefix['info']'§7Discord §r : https://discord.evatuna.fish/')
+    }
+  ))
+  register_command('site', array(
+    'executor': closure(@cmd, @sender, @cArgs){
+      msg(@prefix['info']'§9EvatunaOffical §r : https://evatuna.fish/')
+    }
+  ))
+  ###
+  ### 도움말 명령어
+  ###
+  if(_is_command_registered('help')) { unregister_command('help') }
+  proc _help_message(@player, @real_command, @sub_commands, @args, @description) {
+    if(is_null(@args)) {
+      @command_text = '/'.@real_command,
     } else {
-      @page = null
+      @command_text = '/'.@real_command.' '.@args,
     }
-    break()
-  default:
-    @page = null
-    break()
+    @raw = array(
+      array(
+        'text': ' ',
+        'color': 'gray'
+      ),
+      array(
+        'text': @command_text,
+        'color': 'yellow',
+        'clickEvent': array(
+          'action': 'suggest_command',
+          'value': '/'.@real_command.' '
+        )
+      ),
+      array(
+        'text': ' - '.@description
+      )
+    )
+    if(is_array(@sub_commands) && array_size(@sub_commands) > 0) {
+      @hover = array(
+        array(
+          'text': '대안 명령어:'
+        )
+      )
+      foreach(@sub_command in @sub_commands) {
+        @hover[] = array(
+          'text': '\n/'.@sub_command,
+          'color': 'yellow'
+        )
+      }
+      @raw[1]['hoverEvent'] = array(
+        'action': 'show_text',
+        'value': @hover
+      )
+    }
+    _tellraw(@player, @raw)
   }
-  # 페이지에 따른 메시지
-  @max_page = 4
-  if(!is_null(@page)) {
-    msg(@prefix['info'].' §b/'.@command.' ['.@page.'/'.@max_page.'] §7< > = 필수 인자, [ ] = 선택 인자')
-    msg('§e 명령어 좌클릭 시, 채팅창에 명령어가 입력됩니다.')
-    switch(@page) {
+  proc _help_commnad(@command, @player, @args, @prefix) {
+    # 페이지 구하기
+    switch(array_size(@args)) {
+    case 0:
+      @page = 1
+      break()
     case 1:
-      msg(' §b# 도움말')
-      _help_message(@player, 'help', array('command', 'commands', 'cmd', 'cmds', '도움말', '명령어', '헬프', '커맨드'), '[페이지]', '서버 명령어를 확인합니다.')
-      _help_message(@player, 'info', array('about', 'version', 'ver', '서버', '서버정보'), null, '서버 정보를 확인합니다.')
-      #_help_message(@player, 'guide', array('newbie', '가이드', '뉴비'), null, '뉴비 가이드를 봅니다.')
-      msg(' §b# 채팅')
-      _help_message(@player, 'whisper', array('w', 'm', 'msg', 'tell', '귓속말', '귓'), '<닉네임> <할 말>', '플레이어에게 귓속말을 보냅니다.')
-      _help_message(@player, 'channel', array('ch', '채널'), '[채널]', '채팅 채널을 변경합니다.')
-      _help_message(@player, 'enko', array(), null, '한영 치환 입력을 활성/비활성합니다.')
-      break()
-    case 2:
-      msg(' §b# 유틸')
-      _help_message(@player, 'util', array('gui', '유틸'), null, '유틸 GUI를 엽니다.')
-      msg(' §b# 텔레포트')
-      _help_message(@player, 'spawn', array(), null, '스폰으로 이동합니다.')
-      _help_message(@player, 'home', array(), null, '홈으로 이동합니다.')
-      _help_message(@player, 'warp', array('워프'), null, '워프 GUI를 엽니다.')
-      _help_message(@player, 'randomteleport', array('rt', '랜덤텔포', '랜덤티피',), null, '랜덤 텔레포트 GUI를 엽니다.')
-      break()
-    case 3:
-      msg(' §b# 스킬')
-      _help_message(@player, 'skillbook', array('skill', 'abilitybook', 'ability', 'masterybook', 'mastery', '스킬북', '스킬', '어빌리티북', '어빌리티', '마스터리북', '마스터리'), null, '스킬북을 엽니다.')
-      msg(' §b# 설정')
-      _help_message(@player, 'setting', array('설정'), null, '설정 GUI를 엽니다.')
-      _help_message(@player, 'screen', array('graphics', '화면설정'), null, '화면 설정 GUI를 엽니다.')
-      _help_message(@player, 'hud', array(), '<너비>', 'HUD 표시 너비를 조정합니다.')
-      break()
-    case 4:
-      msg(' §b# 돈')
-      _help_message(@player, 'money', array(), null, '현재 소지한 돈을 확인합니다.')
-      _help_message(@player, 'pay', array(), '<닉네임> <수량>', '플레이어에게 돈을 송금합니다.')
-      msg(' §b# 기타')
-      _help_message(@player, 'co i', array(), null, '로그조사 (토글)')
-      #_help_message(@player, '', array(), null, '')
+      if(is_integral(@args[0])) {
+        @page = integer(@args[0])
+      } else {
+        @page = null
+      }
       break()
     default:
-      msg(' §7해당 페이지의 도움말이 존재하지 않습니다.')
+      @page = null
       break()
     }
-  } else {
-    msg(@prefix['warn'].' §e'.@command.' [페이지]')
+    # 페이지에 따른 메시지
+    @max_page = 4
+    if(!is_null(@page)) {
+      msg(@prefix['info'].' §b/'.@command.' ['.@page.'/'.@max_page.'] §7< > = 필수 인자, [ ] = 선택 인자')
+      msg('§e 명령어 좌클릭 시, 채팅창에 명령어가 입력됩니다.')
+      switch(@page) {
+      case 1:
+        msg(' §b# 도움말')
+        _help_message(@player, 'help', array('command', 'commands', 'cmd', 'cmds', '도움말', '명령어', '헬프', '커맨드'), '[페이지]', '서버 명령어를 확인합니다.')
+        _help_message(@player, 'info', array('about', 'version', 'ver', '서버', '서버정보'), null, '서버 정보를 확인합니다.')
+        #_help_message(@player, 'guide', array('newbie', '가이드', '뉴비'), null, '뉴비 가이드를 봅니다.')
+        msg(' §b# 채팅')
+        _help_message(@player, 'whisper', array('w', 'm', 'msg', 'tell', '귓속말', '귓'), '<닉네임> <할 말>', '플레이어에게 귓속말을 보냅니다.')
+        _help_message(@player, 'channel', array('ch', '채널'), '[채널]', '채팅 채널을 변경합니다.')
+        _help_message(@player, 'enko', array(), null, '한영 치환 입력을 활성/비활성합니다.')
+        break()
+      case 2:
+        msg(' §b# 유틸')
+        _help_message(@player, 'util', array('gui', '유틸'), null, '유틸 GUI를 엽니다.')
+        msg(' §b# 텔레포트')
+        _help_message(@player, 'spawn', array(), null, '스폰으로 이동합니다.')
+        _help_message(@player, 'home', array(), null, '홈으로 이동합니다.')
+        _help_message(@player, 'warp', array('워프'), null, '워프 GUI를 엽니다.')
+        _help_message(@player, 'randomteleport', array('rt', '랜덤텔포', '랜덤티피',), null, '랜덤 텔레포트 GUI를 엽니다.')
+        break()
+      case 3:
+        msg(' §b# 스킬')
+        _help_message(@player, 'skillbook', array('skill', 'abilitybook', 'ability', 'masterybook', 'mastery', '스킬북', '스킬', '어빌리티북', '어빌리티', '마스터리북', '마스터리'), null, '스킬북을 엽니다.')
+        msg(' §b# 설정')
+        _help_message(@player, 'setting', array('설정'), null, '설정 GUI를 엽니다.')
+        _help_message(@player, 'screen', array('graphics', '화면설정'), null, '화면 설정 GUI를 엽니다.')
+        _help_message(@player, 'hud', array(), '<너비>', 'HUD 표시 너비를 조정합니다.')
+        msg(' §b# 로그 조사')
+        _help_message(@player, 'co i', array(), null, '로그조사 (토글)')
+        break()
+      case 4:
+        msg(' §b# 돈')
+        _help_message(@player, 'money', array(), null, '현재 소지한 돈을 확인합니다.')
+        _help_message(@player, 'pay', array(), '<닉네임> <수량>', '플레이어에게 돈을 송금합니다.')
+        msg(' §b# 튜나랜드')
+        _help_message(@player, 'tunaland', array('tl'), null, '거주 월드 청크 관리 명령어입니다.')
+        msg(' §b# 길드')
+        _help_message(@player, 'guild', array(), null, '길드 관리 명령어입니다.')
+        #_help_message(@player, '', array(), null, '')
+        break()
+      default:
+        msg(' §7해당 페이지의 도움말이 존재하지 않습니다.')
+        break()
+      }
+    } else {
+      msg(@prefix['warn'].' §e'.@command.' [페이지]')
+    }
   }
-}
 
-#unregister_command('minecraft:help')
-#unregister_command('bukkit:help')
-register_command('help', array(
-  'aliases': array('command', 'commands', 'cmd', 'cmds', '도움말', '명령어', '헬프', '커맨드'),
-  'tabcompleter': closure(@command, @player, @args) { return(array()) },
-  'executor': closure(@command, @player, @args) {
-    _help_commnad(@command, @player, @args, @prefix)
-  }
-))
+  register_command('help', array(
+    'aliases': array('command', 'commands', 'cmd', 'cmds', '도움말', '명령어', '헬프', '커맨드'),
+    'tabcompleter': closure(@command, @player, @args) { return(array()) },
+    'executor': closure(@command, @player, @args) {
+      _help_commnad(@command, @player, @args, @prefix)
+    }
+  ))
+})
+/*
+
+*/
 
 /*
 
@@ -539,6 +549,8 @@ register_command('whisper', array(
 ### GUI 명령어 (유틸, 설정)
 ###
 
+#\\uF801\\ue540\\uF801\\ue540\\uF801\\ue540\\uF801\\ue540\\uF801\\ue56f\\uF801\\ue540\\uF801\\ue540\\uF801\\ue540\\uF801\\ue540\\uF81C\\uF81A\\uF802\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF81C\\uF81A\\uF802\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF81C\\uF81A\\uF802TunaLands
+
 # 유틸
 proc _util_command(@command, @player, @args, @prefix, @text) {
   @texture_layer = @text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-162'].@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-162'].@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-162']
@@ -593,6 +605,7 @@ register_command('util', array(
 ))
 # 설정
 proc _setting_command(@command, @player, @args, @prefix, @text) {
+  @uuid = puuid(@player)
   @texture_layer = @text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-162'].@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-162'].@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-162']
   @message = '설정'
   @inventory = array()
@@ -705,7 +718,7 @@ proc _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @s
     '',
     '§7HUD 표시 너비 = 마인크래프트 해상도 / GUI 비율'
   )
-  @inventory[4]['meta']['display'] = '클릭시, HUD 표시 너비를 기본(427)으로 되돌립니다.'
+  @inventory[4]['meta']['display'] = '§f클릭시, HUD 표시 너비를 기본(427)으로 되돌립니다.'
   @inventory[4]['meta']['lore'] = array(
     '§7채팅 채널과 입력 언어 표시 HUD의 위치와',
     '§7채광/경작 진행도 표시 HUD의 위치를 조정할 수 있습니다',
@@ -737,7 +750,7 @@ proc _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @s
     '',
     '§7HUD 표시 너비 = 마인크래프트 해상도 / GUI 비율'
   )
-  @inventory[6]['meta']['display'] = '§f클릭시, HUD 표시 너비를 §e100§f 넓힙니다.'
+  @inventory[6]['meta']['display'] = '§f클릭시, HUD 표시 너비를 §e10§f 넓힙니다.'
   @inventory[6]['meta']['lore'] = array(
     '§7채팅 채널과 입력 언어 표시 HUD의 위치와',
     '§7채광/경작 진행도 표시 HUD의 위치를 조정할 수 있습니다',
@@ -805,6 +818,7 @@ proc _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @s
       if(@event['action'] == 'PICKUP_ALL') {
         @is_size_changed = false
         @new_resolution = @players_data[@uuid]['setting'][12]
+        @new_is_using_right_hand = null
         switch(@event['rawslot']) {
         case 1:
           @new_resolution = @players_data[@uuid]['setting'][12] - 100
@@ -836,7 +850,7 @@ proc _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @s
           #@players_data[@uuid]['setting'][13] = false
           break()
         }
-        if(@is_using_right_hand != @new_is_using_right_hand) {
+        if(!is_null(@new_is_using_right_hand) && @is_using_right_hand != @new_is_using_right_hand) {
           @players_data[@uuid]['setting'][13] = @new_is_using_right_hand
           cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           if(@new_is_using_right_hand) {
@@ -1177,14 +1191,15 @@ register_command('chatobserver', array(
   }
 ))
 
-register_command('sendtip', array(
-  permission: 'sendtip',
+register_command('sendwarn', array(
+  #permission: 'sendwarn',
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
-    @uuid = puuid(@player)
-    @message = @args[0]
+    @target_name = @args[0]
+    @target_uuid = puuid(@target_name)
+    @message = array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' ')
     @countdown = 3
-    @is_warn = false
-    _add_tips(@player, @uuid, @players_data, @message, @countdown, @is_warn)
+    @is_warn = true
+    _add_tips(@target_name, @target_uuid, @players_data, @message, @countdown, @is_warn)
   }
 ))

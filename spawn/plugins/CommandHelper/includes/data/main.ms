@@ -26,14 +26,15 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
   )
   create_bar(@indicator_id, @indicator_bossbar_data)
   bar_add_player(@indicator_id, @player)
-  if(!array_contains(@bossbars, @tip_id)) {
-    @tip_bossbar_data = array(
-      'title': '',
-      'percent': 0
-    )
-    create_bar(@tip_id, @tip_bossbar_data)
-    bar_add_player(@tip_id, @player)
+  if(array_contains(@bossbars, @tip_id)) {
+    remove_bar(@tip_id)
   }
+  @tip_bossbar_data = array(
+    'title': '',
+    'percent': 0
+  )
+  create_bar(@tip_id, @tip_bossbar_data)
+  bar_add_player(@tip_id, @player)
   @players_data[@uuid]['item'] = array(
     'is_inv_open': false,
     'main_hand': null,
@@ -131,7 +132,7 @@ proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @
 proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @bots, @skills_spec, @text, @server) {
   if(!array_contains(@bots, @uuid)) {
     #broadcast('봇아님' @player)
-    sudo(@player, '/recipe give '.@player.' *')
+    runas('~console', '/recipe give '.@player.' *')
     if(!array_index_exists(@reconnectable_players, @uuid)) {
       _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @server)
     } else {
@@ -215,7 +216,7 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
   @player = @event['player']
   @uuid = puuid(@player)
   if(!array_contains(@bots , @player)) {
-    if(@players_data[@uuid]['item']['enchantments']['armor'] == '깃털') {
+    if(array_index_exists(@players_data, @uuid) && @players_data[@uuid]['item']['enchantments']['armor'] == '깃털') {
       if(@event['sneaking']) {
         set_peffect(@player, 'SLOW_FALLING', 0, 0, false, true)
       } else {
@@ -409,7 +410,7 @@ bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @r
     #
     if(@identifier_size != -1) {
       @value_string = string(ba_get_bytes(@event['bytes'], array_size(@event['bytes']) - @identifier_size - 6, @identifier_size + 6))
-      if(string_ends_with(@value_string, '}')) {
+      if(string_starts_with(@value_string, '{"') &&string_ends_with(@value_string, '}')) {
         @data = array(
           'identifier': string(ba_get_bytes(@event['bytes'], @identifier_size, 2)),
           'value': json_decode(@value_string)
@@ -490,7 +491,6 @@ bind('block_place', null, null, @event, @players_data, @skills_spec, @server) {
             break()
           }
         }
-        broadcast(@event)
       }
     }
   }
@@ -501,8 +501,7 @@ bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spe
     @player = @event['player']
     @uuid = puuid(@player)
     if(!is_cancelled() && pmode(@player) == 'SURVIVAL') {
-      @is_farming_allowed = true
-      if(@is_farming_allowed) {
+      if(@server['name'] == 'main') {
         _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skills_spec, @text)
       }
       #@is_mining_allowed = true
@@ -628,7 +627,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
     #take_from_inventory(@uuid, 'PAPER', 1)
   }
   # cancel using disabled blocks & block system
-  if(@event['action'] == 'right_click_block' && !psneaking(@player) && (is_null(get_inventory_item(@uuid, pheld_slot(@player))) || is_null(get_inventory_item(@uuid, 40)))) {
+  if(@event['action'] == 'right_click_block' && (is_null(get_inventory_item(@uuid, pheld_slot(@player))) || is_null(get_inventory_item(@uuid, 40)))) {
     @action = null
     switch(@event['block']) {
     case 'END_PORTAL_FRAME':
@@ -642,7 +641,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       break()
     case 'SMITHING_TABLE':
       cancel()
-      if(@server['name'] == 'main' && pworld(@player) == 'spawn') {
+      if(!psneaking(@player) && @server['name'] == 'main' && pworld(@player) == 'spawn') {
         @location = array('x': integer(@event['location']['x']), 'y': integer(@event['location']['y']), 'z': integer(@event['location']['z']), 'world': @event['location']['world'])
         @gui_id = 'enchant_table.'.@location['x'].'.'.@location['y'].'.'.@location['z']
         # 인첸트 되는 아이템 위치 설정
@@ -967,109 +966,115 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       break()
     case 'ENCHANTING_TABLE':
       cancel()
-      @location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 1.01, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
-      if(plevel(@player) >= 30) {
-        if(pcooldown(@player, 'CAVE_AIR') == 0) {
-          set_pcooldown(@player, 'CAVE_AIR', 30)
-          @task = array('tick': 10, 'id': null)
-          @id = set_interval(100 , closure() {
-            if(ponline(@player)) {
-              if(@task['tick'] > 0) {
-                @ploc = ploc(@player)
-                play_named_sound(@location, array('sound': 'minecraft:entity.player.levelup', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
-                @pos = array(
-                  'x': @ploc['x'] + rand() / 2 - 0.25,
-                  'y': @ploc['y'] + rand() * 1.5 + 1,
-                  'z': @ploc['z'] + rand() / 2 - 0.25
-                )
-                @delta = array(
-                  'x': (@location['x'] - @pos['x']) / 2,
-                  'y': (@location['y'] - @pos['y']) / 2,
-                  'z': (@location['z'] - @pos['z']) / 2
-                )
-                mom_playerparticle(@uuid, 'TOTEM', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 1.0)
-                @task['tick'] -= 1
+      if(!psneaking(@player)) {
+        @location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 1.01, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
+        if(plevel(@player) >= 30) {
+          if(pcooldown(@player, 'CAVE_AIR') == 0) {
+            set_pcooldown(@player, 'CAVE_AIR', 30)
+            @task = array('tick': 10, 'id': null)
+            @id = set_interval(100 , closure() {
+              if(ponline(@player)) {
+                if(@task['tick'] > 0) {
+                  @ploc = ploc(@player)
+                  play_named_sound(@location, array('sound': 'minecraft:entity.player.levelup', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
+                  @pos = array(
+                    'x': @ploc['x'] + rand() / 2 - 0.25,
+                    'y': @ploc['y'] + rand() * 1.5 + 1,
+                    'z': @ploc['z'] + rand() / 2 - 0.25
+                  )
+                  @delta = array(
+                    'x': (@location['x'] - @pos['x']) / 2,
+                    'y': (@location['y'] - @pos['y']) / 2,
+                    'z': (@location['z'] - @pos['z']) / 2
+                  )
+                  mom_playerparticle(@uuid, 'TOTEM', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 1.0)
+                  @task['tick'] -= 1
+                } else {
+                  clear_task()
+                  play_named_sound(@location, array('sound': 'minecraft:block.enchantment_table.use', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
+                  set_plevel(@player, plevel(@player) - 30)
+                  @essence_name = array_rand(array(/*'희미한 마법의 정수', */'미약한 마법의 정수', '농축된 마법의 정수'/*, '강력한 마법의 정수', '찬란한 마법의 정수'*/), 1, false)[0]
+                  #broadcast(@essence_name)
+                  drop_item(@location, @essences[@essence_name]['item'], false)
+                }
               } else {
                 clear_task()
-                play_named_sound(@location, array('sound': 'minecraft:block.enchantment_table.use', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
-                set_plevel(@player, plevel(@player) - 30)
-                @essence_name = array_rand(array(/*'희미한 마법의 정수', */'미약한 마법의 정수', '농축된 마법의 정수'/*, '강력한 마법의 정수', '찬란한 마법의 정수'*/), 1, false)[0]
-                #broadcast(@essence_name)
-                drop_item(@location, @essences[@essence_name]['item'], false)
               }
-            } else {
-              clear_task()
-            }
-          })
-          @task['id'] = @id
+            })
+            @task['id'] = @id
+          }
         }
       }
       break()
     }
   }
   ## farming (if canceled it didn't work)
-  set_timeout(1, closure() {
+  if(@server['name'] == 'main') {
     if(@event['action'] == 'right_click_block') {
-      if(!is_cancelled()) {
-        # sowing
-        if(pmode(@player) == 'SURVIVAL') {
-          @is_sowing_allowed = true
-          if(@is_sowing_allowed) {
-            _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @skills_spec, @text)
-          }
+      # bone mealing
+      if(!is_null(@event['item']) && @event['item']['name'] == 'BONE_MEAL' && array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
+        @data = get_blockdata(@event['location'])
+        if(@data['age'] == 0) {
+          @data['age'] = 1
+          @pos = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.2, 'z': @event['location']['z'] + 0.5)
+          @delta = array('x': 0.25, 'y': 0.125, 'z': 0.25)
+          @uuid = puuid(@player)
+          #mom_playerparticle(@uuid, 'VILLAGER_HAPPY', @pos['x'], @pos['y'], @pos['z'], 15, @delta['x'], @delta['y'], @delta['z'], 0.0)
+          _add_epxerience(@uuid, 'fertile_touch', @players_data[@uuid]['skill_data']['sowing_method']['fertile_touch'], 1, 0)
+          set_timeout(0, closure( set_blockdata(@event['location'], @data) ))
+        } else {
+          cancel()
         }
-        # bone mealing
-        if(!is_null(@event['item']) && @event['item']['name'] == 'BONE_MEAL' && array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
+      }
+      # watering
+      if(!is_null(@event['item']) && @event['item']['name'] == 'POTION' && @event['item']['meta']['base']['type'] == 'WATER') {
+        if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'ATTACHED_PUMPKIN_STEM', 'ATTACHED_MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
+          @event['location']['y'] -= 1
+          @is_farmland = true
+          cancel()
+        } else if(@event['block'] == 'FARMLAND') {
+          @is_farmland = true
+          cancel()
+        } else {
+          @is_farmland = false
+        }
+        if(@is_farmland) {
           @data = get_blockdata(@event['location'])
-          if(@data['age'] == 0) {
-            @data['age'] = 1
-            @pos = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.2, 'z': @event['location']['z'] + 0.5)
-            @delta = array('x': 0.25, 'y': 0.125, 'z': 0.25)
-            @uuid = puuid(@player)
-            #mom_playerparticle(@uuid, 'VILLAGER_HAPPY', @pos['x'], @pos['y'], @pos['z'], 15, @delta['x'], @delta['y'], @delta['z'], 0.0)
-            _add_epxerience(@uuid, 'fertile_touch', @players_data[@uuid]['skill_data']['sowing_method']['fertile_touch'], 1, 0)
-            set_timeout(0, closure( set_blockdata(@event['location'], @data) ))
+          play_named_sound(@event['location'], array('sound': 'minecraft:item.bottle.empty', 'category': 'NEUTRAL', 'volum': 1))
+          @data['moisture'] = 6
+          set_blockdata(@event['location'], @data)
+          _add_epxerience(@uuid, 'wet_hands', @players_data[@uuid]['skill_data']['sowing_method']['wet_hands'], 1, 0)
+          if(@event['hand'] =='main_hand') {
+            @slot = pheld_slot(@player)
           } else {
-            cancel()
+            @slot = 40
           }
-        }
-        # watering
-        if(!is_null(@event['item']) && @event['item']['name'] == 'POTION' && @event['item']['meta']['base']['type'] == 'WATER') {
-          if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'ATTACHED_PUMPKIN_STEM', 'ATTACHED_MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
-            @event['location']['y'] -= 1
-            @is_farmland = true
-            cancel()
-          } else if(@event['block'] == 'FARMLAND') {
-            @is_farmland = true
-            cancel()
-          } else {
-            @is_farmland = false
-          }
-          if(@is_farmland) {
-            @data = get_blockdata(@event['location'])
-            play_named_sound(@event['location'], array('sound': 'minecraft:item.bottle.empty', 'category': 'NEUTRAL', 'volum': 1))
-            @data['moisture'] = 6
-            set_blockdata(@event['location'], @data)
-            _add_epxerience(@uuid, 'wet_hands', @players_data[@uuid]['skill_data']['sowing_method']['wet_hands'], 1, 0)
-            if(@event['hand'] =='main_hand') {
-              @slot = pheld_slot(@player)
+          @event['item']['qty'] -= 1
+          if(pmode(@player) != 'CREATIVE') {
+            if(@event['item']['qty'] > 0) {
+              set_inventory_item(@uuid, @slot, @event['item'])
+              pgive_item(@player, array('name': 'GLASS_BOTTLE'))
             } else {
-              @slot = 40
-            }
-            @event['item']['qty'] -= 1
-            if(pmode(@player) != 'CREATIVE') {
-              if(@event['item']['qty'] > 0) {
-                set_inventory_item(@uuid, @slot, @event['item'])
-                pgive_item(@player, array('name': 'GLASS_BOTTLE'))
-              } else {
-                set_inventory_item(@uuid, @slot, array('name': 'GLASS_BOTTLE'))
-              }
+              set_inventory_item(@uuid, @slot, array('name': 'GLASS_BOTTLE'))
             }
           }
         }
       }
     }
-  })
+    set_timeout(1, closure() {
+      if(@event['action'] == 'right_click_block') {
+        if(!is_cancelled()) {
+          # sowing
+          if(pmode(@player) == 'SURVIVAL') {
+            @is_sowing_allowed = true
+            if(@is_sowing_allowed) {
+              _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @skills_spec, @text)
+            }
+          }
+        }
+      }
+    })
+  }
 }
 
 bind('block_grow', null, null, @event) {
@@ -1117,12 +1122,12 @@ bind('inventory_click', null, null, @event) {
 
 
 if(@server['name'] == 'main') {
-  bind('player_interact_entity', null, array('clicked': 'PLAYER', 'hand': 'main_hand'), @event, @stores) {
+  bind('player_interact_entity', null, array('clicked': 'PLAYER', 'hand': 'main_hand'), @event, @stores, @shop_log_data) {
     @player = @event['player']
     @uuid = puuid(@player)
     switch(@event['data']) {
     case '편돌이튜나':
-      _showGui(@player, 'crop', @stores)
+      _showGui(@player, 'crop', @stores, @shop_log_data)
       break()
     }
   }

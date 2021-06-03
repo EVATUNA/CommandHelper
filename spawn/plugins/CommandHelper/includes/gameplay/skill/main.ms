@@ -1,4 +1,28 @@
-console('EvaSkill loaded')
+@skill_log_data = array()
+if(@server['name'] == 'main') {
+  @date = simple_date('yyyy-MM-dd')
+  @skill_log_data = array(
+    'date': @date,
+    'path': 'logs/'.@date.'.log'
+  )
+
+  if(!file_exists(@skill_log_data['path'])) {
+    create_file(@skill_log_data['path'])
+  }
+
+  @cron_task = set_cron('0 0 * * *', closure() {
+    @date = simple_date('yyyy-MM-dd')
+    @skill_log_data['date'] = @date
+    @skill_log_data['path'] = 'logs/'.@date.'.log'
+  })
+
+  proc _skill_logging( @player, @uuid, @skill, @level) {
+    @path = 'logs/'.simple_date('yyyy-MM-dd').'.log'
+    @message = @player.'('.@uuid.') '.@skill.' level up to '.@level
+    @log = string('['.simple_date('HH:mm:ss').'] '.@message.'\n')
+    write_file(@skill_log_data['path'], @log, 'APPEND')
+  }
+}
 
 @skills_info = array()
 async_read('skills_info.json', closure(@value) {
@@ -22,6 +46,14 @@ proc _load_skill_data(@uuid, @category, @skill, @is_default, @players_data, @ski
         0,
         3,
         @skills_spec[@category][@skill]['levels'][0]['max_experience']
+      )
+      cup_set('SKILL_DATA', @uuid.'_'.@skill, @skill_data)
+    } else {
+      @skill_data = array(
+        @skill_data[0],
+        @skill_data[1],
+        @skill_data[2],
+        @skills_spec[@category][@skill]['levels'][@skill_data[0]]['max_experience']
       )
       cup_set('SKILL_DATA', @uuid.'_'.@skill, @skill_data)
     }
@@ -1348,7 +1380,7 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
 register_command('skillbook', array(
   'description': 'can see skill book',
   'usage': '/skillbook',
-  'aliases': array('ability', 'abilitybook', 'mastery', 'masterybook', 'skill'),
+  'aliases': array('skill', 'abilitybook', 'ability', 'masterybook', 'mastery', '스킬북', '스킬', '어빌리티북', '어빌리티', '마스터리북', '마스터리'),
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) { 
     @uuid = puuid(@player)
@@ -1539,6 +1571,11 @@ proc _add_epxerience(@uuid, @skill, @skill_data, @default_xp, @extra_xp) {
       } else {
         @skill_data[0] += 1
         @skill_data[1] = 0
+        if(is_proc('_skill_logging')) {
+          @player = player(@uuid)
+          @level = @skill_data[0]
+          _skill_logging(@player, @uuid, @skill, @level)
+        }
       }
       cup_set('SKILL_DATA', @uuid.'_'.@skill, @skill_data)
     }
@@ -2003,7 +2040,7 @@ proc _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @ski
           )
           @players_data[@uuid]['cache']['indicator'] = @indicator_data
           _set_indicator(@player, @uuid, @players_data, @text)
-          cancel()
+          set_block(@location, @block)
           if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
             @damage = 0
           } else {

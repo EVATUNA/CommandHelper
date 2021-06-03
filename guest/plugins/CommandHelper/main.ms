@@ -9,6 +9,8 @@ if(!is_channel_registered('BungeeCord')) {
   'resourcepack': get_value('resourcepack')
 )
 
+
+
 ## BungeeCord Data Sender
 proc _bungeecord_foward(@player, @identifier, @data) {
   @data_array = byte_array()
@@ -99,3 +101,36 @@ register_command('resourceurl', array(
     }
   }
 ))
+
+bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @server) {
+  if(ponline(@event['player'])) {
+    @identifier_size = -1
+    foreach(@key: @byte in @event['bytes']) {
+      #broadcast(@key @byte )
+      if(@key != 0) {
+        #if(@byte == 0) {
+        if(@byte == 123) {
+          @identifier_size = @key - 6 #-2
+          break()
+        }
+      }
+    }
+    #
+    if(@identifier_size != -1) {
+      @value_string = string(ba_get_bytes(@event['bytes'], array_size(@event['bytes']) - @identifier_size - 6, @identifier_size + 6))
+      if(string_starts_with(@value_string, '{"') &&string_ends_with(@value_string, '}')) {
+        @data = array(
+          'identifier': string(ba_get_bytes(@event['bytes'], @identifier_size, 2)),
+          'value': json_decode(@value_string)
+        )
+        switch(@data['identifier']) {
+        case 'ch_resourcepack_url_update':
+          @server['resourcepack'] = @data['value']['url']
+          store_value('resourcepack', @data['value']['url'])
+        }
+      } #else {
+        #broadcast(@value_string)
+      #}
+    }
+  }
+}

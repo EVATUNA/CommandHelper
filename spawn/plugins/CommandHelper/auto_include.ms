@@ -1,6 +1,6 @@
 ## Initial Including Data
 @server = array(
-  'name': 'over',
+  'name': 'nether',
   'resourcepack': get_value('resourcepack')
 )
 
@@ -8,7 +8,8 @@
   'c45537c6-39d3-459e-9a48-86f938a9c0dd', #dohun1
   'b5ee7eb3-f4e8-4ab4-82e4-e97c60a6b8c1', #Loplove
   'ff1cb130-7152-4609-8cbc-76884c7444bd', #Geralt_w
-  '5c499342-2909-4571-8c45-7833a076b1dd'  #AppleCrepe
+  '5c400342-2909-4571-8c45-7833a076b1dd', #AppleCrepe
+  'bee4cc4e-ebd4-472c-9751-32d2655e9848'  #CreamCrepe
 )
 @reconnectable_players = array()
 @players_data = array()
@@ -358,6 +359,11 @@ proc _set_tips(@player, @uuid, @players_data) {
   @tips = @players_data[@uuid]['cache']['tips']
   if(array_size(@tips) > 0) {
     @tip_message = @tips[0]['message']
+    if(array_index_exists(@tips[0], 'sound')) {
+      if(@tips[0]['sound_time'] == @tips[0]['countdown']) {
+        play_named_sound(ploc(@player), @tips[0]['sound'], array(@player))
+      }
+    }
   } else {
     @tip_message = ''
   }
@@ -367,15 +373,27 @@ proc _set_tips(@player, @uuid, @players_data) {
   update_bar('tip.'.@uuid, @tip_bossbar_data)
 }
 
-proc _add_tips(@player, @uuid, @players_data, @message, @countdown, @is_warn) {
+proc _add_tips(@player, @uuid, @players_data, @message, @countdown, @is_warn, @sound) {
   @tips = @players_data[@uuid]['cache']['tips']
   @tip = array(
     'message': @message,
     'countdown': @countdown,
     'is_warn': @is_warn
   )
+  if(is_array(@sound)) {
+    @tip['sound'] = @sound
+    if(array_size(@tips) == 0) {
+      @tip['sound_time'] = @countdown - 1
+    } else {
+      @tip['sound_time'] = @countdown
+    }
+  }
   if(@is_warn) {
-    array_insert(@tips, @tip, 0)
+    if(array_size(@tips) > 0 && @tips[0]['is_warn']) {
+      @tips[0] = @tip
+    } else {
+      array_insert(@tips, @tip, 0)
+    }
   } else {
     @tips[] = @tip
   }
