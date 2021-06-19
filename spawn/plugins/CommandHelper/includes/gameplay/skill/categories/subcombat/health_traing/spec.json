@@ -1,0 +1,60 @@
+{
+	"default_max_point": 3,
+	"effect_by_point": [
+		{
+			"passive" :{
+				"max_health": 20
+			}
+		},
+		{
+			"passive" :{
+				"max_health": 22
+			}
+		},
+		{
+			"passive" :{
+				"max_health": 24
+			}
+		},
+		{
+			"passive" :{
+				"max_health": 26
+			}
+		},
+		{
+			"passive" :{
+				"max_health": 28
+			}
+		},
+		{
+			"passive" :{
+				"max_health": 30
+			}
+		},
+		{
+			"passive" :{
+				"max_health": 32
+			}
+		},
+		{
+			"passive" :{
+				"max_health": 34
+			}
+		},
+		{
+			"passive" :{
+				"max_health": 36
+			}
+		},
+		{
+			"passive" :{
+				"max_health": 38
+			}
+		},
+		{
+			"passive" :{
+				"max_health": 40
+			}
+		}
+	]
+}

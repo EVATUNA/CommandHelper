@@ -1,0 +1,29 @@
+{
+	"default_max_point": 3,
+	"effect_by_point": [
+		{
+			"passive": {
+			}
+		},
+		{
+			"passive": {
+			}
+		},
+		{
+			"passive": {
+			}
+		},
+		{
+			"passive": {
+			}
+		},
+		{
+			"passive": {
+			}
+		},
+		{
+			"passive": {
+			}
+		}
+	]
+}

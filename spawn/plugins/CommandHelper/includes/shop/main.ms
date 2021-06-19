@@ -147,10 +147,13 @@ proc _takeItem(@player, @take_item, @detail) {
           @inventory[@slot]['qty'] = 0
           set_inventory_item(puuid(@player), @slot, @inventory[@slot])
         } else if(@qty > @take_qty) {
-          @taken_qty += @take_qty
+          @taken_qty += @take_qty 
           @inventory[@slot]['qty'] -= @take_qty
           @take_qty -= @qty
           set_inventory_item(puuid(@player), @slot, @inventory[@slot])
+          if(@take_qty < 0) {
+            break()
+          }
         } else {
           @taken_qty += @inventory[@slot]['qty']
           @inventory[@slot]['qty'] = 0

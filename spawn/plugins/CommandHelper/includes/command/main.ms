@@ -3,7 +3,8 @@
   'success': '\ue4dc',
   'failure': '\ue4de',
   'warn': '\ue4dd',
-  'info': '\ue4e3'
+  'info': '\ue4e3',
+  'broadcast': '\ue4db'
 )
 # 명령어 proc
 proc _is_command_registered(@command) {
@@ -26,7 +27,7 @@ set_timeout(1000, closure() {
     msg(' §7서버오픈일: 2021년 06월 03일')
   }
   if(_is_command_registered('info')) { unregister_command('info') }
-  if(_is_command_registered('version')) { unregister_command('version') }
+  #if(_is_command_registered('version')) { unregister_command('version') }
   register_command('info', array(
     'aliases': array('about', 'version', 'ver', '서버', '서버정보'),
     'tabcompleter': closure(@command, @player, @args) {
@@ -583,7 +584,10 @@ proc _util_command(@command, @player, @args, @prefix, @text) {
           runas(@player, '/warp')
           break()
         case 12:
-          runas(@player, '/skill')
+          close_pinv(@player)
+          set_timeout(1, closure() {
+            runas(@player, '/skill')
+          })
           break()
         case 14:
           break()
@@ -1201,5 +1205,61 @@ register_command('sendwarn', array(
     @countdown = 3
     @is_warn = true
     _add_tips(@target_name, @target_uuid, @players_data, @message, @countdown, @is_warn)
+  }
+))
+
+register_command('broadcast', array(
+  'description': 'can broadcast',
+  'usage': '/broadcast <msg>',
+  'aliases': array('say'),
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    if(ponline(@player)) {
+      if(pisop(@player)) {
+        @sender_name = @player
+        @sender_uuid = puuid(@sender_name)
+        if(array_index_exists(@players_data, @sender_uuid) && array_size(@args) > 0) {
+          @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
+          @setting = @players_data[@sender_uuid]['setting']
+          _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @bots, @log_data)
+        } else {
+          tmsg(@player, color('yellow')'/'.@command'<message>')
+        }
+      } else {
+        return(false)
+      }
+    } else {
+      @sender_name = 'console'
+      @sender_uuid = 'console'
+      if(array_size(@args) > 0) {
+        @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
+        @setting = array('broadcast', false)
+        _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @bots, @log_data)
+      } else {
+        console(color('yellow')'/'.@command'<message>')
+      }
+    }
+  }
+))
+
+
+proc _chreload_command(@command, @player, @args, @prefix, @players_data) {
+  foreach(@target_name in all_players()) {
+    @target_uuid = puuid(@target_name)
+    @inv_holder = pinventory_holder(@target_name)
+    if(is_string(@inv_holder) && @inv_holder != @target_uuid) {
+      close_pinv(@target_name)
+    }
+  }
+  set_timeout(1, closure() {
+    broadcast(@prefix['broadcast'] hexcolor('#80c8ff').'인스턴스 패치가 진행되어 일부 데이터가 초기화 되었습니다.')
+    run('/reloadalias')
+  })
+}
+register_command('chreload', array(
+  permission: 'chreload',
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    _chreload_command(@command, @player, @args, @prefix, @players_data)
   }
 ))

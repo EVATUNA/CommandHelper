@@ -1,6 +1,6 @@
 ## Initial Including Data
 @server = array(
-  'name': 'nether',
+  'name': 'over',
   'resourcepack': get_value('resourcepack')
 )
 
@@ -9,7 +9,16 @@
   'b5ee7eb3-f4e8-4ab4-82e4-e97c60a6b8c1', #Loplove
   'ff1cb130-7152-4609-8cbc-76884c7444bd', #Geralt_w
   '5c400342-2909-4571-8c45-7833a076b1dd', #AppleCrepe
-  'bee4cc4e-ebd4-472c-9751-32d2655e9848'  #CreamCrepe
+  'bee4cc4e-ebd4-472c-9751-32d2655e9848', #CreamCrepe
+  '9dfadbe7-9ad1-4048-9cdd-228f8db82be7'  #1L_Bottle
+)
+@bots_name = array(
+  'dohun1', #dohun1
+  'Loplove', #Loplove
+  'Geralt_w', #Geralt_w
+  'AppleCrepe', #AppleCrepe
+  'creamcrepe',  #CreamCrepe
+  '1L_Bottle' #1L_Bottle
 )
 @reconnectable_players = array()
 @players_data = array()
@@ -85,7 +94,7 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
     @category = 'combat_method'
     @skill = @player_data['skill_manager'][2]
   }
-  if(@skill != '' && array_index_exists(@player_data['active_skill'], @category) && array_index_exists(@player_data['active_skill'][@category], @skill)) {
+  if(@skill != '' && array_index_exists(@player_data, 'active_skill') && array_index_exists(@player_data['active_skill'], @category) && array_index_exists(@player_data['active_skill'][@category], @skill)) {
     @level = @player_data['skill_data'][@category][@skill][0]
     if(@skills_spec[@category][@skill]['levels'][@level]['active']['count'] == 0) {
       if(@player_data['active_skill'][@category][@skill][1] > 0) {
@@ -573,7 +582,12 @@ proc _paging(@array, @size) {
 }
 
 proc _multiply_value(@value, @multiply, @deviation) {
-  return(@value * @multiply + @value * @deviation * 0.5 - @value * @deviation * rand())
+  @multiply_value = @value * @multiply + @value * @deviation * 0.5 - @value * @deviation * rand()
+  # 9 + 0.45 - 0~0.9
+  @quota = integer(@multiply_value)
+  @rest = @multiply_value - @quota
+  if(@rest > rand()) { @quota += 1 }
+  return(integer(@quota))
 }
 
 register_command('resourceurl', array(

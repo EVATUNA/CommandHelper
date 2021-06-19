@@ -1,311 +1,314 @@
-@skill_log_data = array()
-if(@server['name'] == 'main') {
-  @date = simple_date('yyyy-MM-dd')
-  @skill_log_data = array(
-    'date': @date,
-    'path': 'logs/'.@date.'.log'
-  )
-
-  if(!file_exists(@skill_log_data['path'])) {
-    create_file(@skill_log_data['path'])
-  }
-
-  @cron_task = set_cron('0 0 * * *', closure() {
-    @date = simple_date('yyyy-MM-dd')
-    @skill_log_data['date'] = @date
-    @skill_log_data['path'] = 'logs/'.@date.'.log'
-  })
-
-  proc _skill_logging( @player, @uuid, @skill, @level) {
-    @path = 'logs/'.simple_date('yyyy-MM-dd').'.log'
-    @message = @player.'('.@uuid.') '.@skill.' level up to '.@level
-    @log = string('['.simple_date('HH:mm:ss').'] '.@message.'\n')
-    write_file(@skill_log_data['path'], @log, 'APPEND')
-  }
-}
-
-@skills_info = array()
-async_read('skills_info.json', closure(@value) {
-  foreach(@category: @skills in json_decode(@value)) {
-    @skills_info[@category] = @skills
-  }
-})
+### 스킬 데이터 저장
 @skills_spec = array()
-async_read('skills_spec.json', closure(@value) {
-  foreach(@category: @skills in json_decode(@value)) {
-    @skills_spec[@category] = @skills
-  }
-})
-
-proc _load_skill_data(@uuid, @category, @skill, @is_default, @players_data, @skills_spec) {
-  @skill_data = cup_get('SKILL_DATA', @uuid.'_'.@skill)
-  if(@is_default) {
-    if(is_null(@skill_data)) {
-      @skill_data = array(
-        0,
-        0,
-        3,
-        @skills_spec[@category][@skill]['levels'][0]['max_experience']
-      )
-      cup_set('SKILL_DATA', @uuid.'_'.@skill, @skill_data)
-    } else {
-      @skill_data = array(
-        @skill_data[0],
-        @skill_data[1],
-        @skill_data[2],
-        @skills_spec[@category][@skill]['levels'][@skill_data[0]]['max_experience']
-      )
-      cup_set('SKILL_DATA', @uuid.'_'.@skill, @skill_data)
-    }
-    @players_data[@uuid]['skill_data'][@category][@skill] = @skill_data
-  } else {
-    /* 나중에 아래 코드로 바꿔야 함 지금은 어떤 전투 특성이든 모두 배우게 되어있음
-    if(!is_null(@skill_data)) {
-      @players_data[@uuid]['skill_data'][@category][@skill] = @skill_data
-    }
-    */
-    if(is_null(@skill_data)) {
-      @skill_data = array(
-        1,
-        0,
-        3,
-        @skills_spec[@category][@skill]['levels'][0]['max_experience']
-      )
-      cup_set('SKILL_DATA', @uuid.'_'.@skill, @skill_data)
-    }
-    @players_data[@uuid]['skill_data'][@category][@skill] = @skill_data
-  }
-}
-
-proc _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills_spec) {
-  @active_skill = cup_get('ACTIVE_SKILL', @uuid.'_'.@skill)
-  #if(!is_null(@active_skill)) { #if(is_null(@active_skill)) {로 돌려놔야 함
-    @active_skill = array(
-      @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown'],
-      0,
-      0,
-      0
-    )
-    cup_set('ACTIVE_SKILL', @uuid.'_'.@skill, @active_skill)
-  #}
-  @players_data[@uuid]['active_skill'][@category][@skill] = @active_skill
-}
-
-proc _set_skill_effect(@uuid, @category, @skill, @level, @players_data, @skills_spec) {
-  switch(@category) {
-  case 'combat_method':
-    switch(@skill) {
-    case 'sweeping':
-      _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills_spec)
-      @passive_attack_speed = @skills_spec['combat_method'][@skill]['levels'][@level]['passive']['attack_speed']
-      @modifier = array(
-        'attribute': 'GENERIC_ATTACK_SPEED',
-        'operation': 'ADD_SCALAR',
-        'amount': @passive_attack_speed,
-        'name': 'sweeping_passive'
-      )
-      add_entity_attribute_modifier(@uuid, @modifier)
-      break()
-    case 'knockback':
-      _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills_spec)
-      break()
-    case 'cleaving':
-      _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills_spec)
-      break()
-    #case 'blocking':
-    #  _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills_spec)
-    #  break()
-    }
-    break()
-  case 'subcombat':
-    switch(@skill) {
-    case 'health_traing':
-      @max_health = @skills_spec['subcombat'][@skill]['levels'][@level]['max_health']
-      set_entity_attribute_base(@uuid, 'GENERIC_MAX_HEALTH', @max_health)
-      break()
-    }
-    break()
-  #case 'farming':
-  #  break()
-  case 'harvesting_method':
-    _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills_spec)
-    #switch(@skill) {
-    #case 'wide_hand':
-    #  break()
-    #case 'golden_finger':
-    #  break()
-    #}
-    break()
-  case 'sowing_method':
-    _load_active_skill(@uuid, @category, @skill, @level, @players_data, @skills_spec)
-    #switch(@skill) {
-    #case 'wet_hands':
-    #  break()
-    #case 'fertile_touch':
-    #  break()
-    #}
-    break()
-  #case 'mining':
-  #  break()
-  }
-}
-
-proc _reset_skill_effect(@uuid, @category) {
-  switch(@category) {
-  case 'combat_method':
-    remove_entity_attribute_modifier(@uuid, 'GENERIC_ATTACK_SPEED', 'sweeping_passive')
-    remove_entity_attribute_modifier(@uuid, 'GENERIC_ATTACK_SPEED', 'sweeping_active')
-    break()
-  case 'combat_inclination':
-    break()
-  #case 'subcombat':
-  #  break()
-  #case 'farming':
-  #  break()
-  #case 'harvesting_method':
-  #  break()
-  #case 'sowing_method':
-  #  break()
-  #case 'mining':
-  #  break()
-  }
-}
-
-proc _load_skill_manager(@uuid, @players_data, @skills_spec) {
-  @skill_manager = cup_get('SKILL_MANAGER', @uuid)
-  if(is_null(@skill_manager)) {
-    @skill_manager = array(
-      '[]',
-      1,
-      '',
-      '',
-      ''
-    )
-    cup_set('SKILL_MANAGER', @uuid, @skill_manager)
-  }
-  @players_data[@uuid]['skill_manager'] = @skill_manager
-
-  #reset effect
-  _reset_skill_effect(@uuid, 'combat_method')
-  _reset_skill_effect(@uuid, 'combat_inclination')
-
-  #subcombat
-  @category = 'subcombat'
-  @skill = 'health_traing'
-  @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-  if(@level > 0) {
-    _set_skill_effect(@uuid, @category, @skill, @level, @players_data, @skills_spec)
-  }
-
-  #combat_inclination
-  @category = 'combat_inclination'
-  foreach(@skill in json_decode(@skill_manager[0])) {
-    if(@skill != '') {
-      @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-      if(@level > 0) {
-
+@skills_info = array()
+@categories = list_files('categories')
+foreach(@category in @categories) { 
+  @skills_info[@category] = array()
+  @category_path = "categories/@category"
+  @skills = list_files(@category_path)
+  foreach(@skill in @skills) {
+    @skill_path = "@category_path/@skill"
+    @files = list_files(@skill_path)
+    foreach(@file in @files) {
+      @file_path = "@skill_path/@file"
+      switch(@file) {
+      case 'spec.json':
+        async_read_file(@file_path, closure(@content) {
+          @skills_spec[@skill] = json_decode(@content)
+        })
+        break()
+      case 'info.json':
+        async_read_file(@file_path, closure(@content) {
+          @skills_info[@skill] = json_decode(@content)
+        })
+        break()
+      case 'load.ms':
+        proc("_apply_loading_by_@skill", @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @selected_combat_method, @selected_sowing_method, @selected_harvesting_method, @selected_runes) {
+          # 내부에서 사용 가능한 변수:
+          # @player_data, @player, @uuid,
+          # @category, @skill, @skill_spec, @point,
+          # @selected_combat_method, @selected_sowing_method, @selected_harvesting_method, @selected_runes
+          include(@file_path)
+        }
+        break()
+      case 'attack.ms':
+        proc("_apply_attacking_by_@skill", @event, @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @attack_cooldown, @attribute_attack_damage, @attribute_attack_speed) {
+          # 내부에서 사용 가능한 변수:
+          # @event, @player_data, @player, @uuid,
+          # @category, @skill, @skill_spec, @point,
+          # @attack_cooldown, @attribute_attack_damage, @attribute_attack_speed
+          include(@file_path)
+        }
+        break()
+      case 'update_item.ms':
+        proc("_apply_item_update_by_@skill", @player_data, @player, @uuid, @skill, @skill_spec, @point, @item, @vanilla_enchants) {
+          # 내부에서 사용 가능한 변수:
+          # @player_data, @player, @uuid,
+          # @skill, @skill_spec, @point,
+          # @item, @vanilla_enchants
+          include(@file_path)
+        }
+        break()
+      case 'active.ms':
+        proc("_apply_active_by_@skill", @player_data, @player, @uuid, @skill, @skill_spec, @point, @active_skill) {
+          # 내부에서 사용 가능한 변수:
+          # @player_data, @player, @uuid,
+          # @skill, @skill_spec, @point,
+          # @active_skill
+          include(@file_path)
+        }
+        break()
+      case 'countdown.ms':
+        proc("_apply_countdown_by_@skill", @player_data, @player, @uuid, @skill, @skill_spec, @point, @active_skill) {
+          # 내부에서 사용 가능한 변수:
+          # @player_data, @player, @uuid,
+          # @skill, @skill_spec, @point,
+          # @active_skill
+          include(@file_path)
+        }
+        break()
       }
     }
-    switch(@skill) {
-    case 'test':
-      #조건에 맞을시 효과 반영
-      #액티브 스킬 있을시 액티브 추가
-      break()
-    }
-  }
-
-  #combat_method
-  if(@skill_manager[2] != '') {
-    @category = 'combat_method'
-    @skill = @skill_manager[2]
-    @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-    if(@level > 0) {
-      _set_skill_effect(@uuid, @category, @skill, @level, @players_data, @skills_spec)
-    }
-  }
-
-  #harvesting_method
-  if(@skill_manager[3] != '') {
-    @category = 'harvesting_method'
-    @skill = @skill_manager[3]
-    @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-    if(@level > 0) {
-      _set_skill_effect(@uuid, @category, @skill, @level, @players_data, @skills_spec)
-    }
-  }
-
-  #sowing_method
-  if(@skill_manager[4] != '') {
-    @category = 'sowing_method'
-    @skill = @skill_manager[4]
-    @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-    if(@level > 0) {
-      _set_skill_effect(@uuid, @category, @skill, @level, @players_data, @skills_spec)
-    }
   }
 }
 
-proc _load_skills(@uuid, @players_data, @skills_spec) {
-  @default_skills = array(
-    'combat_method': array(
-      'sweeping',
-      'knockback',
-      'cleaving',
-      'blocking'
-    ),
-    'subcombat': array(
-      'bow_mastery',
-      'crossbow_mastery',
-      'health_traing'
-    ),
-    'farming': array(
-      'wheat_farming_mastery',
-      'beetroot_farming_mastery',
-      'potato_farming_mastery',
-      'carrot_farming_mastery',
-      'berries_farming_mastery',
-      'pumpkin_farming_mastery',
-      'melon_farming_mastery',
-      'plenty'
-    ),
-    'harvesting_method': array(
-      'wide_hand',
-      'golden_finger'
-    ),
-    'sowing_method': array(
-      'wet_hands',
-      'fertile_touch'
-    ),
-    'mining': array(
-      'copper_mining_mastery',
-      'iron_mining_mastery',
-      'gold_mining_mastery',
-      'diamond_mining_mastery',
-      'ancient_debris_mining_mastery',
-      'ore_selecting',
-      'tough_shoulder'
-    )
-  )
-  foreach(@category: @skills in @default_skills) {
-    foreach(@skill in @skills) {
-      _load_skill_data(@uuid, @category, @skill, true, @players_data, @skills_spec)
-    }
-  }
-  @additional_skills = array(
-    'combat_inclination': array(
-      'test1'
-    )
-  )
-  foreach(@category: @skills in @additional_skills) {
-    foreach(@skill in @skills) {
-      _load_skill_data(@uuid, @category, @skill, false, @players_data, @skills_spec)
-    }
-  }
+### 프로시저
 
-  #전투 방식 로드시 레벨 1이상일 경우에만 로드
-  #사용하지 않던 특성을 사용할 시 new / 매초마다 set
-  _load_skill_manager(@uuid, @players_data, @skills_spec)
+## 스킬 데이터 (레벨, 경험치, 토탈포인트)
+# 스킬 매니저 get
+proc _get_skill_manager(@uuid) {
+  @skill_manager = cup_get('SKILL_MANAGER', @uuid)
+  if(is_null(@skill_manager)) {
+    # 기본 값
+    @default_level = 0
+    @default_experience = 0
+    @default_total_point = 0
+    @default_rune_slot = 1
+    @default_selected_methods = array(
+      'combat_method': '',
+      'harvesting_method': '',
+      'sowing_method': ''
+    )
+    @default_selected_runes = array(
+    )
+    # 스킬 메니저 션언
+    @skill_manager = array(
+      @default_level,
+      @default_experience,
+      @default_total_point,
+      @default_rune_slot,
+      @default_selected_methods,
+      @default_selected_runes
+    )
+    # cup에 저장
+    _set_skill_manager(@uuid, @skill_manager)
+  }
+  return(@skill_manager)
 }
+# 스킬 매니저 set
+proc _set_skill_manager(@uuid, @skill_manager) {
+  cup_set('SKILL_MANAGER', @uuid, @skill_manager)
+}
+
+## 스킬 데이터 (현재 포인트, 맥스 포인트)
+# 스킬 데이터 get
+proc _get_skill_data(@uuid, @skill, @skill_spec) {
+  @skill_data = cup_get('SKILL_DATA', @uuid.'_'.@skill)
+  if(is_null(@skill_data)) {
+    # 기본 값
+    @default_point = 0
+    @default_max_point = @skill_spec['default_max_point']
+    # 스킬 데이터 선언
+    @skill_data = array(
+      @default_point,
+      @default_max_point
+    )
+    # cup에 저장
+    _set_skill_data(@uuid, @skill, @skill_data)
+  }
+  return(@skill_data) 
+}
+# 스킬 데이터 set
+proc _set_skill_data(@uuid, @skill, @skill_data) {
+  cup_set('SKILL_DATA', @uuid.'_'.@skill, @skill_data)
+}
+
+## 액티브 스킬 (쿨타임, 지속시간, 갯수, 에너지, 활성화 여부)
+# 액티브 스킬 load
+proc _load_active_skill(@player_data, @uuid, @skill, @point, @skill_spec) {
+  @active_skill = cup_get('ACTIVE_SKILL', @uuid.'_'.@skill)
+  if(is_null(@active_skill) || !@active_skill[4]) {
+    # 기본 값
+    @default_cooldown = @skill_spec['effect_by_point'][@point]['active']['cooldown']
+    @default_duration = 0
+    @default_count = 0
+    @default_energy = 0
+    @default_is_activated = true
+    # 액티브 스킬 선언
+    @active_skill = array(
+      @default_cooldown,
+      @default_duration,
+      @default_count,
+      @default_energy,
+      @default_is_activated
+    )
+    # cup에 저장
+    _save_active_skill(@uuid, @skill, @active_skill)
+  }
+  # 플레이어 데이터에 저장
+  @player_data['active_skill'][@skill] = @active_skill
+}
+# 액티브 스킬 reset
+proc _reset_active_skill(@player_data, @uuid, @skill) {
+  # 비활성화 값
+  @reseted_cooldown = 0
+  @reseted_duration = 0
+  @reseted_count = 0
+  @reseted_energy = 0
+  @reseted_is_activated = false
+  # 액티브 스킬 선언
+  @reseted_active_skill = array(
+    @reseted_cooldown,
+    @reseted_duration,
+    @reseted_count,
+    @reseted_energy,
+    @reseted_is_activated
+  )
+  # cup에 저장
+  _save_active_skill(@uuid, @skill, @active_skill)
+  # 플레이어 데이터에서 삭제
+  array_remove(@player_data['active_skill'], @skill)
+}
+# 액티브 스킬 save
+proc _save_active_skill(@uuid, @skill, @active_skill) {
+  cup_set('ACTIVE_SKILL', @uuid.'_'.@skill, @active_skill)
+}
+
+## 플레이어 관리 펑션
+# 플레이어의 모든 레벨 경치 스텟 및 스킬 데이터, 효과 로드
+proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
+  # 플레이어의 레벨, 경험치, 어떤 스킬을 선택중인지 구함
+  @skill_manager = _get_skill_manager(@uuid)
+  @player_data['skill_manager'] = @skill_manager
+  # 플레이어가 선택한 스킬들 선언
+  @selected_methods = json_decode(@skill_manager[4])
+  @selected_combat_method = @selected_methods['combat_method']
+  @selected_sowing_method = @selected_methods['sowing_method']
+  @selected_harvesting_method = @selected_methods['harvesting_method']
+  @selected_runes = json_decode(@skill_manager[5])
+  # 투자한 총 포인트 선언
+  @invested_point = 0
+  # 스킬 데이터 로드 및, 스킬 효과 적용 (모든 스킬 데이터 로드시 선택한 스킬,룬 이라면 로드.ms 작동해야 함)
+  foreach(@skill: @skill_spec in @skills_spec) {
+    # 카테고리 선언
+    @category = @skill_spec['category']
+    # 스킬 데이터 로드
+    @skill_data = _get_skill_data(@uuid, @skill, @skill_spec)
+    @player_data['skill_data'][@skill] = @skill_data
+    # 투자 포인트 계산
+    @point = @skill_data[0]
+    if(@category != 'rune') {
+      @invested_point += @point
+    }
+    # 스킬 효과 적용 (로드시)
+    @proc_name = "_apply_loading_by_@skill"
+    if(is_proc(@proc_name)) {
+      call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @selected_combat_method, @selected_sowing_method, @selected_harvesting_method, @selected_runes)
+    }
+  }
+  # 투자한 총 포인트 저장
+  @player_data['invested_point'] = @invested_point
+}
+
+
+
+
+# 버튼이랑 메인 나누기
+# 버튼 누를시 포인트 찍은거 인식
+
+proc _open_combat_skill(@player, @uuid, @skill_manager, @invested_point, @skills_data, @skills_info, @text) {
+  # 레벨
+  @level = @skill_manager[0]
+  # 경험치
+  @experience = @skill_manager[1]
+  # 포인트
+  @total_point = @skill_manager[2]
+  @remaining_point = @total_point - @invested_point
+  # 선택한 전투 방식
+  @selected_methods = @skill_manager[4]
+  @selected_combat_method = @selected_methods['combat_method']
+  # GUI 기본 데이터 선언
+  @texture_layer = ''
+  @message = '전투'
+  @inventory = array()
+  for(@index = 0, @index < 27, @index++) {
+    @inventory[@index] = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': ' ',
+        'model': 1
+      )
+    )
+  }
+  # 스킬 배치
+  @skill_setup = array(
+    'sweeping': 10,
+    'knockback': 12,
+    'cleaving': 14,
+    'blocking': 16,
+    'bow_mastery': 28,
+    'crossbow_mastery': 30,
+    'health_traing': 32
+  )
+  foreach(@skill: @slot in @skill_setup) {
+    @skill_point = @skills_data[@skill][0]
+    @skill_max_point = @skills_data[@skill][1]
+    @skill_info = @skills_info[@skill]
+    @skill_name = @skill_info['name']
+    @skill_desriptions = @skill_info['desriptions'][@skill_point]
+    if(array_size(@skill_desriptions) > 0) {
+      if(array_size(@skill_desriptions) - 1 < @skill_point) {
+        @desription_index = array_size(@skill_desriptions) - 1
+      } else {
+        @desription_index = @skill_point
+      }
+      @skill_desription = @skill_desriptions[@desription_index]
+    } else {
+      @skill_desription = array()
+    }
+    @inventory[@slot]['meta']['display'] = "§fLv.@skill_point @skill_name"
+    @inventory[@slot]['meta']['lore'] = @skill_desription
+  }
+  # GUI 이벤트 익스큐터 설정
+  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @skill_manager, @invested_point, @skills_data, @skills_info, @text) {
+    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @id, @skill_manager, @invested_point, @skills_data, @skills_info, @text) {
+      cancel()
+      if(@event['action'] == 'PICKUP_ALL') {
+        switch(@event['rawslot']) {
+        case 0:
+          break()
+        }
+      }
+    }
+  }
+  # GUI 보여주기
+  _show_gui(@player, 'skillbook_combat', 54, @texture_layer, @message, @inventory, @closure, @skill_manager, @invested_point, @skills_data, @skills_info, @text)
+}
+
+
+# @skill_manager = @player_data['skill_manager']
+# @invested_point = @player_data['invested_point']
+#  # 룬 슬롯 갯수
+#  @rune_slot = @skill_manager[3]
+#  # 선택한 방식 스킬
+#  @selected_methods = @skill_manager[4]
+#  @selected_combat_method = @selected_methods['combat_method']
+#  @selected_sowing_method = @selected_methods['sowing_method']
+#  @selected_harvesting_method = @selected_methods['harvesting_method']
+#  # 선택한 룬들
+#  @selected_runes = @skill_manager[5]
+# _open_skill_???page() 쓰기전 위의 변수들 선언 되어야 함
+
 
 proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, @text) {
   @uuid = puuid(@player)
@@ -1560,32 +1563,19 @@ register_command('skillbook', array(
   }
 ))
 
-proc _add_epxerience(@uuid, @skill, @skill_data, @default_xp, @extra_xp) {
-  #핫타임 있을시 핫타임 반영하기
-  if(@skill_data[0] < @skill_data[2]) {
-    @xp = round(@default_xp + rand() * @extra_xp * 1) #핫타임 배수 반영
-    if(@xp > 0) {
-      @new_experience = @skill_data[1] + @xp
-      if(@new_experience < @skill_data[3]) {
-        @skill_data[1] = integer(@new_experience)
-      } else {
-        @skill_data[0] += 1
-        @skill_data[1] = 0
-        if(is_proc('_skill_logging')) {
-          @player = player(@uuid)
-          @level = @skill_data[0]
-          _skill_logging(@player, @uuid, @skill, @level)
-        }
-      }
-      cup_set('SKILL_DATA', @uuid.'_'.@skill, @skill_data)
-    }
-  }
-}
-
 proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @minerals_spec, @skills_spec, @text) {
+  @player_data = @players_data[@uuid]
+  # 부순 블럭 선언
   @mineral = @event['block']
+  # 부순 블럭이 광물일시
   if(array_contains(array_keys(@minerals_spec), @mineral)) {
+    # 광물 스펙 선언
     @mineral_spec = @minerals_spec[@mineral]
+    ## 곡괭이 관련 데이터 선언
+    # 기본 데이터 선언
+    @pickaxe_hardness = 0
+    @mining_power = 0
+    # 곡괭이 강도 데이터
     @pickaxes_hardness = array(          # 캘수있는 광물
       'WOODEN_PICKAXE': 1,   #나무         (석탄)
       'GOLDEN_PICKAXE': 2,   #돌,금        (석탄, 구리)
@@ -1594,54 +1584,105 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
       'DIAMOND_PICKAXE': 5,  #다이아       (석탄, 구리, 청금석, 철, 금, 레드스톤, 다이아, 고대파편)
       'NETHERITE_PICKAXE': 6 #네더라이트   (석탄, 구리, 청금석, 철, 금, 레드스톤, 다이아, 고대파편)
     )
-    @pickaxe_hardness = 0
-    @mining_power = 0
-    if(!is_null(@players_data[@uuid]['item']['main_hand']) && array_contains(array_keys(@pickaxes_hardness), @players_data[@uuid]['item']['main_hand']['name'])) {
-      @pickaxe_hardness = @pickaxes_hardness[@players_data[@uuid]['item']['main_hand']['name']]
-      if(!is_null(@players_data[@uuid]['item']['main_hand']['meta'])) {
-        if(@pickaxe_hardness == 1 && @players_data[@uuid]['item']['main_hand']['meta']['model'] >= 8) {
-          @pickaxe_hardness = 2 // 돌 곡괭이 hardness 조정
+    if(!is_null(@player_data['item']['main_hand']) && array_contains(array_keys(@pickaxes_hardness), @player_data['item']['main_hand']['name'])) { // 곡괭이로 채굴할시
+      # 곡괭이 선언
+      @pickaxe = @player_data['item']['main_hand']
+      # 곡괭이 강도 설정
+      @pickaxe_hardness = @pickaxes_hardness[@pickaxe['name']]
+      if(!is_null(@pickaxe['meta'])) {
+        if(@pickaxe_hardness == 1 && @pickaxe['meta']['model'] >= 8) {
+          @pickaxe_hardness = 2 // 돌 곡괭이 강도 조정
         }
-        if(array_index_exists(@players_data[@uuid]['item']['main_hand']['meta'], 'modifiers')) {
-          foreach(@modifier in @players_data[@uuid]['item']['main_hand']['meta']['modifiers']) {
+        if(array_index_exists(@pickaxe['meta'], 'modifiers')) {
+          foreach(@modifier in @pickaxe['meta']['modifiers']) {
             if(@modifier['attribute'] == 'HORSE_JUMP_STRENGTH') {
-              @mining_power = @modifier['amount'] * (1 + @players_data[@uuid]['skill_data']['mining']['tough_shoulder'][0] * 0.1)
+              # 채굴 강도 선언
+              @mining_power = @modifier['amount']
               break()
             }
           }
         }
       }
     }
+    # 위치 선언 (아이템 드랍 위치 기준)
     @location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.5, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
+    # id 선언 (x.y.z.world)
     @id = array_implode(array(integer(@location['x']), integer(@location['y']), integer(@location['z']), @location['world']), '.')
+    # 피통 선언
     @max_hp = @minerals_spec[@mineral]['hp']
-    if(@pickaxe_hardness >= @minerals_spec[@mineral]['hardness']) {
+    if(@pickaxe_hardness >= @minerals_spec[@mineral]['hardness']) { // 곡괭이로 캘 수 있는 광물일시
+      ## 스킬 불러오기
+      # 강인한 어깨 배수
+      @mining_power_point = @player_data['skill_data']['tough_shoulder'][0]
+      @mining_power_multiply = @skills_spec['tough_shoulder']['effect_by_point'][@mining_power_point]['multiply']
+      @mining_power *= @mining_power_multiply
+      # 채광 숙련 배수
+      @mining_mastery_multiply = 1
+      if(array_index_exists(@mineral_spec, 'mastery')) {
+        @mining_mastery_name = @mineral_spec['mastery']
+        @mining_mastery_point = @player_data['skill_data'][@mining_mastery_name][0]
+        @mining_mastery_multiply = @skills_spec[@mining_mastery_name]['effect_by_point'][@mining_mastery_point]['multiply']
+      }
+      # 선광 배수
+      @ore_selecting_multiply = 1
+      switch(@location['world']) {
+      case 'over':
+        @ore_selecting_name = 'over_ore_selecting'
+        break()
+      case 'nether':
+        @ore_selecting_name = 'nether_ore_selecting'
+        break()
+      default:
+        @ore_selecting_name = null
+        break()
+      }
+      if(!is_null(@ore_selecting_name)) {
+        @ore_selecting_point = @player_data['skill_data'][@ore_selecting_name][0]
+        @ore_selecting_multiply = @skills_spec[@ore_selecting_name]['effect_by_point'][@ore_selecting_point]['multiply']
+      }
+      # 최대 드랍 갯수 배수에 선광 스킬 배수, 인첸트 반영
+      @max_drop_multiply = @ore_selecting_multiply
+      if(@player_data['item']['enchantments']['main_hand'] == '행운') {
+        @max_drop_multiply += 1.5
+      }
+      # id가 존재하지 않거나 광물이 다른 광물로 바뀔경우 기본데이터로 설정
       if(!array_index_exists(@hp_blocks, @id)) {
         @hp_blocks[@id] = array(
           'name': @mineral,
           'hp': @minerals_spec[@mineral]['hp'],
-          'reset_countdown': 3
+          'reset_countdown': 3,
+          'logs': array(
+            'max_drop_multiplies': array(),
+            'rank_quality_multiplies': array()
+          )
         )
       } else if(@hp_blocks[@id]['name'] != @mineral) {
         @hp_blocks[@id] = array(
           'name': @mineral,
           'hp': @minerals_spec[@mineral]['hp'],
-          'reset_countdown': 3
+          'reset_countdown': 3,
+          'logs': array(
+            'max_drop_multiplies': array(),
+            'rank_quality_multiplies': array()
+          )
         )
       }
+      # 체력 깍기 (0이하로 내려거면 0으로 설정) 및 @hp_block 기타 데이터 갱신
       @hp_blocks[@id]['hp'] -= @mining_power
-      @ore_selecting_xp = @mining_power * @minerals_spec[@mineral]['hardness'] * 0.1
-      @ore_selecting_default_xp = integer(@ore_selecting_xp)
-      @ore_selecting_extra_xp = @ore_selecting_xp - @ore_selecting_default_xp
-      _add_epxerience(@uuid, 'ore_selecting', @players_data[@uuid]['skill_data']['mining']['ore_selecting'], @ore_selecting_default_xp, @ore_selecting_extra_xp)
       if(@hp_blocks[@id]['hp'] < 0) {
         @hp_blocks[@id]['hp'] = 0
       }
       @hp_blocks[@id]['reset_countdown'] = 3
+      # hp 선언
       @hp = @hp_blocks[@id]['hp']
-      if(@hp_blocks[@id]['hp'] > 0) {
+      # 선광 숙련, 채굴 숙련 기록
+      @hp_blocks[@id]['logs']['max_drop_multiplies'][] = @max_drop_multiply
+      @hp_blocks[@id]['logs']['rank_quality_multiplies'][] = @mining_mastery_multiply
+      # 채굴 도중 일시
+      if(@hp > 0) {
         cancel()
-        @item = @players_data[@uuid]['item']['main_hand']
+        # 수동 내구도 깍기 (캔슬 걸려 있어서 내구도 깍아줘야 함)
+        @item = @player_data['item']['main_hand']
         @slot = pheld_slot(@player)
         if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
           @damage = 0
@@ -1669,35 +1710,38 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
           }
           _update_item(@player, @uuid, array('main_hand': @item), @players_data, @skills_spec, @text)
         }
-        @indicator_data = array(
+        # 인디케이터 데이터 설정
+        @indicator_data  = array(
           'block': @mineral,
           'max_hp': @max_hp,
           'hp': @hp,
           'countdown': 7
         )
-      } else {
+      } else { // 채굴 완료시
+        # 채굴 데이터 삭제
         array_remove(@hp_blocks, @id)
+        # 채굴 완료 소리
         play_named_sound(@location, array(
           'sound': 'minecraft:entity.player.levelup',
           'category': 'PLAYERS',
           'volume': 0.4,
           'pitch': 1.5
         ), @player)
-        @extra_qty = @players_data[@uuid]['skill_data']['mining']['ore_selecting'][0]
-        if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '행운') {
-          @extra_qty += 1.5
-        }
+        # 선광 숙련, 채광 숙련 평균 구하기 (높은 레벨 유저가 막타 치거나 행운곡 막타 방지)
+        @mining_mastery_multiply = average(@hp_blocks[@id]['logs']['rank_quality_multiplies']) 
+        @max_drop_multiply = average(@hp_blocks[@id]['logs']['max_drop_multiplies'])
+        # 루트 테이블 시스템
         @entries = @mineral_spec['loot_table']
         @total_weight = 0
         foreach(@key: @entry in @entries) {
-          if(array_index_exists(@mineral_spec, 'mastery')) {
-            @entries[@key]['weight'] += @entry['quality'] * @players_data[@uuid]['skill_data']['mining'][@mineral_spec['mastery']][0]
-          } else {
-            @entries[@key]['weight'] += @entry['quality']
-          }
+          # 채광 숙련 반영 (채광 숙련 스킬 연관 없는 광물일 경우 배수는 1임)
+          @entries[@key]['weight'] += @entry['quality'] * @mining_mastery_multiply
           @total_weight += @entry['weight']
         }
-        @qty = integer(round(@mineral_spec['default_qty'] + rand() * @extra_qty))
+        # 드랍 갯수 설정
+        @qty = integer(round(@mineral_spec['default_qty'] * @max_drop_multiply * rand()))
+        if(@qty < @mineral_spec['default_qty']) { @qty = @mineral_spec['default_qty']}
+        # 드랍 갯수 만큼 아이템 떨구기
         for(@i = 0, @i < @qty, @i++) {
           @result_weight = @total_weight * round(rand(), 5)
           @min_weight = 0
@@ -1711,7 +1755,8 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
             }
           }
         }
-        if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
+        # 경험치 드랍
+        if(@player_data['item']['enchantments']['main_hand'] == '경험') {
           @xp = integer(round((@mineral_spec['default_xp'] + rand() * @mineral_spec['extra_xp']) * 2))
         } else {
           @xp = integer(round(@mineral_spec['default_xp'] + rand() * @mineral_spec['extra_xp']))
@@ -1721,13 +1766,10 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
             set_entity_spec(@euuid, array('amount': @xp))
           })
         }
+        # 아이템, 경험치 수동으로 떨구기 때문에 모디피 이벤트로 이벤트 결과 수정
         modify_event('drops', array())
         modify_event('xp', 0)
-        foreach(@category: @skills in @mineral_spec['skills']) {
-          foreach(@skill: @xp_data in @skills) {
-            _add_epxerience(@uuid, @skill, @players_data[@uuid]['skill_data'][@category][@skill], @xp_data['default_xp'], @xp_data['extra_xp'])
-          }
-        }
+        # 인디케이터 데이터 설정
         @indicator_data = array(
           'block': @mineral,
           'max_hp': @max_hp,
@@ -1735,12 +1777,14 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
           'countdown': 1
         )
       }
-    } else {
+    } else { # 곡괭이 강도가 부족할시
+      # hp 변화 없어 보이도록 @hp 선언
       if(array_index_exists(@hp_blocks, @id)) {
         @hp = @hp_blocks[@id]['hp']
       } else {
         @hp = @minerals_spec[@mineral]['hp']
       }
+      # 인디케이터 데이터 설정
       @indicator_data = array(
         'block': @mineral,
         'max_hp': @max_hp,
@@ -1749,16 +1793,39 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
       )
       cancel()
     }
-    @players_data[@uuid]['cache']['indicator'] = @indicator_data
-    _set_indicator(@player, @uuid, @players_data, @text)
+    #인디케이터 보여주기
+    @player_data['cache']['indicator'] = @indicator_data
+    _set_indicator(@player, @uuid, @player_data, @text)
+    #캔슬은 안됬는데 정상적으로 캔게 아닐떼 템 안떨구도록 해주는 코드
     modify_event('drops', array())
   }
 }
   
 proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skills_spec, @text) {
+  @player_data = @players_data[@uuid]
+  # 부순 블럭 선언
   @crop = @event['block']
+  # 부순 블럭이 작물일 시
   if(array_contains(array_keys(@crops_spec), @crop)) {
+    # 작물 스펙 선언
     @crop_spec = @crops_spec[@crop]
+    ## 스킬 불러오기
+    # 수확 숙련 배수
+    @farming_mastery_multiply = 1
+    if(array_index_exists(@crop_spec, 'mastery')) {
+      @farming_mastery_name = @crop_spec['mastery']
+      @farming_mastery_point = @player_data['skill_data'][@farming_mastery_name][0]
+      @farming_mastery_multiply = @skills_spec[@farming_mastery_name]['effect_by_point'][@farming_mastery_point]['multiply']
+    }
+    # 풍년 배수
+    @plenty_point = @player_data['skill_data']['plenty'][0]
+    @plenty_multiply = @skills_spec['plenty']['effect_by_point'][@plenty_point]['multiply']
+    # 최대 드랍 갯수 배수에 선광 스킬 배수, 인첸트 반영
+    @max_drop_multiply = @plenty_multiply
+    if(@player_data['item']['enchantments']['main_hand'] == '행운') {
+      @max_drop_multiply += 1.5
+    }
+    # 수박 호박 수확할 시
     if(array_contains(array('PUMPKIN', 'MELON'), @crop)) {
       @center_location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.5, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
       @near_locations = array(
@@ -1779,6 +1846,7 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
           'location': array('x': @center_location['x'], 'y': @center_location['y'], 'z': @center_location['z'] - 1, 'world': @center_location['world'])
         )
       )
+      # 줄기가 연결되어 있는지
       @is_placed = true
       foreach(@near_location in @near_locations) {
         if(get_block(@near_location['location']) == @crop_spec['stem'] && get_blockdata(@near_location['location'])['facing'] == @near_location['facing']) {
@@ -1787,192 +1855,198 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
         }
       }
       if(!@is_placed) {
-        break_block(@near_location['location'])
-        @extra_qty = @players_data[@uuid]['skill_data']['farming']['plenty'][0]
-        if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '행운') {
-          @extra_qty += 1.5
-        }
-        @entries = @crop_spec['loot_table']
-        @total_weight = 0
-        foreach(@key: @entry in @entries) {
-          if(array_index_exists(@crop_spec, 'mastery')) {
-            @entries[@key]['weight'] += @entry['quality'] * @players_data[@uuid]['skill_data']['farming'][@crop_spec['mastery']][0]
-          } else {
-            @entries[@key]['weight'] += @entry['quality']
-          }
-          @total_weight += @entry['weight']
-        }
-        @qty = integer(round(@crop_spec['default_qty'] + rand() * @extra_qty))
-        for(@i = 0, @i < @qty, @i++) {
-          @result_weight = @total_weight * round(rand(), 5)
-          @min_weight = 0
-          foreach(@entry in @entries) {
-            @max_weight = @min_weight + @entry['weight']
-            if(@max_weight > @result_weight) {
-              drop_item(@center_location, @entry['item'], false)
-              break()
-            } else {
-              @min_weight = @max_weight
+        set_timeout(1, closure() {
+          if(!is_cancelled()) { // 성공적으로 수확 시
+            # 줄기 부수기
+            break_block(@near_location['location'])
+            # 루트 테이블 시스템
+            @entries = @crop_spec['loot_table']
+            @total_weight = 0
+            foreach(@key: @entry in @entries) {
+              @entries[@key]['weight'] += @entry['quality'] * @farming_mastery_multiply
+              @total_weight += @entry['weight']
             }
-          }
-        }
-        if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
-          @xp = integer(round((@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']) * 2))
-        } else {
-          @xp = integer(round(@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']))
-        }
-        if(@xp > 0) {
-          spawn_entity('EXPERIENCE_ORB', 1, @center_location, closure(@euuid) {
-            set_entity_spec(@euuid, array('amount': @xp))
-          })
-        }
-        modify_event('drops', array())
-        modify_event('xp', 0)
-        foreach(@category: @skills in @crop_spec['skills']) {
-          foreach(@skill: @xp_data in @skills) {
-            _add_epxerience(@uuid, @skill, @players_data[@uuid]['skill_data'][@category][@skill], @xp_data['default_xp'], @xp_data['extra_xp'])
-          }
-        }
-      }
-    } else {
-      @locations = array()
-      @center_location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.5, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
-      @harvesting_method = @players_data[@uuid]['skill_manager'][3]
-      @age = get_blockdata(@center_location)['age']
-      @item = @players_data[@uuid]['item']['main_hand']
-      @slot = pheld_slot(@player)
-      if(!is_null(@item) && array_contains(array('WOODEN_HOE', 'STONE_HOE', 'GOLDEN_HOE', 'IRON_HOE', 'DIAMOND_HOE', 'NETHERITE_HOE'), @item['name'])) {
-        @max_durability = material_info(@item['name'], 'maxDurability')
-        if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
-          @damage = 0
-          @item['meta'] = array()
-        } else {
-          @damage = @item['meta']['damage']
-        }
-        if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'enchants') || !array_index_exists(@item['meta']['enchants'], 'unbreaking')) {
-          @unbreaking_level = 0
-        } else {
-          @unbreaking_level = @item['meta']['enchants']['unbreaking']['elevel']
-        }
-        @breaking_chance = 1 / (@unbreaking_level + 1)
-        if(@harvesting_method != '' && @players_data[@uuid]['active_skill']['harvesting_method'][@harvesting_method][1] > 0) {
-          switch(@harvesting_method) {
-          case 'wide_hand':
-            if(@age == @crop_spec['max_age']) {
-              if(rand() < @breaking_chance) {
-                @damage += 1
-              }
-              @locations[] = @center_location
-              for(@x = -1, @x < 2, @x++) {
-                for(@z = -1, @z < 2, @z++) {
-                  if(@x != 0 || @z != 0) {
-                    @surrounding_location = array('x': @center_location['x'] + @x, 'y': @center_location['y'], 'z': @center_location['z'] + @z, 'world': @center_location['world'])
-                    if(get_block(@surrounding_location) == @crop && get_blockdata(@surrounding_location)['age'] == @crop_spec['max_age']) {
-                      if(@max_durability > @damage) {
-                        if(rand() < @breaking_chance) {
-                          @damage += 1
-                        }
-                        @locations[] = @surrounding_location
-                        break_block(@surrounding_location)
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            @crop_spec['skills']['harvesting_method']['wide_hand']['extra_xp'] *= 1.5
-            break()
-          case 'golden_finger':
-            if(@age == @crop_spec['max_age']) {
-              if(rand() < @breaking_chance) {
-                @damage += 1
-              }
-              @locations[] = @center_location
-              array_remove(@event['drops'], 0)
-              foreach(@seed in @event['drops']) {
-                drop_item(@center_location, @seed, false)
-              }
-              if(!is_cancelled()) {
-                set_timeout(1, closure() {
-                  set_block(@center_location, @crop)
-                })
-              }
-            } else {
-              cancel()
-            }
-            @crop_spec['skills']['harvesting_method']['golden_finger']['extra_xp'] *= 1.5
-            break()
-          default:
-            if(@age == @crop_spec['max_age']) {
-              if(rand() < @breaking_chance) {
-                @damage += 1
-              }
-              @locations[] = @center_location
-            }
-            break()
-          }
-        } else {
-          if(@age == @crop_spec['max_age']) {
-            if(rand() < @breaking_chance) {
-              @damage += 1
-            }
-            @locations[] = @center_location
-          }
-        }
-        if(@max_durability > @damage) {
-          @item['meta']['damage'] = @damage
-          set_inventory_item(puuid(@player), @slot, @item)
-        } else {
-          play_entity_effect(puuid(@player), 'BREAK_EQUIPMENT_MAIN_HAND')
-          @item = null
-          set_inventory_item(puuid(@player), @slot, @item)
-        }
-        _update_item(@player, @uuid, array('main_hand': @item), @players_data, @skills_spec, @text)
-        if(@age == @crop_spec['max_age']) {
-          @extra_qty = @players_data[@uuid]['skill_data']['farming']['plenty'][0]
-          if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '행운') {
-            @extra_qty += 1.5
-          }
-          @entries = @crop_spec['loot_table']
-          @total_weight = 0
-          foreach(@key: @entry in @entries) {
-            @entries[@key]['weight'] += @entry['quality'] * @players_data[@uuid]['skill_data']['farming'][@crop_spec['mastery']][0]
-            @total_weight += @entry['weight']
-          }
-          foreach(@location in @locations) {
-            @qty = integer(round(@crop_spec['default_qty'] + rand() * @extra_qty))
+            # 드랍 갯수 설정
+            @qty = integer(round(@crop_spec['default_qty'] * @max_drop_multiply * rand()))
+            if(@qty < @crop_spec['default_qty']) { @qty = @crop_spec['default_qty']}
+            # 드랍 갯수 만큼 아이템 떨구기
             for(@i = 0, @i < @qty, @i++) {
               @result_weight = @total_weight * round(rand(), 5)
               @min_weight = 0
               foreach(@entry in @entries) {
                 @max_weight = @min_weight + @entry['weight']
                 if(@max_weight > @result_weight) {
-                  drop_item(@location, @entry['item'], false)
+                  drop_item(@center_location, @entry['item'], false)
                   break()
                 } else {
                   @min_weight = @max_weight
                 }
               }
             }
-            @xp = integer(round(@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']))
+            # 경험치 드랍
+            if(@player_data['item']['enchantments']['main_hand'] == '경험') {
+              @xp = integer(round((@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']) * 2))
+            } else {
+              @xp = integer(round(@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']))
+            }
             if(@xp > 0) {
-              spawn_entity('EXPERIENCE_ORB', 1, @location, closure(@euuid) {
+              spawn_entity('EXPERIENCE_ORB', 1, @center_location, closure(@euuid) {
                 set_entity_spec(@euuid, array('amount': @xp))
               })
             }
           }
-          foreach(@category: @skills in @crop_spec['skills']) {
-            foreach(@skill: @xp_data in @skills) {
-              _add_epxerience(@uuid, @skill, @players_data[@uuid]['skill_data'][@category][@skill], @xp_data['default_xp'], @xp_data['extra_xp'])
+        })
+        # 아이템, 경험치 수동으로 떨구기 때문에 모디피 이벤트로 이벤트 결과 수정
+        modify_event('drops', array())
+        modify_event('xp', 0)
+      }
+    } else { //호박 수박 이외의 작물 수확 시
+      @locations = array()
+      @center_location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.5, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
+      @harvesting_method = @player_data['skill_manager'][4]['harvesting_method']
+      @age = get_blockdata(@center_location)['age']
+      set_timeout(1, closure() {
+        if(!is_cancelled()) { // 성공적으로 수확 시
+          # 괭이 검사
+          @item = @player_data['item']['main_hand']
+          @slot = pheld_slot(@player)
+          if(!is_null(@item) && array_contains(array('WOODEN_HOE', 'STONE_HOE', 'GOLDEN_HOE', 'IRON_HOE', 'DIAMOND_HOE', 'NETHERITE_HOE'), @item['name'])) {
+            # 괭이 수확 내구도 시스템
+            @max_durability = material_info(@item['name'], 'maxDurability')
+            if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
+              @damage = 0
+              @item['meta'] = array()
+            } else {
+              @damage = @item['meta']['damage']
+            }
+            if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'enchants') || !array_index_exists(@item['meta']['enchants'], 'unbreaking')) {
+              @unbreaking_level = 0
+            } else {
+              @unbreaking_level = @item['meta']['enchants']['unbreaking']['elevel']
+            }
+            @breaking_chance = 1 / (@unbreaking_level + 1)
+            # 수확 방식 적용
+            if(@harvesting_method != '' && @player_data['active_skill']['harvesting_method'][@harvesting_method][1] > 0) {
+              switch(@harvesting_method) {
+              case 'wide_hands':
+                if(@age == @crop_spec['max_age']) {
+                  if(rand() < @breaking_chance) {
+                    @damage += 1
+                  }
+                  @locations[] = @center_location
+                  for(@x = -1, @x < 2, @x++) {
+                    for(@z = -1, @z < 2, @z++) {
+                      if(@x != 0 || @z != 0) {
+                        @surrounding_location = array('x': @center_location['x'] + @x, 'y': @center_location['y'], 'z': @center_location['z'] + @z, 'world': @center_location['world'])
+                        if(get_block(@surrounding_location) == @crop && get_blockdata(@surrounding_location)['age'] == @crop_spec['max_age']) {
+                          if(@max_durability > @damage) {
+                            if(rand() < @breaking_chance) {
+                              @damage += 1
+                            }
+                            #주변 블럭들 부술 블럭 목록에 넣기 및 부수기
+                            @locations[] = @surrounding_location
+                            break_block(@surrounding_location)
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                break()
+              case 'golden_finger':
+                if(@age == @crop_spec['max_age']) {
+                  if(rand() < @breaking_chance) {
+                    @damage += 1
+                  }
+                  @locations[] = @center_location
+                  array_remove(@event['drops'], 0)
+                  foreach(@seed in @event['drops']) {
+                    drop_item(@center_location, @seed, false)
+                  }
+                  if(!is_cancelled()) { // 성공적으로 수확 시 1단계 작물 심기
+                    set_timeout(1, closure() {
+                      set_block(@center_location, @crop)
+                    })
+                  }
+                } else {
+                  #다 안자란 작물 캘려 하면 안캐지도록 캔슬
+                  cancel()
+                }
+                break()
+              default:
+                if(@age == @crop_spec['max_age']) {
+                  if(rand() < @breaking_chance) {
+                    @damage += 1
+                  }
+                  @locations[] = @center_location
+                }
+                break()
+              }
+            } else {
+              if(@age == @crop_spec['max_age']) {
+                if(rand() < @breaking_chance) {
+                  @damage += 1
+                }
+                @locations[] = @center_location
+              }
+            }
+            _update_item(@player, @uuid, array('main_hand': @item), @players_data, @skills_spec, @text)
+            # 루트 테이블 시스템
+            @entries = @crop_spec['loot_table']
+            @total_weight = 0
+            foreach(@key: @entry in @entries) {
+              @entries[@key]['weight'] += @entry['quality'] * @farming_mastery_multiply
+              @total_weight += @entry['weight']
+            }
+            # 부순 모든 작물에 드랍 시스템 작동
+            foreach(@location in @locations) {
+              # 드랍 갯수 설정
+              @qty = integer(round(@crop_spec['default_qty'] * @max_drop_multiply * rand()))
+              if(@qty < @crop_spec['default_qty']) { @qty = @crop_spec['default_qty']}
+              # 드랍 갯수 만큼 아이템 떨구기
+              for(@i = 0, @i < @qty, @i++) {
+                @result_weight = @total_weight * round(rand(), 5)
+                @min_weight = 0
+                foreach(@entry in @entries) {
+                  @max_weight = @min_weight + @entry['weight']
+                  if(@max_weight > @result_weight) {
+                    drop_item(@location, @entry['item'], false)
+                    break()
+                  } else {
+                    @min_weight = @max_weight
+                  }
+                }
+              }
+              # 경험치 드랍
+              if(@player_data['item']['enchantments']['main_hand'] == '경험') {
+                @xp = integer(round((@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']) * 2))
+              } else {
+                @xp = integer(round(@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']))
+              }
+              if(@xp > 0) {
+                spawn_entity('EXPERIENCE_ORB', 1, @location, closure(@euuid) {
+                  set_entity_spec(@euuid, array('amount': @xp))
+                })
+              }
+            }
+            # 내구도 깍기 및 다 부셔지면 아이템 없애기
+            if(@max_durability > @damage) {
+              @item['meta']['damage'] = @damage
+              set_inventory_item(puuid(@player), @slot, @item)
+            } else {
+              play_entity_effect(puuid(@player), 'BREAK_EQUIPMENT_MAIN_HAND')
+              @item = null
+              set_inventory_item(puuid(@player), @slot, @item)
             }
           }
         }
-      }
+      })
     }
   }
 }
 
 proc _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @skills_spec, @text) {
+  @player_data = @players_data[@uuid]
   @block = @event['block']
   if(@event['action'] == 'right_click_block' && array_contains(array('GRASS_BLOCK', 'DIRT'), @event['block']) && !is_null(@event['item']) && array_index_exists(@event, 'location')) {
     @location = array('x': @event['location']['x'], 'y': @event['location']['y'], 'z': @event['location']['z'], 'world': @event['location']['world'])
@@ -1990,9 +2064,9 @@ proc _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @ski
       } else {
         @slot = 40
       }
-      @item = @players_data[@uuid]['item'][@event['hand']]
+      @item = @player_data['item'][@event['hand']]
       if(pcooldown(@player, @item['name']) == 0) {
-        if(@players_data[@uuid]['item']['enchantments'][@event['hand']] == '효율') {
+        if(@player_data['item']['enchantments'][@event['hand']] == '효율') {
           @cooldown_multiply = 0.75
         } else {
           @cooldown_multiply = 1
@@ -2038,8 +2112,8 @@ proc _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @ski
             'hp': @hp,
             'countdown': 3
           )
-          @players_data[@uuid]['cache']['indicator'] = @indicator_data
-          _set_indicator(@player, @uuid, @players_data, @text)
+          @player_data['cache']['indicator'] = @indicator_data
+          _set_indicator(@player, @uuid, @player_data, @text)
           set_block(@location, @block)
           if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
             @damage = 0
@@ -2079,282 +2153,320 @@ proc _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @ski
             'hp': @hp,
             'countdown': 1
           )
-          @players_data[@uuid]['cache']['indicator'] = @indicator_data
-          _set_indicator(@player, @uuid, @players_data, @text)
+          @player_data['cache']['indicator'] = @indicator_data
+          _set_indicator(@player, @uuid, @player_data, @text)
         }
       }
     }
   }
 }
 
-/*
-bind('player_join', array('id': 'mastery.fishing.setup'), null, @event) {
-  @player = @event['player']
-  @fishing_data = array(
-  )
-  #bind('player_fish', array('id': 'mastery.fishing.reel_out.'.@player), array('player': @player, 'state': 'FISHING'), @event, @player, @fishing_data)
-  bind('player_fish', array('id': 'mastery.fishing.bite.'.@player), array('player': @player, 'state': 'BITE'), @event, @player, @fishing_data) {
-    cancel()
-    set_interval(100, closure() {
-      if(!ponline(@player)) {
-        clear_task()
-        if(has_bind('mastery.fishing.reel_out.'.@player)) { unbind('mastery.fishing.reel_out.'.@player) }
-        if(has_bind('mastery.fishing.caught_fish.'.@player)) { unbind('mastery.fishing.reel_in.'.@player) }
-        if(has_bind('mastery.fishing.bite.'.@player)) { unbind('mastery.fishing.bite.'.@player) }
-      } else {
-        @hook = @event['hook']
-        if(!entity_exists(@hook)) {
-          clear_task()
-          if(has_bind('mastery.fishing.caught_fish.'.@player)) { unbind('mastery.fishing.caught_fish.'.@player) }
-          if(has_bind('mastery.fishing.bite.'.@player)) { unbind('mastery.fishing.bite.'.@player) }
-          #entity_remove(@fishing_players[@player]['armor_stand']) ### 추가 상황에서도 아머스탠드 제거 해줘야 함 (낚시중 서버 꺼져서 아머스탠드가 살아 있을수도 있음)
-          #array_remove(@fishing_players, @player) #데이터 초기화
-          stop_named_sound(@player, 'entity.fishing_bobber.splash', 'NEUTRAL')
-          stop_named_sound(@player, 'entity.entity.player.swim', 'NEUTRAL')
-          stop_named_sound(@player, 'entity.entity.player.splash', 'NEUTRAL')
-          stop_named_sound(@player, 'entity.item.crossbow.quick_charge_3', 'NEUTRAL')
-        } else {
-          @hook_location = entity_loc(@hook)
-          @hook_location['y'] += 0.125
-          @player_location = ploc(@player)
-          if(psneaking(@player)) { @y_adjustment = 2.255 } else { @y_adjustment = 2.625 }
-          @player_location['y'] += @y_adjustment
-          @magnitude = distance(@hook_location, @player_location)
-          @vector = ('x': (@hook_location['x'] - @player_location['x']) / @magnitude, 'y': (@hook_location['y'] - @player_location['y']) / @magnitude, 'z': (@hook_location['z'] - @player_location['z']) / @magnitude)
-          @rotating_yaw = get_yaw(@player_location, @hook_location)
-          @rotating_pitch = get_pitch(@player_location, @hook_location)
-          #
-          if(@rotating_yaw < 180) {
-            if(@player_location['yaw'] > @rotating_yaw && @player_location['yaw'] < @rotating_yaw + 180) {
-              @leaning = 'right'
-            } else {
-              @leaning = 'left'
-            }
-          } else {
-            @opposite_yaw = @rotating_yaw - 180
-            if(@player_location['yaw'] < @rotating_yaw && @player_location['yaw'] > @rotating_yaw - 180) {
-              @leaning = 'left'
-            } else {
-              @leaning = 'right'
-            }
-          }
-
-          if(@leaning == 'left') {
-            @new_yaw = @player_location['yaw'] + 0.1
-          } else {
-            @new_yaw = @player_location['yaw'] - 0.1
-          }
-          #
-          #action_msg(@player, '내_yaw' round(@player_location['yaw'], 2) '위치기준 yaw' round(@rotating_yaw, 2) '좌우 회전 중심'round(@opposite_yaw, 2) @a)
-          #relative_teleport(puuid(@player), array('x': ploc()[x], 'y': ploc()[y] + 1, 'z': ploc()[z], 'world':  ploc()['world'], 'yaw': @new_yaw, 'pitch': get_pitch(@player_location, @hook_location)))
-        }
-        
-      }
-    })
-  }
-}
-*/
-/*
-@fishings = array()
-bind('player_fish', null, array('state': 'BITE'), @event, @fishings) {
-  @player = @event['player']
-  @hook = @event['hook']
-  @player_location = ploc(@player)
-  @hook_location = entity_loc(@hook)
-  @direction = array_rand(array(array('left', -90), array('right', 90)), 1, false)[0]
-  @moving_yaw = get_yaw(@player_location, @hook_location) + @direction[1]
-  @moving_vector = get_vector(array('yaw': @moving_yaw, 'pitch': 0), 0.2)
-  play_named_sound(@hook_location, array('sound': 'entity.player.splash', 'category': 'NEUTRAL', 'volume': 0.3, 'pitch': 1 + rand() / 2))
-  play_named_sound(@hook_location, array('sound': 'entity.fishing_bobber.splash', 'category': 'NEUTRAL', 'volume': 0.3, 'pitch': 0.85 + rand() / 2))
-  play_named_sound(@player_location, array('sound': 'entity.player.splash', 'category': 'NEUTRAL', 'volume': 0.05, 'pitch': 1 + rand() / 2), @player)
-  play_named_sound(@player_location, array('sound': 'entity.fishing_bobber.splash', 'category': 'NEUTRAL', 'volume': 0.05, 'pitch': 0.85 + rand() / 2), @player)
-  set_entity_velocity(@hook, @moving_vector)
-  if(!array_index_exists(@fishings, @player)) {
-    @hook_location['yaw'] = 0.0
-    @fishings[@player] = array(
-      'armor_stand': spawn_entity('ARMOR_STAND', 1, @hook_location, closure(@uuid) { set_entity_spec(@uuid, array('visible': false, 'small': true, 'marker': true, 'poses': array('poseHead': @moving_vector))) set_entity_rider(@hook, @uuid) set_mob_equipment(@uuid, array('HELMET': array('name': 'LEATHER_HORSE_ARMOR', 'meta': array('model': 1)))) })[0],
-      'direction': @direction[0]
-    )
-    
-    bind('player_interact', array('id': 'mastery.fishing.click.'.@player), array('player': @player, 'hand': 'main_hand', 'itemname': 'FISHING_ROD', 'button': 'right'), @event, @fishings, @player, @hook) {
-      cancel()
-      @player_location = ploc(@player)
-      @hook_location = entity_loc(@hook)
-      @relative_yaw = get_yaw(@player_location, @hook_location)
-      if(@relative_yaw < 180) {
-        if(@player_location['yaw'] > @relative_yaw && @player_location['yaw'] < @relative_yaw + 180) {
-          @leaning = 'right'
-        } else {
-          @leaning = 'left'
-        }
-      } else {
-        if(@player_location['yaw'] < @relative_yaw && @player_location['yaw'] > @relative_yaw - 180) {
-          @leaning = 'left'
-        } else {
-          @leaning = 'right'
-        }
-      }
-      if(@fishings[@player]['direction'] == 'left') {
-        if(@leaning == 'left') {
-          @moving_yaw = @relative_yaw - 90
-          @draw = false
-        } else {
-          @moving_yaw = @relative_yaw + 90
-          @draw = true
-        }
-      } else {
-        if(@leaning == 'left') {
-          @moving_yaw = @relative_yaw - 90
-          @draw = true
-        } else {
-          @moving_yaw = @relative_yaw + 90
-          @draw = false
-        }
-      }
-      if(@draw) {
-        @magnitude = 0.2 + 0.4 * rand()
-        play_named_sound(@player_location, array('sound': 'item.crossbow.quick_charge_3', 'category': 'PLAYERS', 'volume': 0.8, 'pitch': 0.5 + rand() / 2))
-        play_named_sound(@player_location, array('sound': 'item.crossbow.quick_charge_3', 'category': 'PLAYERS', 'volume': 0.8, 'pitch': 0.5 + rand() / 2), @player)
-      } else {
-        @magnitude = 0.5 + rand()
-        play_named_sound(@player_location, array('sound': 'entity.fishing_bobber.retrieve', 'category': 'PLAYERS', 'volume': 1, 'pitch': 0.3 + rand() / 2))
-        play_named_sound(@player_location, array('sound': 'entity.fishing_bobber.retrieve', 'category': 'PLAYERS', 'volume': 1, 'pitch': 0.3 + rand() / 2), @player)
-      }
-      @moving_vector = get_vector(array('yaw': @moving_yaw, 'pitch': 0), @magnitude)
-      set_entity_velocity(@hook, @moving_vector)
+proc _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skills_spec, @allowed_entity, @text, @server) {
+  # 기본 변수 선언
+  @player_data = @players_data[@puuid]
+  @skill_manager = @player_data['skill_manager']
+  @selected_combat_method = @selected_methods['combat_method']
+  @selected_runes = @skill_manager[5]
+  @skills_data = @player_data['skill_data']
+  # 전투 관련 데이터들 불러오기
+  ## 공격 쿨타임
+  @attack_cooldown = pattack_cooldown(@player)
+  ## 공격 피해
+  @attribute_attack_damage = entity_attribute_value(@puuid, 'GENERIC_ATTACK_DAMAGE')
+  ## 공격 속도
+  @attribute_attack_speed = entity_attribute_value(@puuid, 'GENERIC_ATTACK_SPEED')
+  # 공속에 따른 무적 시간 설정
+  if(!is_null(@items['main_hand']) && array_contains(@weapons, @items['main_hand']['name'])) {
+    @immunity_tick = integer(20 / @attribute_attack_speed)
+    if(@immunity_tick < 20) {
+      set_timeout(0, closure( set_entity_immunity_ticks(@euuid, @immunity_tick) ))
     }
-    @direction = array_rand(array(array('left', -90), array('right', 90)), 1, false)[0]
-    @int = array(0)
-    set_interval(100, closure() {
-      if(!entity_exists(@hook)) {
-        if(has_bind('mastery.fishing.click.'.@player)) { unbind('mastery.fishing.click.'.@player) }
-        if(entity_exists(@fishings[@player]['armor_stand'])) { entity_remove(@fishings[@player]['armor_stand']) } ### 추가 상황에서도 아머스탠드 제거 해줘야 함 (낚시중 서버 꺼져서 아머스탠드가 살아 있을수도 있음)
-        array_remove(@fishings, @player)
-        stop_named_sound(@player, 'entity.fishing_bobber.splash', 'NEUTRAL')
-        stop_named_sound(@player, 'entity.entity.player.swim', 'NEUTRAL')
-        stop_named_sound(@player, 'entity.entity.player.splash', 'NEUTRAL')
-        stop_named_sound(@player, 'entity.item.crossbow.quick_charge_3', 'NEUTRAL')
-        if(has_bind('mastery.fishing.click.'.@player)) { unbind('mastery.fishing.click.'.@player) }
-        clear_task()
-      } else {
-        @player_location = ploc()
-        @hook_location = entity_loc(@hook)
-        
-        set_timeout(integer(rand() * 100), closure() {
-          if(rand() > 0.95) {
-            @direction = array_rand(array(array('left', -90), array('right', 90)), 1, false)[0]
-            @fishings[@player]['direction'] = @direction[0]
-            @moving_yaw = get_yaw(@player_location, @hook_location) + @direction[1]
-            @moving_vector = get_vector(array('yaw': @moving_yaw, 'pitch': 0), 0.2)
-            @moving_vector['y'] = - 0.1 - 0.2 * rand()
-            set_entity_velocity(@hook, @moving_vector)
-            ###
-            play_named_sound(@hook_location, array('sound': 'entity.player.splash', 'category': 'NEUTRAL', 'volume': 0.3, 'pitch': 1 + rand() / 2))
-            play_named_sound(@hook_location, array('sound': 'entity.fishing_bobber.splash', 'category': 'NEUTRAL', 'volume': 0.3, 'pitch': 0.85 + rand() / 2))
-            play_named_sound(@player_location, array('sound': 'entity.player.splash', 'category': 'NEUTRAL', 'volume': 0.05, 'pitch': 1 + rand() / 2), @player)
-            play_named_sound(@player_location, array('sound': 'entity.fishing_bobber.splash', 'category': 'NEUTRAL', 'volume': 0.05, 'pitch': 0.85 + rand() / 2), @player)
-            
-          } else {
-            @direction = @fishings[@player]['direction']
-            if(@direction == 'left') { @moving_yaw = get_yaw(@player_location, @hook_location) - 90 } else { @moving_yaw = get_yaw(@player_location, @hook_location) + 90 }
-            @moving_vector = get_vector(array('yaw': @moving_yaw, 'pitch': 0), 0.04 * rand())
-            if(rand() > 0.9) { @moving_vector['y'] = -0.2 * rand()}
-            set_entity_velocity(@hook, @moving_vector)
-            @int[0] += 0.05
-            set_entity_spec(@fishings[@player]['armor_stand'], array('poses': array('poseHead': array('x': 0, 'y': @moving_yaw / 60, 'z': 0))))
-            #action_msg(@int[0] '|' entity_spec(@fishings[@player]['armor_stand'])['poses']['poseHead']['x'] entity_spec(@fishings[@player]['armor_stand'])['poses']['poseHead']['y'] entity_spec(@fishings[@player]['armor_stand'])['poses']['poseHead']['z'])
-          }
-        })
-        if(rand() > 0.7) {
-          spawn_particle(@hook_location, 'WATER_BUBBLE')
-          play_named_sound(@hook_location, array('sound': 'entity.player.swim', 'category': 'NEUTRAL', 'volume': 0.2, 'pitch': 1 + rand() / 2))
-          play_named_sound(@player_location, array('sound': 'entity.player.swim', 'category': 'NEUTRAL', 'volume': 0.08, 'pitch': 1 + rand() / 2), @player)
-        }
-        @hook_location['y'] += 0.2
-        spawn_particle(@hook_location, 'WATER_SPLASH')
-        spawn_particle(@hook_location, 'WATER_SPLASH')
-        spawn_particle(@hook_location, 'WATER_SPLASH')
-        spawn_particle(@hook_location, 'WATER_SPLASH')
-        spawn_particle(@hook_location, 'WATER_SPLASH')
-        #@fishing_players[@player]['player_location']['yaw'] - ploc(@player)['yaw']
-        #@fishing_players[@player]['player_location']['pitch'] - ploc(@player)['pitch']
-        #action_msg(@player, @fishing_players[@player]['player_location']['yaw'] - ploc(@player)['yaw'] @fishing_players[@player]['player_location']['pitch'] - ploc(@player)['pitch'])
-        #relative_teleport(@player, array(yaw: 1, pitch: 0))
-        #set_entity_rotation(puuid(@player), 0, 1)
-        #set_entity_velocity(@hook, array('x': 0.05, 'y': 0, 'z': 0))
-      }
-    })
-  } else {
-    @fishings[@player]['direction'] = @direction[0]
   }
+  # 스킬 효과 적용
+  ## 전투 방식
+  if(@selected_combat_method != '') {
+    @proc_name = "_apply_attacking_by_@selected_combat_method"
+    if(is_proc(@proc_name)) {
+      @category = 'combat_method'
+      @point = @skill_manager
+      @skill_spec = @skills_spec[@selected_combat_method]
+      @skill_data = @player_data['skill_data'][@skill]
+      @point = @skill_data[0]
+      call_proc(@proc_name, @event, @player_data, @player, @uuid, @category, @selected_combat_method, @skill_spec, @point, @attack_cooldown, @attribute_attack_damage, @attribute_attack_speed)
+    }
+  }
+  ## 룬
+  foreach(@selected_rune in @selected_runes) {
+    @proc_name = "_apply_attacking_by_@selected_combat_method"
+    if(is_proc(@proc_name)) {
+      @category = 'rune'
+      @point = @skill_manager
+      @skill_spec = @skills_spec[@selected_rune]
+      @skill_data = @player_data['skill_data'][@skill]
+      @point = @skill_data[0]
+      call_proc(@proc_name, @event, @player_data, @player, @uuid, @category, @selected_combat_method, @skill_spec, @point, @attack_cooldown, @attribute_attack_damage, @attribute_attack_speed)
+    }
+  }
+  # 인첸트
+  @time = time()
+  ## 인첸트 미반영시 기본 네더 필드 효과 뎀지 배수 선언
+  @nether_field_effect_multiply = 0.5
+  ## 무기 인첸트
+  @weapon_enchant = @items['enchantments']['main_hand']
+  if(@weapon_enchant) {
+    @weapon_chance_multiply = (@time - @player_data['cache']['last_weapon_effect']) / 5000
+    if(@weapon_chance_multiply > 1) {
+      @weapon_chance_multiply = 1
+    }
+    @weapon_chance_multiply *= @attack_cooldown
+    switch(@weapon_enchant) {
+    case '효율':
+      @event['amount'] *= 1.2
+      break()
+    case '전격':
+      if(rand() < 0.1 * @weapon_chance_multiply) {
+        @player_data['cache']['last_weapon_effect'] = @time
+        @entity_location = entity_loc(@euuid)
+        if((get_highest_block_at(@entity_location)['y'] <= @entity_location['y'] + 2 && (has_thunder(@entity_location['world']) || has_storm(@entity_location['world']))) || get_block(@entity_location) == 'WATER') {
+          @range = 10
+        } else {
+          @range = 5
+        }
+        @entity_location['x'] += rand() / 2 - 0.25
+        @entity_location['y'] += 1 + rand() * @allowed_entity[@entity_type] * 0.5 - @allowed_entity[@entity_type] * 0.25
+        @entity_location['z'] += rand() / 2 - 0.25
+        mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @entity_location['x'], @entity_location['y'], @entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
+        @near_entities = entities_in_radius(@entity_location, @range)
+        #
+        #
+        #array_remove_values(@near_entities, @puuid)
+        array_remove_values(@near_entities, @euuid)
+        foreach(@near_entity in @near_entities) {
+          @near_entity_type = entity_type(@near_entity)
+          if(array_contains(array_keys(@allowed_entity), @near_entity_type)) {
+            @near_entity_location = entity_loc(@near_entity)
+            @near_entity_location['x'] += rand() / 2 - 0.25
+            @near_entity_location['y'] += 1 + rand() * @allowed_entity[@near_entity_type] * 0.5 - @allowed_entity[@near_entity_type] * 0.25
+            @near_entity_location['z'] += rand() / 2 - 0.25
+            mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @near_entity_location['x'], @near_entity_location['y'], @near_entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
+            @distance = distance(@entity_location,  @near_entity_location)
+            for(@i = 0, @i < distance(@entity_location,  @near_entity_location), @i += 0.25 + rand() * 0.25) {
+              @pos = location_shift(@entity_location,  @near_entity_location, @i)
+              mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @pos['x'], @pos['y'], @pos['z'], 1, 0.0, 0.0, 0.0, 0.0)
+            }
+            damage_entity(@near_entity, 2)
+          }
+        }
+      }
+      break()
+    case '천둥':
+      if(rand() < 0.25 * @weapon_chance_multiply) {
+        @player_data['cache']['last_weapon_effect'] = @time
+        @entity_location = entity_loc(@euuid)
+        @range = 5
+        @has_storm = false
+        if(get_block(@entity_location) == 'WATER') {
+          @range = 10
+        }
+        if(get_highest_block_at(@entity_location)['y'] <= @entity_location['y'] + 2) {
+          if(has_thunder(@entity_location['world'])) {
+            @range = 10
+          } else if(has_storm(@entity_location['world'])) {
+            @range = 10
+            @has_storm = true
+          }
+        }
+        if(@has_storm) {
+          lightning(@entity_location)
+        }
+        @entity_location['x'] += rand() / 2 - 0.25
+        @entity_location['y'] += 1 + rand() * @allowed_entity[@entity_type] * 0.5 - @allowed_entity[@entity_type] * 0.25
+        @entity_location['z'] += rand() / 2 - 0.25
+        mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @entity_location['x'], @entity_location['y'], @entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
+        @near_entities = entities_in_radius(@entity_location, @range)
+        #array_remove_values(@near_entities, @puuid)
+        array_remove_values(@near_entities, @euuid)
+        foreach(@near_entity in @near_entities) {
+          @near_entity_type = entity_type(@near_entity)
+          if(array_contains(array_keys(@allowed_entity), @near_entity_type)) {
+            @near_entity_location = entity_loc(@near_entity)
+            @near_entity_location['x'] += rand() / 2 - 0.25
+            @near_entity_location['y'] += 1 + rand() * @allowed_entity[@near_entity_type] * 0.5 - @allowed_entity[@near_entity_type] * 0.25
+            @near_entity_location['z'] += rand() / 2 - 0.25
+            mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @near_entity_location['x'], @near_entity_location['y'], @near_entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
+            @distance = distance(@entity_location,  @near_entity_location)
+            for(@i = 0, @i < distance(@entity_location,  @near_entity_location), @i += 0.25 + rand() * 0.25) {
+              @pos = location_shift(@entity_location,  @near_entity_location, @i)
+              mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @pos['x'], @pos['y'], @pos['z'], 1, 0.0, 0.0, 0.0, 0.0)
+            }
+            damage_entity(@near_entity, 2)
+          }
+        }
+      }
+      break()
+    case '화염':
+      if(rand() < 0.1 * @weapon_chance_multiply) {
+        @player_data['cache']['last_weapon_effect'] = @time
+        set_entity_onfire(@euuid, entity_onfire(@euuid) + 5)
+      }
+      break()
+    case '유황불':
+      if(rand() < 0.25 * @weapon_chance_multiply) {
+        @player_data['cache']['last_weapon_effect'] = @time
+        if(entity_onfire(@euuid) > 0) {
+          set_mob_effect(@euuid, 'WEAKNESS', 0, 3, false, true)
+        }
+        set_entity_onfire(@euuid, entity_onfire(@euuid) + 5)
+      }
+      break()
+    case '냉기':
+      @nether_field_effect_multiply = 0.625
+      if(rand() < 0.1 * @weapon_chance_multiply) {
+        @player_data['cache']['last_weapon_effect'] = @time
+        set_mob_effect(@euuid, 'SLOWNESS', 1, 10, false, true)
+      }
+      break()
+    case '빙결':
+      @nether_field_effect_multiply = 1
+      if(rand() < 0.25 * @weapon_chance_multiply) {
+        @player_data['cache']['last_weapon_effect'] = @time
+        set_mob_effect(@euuid, 'SLOWNESS', 1, 10, false, true)
+      }
+      if(rand() < 0.025 * @weapon_chance_multiply) {
+        @player_data['cache']['last_weapon_effect'] = @time
+        set_mob_effect(@euuid, 'SLOWNESS', 5, 4, false, true)
+      }
+      break()
+    case '신성':
+      @undead_entities = array(
+        'DROWNED',
+        'HUSK',
+        'PHANTOM',
+        'SKELETON',
+        'SKELETON_HORSE',
+        'STRAY',
+        'WITHER',
+        'WITHER_SKELETON',
+        'ZOGLIN',
+        'ZOMBIE',
+        'ZOMBIE_HORSE',
+        'ZOMBIE_VILLAGER',
+        'ZOMBIFIED_PIGLIN'
+      )
+      if(array_contains(@undead_entities, entity_type(@euuid)) && rand() < 0.1 * @weapon_chance_multiply) {
+        @player_data['cache']['last_weapon_effect'] = @time
+        set_mob_effect(@euuid, 'INSTANT_HEALTH', 1, 0.1, false, true)
+      }
+      break()
+    case '퇴마':
+      @undead_entities = array(
+        'DROWNED',
+        'HUSK',
+        'PHANTOM',
+        'SKELETON',
+        'SKELETON_HORSE',
+        'STRAY',
+        'WITHER',
+        'WITHER_SKELETON',
+        'ZOGLIN',
+        'ZOMBIE',
+        'ZOMBIE_HORSE',
+        'ZOMBIE_VILLAGER',
+        'ZOMBIFIED_PIGLIN'
+      )
+      if(array_contains(@undead_entities, entity_type(@euuid)) && rand() < 0.25 * @weapon_chance_multiply) {
+        @player_data['cache']['last_weapon_effect'] = @time
+        set_mob_effect(@euuid, 'INSTANT_HEALTH', 2, 0.1, false, true)
+      }
+      break()
+    case '독성':
+      if(rand() < 0.1 * @weapon_chance_multiply) {
+        @player_data['cache']['last_weapon_effect'] = @time
+        set_mob_effect(@euuid, 'POISON', 0, 5, false, true)
+      }
+      break()
+    case '맹독':
+      if(rand() < 0.1 * @weapon_chance_multiply) {
+        @player_data['cache']['last_weapon_effect'] = @time
+        set_mob_effect(@euuid, 'POISON', 4, 5, false, true)
+      }
+      break()
+    }
+  }
+  ## 방어구 인첸트
+  @armor_enchant = @items['enchantments']['armor']
+  if(@armor_enchant && entity_type(@euuid) != 'PLAYER') {
+    @armor_chance_multiply = (@time - @player_data['cache']['last_armor_effect']) / 5000
+    if(@armor_chance_multiply > 1) {
+      @armor_chance_multiply = 1
+    }
+    @armor_chance_multiply *= @attack_cooldown
+    switch(@items['enchantments']['armor']) {
+    case '복원':
+      if(rand() < 0.1 * @armor_chance_multiply) {
+        @player_data['cache']['last_armor_effect'] = @time
+        if(!is_null(@items['main_hand']) && !is_null(@items['main_hand']['meta']) && @items['main_hand']['meta']['damage'] > 0) {
+          if(@items['armor']['meta']['damage'] > 0) {
+            if(rand() < 0.5) {
+              @items['main_hand']['meta']['damage'] -= 1
+              set_inventory_item(@puuid, pheld_slot(@player), @items['main_hand'])
+              _update_item(@player, @puuid, array('main_hand': @items['main_hand']), @players_data, @skills_spec, @text)
+            } else {
+              @items['armor']['meta']['damage'] -= 1
+              _update_item(@player, @puuid, array('armor': @items['armor']), @players_data, @skills_spec, @text)
+              set_inventory_item(@puuid, 36, @items['armor'])
+            }
+          } else {
+            @items['main_hand']['meta']['damage'] -= 1
+            _update_item(@player, @puuid, array('main_hand': @items['main_hand']), @players_data, @skills_spec, @text)
+            set_inventory_item(@puuid, pheld_slot(@player), @items['main_hand'])
+          }
+        } else {
+          if(@items['armor']['meta']['damage'] > 0) {
+            @items['armor']['meta']['damage'] -= 1
+            _update_item(@player, @puuid, array('armor': @items['armor']), @players_data, @skills_spec, @text)
+            set_inventory_item(@puuid, 36, @items['armor'])
+          }
+        }
+      }
+      break()
+    case '친수성':
+      if(rand() < 0.1 * @armor_chance_multiply) {
+        @player_data['cache']['last_armor_effect'] = @time
+        set_mob_effect(@puuid, 'WATER_BREATHING', 0, 5, false, true)
+      }
+      break()
+    case '포화':
+      if(rand() < 0.1 * @armor_chance_multiply) {
+        @player_data['cache']['last_armor_effect'] = @time
+        set_mob_effect(@puuid, 'SATURATION', 0, 0.05, false, true)
+      }
+      break()
+    case '재생':
+      if(rand() < 0.1 * @armor_chance_multiply) {
+        @player_data['cache']['last_armor_effect'] = @time
+        set_mob_effect(@puuid, 'REGENERATION', 2, 1, false, true)
+      }
+      break()
+    case '저항':
+      if(rand() < 0.1 * @armor_chance_multiply) {
+        @player_data['cache']['last_armor_effect'] = @time
+        set_mob_effect(@puuid, 'RESISTANCE', 2, 5, false, true)
+      }
+      break()
+    case '힘':
+      if(rand() < 0.1 * @armor_chance_multiply) {
+        @player_data['cache']['last_armor_effect'] = @time
+        set_mob_effect(@puuid, 'STRENGTH', 1, 5, false, true)
+      }
+      break()
+    }
+  }
+  # 지옥 필드 효과 반영
+  if(@server['name'] != 'nether') { //지옥이 아닐경수 효과 없도록 배수 1로 설정
+    @nether_field_effect_multiply = 1
+  }
+  @event['amount'] *= @nether_field_effect_multiply // 반영
+  # 모디피 이벤트 (실제 반영)
+  modify_event('amount', @event['amount'])
 }
-
-*/
-  #@hook_location['y'] -= 0.8
-  #@fishing_array = array(
-  #  'dummy_item': drop_item(@hook_location, array('name': 'STONE'), false),
-  #  'dummy_armorstand': spawn_entity('ARMOR_STAND', 1, @hook_location, closure(@uuid) { set_entity_spec(@uuid, array('visible': false, 'small': true)) })[0]
-  #)
-  #set_timeout(1, closure() {
-  #  set_entity_rider(@fishing_array['dummy_item'], @fishing_array['dummy_armorstand'])
-  #  set_entity_rider(@fishing_array['dummy_armorstand'], @hook)
-  #})
-  #@dummy_item = drop_item(@hook_location, array('name': 'STONE'), false)
-  #spawn_entity('ARMOR_STAND', 1, @hook_location, closure(@dummy_armorstand) {
-    #set_entity_spec(@dummy_armorstand, array('visible': false, 'small': true))
-    #set_entity_rider(@dummy_item, @dummy_armorstand)
-    #set_entity_rider(@dummy_armorstand, @hook)
-  #})
-  #@hook_vector = entity_velocity(@hook)
-  #@fishing_array = array('is_ready': false, 'uuids': array('hook': @hook, 'dummy_item': null, 'dummy_armorstand': null))
-  #set_interval(200, closure() {
-    #if(!entity_exists(@hook)) {
-      #clear_task()
-    #} else {
-      #if(@fishing_array['is_ready']) {
-        #@hook_vector = entity_velocity(@hook)
-        #@hook_location = entity_loc(@hook)
-        #@under_block = get_block(@hook_location)
-        #@hook_location['y'] += 0.25
-        #@upper_block = get_block(@hook_location)
-
-        #if(!@fishing_array['is_ready'] && @under_block == 'WATER' && @upper_block != 'WATER' && @hook_vector['magnitude'] < 0.1 && @hook_vector['x'] < 0.1 && @hook_vector['x'] < 0.1) {
-        #  @fishing_array['is_ready'] = true
-        #  #set_entity_loc(@hook, entity_loc(@hook))
-        #  @dummy_item = drop_item(@hook_location, array('name': 'STONE'), false)
-
-          
-        #}
-        #action_msg(@player, '던져지는 중' @fishing_array)
-      #} else {
-        #action_msg(@player, '안착' @fishing_array)
-        #set_entity_velocity(@hook, array('x': 0, 'y': rand() / 5 * -1, 'z': 0))
-      #}
-    #}
-  #})
-  #@target_location = location_shift(@hook_location, @hook_vector)
-  #broadcast(@target_location)
-  #broadcast(round(@hook_location['x'], 3) round(@hook_location['y'], 3) round(@hook_location['z'], 3))
-  #broadcast(round(@target_location['x'], 3) round(@target_location['y'], 3) round(@target_location['z'], 3))
-  #shoot_projectile(player(), 'ARMOR_STAND', @target_location)
-  #broadcast(a)
-  #@uuid = drop_item(@hook_location, array('name': 'STONE'), false)
-  #spawn_entity('PIG', 1, @hook_location, closure(@uuid) {
-    #broadcast(@uuid)
-    #set_timeout(100, closure() {
-    #  broadcast(entity_spec(@uuid))
-    #})
-    #set_entity_spec(@uuid, array('pickupdelay': '-100'))
-    #broadcast(entity_spec(@uuid))
-    #set_entity_silent(@uuid, true)
-    #set_can_pickup_items(@uuid, false)
-    #set_entity_ai(@uuid, false)
-    #set_mob_age(@uuid, -1, ture)
-    #set_entity_velocity(@uuid, @hook_vector)
-  #})
-
-#include_dir('includes', true)
-
-######################################################################################
-
-

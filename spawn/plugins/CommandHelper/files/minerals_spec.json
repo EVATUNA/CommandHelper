@@ -522,7 +522,7 @@
         "item": {
           "name": "NETHERITE_SCRAP",
           "meta": {
-            "display": "§e중급 네더라이트 주괴",
+            "display": "§e중급 네더라이트 파편",
             "model": 1
           }
         },
@@ -533,7 +533,7 @@
         "item": {
           "name": "NETHERITE_SCRAP",
           "meta": {
-            "display": "§b상급 네더라이트 주괴",
+            "display": "§b상급 네더라이트 파편",
             "model": 2
           }
         },
@@ -544,7 +544,7 @@
         "item": {
           "name": "NETHERITE_SCRAP",
           "meta": {
-            "display": "§d최상급 네더라이트 주괴",
+            "display": "§d최상급 네더라이트 파편",
             "model": 3
           }
         },

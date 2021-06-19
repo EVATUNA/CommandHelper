@@ -73,9 +73,11 @@ proc _apply_passive_armor_enchantment(@player, @player_data) {
     )
     foreach(@effect: @effect_data in get_peffect(@player)) {
       if(array_contains(array_keys(@debuff_effects), @effect) && rand() < 0.6) {
-        @effect_data['seconds'] -= 1
-        set_peffect(@player, @debuff_effects[@effect], @effect_data['strength'], 0, @effect_data['ambient'], @effect_data['particles'])
-        set_peffect(@player, @debuff_effects[@effect], @effect_data['strength'], @effect_data['seconds'], @effect_data['ambient'], @effect_data['particles'])
+        if(@effect_data['seconds'] > 1) {
+          @effect_data['seconds'] -= 1
+          set_peffect(@player, @debuff_effects[@effect], @effect_data['strength'], 0, @effect_data['ambient'], @effect_data['particles'])
+          set_peffect(@player, @debuff_effects[@effect], @effect_data['strength'], @effect_data['seconds'], @effect_data['ambient'], @effect_data['particles'])
+        }
       }
     }
     break()
@@ -198,10 +200,10 @@ proc _preset_essence_armorstand(@essence_location) {
       })[0]
     }
   }
-  set_timeout(1, closure() {
-    set_mob_equipment(@essence_armorstand, array(
-      'HELMET': null
-    ))
-  })
+  #set_timeout(1, closure() {
+  #  set_mob_equipment(@essence_armorstand, array(
+  #    'HELMET': null
+  #  ))
+  #})
   return(@essence_armorstand)
 }

@@ -148,7 +148,9 @@ proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @bots, @
       register_channel('BungeeCord')
     }
     set_timeout(10, closure() {
-      set_pmode(@player, 'SPECTATOR')
+      if(ponline(@player)) {
+        set_pmode(@player, 'SPECTATOR')
+      }
     })
   }
 }
@@ -252,108 +254,11 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
         _set_tips(@player, @uuid, @players_data)
       }
 
-      #_countdown_skill() {}로 아래 코드 대체
-
-      #combat_combat_inclination
-      @category = 'combat_inclination'
-      foreach(@skill in json_decode(@players_data[@uuid]['skill_manager'][0])) {
-        #broadcast(@skill)
-      }
-
-      #combat_method
-      @category = 'combat_method'
-      @skill = @players_data[@uuid]['skill_manager'][2]
-      if(@skill != '' && array_index_exists(@player_data['active_skill'], @category) && array_index_exists(@player_data['active_skill'][@category], @skill)) {
-        @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-        @active_skill = @players_data[@uuid]['active_skill'][@category][@skill]
-        switch(@skill) {
-        case 'sweeping':
-          if(@active_skill[2] == 0) {
-            if(@active_skill[1] > 0) {
-              @active_skill[1] -= 1
-              if(@active_skill[1] == 0) {
-                @active_skill[0] = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
-                remove_entity_attribute_modifier(@uuid, 'GENERIC_ATTACK_SPEED', 'sweeping_active')
-              }
-            } else {
-              if(@active_skill[0] > 0) {
-                @active_skill[0] -= 1
-              } else {
-                @active_skill[2] = 1
-              }
-            }
-          }
-          break()
-        case 'knockback':
-          if(@active_skill[2] < 3) {
-            if(@active_skill[0] > 0) {
-              @active_skill[0] -= 1
-            } else {
-              @active_skill[2] += 1
-              @active_skill[0] = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
-            }
-          }
-          break()
-        case 'cleaving':
-          if(@active_skill[2] == 0) {
-            if(@active_skill[1] > 0) {
-              @active_skill[1] -= 1
-              if(@active_skill[1] == 0) {
-                @active_skill[0] = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
-              }
-            } else {
-              if(@active_skill[0] > 0) {
-                @active_skill[0] -= 1
-              } else {
-                @active_skill[2] = 1
-              }
-            }
-          }
-          break()
-        }
-      }
-
-      #harvesting_method
-      @category = 'harvesting_method'
-      @skill = @players_data[@uuid]['skill_manager'][3]
-      if(@skill != '' && array_index_exists(@player_data['active_skill'], @category) && array_index_exists(@player_data['active_skill'][@category], @skill)) {
-        @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-        @active_skill = @players_data[@uuid]['active_skill'][@category][@skill]
-        if(@active_skill[2] == 0) {
-          if(@active_skill[1] > 0) {
-            @active_skill[1] -= 1
-            if(@active_skill[1] == 0) {
-              @active_skill[0] = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
-            }
-          } else {
-            if(@active_skill[0] > 0) {
-              @active_skill[0] -= 1
-            } else {
-              @active_skill[2] = 1
-            }
-          }
-        }
-      }
-
-      #sowing_method
-      @category = 'sowing_method'
-      @skill = @players_data[@uuid]['skill_manager'][4]
-      if(@skill != '' && array_index_exists(@player_data['active_skill'], @category) && array_index_exists(@player_data['active_skill'][@category], @skill)) {
-        @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-        @active_skill = @players_data[@uuid]['active_skill'][@category][@skill]
-        if(@active_skill[2] == 0) {
-          if(@active_skill[1] > 0) {
-            @active_skill[1] -= 1
-            if(@active_skill[1] == 0) {
-              @active_skill[0] = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
-            }
-          } else {
-            if(@active_skill[0] > 0) {
-              @active_skill[0] -= 1
-            } else {
-              @active_skill[2] = 1
-            }
-          }
+      # 액티브 스킬 카운드다운 코드 있는 스킬들은 카운트 다운하기 (지속시간 다 달았을때 특정 코드 작동하기)
+      foreach(@skill: @active_skill in @player_data['active_skill']) { // 활성화된 액티브 스킬 포리치
+        @proc_name = "_apply_countdown_by_@skill"
+        if(is_proc(@proc_name)) {
+          call_proc(@proc_name, @var)
         }
       }
 
@@ -367,13 +272,13 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
           case '반엔트로피':
             break()
           case '원소 보호':
-            if(rand() < 0.2) {
-              set_entity_onfire(@uuid, entity_onfire(@uuid) + 3)
+            if(rand() < 0.02) {
+              set_entity_onfire(@uuid, entity_onfire(@uuid) + 6)
             }
             break()
           default:
-            if(rand() < 0.3) {
-              set_entity_onfire(@uuid, entity_onfire(@uuid) + 4)
+            if(rand() < 0.075) {
+              set_entity_onfire(@uuid, entity_onfire(@uuid) + 10)
             }
             break()
           }
@@ -384,6 +289,11 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
 })
 
 @cron_task = set_cron('*/1 * * * *', closure() {
+  foreach(@bot_name in @bots_name) {
+    if(ponline(@bot_name) && pmode(@bot_name) != 'SPECTATOR') {
+      set_pmode(@bot_name, 'SPECTATOR')
+    }
+  }
   foreach(@id: @hp_block in @hp_blocks) {
     if(@hp_block['reset_countdown'] > 0) {
       @hp_block['reset_countdown'] -= 1
@@ -464,7 +374,7 @@ bind('block_place', null, null, @event, @players_data, @skills_spec, @server) {
       @crops = array(
         'WHEAT',
         'BEETROOTS',
-        'POTATOS',
+        'POTATOES',
         'CARROTS',
         'SWEET_BERRY_BUSH',
         'PUMPKIN_STEM',
@@ -473,6 +383,7 @@ bind('block_place', null, null, @event, @players_data, @skills_spec, @server) {
       if(array_contains(@crops, @event['block'])) {
         @sowing_method = @players_data[@uuid]['skill_manager'][4]
         if(@sowing_method != '' && @players_data[@uuid]['active_skill']['sowing_method'][@sowing_method][1] > 0) {
+
           switch(@sowing_method) {
           case 'wet_hands':
             @farmland_location = array_deep_clone(@event['location'])
@@ -497,114 +408,111 @@ bind('block_place', null, null, @event, @players_data, @skills_spec, @server) {
 }
 
 bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spec, @crops_spec, @skills_spec, @text, @server) {
-  #set_timeout(1, closure() {
-    @player = @event['player']
-    @uuid = puuid(@player)
-    if(!is_cancelled() && pmode(@player) == 'SURVIVAL') {
-      if(@server['name'] == 'main') {
-        _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skills_spec, @text)
+  @player = @event['player']
+  @uuid = puuid(@player)
+  if(pmode(@player) == 'SURVIVAL') {
+    if(@server['name'] == 'main' && pworld(@player) == 'spawn_minecraft_residence') {
+      _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skills_spec, @text)
+    }
+    if(@server['name'] != 'main') {
+      _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @minerals_spec, @skills_spec, @text)
+      @stones = array(
+        'STONE': 1,
+        'GRANITE': 0.25,
+        'DIORITE': 0.25,
+        'ANDESITE': 0.25,
+        'BASALT': 0.5,
+        'BLACKSTONE': 1,
+        'NETHERRACK': 0.25,
+        'CRIMSON_NYLIUM': 0.25,
+        'WARPED_NYLIUM': 0.25,
+        'MAGMA_BLOCK': 0.5
+      )
+      if(array_index_exists(@stones, @event['block'])) {
+        @default_xp = integer(@stones[@event['block']])
+        @extra_xp = @stones[@event['block']] - @default_xp
+        @skill = 'tough_shoulder'
+        @skill_data = @players_data[@uuid]['skill_data']['mining'][@skill]
+        _add_epxerience(@uuid, @skill, @skill_data, @default_xp, @extra_xp)
       }
-      #@is_mining_allowed = true
-      if(@server['name'] != 'main') {
-        _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @minerals_spec, @skills_spec, @text)
-        @stones = array(
-          'STONE': 1,
-          'GRANITE': 0.25,
-          'DIORITE': 0.25,
-          'ANDESITE': 0.25,
-          'BASALT': 0.5,
-          'BLACKSTONE': 1,
-          'NETHERRACK': 0.25,
-          'CRIMSON_NYLIUM': 0.25,
-          'WARPED_NYLIUM': 0.25,
-          'MAGMA_BLOCK': 0.5
-        )
-        if(array_index_exists(@stones, @event['block'])) {
-          @default_xp = integer(@stones[@event['block']])
-          @extra_xp = @stones[@event['block']] - @default_xp
-          @skill = 'tough_shoulder'
-          @skill_data = @players_data[@uuid]['skill_data']['mining'][@skill]
-          _add_epxerience(@uuid, @skill, @skill_data, @default_xp, @extra_xp)
-        }
-        if(@server['name'] == 'nether') {
-          if(array_contains(array('SURVIVAL', 'ADVENTURE'), pmode(@player))) {
-            @location = array('x': @event['location']['x'], 'y': @event['location']['y'], 'z': @event['location']['z'], 'world': @event['location']['world'])
-            switch(@players_data[@uuid]['item']['enchantments']['main_hand']) {
-            case '빙결':
-              @probability = 0
+      if(@server['name'] == 'nether') {
+        if(array_contains(array('SURVIVAL', 'ADVENTURE'), pmode(@player))) {
+          @location = array('x': @event['location']['x'], 'y': @event['location']['y'], 'z': @event['location']['z'], 'world': @event['location']['world'])
+          switch(@players_data[@uuid]['item']['enchantments']['main_hand']) {
+          case '빙결':
+            @probability = 0
+            break()
+          case '냉기':
+            @probability = 0.25
+            break()
+          default:
+            @probability = 0.5
+            break()
+          }
+          switch(@event['block']) {
+          case 'ANCIENT_DEBRIS':
+            @probability *= 1
+            switch(rand(0, 6)) {
+            case 0:
+              @location['x'] += 1
               break()
-            case '냉기':
-              @probability = 0.25
+            case 1:
+              @location['x'] -= 1
               break()
-            default:
-              @probability = 0.5
+            case 2:
+              @location['y'] += 1
+              break()
+            case 3:
+              @location['y'] -= 1
+              break()
+            case 4:
+              @location['z'] += 1
+              break()
+            case 5:
+              @location['z'] -= 1
               break()
             }
-            switch(@event['block']) {
-            case 'ANCIENT_DEBRIS':
-              @probability *= 1
-              switch(rand(0, 6)) {
-              case 0:
-                @location['x'] += 1
-                break()
-              case 1:
-                @location['x'] -= 1
-                break()
-              case 2:
-                @location['y'] += 1
-                break()
-              case 3:
-                @location['y'] -= 1
-                break()
-              case 4:
-                @location['z'] += 1
-                break()
-              case 5:
-                @location['z'] -= 1
-                break()
+            break()
+          case 'MAGMA_BLOCK':
+            @probability *= 1.5
+            break()
+          case 'NETHERRACK':
+          case 'BALCKSTONE':
+            @probability *= 0.1
+            break()
+          case 'CRIMSON_NYLIUM':
+          case 'WARPED_NYLIUM':
+            @probability *= 0.05
+            break()
+          default:
+            @probability *= 0
+            break()
+          }
+          if(rand() < @probability) {
+            @meltable_blocks = array(
+              'AIR',
+              'CAVE_AIR',
+              'NETHERRACK',
+              'BALCKSTONE',
+              'CRIMSON_NYLIUM',
+              'WARPED_NYLIUM',
+              'MAGMA_BLOCK'
+            )
+            set_timeout(1, closure() {
+              if(array_contains(@meltable_blocks, get_block(@location))) {
+                set_blockdata(@location, array('block': 'lava', 'level': 0))
               }
-              break()
-            case 'MAGMA_BLOCK':
-              @probability *= 1.5
-              break()
-            case 'NETHERRACK':
-            case 'BALCKSTONE':
-              @probability *= 0.1
-              break()
-            case 'CRIMSON_NYLIUM':
-            case 'WARPED_NYLIUM':
-              @probability *= 0.05
-              break()
-            default:
-              @probability *= 0
-              break()
-            }
-            if(rand() < @probability) {
-              @meltable_blocks = array(
-                'AIR',
-                'CAVE_AIR',
-                'NETHERRACK',
-                'BALCKSTONE',
-                'CRIMSON_NYLIUM',
-                'WARPED_NYLIUM',
-                'MAGMA_BLOCK'
-              )
-              set_timeout(1, closure() {
-                if(array_contains(@meltable_blocks, get_block(@location))) {
-                  set_blockdata(@location, array('block': 'lava', 'level': 0))
-                }
-              })
-              set_timeout(500, closure() {
-                if(get_block(@location) == 'LAVA') {
-                  set_blockdata(@location, array('block': 'lava', 'level': 1))
-                }
-              })
-            }
+            })
+            set_timeout(500, closure() {
+              if(get_block(@location) == 'LAVA') {
+                set_blockdata(@location, array('block': 'lava', 'level': 1))
+              }
+            })
           }
         }
       }
     }
-  #})
+  }
 }
 
 bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_spec, @essences, @server, @text) {
@@ -619,354 +527,367 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
     'DIAMOND_BOOTS',
     'NETHERITE_BOOTS'
   )
-  if(is_null(get_inventory_item(@uuid, 36)) && !is_null(@event['item']) && array_contains(@armors, @event['item']['name']) && array_contains(array('right_click_block', 'right_click_air'), @event['action'])) {
+  if(!is_cancelled() && is_null(get_inventory_item(@uuid, 36)) && !is_null(@event['item']) && array_contains(@armors, @event['item']['name']) && array_contains(array('right_click_block', 'right_click_air'), @event['action'])) {
     _update_item(@player, @uuid, array('armor': @event['item']), @players_data, @skills_spec, @text)
   }
   # use skill scroll
   if(!is_null(@event['item']) && @event['item']['name'] == 'ENCHANTED_BOOK' && !is_null(@event['item']['meta']) && !is_null(@event['item']['meta']) && @event['item']['meta']['model'] > 0) {
     #take_from_inventory(@uuid, 'PAPER', 1)
+  # use enchant
+  }
+  if(!is_null(@event['item']) && @event['item']['name'] == 'EXPERIENCE_BOTTLE' && !is_null(@event['item']['meta']) && !is_null(@event['item']['meta']) && @event['item']['meta']['model'] > 0) {
+    cancel()
   }
   # cancel using disabled blocks & block system
-  if(@event['action'] == 'right_click_block' && (is_null(get_inventory_item(@uuid, pheld_slot(@player))) || is_null(get_inventory_item(@uuid, 40)))) {
+  if(@event['action'] == 'right_click_block') {
     @action = null
     switch(@event['block']) {
     case 'END_PORTAL_FRAME':
-    case 'ENDER_CHEST':
+    #case 'ENDER_CHEST':
     case 'GRINDSTONE':
     case 'SWEET_BERRY_BUSH':
     case 'ANVIL':
     case 'CHIPPED_ANVIL':
     case 'DAMAGED_ANVIL':
-      cancel()
+      if(psneaking(@player)) {
+        cancel()
+      }
       break()
     case 'SMITHING_TABLE':
       cancel()
-      if(!psneaking(@player) && @server['name'] == 'main' && pworld(@player) == 'spawn') {
-        @location = array('x': integer(@event['location']['x']), 'y': integer(@event['location']['y']), 'z': integer(@event['location']['z']), 'world': @event['location']['world'])
-        @gui_id = 'enchant_table.'.@location['x'].'.'.@location['y'].'.'.@location['z']
-        # 인첸트 되는 아이템 위치 설정
-        @item_location = array_deep_clone(@location)
-        @item_location['x'] += 1.25
-        @item_location['z'] += 0.5
-        @item_location['y'] -= 0.7
-        @item_location['yaw'] = 90
-        @item_armorstand = _preset_item_armorstand(@item_location)
-        # 마법의 정수 위치 설정
-        @essence_location = array_deep_clone(@location)
-        @essence_location['x'] += 0.75
-        @essence_location['z'] += 1.5
-        @essence_location['y'] += 1
-        @essence_location['yaw'] = -90
-        @essence_armorstand = _preset_essence_armorstand(@essence_location)
-        # 아머스탠드 정보 기준 사용중인 유저
-        @user_by_armorstand = get_mob_name(@item_armorstand)
-        # 실제 사용중인 유저
-        @user_by_commandhelper = import(@gui_id, '')
-        # 시각 효과 진행중인지 여부
-        @is_effect_progressing = boolean(get_mob_name(@essence_armorstand))
-        # 조건 시작
-        @item = get_mob_equipment(@item_armorstand)['helmet']
-        @can_take_out_item = false
-        @can_enchant = false
-        if(@user_by_armorstand != '' && @user_by_armorstand == @user_by_commandhelper) {
-          if(@user_by_commandhelper == @player && !@is_effect_progressing && !is_null(@item)) {
-            @can_take_out_item = true
-          }
-        } else {
-          if(!is_null(@item)) {
-            @can_take_out_item = true
-          } else {
-            @can_enchant = true
-          }
-        }
-        # 아이템 올려져 있고 아이템 꺼낼수 있을시 아이템 주기
-        if(@can_take_out_item) {
-          set_mob_equipment(@item_armorstand, array(
-            'helmet': null
-          ))
-          set_mob_equipment(@essence_armorstand, array(
-            'helmet': null
-          ))
-          @item['qty'] = pgive_item(@player, @item)
-          @drop_location = array_deep_clone(@location)
-          @drop_location['x'] += 0.5
-          @drop_location['z'] += 0.5
-          @drop_location['y'] += 1
-          drop_item(@drop_location, @item, false)
-          export(@gui_id, '')
-          set_mob_name(@item_armorstand, '')
-        }
-        # 아무도 이용중이지 않고 올려진 아이템도 없을시 gui 열기
-        if(@can_enchant) {
-          # gui 세팅
-          @texture_layer = @text['space_fonts']['space.-8'].'§f\ue3fb'.@text['space_fonts']['space.-169'].hexcolor('#404040')
-          @message = '마법 작업대'
-          @inventory = array()
-          for(@index = 0, @index < 27, @index++) {
-            @inventory[@index] = array(
-              'name': 'STRUCTURE_VOID',
-              'meta': array(
-                'display': ' ',
-                'model': 1
-              )
-            )
-          }
-          @inventory[22] = null
-          # 사용중으로 설정
-          export(@gui_id, @player)
-          set_mob_name(@item_armorstand, @player)
-          # 이벤트 세팅
-          @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @essences, @location, @uuid, @item_armorstand, @essence_armorstand, @text) {
-            #인첸트 안하고 그냥 인벤 닫을시
-            bind('inventory_close', array('id': 'close'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @item_armorstand, @essence_armorstand) {
-              @item = @event['inventory'][22]
-              if(!is_null(@item)) {
-                @item['qty'] = pgive_item(@player, @item)
-                @ploc = ploc(@player)
-                @ploc['y'] += 1
-                drop_item(@ploc, @item, false)
-              }
-              export(@gui_id, '')
-              set_mob_name(@item_armorstand, '')
-              set_mob_name(@essence_armorstand, '')
-              #broadcast(초기화 완료)
+      if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
+        if(pworld(@player) == 'spawn') {
+          @location = array('x': integer(@event['location']['x']), 'y': integer(@event['location']['y']), 'z': integer(@event['location']['z']), 'world': @event['location']['world'])
+          @gui_id = 'enchant_table.'.@location['x'].'.'.@location['y'].'.'.@location['z']
+          # 인첸트 되는 아이템 위치 설정
+          @item_location = array_deep_clone(@location)
+          @item_location['x'] += 1.25
+          @item_location['z'] += 0.5
+          @item_location['y'] -= 0.7
+          @item_location['yaw'] = 90
+          @item_armorstand = _preset_item_armorstand(@item_location)
+          # 마법의 정수 위치 설정
+          @essence_location = array_deep_clone(@location)
+          @essence_location['x'] += 0.75
+          @essence_location['z'] += 1.5
+          @essence_location['y'] += 1
+          @essence_location['yaw'] = -90
+          @essence_armorstand = _preset_essence_armorstand(@essence_location)
+          # 아머스탠드 정보 기준 사용중인 유저
+          @user_by_armorstand = get_mob_name(@item_armorstand)
+          # 실제 사용중인 유저
+          @user_by_commandhelper = import(@gui_id, '')
+          # 시각 효과 진행중인지 여부
+          @is_effect_progressing = boolean(get_mob_name(@essence_armorstand))
+          
+          # 조건 시작
+          @item = get_mob_equipment(@item_armorstand)['helmet']
+          @can_take_out_item = false
+          @can_enchant = false
+          #tmsg('aaaa__', @user_by_armorstand @user_by_commandhelper)
+          if(@user_by_armorstand != '' && @user_by_armorstand == @user_by_commandhelper) { # 주인이 가져갈 때
+            #tmsg('aaaa__', 주인)
+            if(@user_by_commandhelper == @player && !@is_effect_progressing && !is_null(@item)) {
+              @can_take_out_item = true
             }
-            #인첸트 할시
-            bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @id, @location, @item_armorstand, @essence_armorstand, @essences) {
-              @enchantable_items = array(
-                'LEATHER_BOOTS': array(
-                  'luck': 1.5,
-                  'entries_type': 'armor_entries'
-                ),
-                'CHAINMAIL_BOOTS': array(
-                  'luck': 0.5,
-                  'entries_type': 'armor_entries'
-                ),
-                'IRON_BOOTS': array(
-                  'luck': 0.9,
-                  'entries_type': 'armor_entries'
-                ),
-                'GOLDEN_BOOTS': array(
-                  'luck': 2.5,
-                  'entries_type': 'armor_entries'
-                ),
-                'DIAMOND_BOOTS': array(
-                  'luck': 1.0,
-                  'entries_type': 'armor_entries'
-                ),
-                'NETHERITE_BOOTS': array(
-                  'luck': 1.5,
-                  'entries_type': 'armor_entries'
-                ),
-                'WOODEN_SWORD': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'WOODEN_SHOVEL': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'WOODEN_PICKAXE': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'WOODEN_AXE': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'WOODEN_HOE': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'STONE_SWORD': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'STONE_SHOVEL': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'STONE_PICKAXE': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'STONE_AXE': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'STONE_HOE': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'IRON_SWORD': array(
-                  'luck': 1.4,
-                  'entries_type': 'weapon_entries'
-                ),
-                'IRON_SHOVEL': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'IRON_PICKAXE': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'IRON_AXE': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'IRON_HOE': array(
-                  'luck': 0.9,
-                  'entries_type': 'weapon_entries'
-                ),
-                'GOLDEN_SWORD': array(
-                  'luck': 2.2,
-                  'entries_type': 'weapon_entries'
-                ),
-                'GOLDEN_SHOVEL': array(
-                  'luck': 2.2,
-                  'entries_type': 'weapon_entries'
-                ),
-                'GOLDEN_PICKAXE': array(
-                  'luck': 2.2,
-                  'entries_type': 'weapon_entries'
-                ),
-                'GOLDEN_AXE': array(
-                  'luck': 2.2,
-                  'entries_type': 'weapon_entries'
-                ),
-                'GOLDEN_HOE': array(
-                  'luck': 2.2,
-                  'entries_type': 'weapon_entries'
-                ),
-                'DIAMOND_SWORD': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'DIAMOND_SHOVEL': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'DIAMOND_PICKAXE': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'DIAMOND_AXE': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'DIAMOND_HOE': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
-                ),
-                'NETHERITE_SWORD': array(
-                  'luck': 1.5,
-                  'entries_type': 'weapon_entries'
-                ),
-                'NETHERITE_SHOVEL': array(
-                  'luck': 1.5,
-                  'entries_type': 'weapon_entries'
-                ),
-                'NETHERITE_PICKAXE': array(
-                  'luck': 1.5,
-                  'entries_type': 'weapon_entries'
-                ),
-                'NETHERITE_AXE': array(
-                  'luck': 1.5,
-                  'entries_type': 'weapon_entries'
-                ),
-                'NETHERITE_HOE': array(
-                  'luck': 1.5,
-                  'entries_type': 'weapon_entries'
-                ),
-                'TRIDENT': array(
-                  'luck': 1.0,
-                  'entries_type': 'weapon_entries'
+          } else { # 남이 가져갈 때 
+            if(!@is_effect_progressing) {
+              if(!is_null(@item)) {
+                @can_take_out_item = true
+              } else {
+                @can_enchant = true
+              }
+            }
+          }
+          # 아이템 올려져 있고 아이템 꺼낼수 있을시 아이템 주기
+          if(@can_take_out_item) {
+            set_mob_equipment(@item_armorstand, array(
+              'helmet': null
+            ))
+            set_mob_equipment(@essence_armorstand, array(
+              'helmet': null
+            ))
+            @item['qty'] = pgive_item(@player, @item)
+            @drop_location = array_deep_clone(@location)
+            @drop_location['x'] += 0.5
+            @drop_location['z'] += 0.5
+            @drop_location['y'] += 1
+            drop_item(@drop_location, @item, false)
+            export(@gui_id, '')
+            set_mob_name(@item_armorstand, '')
+          }
+          # 아무도 이용중이지 않고 올려진 아이템도 없을시 gui 열기
+          if(@can_enchant) {
+            # 사용중으로 설정
+            export(@gui_id, @player)
+            # gui 세팅
+            @texture_layer = @text['space_fonts']['space.-8'].'§f\ue3fb'.@text['space_fonts']['space.-169'].hexcolor('#404040')
+            @message = '마법 작업대'
+            @inventory = array()
+            for(@index = 0, @index < 27, @index++) {
+              @inventory[@index] = array(
+                'name': 'STRUCTURE_VOID',
+                'meta': array(
+                  'display': ' ',
+                  'model': 1
                 )
               )
-              @rawslot = @event['rawslot']
-              if(@rawslot >= 0 && @rawslot <= 26) {
-                @clicked_item = @event['inventory'][@rawslot]
-                if(!is_null(@clicked_item) && @clicked_item['name'] == 'STRUCTURE_VOID') {
-                  cancel()
+            }
+            @inventory[22] = null
+            set_mob_name(@item_armorstand, @player)
+            # 이벤트 세팅
+            @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @essences, @location, @uuid, @item_armorstand, @essence_armorstand, @text) {
+              #인첸트 안하고 그냥 인벤 닫을시
+              bind('inventory_close', array('id': 'close'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @item_armorstand, @essence_armorstand) {
+                @item = @event['inventory'][22]
+                if(!is_null(@item)) {
+                  @item['qty'] = pgive_item(@player, @item)
+                  @ploc = ploc(@player)
+                  @ploc['y'] += 1
+                  drop_item(@ploc, @item, false)
                 }
-                @cursor_item = @event['cursoritem']
-                if(!is_null(@cursor_item) && @cursor_item['name'] == 'EXPERIENCE_BOTTLE' && !is_null(@cursor_item['meta']) && !is_null(@cursor_item['meta']['display']) && @rawslot == 22 && @event['action'] == 'SWAP_WITH_CURSOR') {
-                  @cursor_item['qty'] -= 1
-                  @enchanting_item = @event['inventory'][@rawslot]
-                  @enchantable_item = @enchantable_items[@enchanting_item['name']]
-                  @enchanted_item = @enchanting_item
-                  if(!is_null(@enchanting_item) && array_index_exists(@enchantable_items, @enchanting_item['name'])) {
-                    @essence_name = strip_colors(@cursor_item['meta']['display'])
-                    if(array_index_exists(@essences, @essence_name)) {
-                      @entries = @essences[@essence_name][@enchantable_item['entries_type']]
-                      @enchanted_item = _get_enchanted_item(@enchanting_item, @entries, @enchantable_item['luck'])
-                    }
+                export(@gui_id, '')
+                set_mob_name(@item_armorstand, '')
+                set_mob_name(@essence_armorstand, '')
+                #broadcast(초기화 완료)
+              }
+              #인첸트 할시
+              bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @id, @location, @item_armorstand, @essence_armorstand, @essences) {
+                @enchantable_items = array(
+                  'LEATHER_BOOTS': array(
+                    'luck': 1.5,
+                    'entries_type': 'armor_entries'
+                  ),
+                  'CHAINMAIL_BOOTS': array(
+                    'luck': 0.5,
+                    'entries_type': 'armor_entries'
+                  ),
+                  'IRON_BOOTS': array(
+                    'luck': 0.9,
+                    'entries_type': 'armor_entries'
+                  ),
+                  'GOLDEN_BOOTS': array(
+                    'luck': 2.5,
+                    'entries_type': 'armor_entries'
+                  ),
+                  'DIAMOND_BOOTS': array(
+                    'luck': 1.0,
+                    'entries_type': 'armor_entries'
+                  ),
+                  'NETHERITE_BOOTS': array(
+                    'luck': 1.5,
+                    'entries_type': 'armor_entries'
+                  ),
+                  'WOODEN_SWORD': array(
+                    'luck': 1.0,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'WOODEN_SHOVEL': array(
+                    'luck': 1.0,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'WOODEN_PICKAXE': array(
+                    'luck': 1.0,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'WOODEN_AXE': array(
+                    'luck': 1.0,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'WOODEN_HOE': array(
+                    'luck': 1.0,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'STONE_SWORD': array(
+                    'luck': 0.9,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'STONE_SHOVEL': array(
+                    'luck': 0.9,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'STONE_PICKAXE': array(
+                    'luck': 0.9,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'STONE_AXE': array(
+                    'luck': 0.9,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'STONE_HOE': array(
+                    'luck': 0.9,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'IRON_SWORD': array(
+                    'luck': 1.4,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'IRON_SHOVEL': array(
+                    'luck': 0.9,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'IRON_PICKAXE': array(
+                    'luck': 0.9,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'IRON_AXE': array(
+                    'luck': 0.9,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'IRON_HOE': array(
+                    'luck': 0.9,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'GOLDEN_SWORD': array(
+                    'luck': 2.2,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'GOLDEN_SHOVEL': array(
+                    'luck': 2.2,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'GOLDEN_PICKAXE': array(
+                    'luck': 2.2,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'GOLDEN_AXE': array(
+                    'luck': 2.2,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'GOLDEN_HOE': array(
+                    'luck': 2.2,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'DIAMOND_SWORD': array(
+                    'luck': 1.0,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'DIAMOND_SHOVEL': array(
+                    'luck': 1.0,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'DIAMOND_PICKAXE': array(
+                    'luck': 1.0,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'DIAMOND_AXE': array(
+                    'luck': 1.0,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'DIAMOND_HOE': array(
+                    'luck': 1.0,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'NETHERITE_SWORD': array(
+                    'luck': 1.5,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'NETHERITE_SHOVEL': array(
+                    'luck': 1.5,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'NETHERITE_PICKAXE': array(
+                    'luck': 1.5,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'NETHERITE_AXE': array(
+                    'luck': 1.5,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'NETHERITE_HOE': array(
+                    'luck': 1.5,
+                    'entries_type': 'weapon_entries'
+                  ),
+                  'TRIDENT': array(
+                    'luck': 1.0,
+                    'entries_type': 'weapon_entries'
+                  )
+                )
+                @rawslot = @event['rawslot']
+                if(@rawslot >= 0 && @rawslot <= 26) {
+                  @clicked_item = @event['inventory'][@rawslot]
+                  if(!is_null(@clicked_item) && @clicked_item['name'] == 'STRUCTURE_VOID') {
                     cancel()
-                    unbind('close'.@id)
-                    modify_event('cursoritem', @cursor_item)
-                    close_pinv(@player)
-                    # 시각 효과
-                    set_mob_name(@essence_armorstand, true)
-                    # 아이템 배치
-                    set_timeout(1000, closure() {
-                      set_mob_equipment(@item_armorstand, array( 'helmet': @enchanted_item ))
-                      play_named_sound(@location, array('sound': 'minecraft:item.armor.equip_diamond', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 0.5))
-                      @pos = array(
-                        'x': @location['x'] + 0.5,
-                        'y': @location['y'] + 1.1,
-                        'z': @location['z'] + 0.5
-                      )
-                      @delta = array(
-                        'x': 0.02,
-                        'y': 0.0,
-                        'z': 0.02
-                      )
-                      mom_playerparticle(@uuid, 'CRIT_MAGIC', @pos['x'], @pos['y'], @pos['z'], 10, @delta['x'], @delta['y'], @delta['z'], 0.25)
-                    })
-                    #정수 배치
-                    set_timeout(5000, closure() {
-                      @cursor_item['qty'] = 1
-                      set_mob_equipment(@essence_armorstand, array( 'helmet': @cursor_item ))
-                      @interval = array('tick': 20, 'id': null)
-                      @interval_id = set_interval(150 , closure() {
-                        if(@interval['tick'] > 0) {
-                          play_named_sound(@location, array('sound': 'minecraft:entity.player.levelup', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
-                          @particle_location = array_deep_clone(@location)
-                          @particle_location['x'] += (0.5 + rand() / 5 - 0.1)
-                          @particle_location['y'] += (2.15 + rand() / 5 - 0.1)
-                          @particle_location['z'] += (0.5 + rand() / 5 - 0.1)
-                          spawn_particle(@particle_location, 'TOTEM')
-                          #@delta = array(
-                          #  'x': rand() / 5 - 0.1,
-                          #  'y': -1.0,
-                          #  'z': rand() / 5 - 0.1
-                          #)
-                          #mom_playerparticle(@uuid, 'TOTEM', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 1.0)
-                          @interval['tick'] -= 1
-                        } else {
-                          clear_task()
-                          play_named_sound(@location, array('sound': 'minecraft:block.enchantment_table.use', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
-                          set_mob_equipment(@essence_armorstand, array( 'helmet': null ))
-                          set_mob_name(@essence_armorstand, '')
-                        }
+                  }
+                  @cursor_item = @event['cursoritem']
+                  if(!is_null(@cursor_item) && @cursor_item['name'] == 'EXPERIENCE_BOTTLE' && !is_null(@cursor_item['meta']) && !is_null(@cursor_item['meta']['display']) && @rawslot == 22 && @event['action'] == 'SWAP_WITH_CURSOR') {
+                    @cursor_item['qty'] -= 1
+                    @enchanting_item = @event['inventory'][@rawslot]
+                    @enchantable_item = @enchantable_items[@enchanting_item['name']]
+                    @enchanted_item = @enchanting_item
+                    if(!is_null(@enchanting_item) && array_index_exists(@enchantable_items, @enchanting_item['name'])) {
+                      @essence_name = strip_colors(@cursor_item['meta']['display'])
+                      if(array_index_exists(@essences, @essence_name)) {
+                        @entries = @essences[@essence_name][@enchantable_item['entries_type']]
+                        @enchanted_item = _get_enchanted_item(@enchanting_item, @entries, @enchantable_item['luck'])
+                      }
+                      cancel()
+                      unbind('close'.@id)
+                      modify_event('cursoritem', @cursor_item)
+                      close_pinv(@player)
+                      # 시각 효과
+                      set_mob_name(@essence_armorstand, true)
+                      # 아이템 배치
+                      set_timeout(1000, closure() {
+                        set_mob_equipment(@item_armorstand, array( 'helmet': @enchanted_item ))
+                        play_named_sound(@location, array('sound': 'minecraft:item.armor.equip_diamond', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 0.5))
+                        @pos = array(
+                          'x': @location['x'] + 0.5,
+                          'y': @location['y'] + 1.1,
+                          'z': @location['z'] + 0.5
+                        )
+                        @delta = array(
+                          'x': 0.02,
+                          'y': 0.0,
+                          'z': 0.02
+                        )
+                        mom_playerparticle(@uuid, 'CRIT_MAGIC', @pos['x'], @pos['y'], @pos['z'], 10, @delta['x'], @delta['y'], @delta['z'], 0.25)
                       })
-                      @interval['id'] = @interval_id
-                    })
-                    set_timeout(60000, closure() {
-                      export(@gui_id, '')
-                    })
+                      #정수 배치
+                      set_timeout(5000, closure() {
+                        @cursor_item['qty'] = 1
+                        set_mob_equipment(@essence_armorstand, array( 'helmet': @cursor_item ))
+                        @interval = array('tick': 20, 'id': null)
+                        @interval_id = set_interval(150 , closure() {
+                          if(@interval['tick'] > 0) {
+                            play_named_sound(@location, array('sound': 'minecraft:entity.player.levelup', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
+                            @particle_location = array_deep_clone(@location)
+                            @particle_location['x'] += (0.5 + rand() / 5 - 0.1)
+                            @particle_location['y'] += (2.15 + rand() / 5 - 0.1)
+                            @particle_location['z'] += (0.5 + rand() / 5 - 0.1)
+                            spawn_particle(@particle_location, 'TOTEM')
+                            #@delta = array(
+                            #  'x': rand() / 5 - 0.1,
+                            #  'y': -1.0,
+                            #  'z': rand() / 5 - 0.1
+                            #)
+                            #mom_playerparticle(@uuid, 'TOTEM', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 1.0)
+                            @interval['tick'] -= 1
+                          } else {
+                            clear_task()
+                            play_named_sound(@location, array('sound': 'minecraft:block.enchantment_table.use', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
+                            set_mob_equipment(@essence_armorstand, array( 'helmet': null ))
+                            set_mob_name(@essence_armorstand, '')
+                          }
+                        })
+                        @interval['id'] = @interval_id
+                      })
+                      set_timeout(60000, closure() {
+                        export(@gui_id, '')
+                      })
+                    }
                   }
                 }
               }
             }
+            _show_gui(@player, @gui_id, 27, @texture_layer, @message, @inventory, @closure, @essences, @location, @uuid, @item_armorstand, @essence_armorstand, @text)
           }
-          _show_gui(@player, @gui_id, 27, @texture_layer, @message, @inventory, @closure, @essences, @location, @uuid, @item_armorstand, @essence_armorstand, @text)
         }
       }
       break()
     case 'ENCHANTING_TABLE':
       cancel()
-      if(!psneaking(@player)) {
+      if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
         @location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 1.01, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
         if(plevel(@player) >= 30) {
           if(pcooldown(@player, 'CAVE_AIR') == 0) {
@@ -1040,22 +961,24 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         }
         if(@is_farmland) {
           @data = get_blockdata(@event['location'])
-          play_named_sound(@event['location'], array('sound': 'minecraft:item.bottle.empty', 'category': 'NEUTRAL', 'volum': 1))
-          @data['moisture'] = 6
-          set_blockdata(@event['location'], @data)
-          _add_epxerience(@uuid, 'wet_hands', @players_data[@uuid]['skill_data']['sowing_method']['wet_hands'], 1, 0)
-          if(@event['hand'] =='main_hand') {
-            @slot = pheld_slot(@player)
-          } else {
-            @slot = 40
-          }
-          @event['item']['qty'] -= 1
-          if(pmode(@player) != 'CREATIVE') {
-            if(@event['item']['qty'] > 0) {
-              set_inventory_item(@uuid, @slot, @event['item'])
-              pgive_item(@player, array('name': 'GLASS_BOTTLE'))
+          if(@data['block'] == 'farmland') {
+            play_named_sound(@event['location'], array('sound': 'minecraft:item.bottle.empty', 'category': 'NEUTRAL', 'volum': 1))
+            @data['moisture'] = 6
+            set_blockdata(@event['location'], @data)
+            _add_epxerience(@uuid, 'wet_hands', @players_data[@uuid]['skill_data']['sowing_method']['wet_hands'], 1, 0)
+            if(@event['hand'] =='main_hand') {
+              @slot = pheld_slot(@player)
             } else {
-              set_inventory_item(@uuid, @slot, array('name': 'GLASS_BOTTLE'))
+              @slot = 40
+            }
+            @event['item']['qty'] -= 1
+            if(pmode(@player) != 'CREATIVE') {
+              if(@event['item']['qty'] > 0) {
+                set_inventory_item(@uuid, @slot, @event['item'])
+                pgive_item(@player, array('name': 'GLASS_BOTTLE'))
+              } else {
+                set_inventory_item(@uuid, @slot, array('name': 'GLASS_BOTTLE'))
+              }
             }
           }
         }
@@ -1114,7 +1037,6 @@ bind('block_fade', null, null, @event) {
 
 bind('inventory_click', null, null, @event) {
   @player = @event['player']
-
   if(ponline(@player) && pmode(@player) == 'SURVIVAL' && @event['leftclick'] && !@event['shiftclick'] && @event['inventorytype'] == 'CRAFTING' && @event['rawslot'] == 7 && is_null(@event['cursoritem'])) {
     runas(@player, '/util')
   }

@@ -8,13 +8,13 @@ if(@server['name'] == 'main') {
     @time = simple_date('yyyy-MM-dd HH:mm:ss')
     @message = replace(@message, '\\', '\\\\')
     @message = replace(@message, '\'', '\\\'')
-    unsafe_query('evatuna', "INSERT INTO log_chat(`time`, `type`, `uuid`, `name`, `message`) VALUES (\'".@time."\', \'".@type."\', \'".@uuid."\', \'".@player."\', \'".@message."\')")
+    query_async('evatuna', "INSERT INTO log_chat(`time`, `type`, `uuid`, `name`, `message`) VALUES (\'".@time."\', \'".@type."\', \'".@uuid."\', \'".@player."\', \'".@message."\')", closure())
   }
   proc _logging_whisper(@type, @sender_uuid, @sender_name, @receiver_uuid, @receiver_name, @message) {
     @time = simple_date('yyyy-MM-dd HH:mm:ss')
     @message = replace(@message, '\\', '\\\\')
     @message = replace(@message, '\'', '\\\'')
-    unsafe_query('evatuna', "INSERT INTO log_whisper(`time`, `sender_uuid`, `sender_name`, `receiver_uuid`, `receiver_name`, `message`) VALUES (\'".@time."\', \'".@sender_uuid."\', \'".@sender_name."\', \'".@receiver_uuid."\', \'".@receiver_name."\', \'".@message."\')")
+    query_async('evatuna', "INSERT INTO log_whisper(`time`, `sender_uuid`, `sender_name`, `receiver_uuid`, `receiver_name`, `message`) VALUES (\'".@time."\', \'".@sender_uuid."\', \'".@sender_name."\', \'".@receiver_uuid."\', \'".@receiver_name."\', \'".@message."\')", closure())
   }
 }
 
@@ -267,12 +267,18 @@ proc _default_chat(@data, @players_data, @bots, @log_data) {
         @receiver_name = @receiver_data['name']
         _tellraw(@receiver_name, array_merge(@name, @modified_message))
         if(@sender_name == @receiver_name) {
-          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+          if(ponline(@sender_name)) {
+            play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+          }
         } else {
           if(@receiver_data['is_mentioned']) {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
+            if(ponline(@receiver_name)) {
+              play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
+            }
           } else {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+            if(ponline(@receiver_name)) {
+              play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+            }
           }
         }
       }
@@ -582,12 +588,18 @@ proc _guild_chat(@data, @players_data, @bots, @log_data) {
         @receiver_name = @receiver_data['name']
         _tellraw(@receiver_name, array_merge(@name, @modified_message))
         if(@sender_name == @receiver_name) {
-          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+          if(ponline(@sender_name)) {
+            play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+          }
         } else {
           if(@receiver_data['is_mentioned']) {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
+            if(ponline(@receiver_name)) {
+              play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
+            }
           } else {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+            if(ponline(@receiver_name)) {
+              play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+            }
           }
         }
       }
@@ -783,12 +795,18 @@ proc _local_chat(@data, @players_data, @bots, @log_data) {
         @receiver_name = @receiver_data['name']
         _tellraw(@receiver_name, array_merge(@name, @modified_message))
         if(@sender_name == @receiver_name) {
-          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+          if(ponline(@sender_name)) {
+            play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+          }
         } else {
           if(@receiver_data['is_mentioned']) {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
+            if(ponline(@receiver_name)) {
+              play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
+            }
           } else {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+            if(ponline(@receiver_name)) {
+              play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+            }
           }
         }
       }
@@ -1010,12 +1028,18 @@ proc _admin_chat(@data, @players_data, @bots, @log_data) {
         @receiver_name = @receiver_data['name']
         _tellraw(@receiver_name, array_merge(@name, @modified_message))
         if(@sender_name == @receiver_name) {
-          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+          if(ponline(@sender_name)) {
+            play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+          }
         } else {
           if(@receiver_data['is_mentioned']) {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
+            if(ponline(@receiver_name)) {
+              play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
+            }
           } else {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+            if(ponline(@receiver_name)) {
+              play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+            }
           }
         }
       }
@@ -1100,45 +1124,16 @@ proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @bots
     @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
     if(ponline(@receiver_name)) {
       tellraw(@receiver_name, @raw)
-      play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
-    } else {
-      @data = array(
-        'raw': @raw
-      )
-      _bungeecord_foward(@sender_name, 'ch_broadcast', @data)
+      if(ponline(@receiver_name)) {
+        play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+      }
     }
   }
+  @data = array(
+    'raw': @raw
+  )
+  _bungeecord_foward(@sender_name, 'ch_broadcast', @data)
 }
-
-register_command('broadcast', array(
-  'description': 'can broadcast',
-  'usage': '/broadcast <msg>',
-  'aliases': array('say'),
-  'tabcompleter': closure(@command, @player, @args) { return(array()) },
-  'executor': closure(@command, @player, @args) {
-    if(ponline(@player)) {
-      @sender_name = @player
-      @sender_uuid = puuid(@sender_name)
-      if(array_index_exists(@players_data, @sender_uuid) && array_size(@args) > 0) {
-        @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
-        @setting = @players_data[@sender_uuid]['setting']
-        _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @bots, @log_data)
-      } else {
-        tmsg(@player, color('yellow')'/'.@command'<message>')
-      }
-    } else {
-      @sender_name = 'console'
-      @sender_uuid = 'console'
-      if(array_size(@args) > 0) {
-        @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
-        @setting = array('broadcast', false)
-        _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @bots, @log_data)
-      } else {
-        console(color('yellow')'/'.@command'<message>')
-      }
-    }
-  }
-))
 
 proc _whisper(@data, @log_data) {
   #변수 선언
@@ -1252,10 +1247,14 @@ proc _whisper(@data, @log_data) {
     if(ponline(@receiver_name)) {
       if(@receiver_data['is_target']) {
         _tellraw(@receiver_name, @target_raw)
-        play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+        if(ponline(@receiver_name)) {
+          play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+        }
       } else {
         _tellraw(@receiver_name, @observer_raw)
-        play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+        if(ponline(@receiver_name)) {
+          play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+        }
       }
     }
   }

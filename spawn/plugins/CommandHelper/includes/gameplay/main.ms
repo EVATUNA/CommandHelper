@@ -52,7 +52,7 @@ include('skill/main.ms')
     'CROSSBOW',
     'SHIELD',
     'WHEAT_SEEDS',
-    'BEETROOT_SEEDS'
+    'BEETROOT_SEEDS',
     'POTATO',
     'CARROT',
     'PUMPKIN_SEEDS',
@@ -63,68 +63,84 @@ include('skill/main.ms')
 
 # PROC
 proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
-  @enchantments = @players_data[@uuid]['item']['enchantments']
+  # 업뎃전 아이템
+  @old_items = array_deep_clone(@items)
+  # 인첸트 (오른손 왼손 갑빠)
+  @enchantments = @player_data['item']['enchantments']
+  # 플레이어 데이터 지정
+  @player_data = @players_data[@uuid]
+  # 스킬 매니징
+  @player_data['skill_manager'] = @skill_manager
+  @selected_methods = json_decode(@skill_manager[4])
+  @selected_combat_method = @selected_methods['combat_method']
+  @selected_runes = json_decode(@skill_manager[5])
+  # 적용할 스킬들
+  @applying_skills = array()
+  # 전투 방식
+  if(@selected_combat_method != '') {
+    @skill_proc_name = "_apply_item_update_by_@selected_combat_method"
+    if(is_proc(@skill_proc_name))  {
+      @applying_skill_data = array(
+        'skill_spec': @skills_spec[@selected_combat_method],
+        'point': @player_data['skill_data'][@selected_combat_method][0],
+        'proc_name': @skill_proc_name
+      )
+    }
+    @applying_skills[@selected_combat_method] = @applying_skill_data
+  }
+  # 룬
+  foreach(@selected_rune in @selected_runes) {
+    @skill_proc_name = "_apply_item_update_by_@selected_rune"
+    if(is_proc(@skill_proc_name))  {
+      @applying_skill_data = array(
+        'skill_spec': @skills_spec[@selected_rune],
+        'point': @player_data['skill_data'][@selected_rune][0],
+        'proc_name': @skill_proc_name
+      )
+    }
+  }
+  # 기타 (서브 컴뱃 처럼 전투 방식, 룬은 아니면서 아이템(도구,무기)에 영향 미칠 스킬들)
+  @extra_skills = array(
+    'bow_bastery',
+    'crossbow_mastery'
+  )
+  foreach(@extra_skill in @extra_skills) {
+    @skill_proc_name = "_apply_item_update_by_@extra_skill"
+    if(is_proc(@skill_proc_name))  {
+      @applying_skill_data = array(
+        'skill_spec': @skills_spec[@extra_skill],
+        'point': @player_data['skill_data'][@extra_skill][0],
+        'proc_name': @skill_proc_name
+      )
+    }
+  }
+  # 아이템 업데이트
+  ## 주로 사용하는 손
   if(array_index_exists(@items, 'main_hand')) {
+    @item = @items['main_hand']
+    # 아이템 업뎃발동 했으니 일단 인첸트 없는것으로 선언
     @enchantments['main_hand'] = null
-    if(!is_null(@items['main_hand'])) {
+    if(!is_null(@item)) { // 도구 들고 있을 시
+      # 바닐라 인첸 목록 선언
       @vanilla_enchants = array()
-      switch(@items['main_hand']['name']) {
-      case 'SHIELD':
-        @category = 'combat_method'
-        @skill = @skill = @players_data[@uuid]['skill_manager'][2]
-        if(@skill = 'blocking') {
-          @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-          @unbreaking = @skills_spec[@category][@skill]['levels'][@level]['passive']['unbreaking']
-          @vanilla_enchants['unbreaking'] = array(
-            'etype': 'DURABILITY',
-            'elevel': @unbreaking
-          )
-        }
-        break()
-      case 'TRIDENT':
+      # 스킬 적용
+      foreach(@applying_skill: @applying_skill_data in @applying_skills) {
+        @skill_spec = @applying_skill_data['skill_spec']
+        @point = @applying_skill_data['point']
+        @proc_name = @applying_skill_data['proc_name']
+        call_proc(@proc_name, @player_data, @player, @uuid, @applying_skill, @skill_spec, @point, @item, @vanilla_enchants)
+      }
+      # 기타 적용
+      if(@item['name'] == 'TRIDENT') {
         @vanilla_enchants['loyalty'] = array(
           'etype': 'LOYALTY',
           'elevel': 5
         )
-        break()
-      case 'BOW':
-        @skill = 'bow_mastery'
-        @category = 'subcombat'
-        @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-        if(@level > 0) {
-          @power = @skills_spec[@category][@skill]['levels'][@level]['passive']['power']
-          @vanilla_enchants['power'] = array(
-            'etype': 'ARROW_DAMAGE',
-            'elevel': @power
-          )
-          @unbreaking = @skills_spec[@category][@skill]['levels'][@level]['passive']['unbreaking']
-          @vanilla_enchants['unbreaking'] = array(
-            'etype': 'DURABILITY',
-            'elevel': @unbreaking
-          )
-        }
-        break()
-      case 'CROSSBOW':
-        @skill = 'crossbow_mastery'
-        @category = 'subcombat'
-        @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-        if(@level > 0) {
-          @quick_charge = @skills_spec[@category][@skill]['levels'][@level]['passive']['quick_charge']
-          @vanilla_enchants['quick_charge'] = array(
-            'etype': 'QUICK_CHARGE',
-            'elevel': @quick_charge
-          )
-          @unbreaking = @skills_spec[@category][@skill]['levels'][@level]['passive']['unbreaking']
-          @vanilla_enchants['unbreaking'] = array(
-            'etype': 'DURABILITY',
-            'elevel': @unbreaking
-          )
-        }
-        break()
       }
-      if(!is_null(@items['main_hand']['meta']) && !is_null(@items['main_hand']['meta']['modifiers']) && !is_null(@items['main_hand']['meta']['lore'])) {
-        @modifiers = @items['main_hand']['meta']['modifiers']
-        @lore = @items['main_hand']['meta']['lore']
+      # 인첸트 적용
+      if(!is_null(@item['meta']) && !is_null(@item['meta']['modifiers']) && !is_null(@item['meta']['lore'])) {
+        @modifiers = @item['meta']['modifiers']
+        @lore = @item['meta']['lore']
         if(array_size(@lore) > array_size(@modifiers)) {
           @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
           @enchantments['main_hand'] = @enchantment
@@ -139,10 +155,6 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
             @vanilla_enchants['efficiency'] = array(
               'etype': 'DIG_SPEED',
               'elevel': 3
-            )
-            @vanilla_enchants['sharpness'] = array(
-              'etype': 'DAMAGE_ALL',
-              'elevel': 1
             )
             break()
           case '행운':
@@ -159,589 +171,575 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
         }
       }
       if(array_size(@vanilla_enchants) > 0) {
-        if(!@items['main_hand']['meta']) {
-          @items['main_hand']['meta'] = array('flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES'))
+        if(!@item['meta'] || !@item['meta']['flags']) {
+          @item['meta'] = array('flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES'))
         }
-        @items['main_hand']['meta']['enchants'] = @vanilla_enchants
+        @item['meta']['enchants'] = @vanilla_enchants
         set_timeout(0, closure() {
-          set_inventory_item(@uuid, pheld_slot(@player), @items['main_hand'])
+          if(get_inventory_item(@uuid, pheld_slot(@player)) == @old_items['main_hand']) {
+            set_inventory_item(@uuid, pheld_slot(@player), @item)
+          }
         })
       }
     }
-    @players_data[@uuid]['item']['main_hand'] = @items['main_hand']
+    @player_data['item']['main_hand'] = @item
   }
+  ## 보조 손
   if(array_index_exists(@items, 'off_hand')) {
+    @item = @items['off_hand']
+    # 아이템 업뎃발동 했으니 일단 인첸트 없는것으로 선언
     @enchantments['off_hand'] = null
-    if(!is_null(@items['off_hand'])) {
+    if(!is_null(@item)) { // 도구 들고 있을 시
+      # 바닐라 인첸 목록 선언
       @vanilla_enchants = array()
-      switch(@items['off_hand']['name']) {
-      case 'SHIELD':
-        @category = 'combat_method'
-        @skill = @skill = @players_data[@uuid]['skill_manager'][2]
-        if(@skill = 'blocking') {
-          @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-          @unbreaking = @skills_spec[@category][@skill]['levels'][@level]['passive']['unbreaking']
-          @vanilla_enchants['unbreaking'] = array(
-            'etype': 'DURABILITY',
-            'elevel': @unbreaking
-          )
-        }
-        break()
-      case 'TRIDENT':
+      # 스킬 적용
+      foreach(@applying_skill: @applying_skill_data in @applying_skills) {
+        @skill_spec = @applying_skill_data['skill_spec']
+        @point = @applying_skill_data['point']
+        @proc_name = @applying_skill_data['proc_name']
+        call_proc(@proc_name, @player_data, @player, @uuid, @applying_skill, @skill_spec, @point, @item, @vanilla_enchants)
+      }
+      #기타 적용
+      if(@item['name'] == 'TRIDENT') {
         @vanilla_enchants['loyalty'] = array(
           'etype': 'LOYALTY',
           'elevel': 5
         )
-        break()
-      case 'BOW':
-        @skill = 'bow_mastery'
-        @category = 'subcombat'
-        @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-        if(@level > 0) {
-          @power = @skills_spec[@category][@skill]['levels'][@level]['passive']['power']
-          @vanilla_enchants['power'] = array(
-            'etype': 'ARROW_DAMAGE',
-            'elevel': @power
-          )
-          @unbreaking = @skills_spec[@category][@skill]['levels'][@level]['passive']['unbreaking']
-          @vanilla_enchants['unbreaking'] = array(
-            'etype': 'DURABILITY',
-            'elevel': @unbreaking
-          )
-        }
-        break()
-      case 'CROSSBOW':
-        @skill = 'crossbow_mastery'
-        @category = 'subcombat'
-        @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-        if(@level > 0) {
-          @quick_charge = @skills_spec[@category][@skill]['levels'][@level]['passive']['quick_charge']
-          @vanilla_enchants['quick_charge'] = array(
-            'etype': 'QUICK_CHARGE',
-            'elevel': @quick_charge
-          )
-          @unbreaking = @skills_spec[@category][@skill]['levels'][@level]['passive']['unbreaking']
-          @vanilla_enchants['unbreaking'] = array(
-            'etype': 'DURABILITY',
-            'elevel': @unbreaking
-          )
-        }
-        break()
       }
-      if(!is_null(@items['off_hand']['meta']) && !is_null(@items['off_hand']['meta']['modifiers']) && !is_null(@items['off_hand']['meta']['lore'])) {
-        @modifiers = @items['off_hand']['meta']['modifiers']
-        @lore = @items['off_hand']['meta']['lore']
+      # 인첸트 적용
+      if(!is_null(@item['meta']) && !is_null(@item['meta']['modifiers']) && !is_null(@item['meta']['lore'])) {
+        @modifiers = @item['meta']['modifiers']
+        @lore = @item['meta']['lore']
         if(array_size(@lore) > array_size(@modifiers)) {
           @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
           @enchantments['off_hand'] = @enchantment
+          switch(@enchantment) {
+          case '내구성':
+            @vanilla_enchants['unbreaking'] = array(
+              'etype': 'DURABILITY',
+              'elevel': 5
+            )
+            break()
+          }
         }
       }
       if(array_size(@vanilla_enchants) > 0) {
-        if(!@items['off_hand']['meta']) {
-          @items['off_hand']['meta'] = array('flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES'))
+        if(!@item['meta'] || !@item['meta']['flags']) {
+          @item['meta'] = array('flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES'))
         }
-        @items['off_hand']['meta']['enchants'] = @vanilla_enchants
+        @item['meta']['enchants'] = @vanilla_enchants
         set_timeout(0, closure() {
-          set_inventory_item(@uuid, 40, @items['off_hand'])
+          if(get_inventory_item(@uuid, 40) == @old_items['off_hand']) {
+            set_inventory_item(@uuid, 40, @item)
+          }
         })
       }
     }
-    @players_data[@uuid]['item']['off_hand'] = @items['off_hand']
+    @player_data['item']['off_hand'] = @item
   }
-  if(array_index_exists(@items, 'armor')) { #널이든 값이든 존재할 경우
+  ## 갑옷
+  if(array_index_exists(@items, 'armor')) {
+    @item = @items['armor']
+    # 아이템 업뎃발동 했으니 일단 인첸트 없는것으로 선언
     @enchantments['armor'] = null
-    if(!is_null(@items['armor']) && !is_null(@items['armor']['meta']) && !is_null(@items['armor']['meta']['modifiers']) && !is_null(@items['armor']['meta']['lore'])) {
-      @modifiers = @items['armor']['meta']['modifiers']
-      @lore = @items['armor']['meta']['lore']
-      if(array_size(@lore) > array_size(@modifiers)) {
-        @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
-        @enchantments['armor'] = @enchantment
-        @vanilla_enchants = array()
-        switch(@enchantment) {
-        case '견교':
-          @vanilla_enchants['unbreaking'] = array(
-            'etype': 'DURABILITY',
-            'elevel': 5
-          )
-          break()
-        case '복원':
-        case '귀속':
-          @vanilla_enchants['unbreaking'] = array(
-            'etype': 'DURABILITY',
-            'elevel': 1
-          )
-          break()
-        case '보호':
-          @vanilla_enchants['protection'] = array(
-            'etype': 'PROTECTION_ENVIRONMENTAL',
-            'elevel': 5
-          )
-          break()
-        case '원소 보호':
-          @vanilla_enchants['fire_protection'] = array(
-            'etype': 'PROTECTION_FIRE',
-            'elevel': 4
-          )
-          break()
-        case '친수성':
-          @vanilla_enchants['respiration'] = array(
-            'etype': 'OXYGEN',
-            'elevel': 3
-          )
-          @vanilla_enchants['aqua_affinity'] = array(
-            'etype': 'WATER_WORKER',
-            'elevel': 1
-          )
-          @vanilla_enchants['depth_strider'] = array(
-            'etype': 'DEPTH_STRIDER',
-            'elevel': 3
-          )
-          break()
-        case '반엔트로피':
-          @vanilla_enchants['fire_protection'] = array(
-            'etype': 'PROTECTION_FIRE',
-            'elevel': 10
-          )
-          break()
-        case '깃털':
-          @vanilla_enchants['feather_falling'] = array(
-            'etype': 'PROTECTION_FALL',
-            'elevel': 10
-          )
-          break()
+    # 인첸트 적용
+    if(!is_null(@item)) { // 갑옷 입었을 시
+      #인첸트 적용
+      if(!is_null(@item['meta']) && !is_null(@item['meta']['modifiers']) && !is_null(@item['meta']['lore'])) {
+        @modifiers = @item['meta']['modifiers']
+        @lore = @item['meta']['lore']
+        if(array_size(@lore) > array_size(@modifiers)) {
+          @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
+          @enchantments['armor'] = @enchantment
+          @vanilla_enchants = array()
+          switch(@enchantment) {
+          case '견교':
+            @vanilla_enchants['unbreaking'] = array(
+              'etype': 'DURABILITY',
+              'elevel': 5
+            )
+            break()
+          case '복원':
+          case '귀속':
+            @vanilla_enchants['unbreaking'] = array(
+              'etype': 'DURABILITY',
+              'elevel': 1
+            )
+            break()
+          case '보호':
+            @vanilla_enchants['protection'] = array(
+              'etype': 'PROTECTION_ENVIRONMENTAL',
+              'elevel': 5
+            )
+            break()
+          case '원소 보호':
+            @vanilla_enchants['fire_protection'] = array(
+              'etype': 'PROTECTION_FIRE',
+              'elevel': 4
+            )
+            break()
+          case '친수성':
+            @vanilla_enchants['respiration'] = array(
+              'etype': 'OXYGEN',
+              'elevel': 3
+            )
+            @vanilla_enchants['aqua_affinity'] = array(
+              'etype': 'WATER_WORKER',
+              'elevel': 1
+            )
+            @vanilla_enchants['depth_strider'] = array(
+              'etype': 'DEPTH_STRIDER',
+              'elevel': 3
+            )
+            break()
+          case '반엔트로피':
+            @vanilla_enchants['fire_protection'] = array(
+              'etype': 'PROTECTION_FIRE',
+              'elevel': 10
+            )
+            break()
+          case '깃털':
+            @vanilla_enchants['feather_falling'] = array(
+              'etype': 'PROTECTION_FALL',
+              'elevel': 10
+            )
+            break()
+          }
         }
-        @items['armor']['meta']['enchants'] = @vanilla_enchants
-        set_timeout(0, closure() {
-          set_inventory_item(@uuid, 36, @items['armor'])
-        })
       }
-      @decoration_armors = array()
-      switch(@items['armor']['name']) {
-      case 'LEATHER_BOOTS':
-        #if(머리 치장이 없을 시) {
-          @decoration_armors[39] = array(
-            'name': 'LEATHER_HELMET',
-            'meta': array(
-              'display': ' ',
-              'enchants': array(
-                'binding_curse': array(
-                  'etype': 'BINDING_CURSE',
-                  'elevel': 1
+      @item['meta']['enchants'] = @vanilla_enchants
+      set_timeout(0, closure() {
+        if(get_inventory_item(@uuid, 36) == @old_items['armor']) {
+          set_inventory_item(@uuid, 36, @item)
+          @decoration_armors = array()
+          switch(@item['name']) {
+          case 'LEATHER_BOOTS':
+            #if(머리 치장이 없을 시) {
+              @decoration_armors[39] = array(
+                'name': 'LEATHER_HELMET',
+                'meta': array(
+                  'display': ' ',
+                  'enchants': array(
+                    'binding_curse': array(
+                      'etype': 'BINDING_CURSE',
+                      'elevel': 1
+                    )
+                  ),
+                  'modifiers': array(
+                    array(
+                      'attribute': 'GENERIC_ARMOR',
+                      'operation': 'ADD_NUMBER',
+                      'amount': 0,
+                      'slot': 'HELMET'
+                    )
+                  ),
+                  'unbreakable': true,
+                  'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
                 )
-              ),
-              'modifiers': array(
-                array(
-                  'attribute': 'GENERIC_ARMOR',
-                  'operation': 'ADD_NUMBER',
-                  'amount': 0,
-                  'slot': 'HELMET'
-                )
-              ),
-              'unbreakable': true,
-              'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
+              )
+            #}
+            @decoration_armors[38] = array(
+              'name': 'LEATHER_CHESTPLATE',
+              'meta': array(
+                'display': ' ',
+                'enchants': array(
+                  'binding_curse': array(
+                    'etype': 'BINDING_CURSE',
+                    'elevel': 1
+                  )
+                ),
+                'modifiers': array(
+                  array(
+                    'attribute': 'GENERIC_ARMOR',
+                    'operation': 'ADD_NUMBER',
+                    'amount': 0,
+                    'slot': 'CHESTPLATE'
+                  )
+                ),
+                'unbreakable': true,
+                'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
+              )
             )
-          )
-        #}
-        @decoration_armors[38] = array(
-          'name': 'LEATHER_CHESTPLATE',
-          'meta': array(
-            'display': ' ',
-            'enchants': array(
-              'binding_curse': array(
-                'etype': 'BINDING_CURSE',
-                'elevel': 1
+            @decoration_armors[37] = array(
+              'name': 'LEATHER_LEGGINGS',
+              'meta': array(
+                'display': color('WHITE').'유틸 GUI',
+                'enchants': array(
+                  'binding_curse': array(
+                    'etype': 'BINDING_CURSE',
+                    'elevel': 1
+                  )
+                ),
+                'modifiers': array(
+                  array(
+                    'attribute': 'GENERIC_ARMOR',
+                    'operation': 'ADD_NUMBER',
+                    'amount': 0,
+                    'slot': 'LEGGINGS'
+                  )
+                ),
+                'unbreakable': true,
+                'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
               )
-            ),
-            'modifiers': array(
-              array(
-                'attribute': 'GENERIC_ARMOR',
-                'operation': 'ADD_NUMBER',
-                'amount': 0,
-                'slot': 'CHESTPLATE'
-              )
-            ),
-            'unbreakable': true,
-            'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
-          )
-        )
-        @decoration_armors[37] = array(
-          'name': 'LEATHER_LEGGINGS',
-          'meta': array(
-            'display': color('WHITE').'유틸 GUI',
-            'enchants': array(
-              'binding_curse': array(
-                'etype': 'BINDING_CURSE',
-                'elevel': 1
-              )
-            ),
-            'modifiers': array(
-              array(
-                'attribute': 'GENERIC_ARMOR',
-                'operation': 'ADD_NUMBER',
-                'amount': 0,
-                'slot': 'LEGGINGS'
-              )
-            ),
-            'unbreakable': true,
-            'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
-          )
-        )
-        break()
-      case 'CHAINMAIL_BOOTS':
-        #if(머리 치장이 없을 시) {
-          @decoration_armors[39] = array(
-            'name': 'CHAINMAIL_HELMET',
-            'meta': array(
-              'display': ' ',
-              'enchants': array(
-                'binding_curse': array(
-                  'etype': 'BINDING_CURSE',
-                  'elevel': 1
-                )
-              ),
-              'modifiers': array(
-                array(
-                  'attribute': 'GENERIC_ARMOR',
-                  'operation': 'ADD_NUMBER',
-                  'amount': 0,
-                  'slot': 'HELMET'
-                )
-              ),
-              'unbreakable': true,
-              'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
             )
-          )
-        #}
-        @decoration_armors[38] = array(
-          'name': 'CHAINMAIL_CHESTPLATE',
-          'meta': array(
-            'display': ' ',
-            'enchants': array(
-              'binding_curse': array(
-                'etype': 'BINDING_CURSE',
-                'elevel': 1
-              )
-            ),
-            'modifiers': array(
-              array(
-                'attribute': 'GENERIC_ARMOR',
-                'operation': 'ADD_NUMBER',
-                'amount': 0,
-                'slot': 'CHESTPLATE'
-              )
-            ),
-            'unbreakable': true,
-            'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
-          )
-        )
-        @decoration_armors[37] = array(
-          'name': 'CHAINMAIL_LEGGINGS',
-          'meta': array(
-            'display': color('WHITE').'유틸 GUI',
-            'enchants': array(
-              'binding_curse': array(
-                'etype': 'BINDING_CURSE',
-                'elevel': 1
-              )
-            ),
-            'modifiers': array(
-              array(
-                'attribute': 'GENERIC_ARMOR',
-                'operation': 'ADD_NUMBER',
-                'amount': 0,
-                'slot': 'LEGGINGS'
-              )
-            ),
-            'unbreakable': true,
-            'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
-          )
-        )
-        break()
-      case 'IRON_BOOTS':
-        #if(머리 치장이 없을 시) {
-          @decoration_armors[39] = array(
-            'name': 'IRON_HELMET',
-            'meta': array(
-              'display': ' ',
-              'enchants': array(
-                'binding_curse': array(
-                  'etype': 'BINDING_CURSE',
-                  'elevel': 1
+            break()
+          case 'CHAINMAIL_BOOTS':
+            #if(머리 치장이 없을 시) {
+              @decoration_armors[39] = array(
+                'name': 'CHAINMAIL_HELMET',
+                'meta': array(
+                  'display': ' ',
+                  'enchants': array(
+                    'binding_curse': array(
+                      'etype': 'BINDING_CURSE',
+                      'elevel': 1
+                    )
+                  ),
+                  'modifiers': array(
+                    array(
+                      'attribute': 'GENERIC_ARMOR',
+                      'operation': 'ADD_NUMBER',
+                      'amount': 0,
+                      'slot': 'HELMET'
+                    )
+                  ),
+                  'unbreakable': true,
+                  'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
                 )
-              ),
-              'modifiers': array(
-                array(
-                  'attribute': 'GENERIC_ARMOR',
-                  'operation': 'ADD_NUMBER',
-                  'amount': 0,
-                  'slot': 'HELMET'
-                )
-              ),
-              'unbreakable': true,
-              'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
+              )
+            #}
+            @decoration_armors[38] = array(
+              'name': 'CHAINMAIL_CHESTPLATE',
+              'meta': array(
+                'display': ' ',
+                'enchants': array(
+                  'binding_curse': array(
+                    'etype': 'BINDING_CURSE',
+                    'elevel': 1
+                  )
+                ),
+                'modifiers': array(
+                  array(
+                    'attribute': 'GENERIC_ARMOR',
+                    'operation': 'ADD_NUMBER',
+                    'amount': 0,
+                    'slot': 'CHESTPLATE'
+                  )
+                ),
+                'unbreakable': true,
+                'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
+              )
             )
-          )
-        #}
-        @decoration_armors[38] = array(
-          'name': 'IRON_CHESTPLATE',
-          'meta': array(
-            'display': ' ',
-            'enchants': array(
-              'binding_curse': array(
-                'etype': 'BINDING_CURSE',
-                'elevel': 1
+            @decoration_armors[37] = array(
+              'name': 'CHAINMAIL_LEGGINGS',
+              'meta': array(
+                'display': color('WHITE').'유틸 GUI',
+                'enchants': array(
+                  'binding_curse': array(
+                    'etype': 'BINDING_CURSE',
+                    'elevel': 1
+                  )
+                ),
+                'modifiers': array(
+                  array(
+                    'attribute': 'GENERIC_ARMOR',
+                    'operation': 'ADD_NUMBER',
+                    'amount': 0,
+                    'slot': 'LEGGINGS'
+                  )
+                ),
+                'unbreakable': true,
+                'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
               )
-            ),
-            'modifiers': array(
-              array(
-                'attribute': 'GENERIC_ARMOR',
-                'operation': 'ADD_NUMBER',
-                'amount': 0,
-                'slot': 'CHESTPLATE'
-              )
-            ),
-            'unbreakable': true,
-            'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
-          )
-        )
-        @decoration_armors[37] = array(
-          'name': 'IRON_LEGGINGS',
-          'meta': array(
-            'display': color('WHITE').'유틸 GUI',
-            'enchants': array(
-              'binding_curse': array(
-                'etype': 'BINDING_CURSE',
-                'elevel': 1
-              )
-            ),
-            'modifiers': array(
-              array(
-                'attribute': 'GENERIC_ARMOR',
-                'operation': 'ADD_NUMBER',
-                'amount': 0,
-                'slot': 'LEGGINGS'
-              )
-            ),
-            'unbreakable': true,
-            'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
-          )
-        )
-        break()
-      case 'GOLDEN_BOOTS':
-        #if(머리 치장이 없을 시) {
-          @decoration_armors[39] = array(
-            'name': 'GOLDEN_HELMET',
-            'meta': array(
-              'display': ' ',
-              'enchants': array(
-                'binding_curse': array(
-                  'etype': 'BINDING_CURSE',
-                  'elevel': 1
-                )
-              ),
-              'modifiers': array(
-                array(
-                  'attribute': 'GENERIC_ARMOR',
-                  'operation': 'ADD_NUMBER',
-                  'amount': 0,
-                  'slot': 'HELMET'
-                )
-              ),
-              'unbreakable': true,
-              'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
             )
-          )
-        #}
-        @decoration_armors[38] = array(
-          'name': 'GOLDEN_CHESTPLATE',
-          'meta': array(
-            'display': ' ',
-            'enchants': array(
-              'binding_curse': array(
-                'etype': 'BINDING_CURSE',
-                'elevel': 1
-              )
-            ),
-            'modifiers': array(
-              array(
-                'attribute': 'GENERIC_ARMOR',
-                'operation': 'ADD_NUMBER',
-                'amount': 0,
-                'slot': 'CHESTPLATE'
-              )
-            ),
-            'unbreakable': true,
-            'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
-          )
-        )
-        @decoration_armors[37] = array(
-          'name': 'GOLDEN_LEGGINGS',
-          'meta': array(
-            'display': color('WHITE').'유틸 GUI',
-            'enchants': array(
-              'binding_curse': array(
-                'etype': 'BINDING_CURSE',
-                'elevel': 1
-              )
-            ),
-            'modifiers': array(
-              array(
-                'attribute': 'GENERIC_ARMOR',
-                'operation': 'ADD_NUMBER',
-                'amount': 0,
-                'slot': 'LEGGINGS'
-              )
-            ),
-            'unbreakable': true,
-            'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
-          )
-        )
-        break()
-      case 'DIAMOND_BOOTS':
-        #if(머리 치장이 없을 시) {
-          @decoration_armors[39] = array(
-            'name': 'DIAMOND_HELMET',
-            'meta': array(
-              'display': ' ',
-              'enchants': array(
-                'binding_curse': array(
-                  'etype': 'BINDING_CURSE',
-                  'elevel': 1
+            break()
+          case 'IRON_BOOTS':
+            #if(머리 치장이 없을 시) {
+              @decoration_armors[39] = array(
+                'name': 'IRON_HELMET',
+                'meta': array(
+                  'display': ' ',
+                  'enchants': array(
+                    'binding_curse': array(
+                      'etype': 'BINDING_CURSE',
+                      'elevel': 1
+                    )
+                  ),
+                  'modifiers': array(
+                    array(
+                      'attribute': 'GENERIC_ARMOR',
+                      'operation': 'ADD_NUMBER',
+                      'amount': 0,
+                      'slot': 'HELMET'
+                    )
+                  ),
+                  'unbreakable': true,
+                  'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
                 )
-              ),
-              'modifiers': array(
-                array(
-                  'attribute': 'GENERIC_ARMOR',
-                  'operation': 'ADD_NUMBER',
-                  'amount': 0,
-                  'slot': 'HELMET'
-                )
-              ),
-              'unbreakable': true,
-              'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
+              )
+            #}
+            @decoration_armors[38] = array(
+              'name': 'IRON_CHESTPLATE',
+              'meta': array(
+                'display': ' ',
+                'enchants': array(
+                  'binding_curse': array(
+                    'etype': 'BINDING_CURSE',
+                    'elevel': 1
+                  )
+                ),
+                'modifiers': array(
+                  array(
+                    'attribute': 'GENERIC_ARMOR',
+                    'operation': 'ADD_NUMBER',
+                    'amount': 0,
+                    'slot': 'CHESTPLATE'
+                  )
+                ),
+                'unbreakable': true,
+                'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
+              )
             )
-          )
-        #}
-        @decoration_armors[38] = array(
-          'name': 'DIAMOND_CHESTPLATE',
-          'meta': array(
-            'display': ' ',
-            'enchants': array(
-              'binding_curse': array(
-                'etype': 'BINDING_CURSE',
-                'elevel': 1
+            @decoration_armors[37] = array(
+              'name': 'IRON_LEGGINGS',
+              'meta': array(
+                'display': color('WHITE').'유틸 GUI',
+                'enchants': array(
+                  'binding_curse': array(
+                    'etype': 'BINDING_CURSE',
+                    'elevel': 1
+                  )
+                ),
+                'modifiers': array(
+                  array(
+                    'attribute': 'GENERIC_ARMOR',
+                    'operation': 'ADD_NUMBER',
+                    'amount': 0,
+                    'slot': 'LEGGINGS'
+                  )
+                ),
+                'unbreakable': true,
+                'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
               )
-            ),
-            'modifiers': array(
-              array(
-                'attribute': 'GENERIC_ARMOR',
-                'operation': 'ADD_NUMBER',
-                'amount': 0,
-                'slot': 'CHESTPLATE'
-              )
-            ),
-            'unbreakable': true,
-            'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
-          )
-        )
-        @decoration_armors[37] = array(
-          'name': 'DIAMOND_LEGGINGS',
-          'meta': array(
-            'display': color('WHITE').'유틸 GUI',
-            'enchants': array(
-              'binding_curse': array(
-                'etype': 'BINDING_CURSE',
-                'elevel': 1
-              )
-            ),
-            'modifiers': array(
-              array(
-                'attribute': 'GENERIC_ARMOR',
-                'operation': 'ADD_NUMBER',
-                'amount': 0,
-                'slot': 'LEGGINGS'
-              )
-            ),
-            'unbreakable': true,
-            'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
-          )
-        )
-        break()
-      case 'NETHERITE_BOOTS':
-        #if(머리 치장이 없을 시) {
-          @decoration_armors[39] = array(
-            'name': 'NETHERITE_HELMET',
-            'meta': array(
-              'display': ' ',
-              'enchants': array(
-                'binding_curse': array(
-                  'etype': 'BINDING_CURSE',
-                  'elevel': 1
-                )
-              ),
-              'modifiers': array(
-                array(
-                  'attribute': 'GENERIC_ARMOR',
-                  'operation': 'ADD_NUMBER',
-                  'amount': 0,
-                  'slot': 'HELMET'
-                )
-              ),
-              'unbreakable': true,
-              'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
             )
-          )
-        #}
-        @decoration_armors[38] = array(
-          'name': 'NETHERITE_CHESTPLATE',
-          'meta': array(
-            'display': ' ',
-            'enchants': array(
-              'binding_curse': array(
-                'etype': 'BINDING_CURSE',
-                'elevel': 1
+            break()
+          case 'GOLDEN_BOOTS':
+            #if(머리 치장이 없을 시) {
+              @decoration_armors[39] = array(
+                'name': 'GOLDEN_HELMET',
+                'meta': array(
+                  'display': ' ',
+                  'enchants': array(
+                    'binding_curse': array(
+                      'etype': 'BINDING_CURSE',
+                      'elevel': 1
+                    )
+                  ),
+                  'modifiers': array(
+                    array(
+                      'attribute': 'GENERIC_ARMOR',
+                      'operation': 'ADD_NUMBER',
+                      'amount': 0,
+                      'slot': 'HELMET'
+                    )
+                  ),
+                  'unbreakable': true,
+                  'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
+                )
               )
-            ),
-            'modifiers': array(
-              array(
-                'attribute': 'GENERIC_ARMOR',
-                'operation': 'ADD_NUMBER',
-                'amount': 0,
-                'slot': 'CHESTPLATE'
+            #}
+            @decoration_armors[38] = array(
+              'name': 'GOLDEN_CHESTPLATE',
+              'meta': array(
+                'display': ' ',
+                'enchants': array(
+                  'binding_curse': array(
+                    'etype': 'BINDING_CURSE',
+                    'elevel': 1
+                  )
+                ),
+                'modifiers': array(
+                  array(
+                    'attribute': 'GENERIC_ARMOR',
+                    'operation': 'ADD_NUMBER',
+                    'amount': 0,
+                    'slot': 'CHESTPLATE'
+                  )
+                ),
+                'unbreakable': true,
+                'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
               )
-            ),
-            'unbreakable': true,
-            'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
-          )
-        )
-        @decoration_armors[37] = array(
-          'name': 'NETHERITE_LEGGINGS',
-          'meta': array(
-            'display': color('WHITE').'유틸 GUI',
-            'enchants': array(
-              'binding_curse': array(
-                'etype': 'BINDING_CURSE',
-                'elevel': 1
+            )
+            @decoration_armors[37] = array(
+              'name': 'GOLDEN_LEGGINGS',
+              'meta': array(
+                'display': color('WHITE').'유틸 GUI',
+                'enchants': array(
+                  'binding_curse': array(
+                    'etype': 'BINDING_CURSE',
+                    'elevel': 1
+                  )
+                ),
+                'modifiers': array(
+                  array(
+                    'attribute': 'GENERIC_ARMOR',
+                    'operation': 'ADD_NUMBER',
+                    'amount': 0,
+                    'slot': 'LEGGINGS'
+                  )
+                ),
+                'unbreakable': true,
+                'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
               )
-            ),
-            'modifiers': array(
-              array(
-                'attribute': 'GENERIC_ARMOR',
-                'operation': 'ADD_NUMBER',
-                'amount': 0,
-                'slot': 'LEGGINGS'
+            )
+            break()
+          case 'DIAMOND_BOOTS':
+            #if(머리 치장이 없을 시) {
+              @decoration_armors[39] = array(
+                'name': 'DIAMOND_HELMET',
+                'meta': array(
+                  'display': ' ',
+                  'enchants': array(
+                    'binding_curse': array(
+                      'etype': 'BINDING_CURSE',
+                      'elevel': 1
+                    )
+                  ),
+                  'modifiers': array(
+                    array(
+                      'attribute': 'GENERIC_ARMOR',
+                      'operation': 'ADD_NUMBER',
+                      'amount': 0,
+                      'slot': 'HELMET'
+                    )
+                  ),
+                  'unbreakable': true,
+                  'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
+                )
               )
-            ),
-            'unbreakable': true,
-            'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
-          )
-        )
-        break()
-      }
-      foreach(@decoration_slot: @decoration_armor in @decoration_armors) {
-        set_inventory_item(@uuid, @decoration_slot, @decoration_armor)
-      }
-    } else {
+            #}
+            @decoration_armors[38] = array(
+              'name': 'DIAMOND_CHESTPLATE',
+              'meta': array(
+                'display': ' ',
+                'enchants': array(
+                  'binding_curse': array(
+                    'etype': 'BINDING_CURSE',
+                    'elevel': 1
+                  )
+                ),
+                'modifiers': array(
+                  array(
+                    'attribute': 'GENERIC_ARMOR',
+                    'operation': 'ADD_NUMBER',
+                    'amount': 0,
+                    'slot': 'CHESTPLATE'
+                  )
+                ),
+                'unbreakable': true,
+                'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
+              )
+            )
+            @decoration_armors[37] = array(
+              'name': 'DIAMOND_LEGGINGS',
+              'meta': array(
+                'display': color('WHITE').'유틸 GUI',
+                'enchants': array(
+                  'binding_curse': array(
+                    'etype': 'BINDING_CURSE',
+                    'elevel': 1
+                  )
+                ),
+                'modifiers': array(
+                  array(
+                    'attribute': 'GENERIC_ARMOR',
+                    'operation': 'ADD_NUMBER',
+                    'amount': 0,
+                    'slot': 'LEGGINGS'
+                  )
+                ),
+                'unbreakable': true,
+                'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
+              )
+            )
+            break()
+          case 'NETHERITE_BOOTS':
+            #if(머리 치장이 없을 시) {
+              @decoration_armors[39] = array(
+                'name': 'NETHERITE_HELMET',
+                'meta': array(
+                  'display': ' ',
+                  'enchants': array(
+                    'binding_curse': array(
+                      'etype': 'BINDING_CURSE',
+                      'elevel': 1
+                    )
+                  ),
+                  'modifiers': array(
+                    array(
+                      'attribute': 'GENERIC_ARMOR',
+                      'operation': 'ADD_NUMBER',
+                      'amount': 0,
+                      'slot': 'HELMET'
+                    )
+                  ),
+                  'unbreakable': true,
+                  'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
+                )
+              )
+            #}
+            @decoration_armors[38] = array(
+              'name': 'NETHERITE_CHESTPLATE',
+              'meta': array(
+                'display': ' ',
+                'enchants': array(
+                  'binding_curse': array(
+                    'etype': 'BINDING_CURSE',
+                    'elevel': 1
+                  )
+                ),
+                'modifiers': array(
+                  array(
+                    'attribute': 'GENERIC_ARMOR',
+                    'operation': 'ADD_NUMBER',
+                    'amount': 0,
+                    'slot': 'CHESTPLATE'
+                  )
+                ),
+                'unbreakable': true,
+                'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
+              )
+            )
+            @decoration_armors[37] = array(
+              'name': 'NETHERITE_LEGGINGS',
+              'meta': array(
+                'display': color('WHITE').'유틸 GUI',
+                'enchants': array(
+                  'binding_curse': array(
+                    'etype': 'BINDING_CURSE',
+                    'elevel': 1
+                  )
+                ),
+                'modifiers': array(
+                  array(
+                    'attribute': 'GENERIC_ARMOR',
+                    'operation': 'ADD_NUMBER',
+                    'amount': 0,
+                    'slot': 'LEGGINGS'
+                  )
+                ),
+                'unbreakable': true,
+                'flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE')
+              )
+            )
+            break()
+          }
+          foreach(@decoration_slot: @decoration_armor in @decoration_armors) {
+            set_inventory_item(@uuid, @decoration_slot, @decoration_armor)
+          }
+        }
+      })
+    } else { // 갑옷 벗었을 시
       #머리 치장 없을경우
         set_inventory_item(@uuid, 39, array(
           'name': 'STRUCTURE_VOID',
@@ -787,16 +785,15 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
         )
       ))
     }
-    @players_data[@uuid]['item']['armor'] = @items['armor']
+    @player_data['item']['armor'] = @item
   }
   foreach(@slot: @enchantment in @enchantments) {
-    @players_data[@uuid]['item']['enchantments'][@slot] = @enchantment
+    @player_data['item']['enchantments'][@slot] = @enchantment
   }
   set_timeout(0, closure() {
-    _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
+    _send_action_msg(@player, @player_data, @skills_spec, @text)
   })
 }
-
 
 @death_penalties_multiply = array(
   'main': array(
@@ -829,14 +826,14 @@ proc _apply_death_penalty(@player, @uuid, @death_penalties_multiply, @players_da
         @death_penalty_multiply = @death_penalties_multiply[@server_name]['default']
       }
       if(@players_data[@uuid]['item']['enchantments']['armor'] == '귀속') {
-        @death_penalty_multiply['multiply'] = (@death_penalty_multiply['multiply'] + 1) / 2
-        @death_penalty_multiply['deviation'] = (@death_penalty_multiply['deviation'] + 1) / 2
+        @death_penalty_multiply['multiply'] += (1 - @death_penalty_multiply['multiply']) / 2
+        @death_penalty_multiply['deviation'] = @death_penalty_multiply['deviation'] / 2
       }
       @max_durability = material_info(@item['name'], 'maxDurability')
       if(@max_durability == 0) {
         @inventory[@key]['qty'] = integer(_multiply_value(@item['qty'], @death_penalty_multiply['multiply'], @death_penalty_multiply['deviation']))
       } else {
-        #내구성 반영
+        #내구도 반영
         @new_damage = integer(_multiply_value(@max_durability, 1 - @death_penalty_multiply['multiply'], @death_penalty_multiply['deviation']))
         if(is_null(@item['meta'])) {
           @durability = @new_damage
@@ -858,7 +855,7 @@ proc _apply_death_penalty(@player, @uuid, @death_penalties_multiply, @players_da
 bind('inventory_click', null, null, @event, @players_data, @effective_items, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid)) {
+  if(!is_cancelled() && array_index_exists(@players_data, @uuid)) {
     @held_slot = pheld_slot(@player)
     @clicked_slot = @event['slot']
     @slot_item = @event['slotitem']
@@ -1116,7 +1113,7 @@ bind('inventory_open', null, null, @event, @players_data) {
 bind('inventory_close', null, null, @event, @players_data, @effective_items, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid) && ponline(@player)) {
+  if(!is_cancelled() && array_index_exists(@players_data, @uuid) && ponline(@player)) {
     @players_data[@uuid]['item']['is_inv_open'] = false
     @items = array()
     @main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
@@ -1146,7 +1143,7 @@ bind('inventory_close', null, null, @event, @players_data, @effective_items, @sk
 bind('item_held', null, null, @event, @players_data, @effective_items, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid) && ponline(@player)) {
+  if(!is_cancelled() && array_index_exists(@players_data, @uuid) && ponline(@player)) {
     @held_item = get_inventory_item(@uuid, @event['to'])
     if(!is_null(@held_item) && array_contains(@effective_items['weapon'], @held_item['name'])) {
       _update_item(@player, @uuid, array('main_hand': @held_item), @players_data, @skills_spec, @text)
@@ -1159,8 +1156,9 @@ bind('item_held', null, null, @event, @players_data, @effective_items, @skills_s
 bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid) && ponline(@player)) {
-    if(psneaking()) {
+  if(!is_cancelled() && array_index_exists(@players_data, @uuid) && ponline(@player)) {
+    @player_data = @players_data[@uuid]
+    if(psneaking()) { // 아이템 스왑 시
       @items = array()
       @main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
       @off_hand_item = get_inventory_item(@uuid, 40)
@@ -1170,12 +1168,12 @@ bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_s
         if(@main_hand_item != @new_main_hand_item && @off_hand_item != @new_off_hand_item) {
           if(!is_null(@main_hand_item) && array_contains(@effective_items['weapon'], @main_hand_item['name'])) {
             @items['off_hand'] = @main_hand_item
-          } else if(!is_null(@players_data[@uuid]['item']['off_hand'])) {
+          } else if(!is_null(@player_data['item']['off_hand'])) {
             @items['off_hand'] = null
           }
           if(!is_null(@off_hand_item) && array_contains(@effective_items['weapon'], @off_hand_item['name'])) {
             @items['main_hand'] = @off_hand_item
-          } else if(!is_null(@players_data[@uuid]['item']['main_hand'])) {
+          } else if(!is_null(@player_data['item']['main_hand'])) {
             @items['main_hand'] = null
           }
           if(array_size(@items) > 0) {
@@ -1183,9 +1181,13 @@ bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_s
           }
         }
       })
-    } else {
+    } else { // 액티브 스킬 사용하려 할 시
       cancel()
-      @main_hand_item = @players_data[@uuid]['item']['main_hand']
+      # 스킬 매니징
+      @skill_manager = @player_data['skill_manager']
+      @selected_methods = json_decode(@skill_manager[4])
+      # 손에 든 아이템 구하기
+      @main_hand_item = @player_data['item']['main_hand']
       @hoes = array(
         'WOODEN_HOE',
         'STONE_HOE',
@@ -1196,70 +1198,37 @@ bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_s
       )
       @seeds = array(
         'WHEAT_SEEDS',
-        'BEETROOT_SEEDS'
+        'BEETROOT_SEEDS',
         'POTATO',
         'CARROT',
         'PUMPKIN_SEEDS',
         'MELON_SEEDS',
         'SWEET_BERRIES'
       )
-      if(!is_null(@main_hand_item)) {
+      # 손에든 아이템에 따라 사용할 액티브 스킬 설정
+      if(!is_null(@main_hand_item)) { // 무언가 들고 있을시
         if(array_contains(@hoes, @main_hand_item['name'])) {
-          @category = 'harvesting_method'
-          @skill = @players_data[@uuid]['skill_manager'][3]
+          @skill = @selected_methods['harvesting_method']
         } else if(array_contains(@seeds, @main_hand_item['name'])) {
-          @category = 'sowing_method'
-          @skill = @players_data[@uuid]['skill_manager'][4]
+          @skill = @selected_methods['sowing_method']
         } else {
-          @category = 'combat_method'
-          @skill = @players_data[@uuid]['skill_manager'][2]
+          @skill = @selected_methods['combat_method']
         }
-        if(@skill == '') {
-          @category = 'combat_method'
-          @skill = @players_data[@uuid]['skill_manager'][2]
+        if(@skill == '') { // 파종, 수확 스킬 선택 안했을시
+          @skill = @selected_methods['combat_method']
         }
-      } else {
-        @category = 'combat_method'
-        @skill = @players_data[@uuid]['skill_manager'][2]
+      } else { // 특별한 도구 든거 없을시
+        @skill = @selected_methods['combat_method']
       }
-      if(@skill != '' && array_index_exists(@players_data[@uuid]['active_skill'], @category) && array_index_exists(@players_data[@uuid]['active_skill'][@category], @skill)) {
-        @active_skill = @players_data[@uuid]['active_skill'][@category][@skill]
-        @level = @players_data[@uuid]['skill_data'][@category][@skill][0]
-        switch(@skill) {
-        case 'sweeping':
-          if(@active_skill[2] == 1) {
-            @active_attack_speed = @skills_spec[@category][@skill]['levels'][@level]['active']['attack_speed']
-            @modifier = array(
-              'attribute': 'GENERIC_ATTACK_SPEED',
-              'operation': 'ADD_SCALAR',
-              'amount': @active_attack_speed,
-              'name': 'sweeping_active'
-            )
-            add_entity_attribute_modifier(@uuid, @modifier)
-            @active_skill[2] = 0
-            @active_skill[1] = @skills_spec[@category][@skill]['levels'][@level]['active']['duration']
-          }
-          break()
-        case 'knockback':
-          if(@active_skill[2] > 0) {
-            @old_ploc = ploc(@player)
-            set_timeout(200, closure() {
-              @new_ploc = ploc(@player)
-              @yaw = get_yaw(@old_ploc, @new_ploc)
-              @vector = get_vector(array('yaw': @yaw, 'pitch': 0), 2)
-              set_pvelocity(@player, @vector)
-              play_named_sound(ploc(@player), array('sound': 'entity.bat.takeoff', 'category': 'NEUTRAL', 'volume': 0.3, 'pitch': 1))
-            })
-            @active_skill[2] -= 1
-            _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
-          }
-          break()
-        default:
-          if(@active_skill[2] == 1) {
-            @active_skill[2] = 0
-            @active_skill[1] = @skills_spec[@category][@skill]['levels'][@level]['active']['duration']
-          }
-          break()
+      # 액티브 스킬을 쓸수 있을시
+      if(@skill != '' && array_index_exists(@player_data['active_skill'], @skill)) {
+        @active_skill = @player_data['active_skill'][@skill]
+        @point = @player_data['skill_data'][@skill][0]
+        @skill_spec = @skills_spec[@skill]
+        @proc_name = "_apply_active_by_@skill"
+        if(is_proc(@proc_name)) {
+          call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skill_spec, @point, @active_skill)
+          _send_action_msg(@player, @player_data, @skills_spec, @text) // 액션바 설정
         }
       }
     }
@@ -1269,7 +1238,7 @@ bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_s
 bind('item_drop', null, null, @event, @players_data, @effective_items, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid) && ponline(@player)) {
+  if(!is_cancelled() && array_index_exists(@players_data, @uuid) && ponline(@player)) {
     if(!@players_data[@uuid]['item']['is_inv_open']) {
       @held_item = @event['item']
       if(array_contains(@effective_items['weapon'], @held_item['name'])) {
@@ -1282,7 +1251,7 @@ bind('item_drop', null, null, @event, @players_data, @effective_items, @skills_s
 bind('item_pickup', null, null, @event, @players_data, @effective_items, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid) && ponline(@player)) {
+  if(!is_cancelled() && array_index_exists(@players_data, @uuid) && ponline(@player)) {
     @held_slot = pheld_slot(@player)
     @inventory = get_inventory(@uuid)
     if(array_contains(@effective_items['weapon'], @event['item']['name']) && is_null(@inventory[@held_slot])) {
@@ -1303,7 +1272,7 @@ bind('item_pickup', null, null, @event, @players_data, @effective_items, @skills
 bind('item_damage', null, null, @event, @players_data, @effective_items, @skills_spec, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid) && ponline(@player)) {
+  if(!is_cancelled() && array_index_exists(@players_data, @uuid) && ponline(@player)) {
     @item = @event['item']
     @max_durability = material_info(@item['name'], 'maxDurability')
     if(is_null(@item['meta'])) {
@@ -1418,7 +1387,8 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text, @s
     'DOLPHIN': 0.6
   )
   if(array_index_exists(@event, 'damager')) {
-    if(array_index_exists(@event, 'shooter') && is_string(@event['shooter']) && ponline(@event['shooter'])) { //플레이어가 투사체 발사 한 경우
+    # 원거리 공격
+    if(array_index_exists(@event, 'shooter') && is_string(@event['shooter']) && ponline(@event['shooter'])) {
       @player = @event['shooter']
       @puuid = puuid(@player)
       if(array_index_exists(@players_data, @puuid)) {
@@ -1428,26 +1398,18 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text, @s
         switch(entity_type(@projectile)) {
         case 'ARROW':
         case 'SPECTRAL_ARROW':
-          @xp = @event['amount'] * @allowed_entity[@entity_type]
-          @default_xp = integer(@xp)
-          @extra_xp = @xp - @default_xp
           switch(get_mob_name(@projectile)) {
           case 'BOW':
-            @skill = 'bow_mastery'
-            @skill_data = @players_data[@puuid]['skill_data']['subcombat'][@skill]
-            _add_epxerience(@puuid, @skill, @skill_data, @default_xp, @extra_xp)
             break()
           case 'CROSSBOW':
-            @skill = 'crossbow_mastery'
-            @skill_data = @players_data[@puuid]['skill_data']['combat_method'][@skill]
-            _add_epxerience(@puuid, @skill, @skill_data, @default_xp, @extra_xp)
             break()
           }
           break()
         }
       }
     }
-    if(ponline(@event['damager'])) { //플레이어가 때리는 경우
+    # 근접 공격
+    if(ponline(@event['damager'])) {
       @player = @event['damager']
       @puuid = puuid(@player)
       if(array_index_exists(@players_data, @puuid)) {
@@ -1488,305 +1450,12 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text, @s
           'TRIDENT'
         )
         if(array_contains(array_keys(@allowed_entity), @entity_type)) {
-          #기본 설정
-          @nether_field_effect_multiply = 0.5
-          @cleaving_multiply = 1
-
-          if(pattack_cooldown(@player) == 1) { // 스킬, 인첸트 반영
-            #스킬
-            @attribute_damage = entity_attribute_value(@puuid, 'GENERIC_ATTACK_DAMAGE') //어트리뷰트 상 공격력
-            @skill = @players_data[@puuid]['skill_manager'][2]
-            if(@skill == 'cleaving') {
-              @cleaving_level = @players_data[@puuid]['skill_data']['combat_method']['cleaving'][0]
-              if(round(@event['amount'], 5) == round(@attribute_damage * 1.5, 5) || @players_data[@puuid]['active_skill']['combat_method']['cleaving'][1] > 0) {
-                @cleaving_multiply = @skills_spec['combat_method']['cleaving']['levels'][@cleaving_level]['passive']['crit_multiply']
-              }
-            }
-            #숙련 경치
-            @xp = @event['amount'] * @allowed_entity[@entity_type]
-            @default_xp = integer(@xp)
-            @extra_xp = @xp - @default_xp
-            if(round(@event['amount'], 5) == round(@attribute_damage * 1.5, 5)) {
-              @skill = 'cleaving'
-              @skill_data = @players_data[@puuid]['skill_data']['combat_method'][@skill]
-              _add_epxerience(@puuid, @skill, @skill_data, @default_xp, @extra_xp)
-            } else if(psprinting(@player)) {
-              @skill = 'knockback'
-              @skill_data = @players_data[@puuid]['skill_data']['combat_method'][@skill]
-              _add_epxerience(@puuid, @skill, @skill_data, @default_xp, @extra_xp)
-            } else {
-              @skill = 'sweeping'
-              @skill_data = @players_data[@puuid]['skill_data']['combat_method'][@skill]
-              _add_epxerience(@puuid, @skill, @skill_data, @default_xp, @extra_xp)
-            }
-            #빠른공속 무적 시간 설정
-            if(!is_null(@items['main_hand']) && array_contains(@weapons, @items['main_hand']['name'])) {
-              @attack_speed = entity_attribute_value(@puuid, 'GENERIC_ATTACK_SPEED')
-              @tick = integer(1/ @attack_speed * 20)
-              if(@tick < 20) {
-                set_timeout(0, closure( set_entity_immunity_ticks(@euuid, @tick) ))
-              }
-            }
-            #인첸트
-            @time = time()
-            @weapon_chance_multiply = (@time - @players_data[@puuid]['cache']['last_weapon_effect']) / 5000
-            if(@weapon_chance_multiply > 1) {
-              @weapon_chance_multiply = 1
-            }
-            @armor_chance_multiply = (@time - @players_data[@puuid]['cache']['last_armor_effect']) / 5000
-            if(@armor_chance_multiply > 1) {
-              @armor_chance_multiply = 1
-            }
-            switch(@items['enchantments']['main_hand']) {
-            case '전격':
-              if(rand() < 0.1 * @weapon_chance_multiply) {
-                @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-                @entity_location = entity_loc(@euuid)
-                if((get_highest_block_at(@entity_location)['y'] <= @entity_location['y'] + 2 && (has_thunder(@entity_location['world']) || has_storm(@entity_location['world']))) || get_block(@entity_location) == 'WATER') {
-                  @range = 10
-                } else {
-                  @range = 5
-                }
-                @entity_location['x'] += rand() / 2 - 0.25
-                @entity_location['y'] += 1 + rand() * @allowed_entity[@entity_type] * 0.5 - @allowed_entity[@entity_type] * 0.25
-                @entity_location['z'] += rand() / 2 - 0.25
-                mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @entity_location['x'], @entity_location['y'], @entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
-                @near_entities = entities_in_radius(@entity_location, @range)
-                #
-                #
-                #array_remove_values(@near_entities, @puuid)
-                array_remove_values(@near_entities, @euuid)
-                foreach(@near_entity in @near_entities) {
-                  @near_entity_type = entity_type(@near_entity)
-                  if(array_contains(array_keys(@allowed_entity), @near_entity_type)) {
-                    @near_entity_location = entity_loc(@near_entity)
-                    @near_entity_location['x'] += rand() / 2 - 0.25
-                    @near_entity_location['y'] += 1 + rand() * @allowed_entity[@near_entity_type] * 0.5 - @allowed_entity[@near_entity_type] * 0.25
-                    @near_entity_location['z'] += rand() / 2 - 0.25
-                    mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @near_entity_location['x'], @near_entity_location['y'], @near_entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
-                    @distance = distance(@entity_location,  @near_entity_location)
-                    for(@i = 0, @i < distance(@entity_location,  @near_entity_location), @i += 0.25 + rand() * 0.25) {
-                      @pos = location_shift(@entity_location,  @near_entity_location, @i)
-                      mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @pos['x'], @pos['y'], @pos['z'], 1, 0.0, 0.0, 0.0, 0.0)
-                    }
-                    damage_entity(@near_entity, 2)
-                  }
-                }
-              }
-              break()
-            case '천둥':
-              if(rand() < 0.25 * @weapon_chance_multiply) {
-                @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-                @entity_location = entity_loc(@euuid)
-                @range = 5
-                @has_storm = false
-                if(get_block(@entity_location) == 'WATER') {
-                  @range = 10
-                }
-                if(get_highest_block_at(@entity_location)['y'] <= @entity_location['y'] + 2) {
-                  if(has_thunder(@entity_location['world'])) {
-                    @range = 10
-                  } else if(has_storm(@entity_location['world'])) {
-                    @range = 10
-                    @has_storm = true
-                  }
-                }
-                if(@has_storm) {
-                  lightning(@entity_location)
-                }
-                @entity_location['x'] += rand() / 2 - 0.25
-                @entity_location['y'] += 1 + rand() * @allowed_entity[@entity_type] * 0.5 - @allowed_entity[@entity_type] * 0.25
-                @entity_location['z'] += rand() / 2 - 0.25
-                mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @entity_location['x'], @entity_location['y'], @entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
-                @near_entities = entities_in_radius(@entity_location, @range)
-                #array_remove_values(@near_entities, @puuid)
-                array_remove_values(@near_entities, @euuid)
-                foreach(@near_entity in @near_entities) {
-                  @near_entity_type = entity_type(@near_entity)
-                  if(array_contains(array_keys(@allowed_entity), @near_entity_type)) {
-                    @near_entity_location = entity_loc(@near_entity)
-                    @near_entity_location['x'] += rand() / 2 - 0.25
-                    @near_entity_location['y'] += 1 + rand() * @allowed_entity[@near_entity_type] * 0.5 - @allowed_entity[@near_entity_type] * 0.25
-                    @near_entity_location['z'] += rand() / 2 - 0.25
-                    mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @near_entity_location['x'], @near_entity_location['y'], @near_entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
-                    @distance = distance(@entity_location,  @near_entity_location)
-                    for(@i = 0, @i < distance(@entity_location,  @near_entity_location), @i += 0.25 + rand() * 0.25) {
-                      @pos = location_shift(@entity_location,  @near_entity_location, @i)
-                      mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @pos['x'], @pos['y'], @pos['z'], 1, 0.0, 0.0, 0.0, 0.0)
-                    }
-                    damage_entity(@near_entity, 2)
-                  }
-                }
-              }
-              break()
-            case '화염':
-              if(rand() < 0.1 * @weapon_chance_multiply) {
-                @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-                set_entity_onfire(@euuid, entity_onfire(@euuid) + 5)
-              }
-              break()
-            case '유황불':
-              broadcast(@weapon_chance_multiply)
-              if(rand() < 0.25 * @weapon_chance_multiply) {
-                @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-                if(entity_onfire(@euuid) > 0) {
-                  set_mob_effect(@euuid, 'WEAKNESS', 0, 3, false, true)
-                }
-                set_entity_onfire(@euuid, entity_onfire(@euuid) + 5)
-              }
-              break()
-            case '냉기':
-              @nether_field_effect_multiply = 0.625
-              if(rand() < 0.1 * @weapon_chance_multiply) {
-                @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-                set_mob_effect(@euuid, 'SLOWNESS', 1, 10, false, true)
-              }
-              break()
-            case '빙결':
-              @nether_field_effect_multiply = 1
-              if(rand() < 0.25 * @weapon_chance_multiply) {
-                @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-                set_mob_effect(@euuid, 'SLOWNESS', 1, 10, false, true)
-              }
-              if(rand() < 0.025 * @weapon_chance_multiply) {
-                @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-                set_mob_effect(@euuid, 'SLOWNESS', 5, 4, false, true)
-              }
-              break()
-            case '신성':
-              @undead_entities = array(
-                'DROWNED',
-                'HUSK',
-                'PHANTOM',
-                'SKELETON',
-                'SKELETON_HORSE',
-                'STRAY',
-                'WITHER',
-                'WITHER_SKELETON',
-                'ZOGLIN',
-                'ZOMBIE',
-                'ZOMBIE_HORSE',
-                'ZOMBIE_VILLAGER',
-                'ZOMBIFIED_PIGLIN'
-              )
-              if(array_contains(@undead_entities, entity_type(@euuid)) && rand() < 0.1 * @weapon_chance_multiply) {
-                @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-                set_mob_effect(@euuid, 'INSTANT_HEALTH', 1, 0.1, false, true)
-              }
-              break()
-            case '퇴마':
-              @undead_entities = array(
-                'DROWNED',
-                'HUSK',
-                'PHANTOM',
-                'SKELETON',
-                'SKELETON_HORSE',
-                'STRAY',
-                'WITHER',
-                'WITHER_SKELETON',
-                'ZOGLIN',
-                'ZOMBIE',
-                'ZOMBIE_HORSE',
-                'ZOMBIE_VILLAGER',
-                'ZOMBIFIED_PIGLIN'
-              )
-              if(array_contains(@undead_entities, entity_type(@euuid)) && rand() < 0.25 * @weapon_chance_multiply) {
-                @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-                set_mob_effect(@euuid, 'INSTANT_HEALTH', 2, 0.1, false, true)
-              }
-              break()
-            case '독성':
-              if(rand() < 0.1 * @weapon_chance_multiply) {
-                @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-                set_mob_effect(@euuid, 'POISON', 0, 5, false, true)
-              }
-              break()
-            case '맹독':
-              if(rand() < 0.1 * @weapon_chance_multiply) {
-                @players_data[@puuid]['cache']['last_weapon_effect'] = @time
-                set_mob_effect(@euuid, 'POISON', 4, 5, false, true)
-              }
-              break()
-            default:
-              break()
-            }
-            switch(@items['enchantments']['armor']) {
-            case '복원':
-              if(rand() < 0.1 * @armor_chance_multiply) {
-                @players_data[@puuid]['cache']['last_armor_effect'] = @time
-                if(!is_null(@items['main_hand']) && !is_null(@items['main_hand']['meta']) && @items['main_hand']['meta']['damage'] > 0) {
-                  if(@items['armor']['meta']['damage'] > 0) {
-                    if(rand() < 0.5) {
-                      @items['main_hand']['meta']['damage'] -= 1
-                      set_inventory_item(@puuid, pheld_slot(@player), @items['main_hand'])
-                      _update_item(@player, @puuid, array('main_hand': @items['main_hand']), @players_data, @skills_spec, @text)
-                    } else {
-                      @items['armor']['meta']['damage'] -= 1
-                      _update_item(@player, @puuid, array('armor': @items['armor']), @players_data, @skills_spec, @text)
-                      set_inventory_item(@puuid, 36, @items['armor'])
-                    }
-                  } else {
-                    @items['main_hand']['meta']['damage'] -= 1
-                    _update_item(@player, @puuid, array('main_hand': @items['main_hand']), @players_data, @skills_spec, @text)
-                    set_inventory_item(@puuid, pheld_slot(@player), @items['main_hand'])
-                  }
-                } else {
-                  if(@items['armor']['meta']['damage'] > 0) {
-                    @items['armor']['meta']['damage'] -= 1
-                    _update_item(@player, @puuid, array('armor': @items['armor']), @players_data, @skills_spec, @text)
-                    set_inventory_item(@puuid, 36, @items['armor'])
-                  }
-                }
-              }
-              break()
-            case '친수성':
-              if(rand() < 0.1 * @armor_chance_multiply) {
-                @players_data[@puuid]['cache']['last_armor_effect'] = @time
-                set_mob_effect(@puuid, 'WATER_BREATHING', 0, 5, false, true)
-              }
-              break()
-            case '포화':
-              if(rand() < 0.1 * @armor_chance_multiply) {
-                @players_data[@puuid]['cache']['last_armor_effect'] = @time
-                set_mob_effect(@puuid, 'SATURATION', 0, 0.05, false, true)
-              }
-              break()
-            case '재생':
-              if(rand() < 0.1 * @armor_chance_multiply) {
-                @players_data[@puuid]['cache']['last_armor_effect'] = @time
-                set_mob_effect(@puuid, 'REGENERATION', 2, 1, false, true)
-              }
-              break()
-            case '저항':
-              if(rand() < 0.1 * @armor_chance_multiply) {
-                @players_data[@puuid]['cache']['last_armor_effect'] = @time
-                set_mob_effect(@puuid, 'RESISTANCE', 2, 5, false, true)
-              }
-              break()
-            case '힘':
-              if(rand() < 0.1 * @armor_chance_multiply) {
-                @players_data[@puuid]['cache']['last_armor_effect'] = @time
-                set_mob_effect(@puuid, 'STRENGTH', 1, 5, false, true)
-              }
-              break()
-            default:
-              break()
-            }
-          }
-          #추가 조건 설정
-          if(@server['name'] != 'nether') { //지옥이 아닐경우 걍 100%뎀
-            @nether_field_effect_multiply = 1
-          }
-          #broadcast(N @nether_field_effect_multiply)
-          #broadcast(C @cleaving_multiply)
-          #최종 데미지 계산
-          @modified_damage = @event['amount'] * @nether_field_effect_multiply * @cleaving_multiply
-          #broadcast(@modified_damage @event['amount'])
-          modify_event('amount', @modified_damage)
+          _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skills_spec, @allowed_entity, @text, @server)
         }
       }
     }
   }
+  # 방어
   if(@event['type'] == 'PLAYER') {
     @player = @event['player']
     @puuid = @event['id']
@@ -1813,26 +1482,11 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text, @s
             set_timeout(1, closure() {set_inventory_item(@puuid, @shield_slot, @damaged_item)})
           }
         })
-        @skill_data = @players_data[@puuid]['skill_data']['combat_method']['blocking']
-        @level = @skill_data[0]
-        set_pcooldown(@player, 'SHIELD', integer(@event['amount'] * (5 - @level)))
-        @default_xp = integer(@event['amount'])
-        @extra_xp = @event['amount'] - @default_xp
-        _add_epxerience(@puuid, @skill, @skill_data, @default_xp, @extra_xp)
+        @skill_data = @players_data[@puuid]['skill_data']['blocking']
+        @point = @skill_data[0]
+        set_pcooldown(@player, 'SHIELD', integer(@event['amount'] * (5 - @point)))
       }
     }
-  }
-}
-
-bind('entity_regain_health', null, null, @event, @players_data) {
-  if(entity_type(@event['id']) == 'PLAYER') {
-    @player = @event['player']
-    @uuid = @event['id']
-    @skill = 'health_traing'
-    @skill_data = @players_data[@uuid]['skill_data']['subcombat'][@skill]
-    @default_xp = integer(@event['amount'])
-    @extra_xp = @event['amount'] - @default_xp
-    _add_epxerience(@uuid, @skill, @skill_data, @default_xp, @extra_xp)
   }
 }
 
@@ -1847,7 +1501,7 @@ bind('entity_death', null, null, @event, @players_data) {
     @player = @event['cause']['damager']
     @uuid = puuid(@player)
     if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
-      broadcast(integer(@event['xp'] * 1.5))
+      #broadcast(integer(@event['xp'] * 1.5))
       modify_event('xp', @event['xp'] * 2)
     }
   }

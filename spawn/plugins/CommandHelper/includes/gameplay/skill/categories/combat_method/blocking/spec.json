@@ -1,0 +1,35 @@
+{
+	"default_max_point": 3,
+	"effect_by_point": [
+		{
+			"passive": {
+				"unbreaking": 0
+			}
+		},
+		{
+			"passive": {
+				"unbreaking": 1
+			}
+		},
+		{
+			"passive": {
+				"unbreaking": 2
+			}
+		},
+		{
+			"passive": {
+				"unbreaking": 3
+			}
+		},
+		{
+			"passive": {
+				"unbreaking": 4
+			}
+		},
+		{
+			"passive": {
+				"unbreaking": 5
+			}
+		}
+	]
+}

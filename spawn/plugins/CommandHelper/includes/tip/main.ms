@@ -125,7 +125,7 @@ proc _bind_tip_events(@player, @uuid, @players_data) {
           @crops = array(
             'WHEAT',
             'BEETROOTS',
-            'POTATOS',
+            'POTATOES',
             'CARROTS',
             'SWEET_BERRY_BUSH',
             'PUMPKIN_STEM',
@@ -152,7 +152,7 @@ proc _bind_tip_events(@player, @uuid, @players_data) {
           @crops = array(
             'WHEAT': 7,
             'BEETROOTS': 3,
-            'POTATOS': 7,
+            'POTATOES': 7,
             'CARROTS': 7,
             'SWEET_BERRY_BUSH': 3
           )

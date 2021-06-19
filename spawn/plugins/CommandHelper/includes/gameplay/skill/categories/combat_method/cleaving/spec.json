@@ -1,0 +1,71 @@
+{
+	"default_max_point": 3,
+	"effect_by_point": [
+		{
+			"passive": {
+				"crit_multiply": 1.5
+			},
+			"active": {
+				"cooldown": 300,
+				"duration": 15,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+				"crit_multiply": 1.6
+			},
+			"active": {
+				"cooldown": 300,
+				"duration": 15,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+				"crit_multiply": 1.7
+			},
+			"active": {
+				"cooldown": 270,
+				"duration": 15,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+				"crit_multiply": 1.8
+			},
+			"active": {
+				"cooldown": 240,
+				"duration": 15,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+				"crit_multiply": 1.9
+			},
+			"active": {
+				"cooldown": 210,
+				"duration": 15,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+				"crit_multiply": 2.0
+			},
+			"active": {
+				"cooldown": 180,
+				"duration": 15,
+				"count": 0,
+				"energy": 0
+			}
+		}
+	]
+}
