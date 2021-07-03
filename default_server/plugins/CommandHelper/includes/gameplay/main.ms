@@ -1,6 +1,3 @@
-## Gameplay
-console('EvaGameplay loaded')
-
 ## Include
 include('crafting/main.ms')
 include('enchant/main.ms')
@@ -808,22 +805,22 @@ proc _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text) {
   )
 )
 
-proc _apply_death_penalty(@player, @uuid, @death_penalties_multiply, @players_data, @server_name) {
+proc _apply_death_penalty(@player, @uuid, @death_penalties_multiply, @players_data, @server) {
   @inventory = get_inventory(@uuid)
   modify_event('death_message', null)
-  if(@server_name != 'main') {
+  if(@server != 'main') {
     if(@players_data[@uuid]['item']['enchantments']['armor'] == '귀속') {
-      tmsg(@player, '💀 §7데스패널티로 약 '.integer(round((1 - @death_penalties_multiply[@server_name]['default']['multiply']) * 50)).'%의 아이템이 소실되었습니다..')
+      tmsg(@player, '💀 §7데스패널티로 약 '.integer(round((1 - @death_penalties_multiply[@server]['default']['multiply']) * 50)).'%의 아이템이 소실되었습니다..')
     } else {
-      tmsg(@player, '💀 §7데스패널티로 약 '.integer(round((1 - @death_penalties_multiply[@server_name]['default']['multiply']) * 100)).'%의 아이템이 소실되었습니다..')
+      tmsg(@player, '💀 §7데스패널티로 약 '.integer(round((1 - @death_penalties_multiply[@server]['default']['multiply']) * 100)).'%의 아이템이 소실되었습니다..')
     }
   }
   foreach(@key: @item in @inventory) {
     if(!is_null(@item) && @item['name'] != 'STRUCTURE_VOID') {
-      if(array_index_exists(@death_penalties_multiply[@server_name], @item['name'])) {
-        @death_penalty_multiply = @death_penalties_multiply[@server_name][@item['name']]
+      if(array_index_exists(@death_penalties_multiply[@server], @item['name'])) {
+        @death_penalty_multiply = @death_penalties_multiply[@server][@item['name']]
       } else {
-        @death_penalty_multiply = @death_penalties_multiply[@server_name]['default']
+        @death_penalty_multiply = @death_penalties_multiply[@server]['default']
       }
       if(@players_data[@uuid]['item']['enchantments']['armor'] == '귀속') {
         @death_penalty_multiply['multiply'] += (1 - @death_penalty_multiply['multiply']) / 2
@@ -1493,7 +1490,7 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text, @s
 bind('player_death', null, null, @event, @death_penalties_multiply, @players_data, @server) {
   @player = @event['player']
   @uuid = puuid(@player)
-  _apply_death_penalty(@player, @uuid, @death_penalties_multiply, @players_data, @server['name'])
+  _apply_death_penalty(@player, @uuid, @death_penalties_multiply, @players_data, @server)
 }
 
 bind('entity_death', null, null, @event, @players_data) {

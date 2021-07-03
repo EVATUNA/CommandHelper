@@ -1,34 +1,38 @@
-## EvaChat
-console('EvaChat loaded')
+# enko
 include('eng_to_kor_translater.ms')
 
-@log_data = array()
-if(@server['name'] == 'main') {
-  proc _logging_message(@type, @uuid, @player, @message) {
-    @time = simple_date('yyyy-MM-dd HH:mm:ss')
-    @message = replace(@message, '\\', '\\\\')
-    @message = replace(@message, '\'', '\\\'')
-    query_async('evatuna', "INSERT INTO log_chat(`time`, `type`, `uuid`, `name`, `message`) VALUES (\'".@time."\', \'".@type."\', \'".@uuid."\', \'".@player."\', \'".@message."\')", closure())
+/* 구 로깅
+  @log_data = array()
+  if(@server['name'] == 'main') {
+    proc _logging_message(@type, @uuid, @player, @message) {
+      @time = simple_date('yyyy-MM-dd HH:mm:ss')
+      @message = replace(@message, '\\', '\\\\')
+      @message = replace(@message, '\'', '\\\'')
+      query_async('evatuna', "INSERT INTO log_chat(`time`, `type`, `uuid`, `name`, `message`) VALUES (\'".@time."\', \'".@type."\', \'".@uuid."\', \'".@player."\', \'".@message."\')", closure())
+    }
+    proc _logging_whisper(@type, @sender_uuid, @sender_name, @receiver_uuid, @receiver_name, @message) {
+      @time = simple_date('yyyy-MM-dd HH:mm:ss')
+      @message = replace(@message, '\\', '\\\\')
+      @message = replace(@message, '\'', '\\\'')
+      query_async('evatuna', "INSERT INTO log_whisper(`time`, `sender_uuid`, `sender_name`, `receiver_uuid`, `receiver_name`, `message`) VALUES (\'".@time."\', \'".@sender_uuid."\', \'".@sender_name."\', \'".@receiver_uuid."\', \'".@receiver_name."\', \'".@message."\')", closure())
+    }
   }
-  proc _logging_whisper(@type, @sender_uuid, @sender_name, @receiver_uuid, @receiver_name, @message) {
-    @time = simple_date('yyyy-MM-dd HH:mm:ss')
-    @message = replace(@message, '\\', '\\\\')
-    @message = replace(@message, '\'', '\\\'')
-    query_async('evatuna', "INSERT INTO log_whisper(`time`, `sender_uuid`, `sender_name`, `receiver_uuid`, `receiver_name`, `message`) VALUES (\'".@time."\', \'".@sender_uuid."\', \'".@sender_name."\', \'".@receiver_uuid."\', \'".@receiver_name."\', \'".@message."\')", closure())
-  }
-}
+*/
 
-@emoji_data = array(
-  'player': array(),
-  'guild': array()
-)
+/* 이모지
+  @emoji_data = array(
+    'player': array(),
+    'guild': array()
+  )
 
-proc _load_player_emoji(@player) {}
-proc _save_player_emoji(@player) {}
-proc _load_guilds_emoji() {}
-proc _load_guild_emoji(@guild) {}
-proc _save_guild_emoji(@guild) {}
+  proc _load_player_emoji(@player) {}
+  proc _save_player_emoji(@player) {}
+  proc _load_guilds_emoji() {}
+  proc _load_guild_emoji(@guild) {}
+  proc _save_guild_emoji(@guild) {}
+*/
 
+# tellraw 메인 쓰레드로 보내기
 proc _tellraw(@player, @raw) {
   if(x_get_current_thread() == 'Server thread') {
     tellraw(@player, @raw)
@@ -39,6 +43,18 @@ proc _tellraw(@player, @raw) {
   }
 }
 
+# 채팅 로깅
+proc _chat_logging(@log) {
+  if(x_get_current_thread() == 'Server thread') {
+    # 로그 남기는 펑션
+  } else {
+    x_run_on_main_thread_now(closure() {
+      # 로그 남기는 펑션
+    })
+  }
+}
+
+# enko
 proc _en_to_ko(@unconverted_message) {
   @converted_message = _convert_eng_to_kor(@unconverted_message)
   if(@converted_message){
@@ -53,19 +69,16 @@ proc _en_to_ko(@unconverted_message) {
   return(@converted_message)
 }
 
-proc _default_chat(@data, @players_data, @bots, @log_data) {
-  #변수 선언
+# 기본 채팅
+proc _default_chat(@data, @players_data) {
+  # 변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
   @sender_setting = @data['sender_setting']
   @unmodified_message = @data['message']
-  #로깅
-  if(is_proc('_logging_message')) {
-    _logging_message('default', @sender_uuid, @sender_name, @unmodified_message)
-  }
-  #리시버 설정
+  # 리시버 설정
   @receivers = array()
-  foreach(@receiver_uuid in _all_players(@bots)) {
+  foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
     @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
     if(ponline(@receiver_name)) {
       if(array_index_exists(@players_data, @receiver_uuid)) {
@@ -286,46 +299,32 @@ proc _default_chat(@data, @players_data, @bots, @log_data) {
   }
 }
 
-proc _guild_chat(@data, @players_data, @bots, @log_data) {
-  #변수 선언
+proc _town_chat(@data, @players_data) {
+  # 변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
   @sender_setting = @data['sender_setting']
   @sender_guild = @data['sender_guild']
   @unmodified_message = @data['message']
-  @guild_owner = null
-  #로깅
-  if(is_proc('_logging_message')) {
-    _logging_message('guild', @sender_uuid, @sender_name, @unmodified_message)
-  }
-  #리시버 설정
+  @town_members = @data['town_members']
+  # 리시버 설정
   @receivers = array()
-  foreach(@receiver_uuid in _all_players(@bots)) {
-    @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
-    @receiver_guild = moori_get_player_guild_id(@receiver_uuid)
-    if(@sender_guild == @receiver_guild) {
-      @is_guild_same = true
-      @guild_role = moori_get_player_guild_role(@receiver_uuid)
-      if(@guild_role == 'owner') {
-        @guild_owner = array(
-          'uuid': @receiver_uuid,
-          'name': @receiver_name
-        )
-      }
+  foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
+    if(array_contains(@town_members, @receiver_uuid)) { // 마을원일시
+      @receiver_role = tunalands_get_player_rank(@receiver_uuid)
     } else {
-      @is_guild_same = false
-      @guild_role = null
+      @receiver_role = null
     }
+    @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
     if(ponline(@receiver_name)) {
       if(array_index_exists(@players_data, @receiver_uuid)) {
         @receiver_setting = @players_data[@receiver_uuid]['setting']
-        if(@is_guild_same || @receiver_setting[8]) {
+        if(!is_null(@receiver_role) || @receiver_setting[8]) {
           @receivers[@receiver_uuid] = array(
             'name': @receiver_name,
             'is_online': true,
             'channel': @receiver_setting[0],
-            'is_guild_same': @is_guild_same,
-            'guild_role': @guild_role,
+            'town_role': @receiver_role,
             'is_listening': @receiver_setting[6],
             'is_observer': @receiver_setting[8],
             'is_mentioned': false
@@ -335,13 +334,12 @@ proc _guild_chat(@data, @players_data, @bots, @log_data) {
     } else {
       @receiver_setting = cup_get('SETTING', @receiver_uuid)
       if(!is_null(@receiver_setting)) {
-        if(@is_guild_same || @receiver_setting[8]) {
+        if(!is_null(@receiver_role) || @receiver_setting[8]) {
           @receivers[@receiver_uuid] = array(
             'name': @receiver_name,
             'is_online': false,
             'channel': @receiver_setting[0],
-            'is_guild_same': @is_guild_same,
-            'guild_role': @guild_role,
+            'town_role': @receiver_role,
             'is_listening': @receiver_setting[6],
             'is_observer': @receiver_setting[8],
             'is_mentioned': false
@@ -350,11 +348,11 @@ proc _guild_chat(@data, @players_data, @bots, @log_data) {
       }
     }
   }
-  #이름 부분
+  # 이름 부분
   @name = array(
     array(
       'text': '',
-      'color': '#d5d0f4'
+      'color': '#16A085'
     ),
     array(
       'text': @sender_setting[11].' ',  // 길드 뱃지로 대체할 것
@@ -395,7 +393,7 @@ proc _guild_chat(@data, @players_data, @bots, @log_data) {
         if(@length == @eng_length) {
           if(!array_contains(@mentioned_messages, @mentioned_message)) {
             foreach(@receiver_uuid: @receiver_data in @receivers) {
-              if(@mentioned_message == @receiver_data['name'] && !is_null(@receiver_data['guild_role'])) {
+              if(@mentioned_message == @receiver_data['name'] && !is_null(@receiver_data['town_role'])) {
                 @receivers[@receiver_uuid]['is_mentioned'] = true
                 @mentioned_messages[] = @mentioned_message
                 @is_modified_message = true
@@ -438,6 +436,7 @@ proc _guild_chat(@data, @players_data, @bots, @log_data) {
             )
           }
         } else if(@length == @kr_length) {
+          /*
           switch(@mentioned_message) {
           case '길드원':
             if(!array_contains(@mentioned_messages, '길드원')) {
@@ -454,7 +453,7 @@ proc _guild_chat(@data, @players_data, @bots, @log_data) {
                 )
               )
               foreach(@receiver_uuid: @receiver_data in @receivers) {
-                if(@receiver_data['guild_role'] == 'member') {
+                if(@receiver_data['town_role'] == 'member') {
                   @receivers[@receiver_uuid]['is_mentioned'] = true
                   @message['hoverEvent']['value'][] = '\n'.@receiver_data['name']
                 }
@@ -480,7 +479,7 @@ proc _guild_chat(@data, @players_data, @bots, @log_data) {
                 )
               )
               foreach(@receiver_uuid: @receiver_data in @receivers) {
-                if(@receiver_data['guild_role'] == 'staff') {
+                if(@receiver_data['town_role'] == 'staff') {
                   @receivers[@receiver_uuid]['is_mentioned'] = true
                   @message['hoverEvent']['value'][] = '\n'.@receiver_data['name']
                 }
@@ -495,27 +494,27 @@ proc _guild_chat(@data, @players_data, @bots, @log_data) {
             if(!array_contains(@mentioned_messages, '길드장')) {
               @mentioned_messages[] = '길드장'
               @is_modified_message = true
-              if(!is_null(@guild_owner)) {
-                @receivers[@guild_owner['uuid']]['is_mentioned'] = true
+              if(!is_null(@town_owner)) {
+                @receivers[@town_owner['uuid']]['is_mentioned'] = true
                 @message = array(
                   'text': @string,
                   'color': 'red',
                   'hoverEvent': array(
                     'action': 'show_text',
                     'value': array(
-                      '길드장:'@guild_owner['name']'(온라인)'
+                      '길드장:'@town_owner['name']'(온라인)'
                     )
                   )
                 )
               } else {
-                @guild_owner_name = 'name': bukkitlinked_get_player_name(moori_get_guild_all_members(@sender_guild)[0])
+                @town_owner_name = bukkitlinked_get_player_name(moori_get_guild_all_members(@sender_town)[0])
                 @message = array(
                   'text': @string,
                   'color': 'red',
                   'hoverEvent': array(
                     'action': 'show_text',
                     'value': array(
-                      '길드장:'@guild_owner['name']'(오프라인)'
+                      '길드장:'@town_owner['name']'(오프라인)'
                     )
                   )
                 )
@@ -527,6 +526,7 @@ proc _guild_chat(@data, @players_data, @bots, @log_data) {
             }
             break()
           }
+          */
         }
       }
     } else if(string_starts_with(@string, './')) {
@@ -584,7 +584,7 @@ proc _guild_chat(@data, @players_data, @bots, @log_data) {
   # 메시지 보내기
   foreach(@receiver_uuid: @receiver_data in @receivers) {
     if(@receiver_data['is_online']) {
-      if(@receiver_data['channel'] == 'guild' || @receiver_data['is_listening'] || @receiver_data['is_observer'] || @receiver_data['is_mentioned']) {
+      if(@receiver_data['channel'] == 'town' || @receiver_data['is_listening'] || @receiver_data['is_observer'] || @receiver_data['is_mentioned']) {
         @receiver_name = @receiver_data['name']
         _tellraw(@receiver_name, array_merge(@name, @modified_message))
         if(@sender_name == @receiver_name) {
@@ -615,13 +615,9 @@ proc _local_chat(@data, @players_data, @bots, @log_data) {
   @is_server_same = @data['is_server_same']
   @near_players = @data['near_players']
   @unmodified_message = @data['message']
-  #로깅
-  if(is_proc('_logging_message')) {
-    _logging_message('local', @sender_uuid, @sender_name, @unmodified_message)
-  }
   #리시버 설정
   @receivers = array()
-  foreach(@receiver_uuid in _all_players(@bots)) {
+  foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
     @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
     if(array_contains(@near_players, @receiver_name) && array_index_exists(@players_data, @receiver_uuid)) {
       @receiver_setting = @players_data[@receiver_uuid]['setting']
@@ -651,7 +647,7 @@ proc _local_chat(@data, @players_data, @bots, @log_data) {
   @name = array(
     array(
       'text': '',
-      'color': '#ffd6bf'
+      'color': '#D35400'
     ),
     array(
       'text': @sender_setting[11].' ',
@@ -820,13 +816,9 @@ proc _admin_chat(@data, @players_data, @bots, @log_data) {
   @sender_uuid = @data['sender_uuid']
   @sender_setting = @data['sender_setting']
   @unmodified_message = @data['message']
-  #로깅
-  if(is_proc('_logging_message')) {
-    _logging_message('admin', @sender_uuid, @sender_name, @unmodified_message)
-  }
   #리시버 설정
   @receivers = array()
-  foreach(@receiver_uuid in _all_players(@bots)) {
+  foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
     @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
     if(ponline(@receiver_name)) {
       if(array_index_exists(@players_data, @receiver_uuid) && pisop(@receiver_name)) {
@@ -858,7 +850,7 @@ proc _admin_chat(@data, @players_data, @bots, @log_data) {
   @name = array(
     array(
       'text': '',
-      'color': '#fdc4d5',
+      'color': '#C0392B',
     ),
     array(
       'text': @sender_setting[11].' ',
@@ -1047,7 +1039,7 @@ proc _admin_chat(@data, @players_data, @bots, @log_data) {
   }
 }
 
-bind('async_player_chat', null , null, @event, @players_data, @bots, @log_data) {
+bind('async_player_chat', null , null, @event, @players_data, @text) {
   cancel()
   @data = array(
     'sender_name': @event['player'],
@@ -1062,30 +1054,48 @@ bind('async_player_chat', null , null, @event, @players_data, @bots, @log_data) 
     }
     switch(@players_data[@data['sender_uuid']]['setting'][0]) {
     case 'default':
-      _bungeecord_foward(@data['sender_name'], 'ch_default_chat', @data)
-      _default_chat(@data, @players_data, @bots, @log_data)
+      # 카프카
+      kafka_send('send_defaultchat', json_encode(@data))
+      # proc
+      _default_chat(@data, @players_data)
+      # logging
+      sys_out('[DefaultChat]'@data['sender_name'].':'@event['message'])
       break()
-    case 'guild':
-      @sender_guild = moori_get_player_guild_id(@data['sender_uuid'])
-      if(!is_null(@sender_guild)) {
-        @data['sender_guild'] = @sender_guild
-        _bungeecord_foward(@data['sender_name'], 'ch_guild_chat', @data)
-        _guild_chat(@data, @players_data, @bots, @log_data)
+    case 'town':
+      @town_members = tunalands_get_player_lands_member_list(@data['sender_uuid'])
+      if(!is_null(@town_members)) {
+        @data['town_members'] = @town_members
+        # 카프카
+        kafka_send('send_townchat', json_encode(@data))
+        # proc
+        _town_chat(@data, @players_data)
+        # logging
+        sys_out('[TownChat]'@data['sender_name'].':'@event['message'])
       } else {
+        # 마을을 찾을수 없어서 채팅 채널 초기화
         @players_data[@sender_uuid]['setting'][0] = 'default'
         cup_set('SETTING', @sender_uuid, @players_data[@sender_uuid]['setting'])
+        tmsg(@data['sender_name'], @text['prefix'] '§7가입된 마을이 없어 일반 채널로 변경됩니다.')
       }
       break()
     case 'local':
       @data['near_players'] = players_in_radius(ploc(@data['sender_name']), 64)
+      # 카프카
       @data['is_server_same'] = false
-      _bungeecord_foward(@data['sender_name'], 'ch_local_chat', @data)
+      kafka_send('send_localchat', json_encode(@data))
+      # proc
       @data['is_server_same'] = true
-      _local_chat(@data, @players_data, @bots, @log_data)
+      _local_chat(@data, @players_data)
+      # logging
+      sys_out('[LocalChat]'@data['sender_name'].':'@event['message'])
       break()
     case 'admin':
-      _bungeecord_foward(@data['sender_name'], 'ch_admin_chat', @data)
-      _admin_chat(@data, @players_data, @bots, @log_data)
+      # 카프카
+      kafka_send('send_adminchat', json_encode(@data))
+      # proc
+      _admin_chat(@data, @players_data)
+      # logging
+      sys_out('[AdminChat]'@data['sender_name'].':'@event['message'])
       break()
     }
   }
@@ -1107,9 +1117,9 @@ proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @bots
   } else {
     @modified_message = @unmodified_message
   }
-  if(is_proc('_logging_message')) {
-    _logging_message('broadcast', @sender_uuid, @sender_name, @unmodified_message)
-  }
+  # logging
+  sys_out('[Broadcast]]'@sender_name.':'@modified_message)
+
   @raw = array(
     array(
       'text': '\ue4db '
@@ -1119,7 +1129,7 @@ proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @bots
       'color': '#80c8ff'
     )
   )
-  @receiver_uuids = _all_players(@bots)
+  @receiver_uuids = bukkitlinked_get_all_players()
   foreach(@receiver_uuid in @receiver_uuids) {
     @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
     if(ponline(@receiver_name)) {
@@ -1132,7 +1142,7 @@ proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @bots
   @data = array(
     'raw': @raw
   )
-  _bungeecord_foward(@sender_name, 'ch_broadcast', @data)
+  kafka_send('send_broadcast', json_encode(@data))
 }
 
 proc _whisper(@data, @log_data) {
@@ -1145,10 +1155,6 @@ proc _whisper(@data, @log_data) {
   @unmodified_message = @data['message']
   #리시버 설정
   @receivers = @data['receivers']
-  #로깅
-  if(is_proc('_logging_whisper')) {
-    _logging_whisper('whisper', @sender_uuid, @sender_name, @target_uuid, @target_name, @unmodified_message)
-  }
   #메시지 생성 부분
   @modified_message = array(
     array('text': '')
@@ -1211,7 +1217,7 @@ proc _whisper(@data, @log_data) {
   @target_raw = array(
     array(
       'text': 'From ',
-      'color': 'gray',
+      'color': '#7F8C8D',
     ),
     array(
       'text': @sender_name,
@@ -1234,7 +1240,7 @@ proc _whisper(@data, @log_data) {
   @observer_raw = array(
     array(
       'text': @sender_name.' To '.@target_name,
-      'color': 'gray',
+      'color': '#7F8C8D',
     ),
     array(
       'text': ' :: ',

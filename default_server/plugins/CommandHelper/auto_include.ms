@@ -1,28 +1,26 @@
-## Initial Including Data
-@server = array(
-  'name': 'over',
-  'resourcepack': get_value('resourcepack')
+### Initial Including Data
+
+## 공용 데이터
+# 서버 이름
+@splited_absolute_path = split('\\', get_absolute_path())
+array_reverse(@splited_absolute_path)
+@server = @splited_absolute_path[2]
+
+# 리소스팩 링크
+@resourcepack = array(
+  'url': get_value('resourcepack')
 )
 
-@bots = array(
-  'c45537c6-39d3-459e-9a48-86f938a9c0dd', #dohun1
-  'b5ee7eb3-f4e8-4ab4-82e4-e97c60a6b8c1', #Loplove
-  'ff1cb130-7152-4609-8cbc-76884c7444bd', #Geralt_w
-  '5c400342-2909-4571-8c45-7833a076b1dd', #AppleCrepe
-  'bee4cc4e-ebd4-472c-9751-32d2655e9848', #CreamCrepe
-  '9dfadbe7-9ad1-4048-9cdd-228f8db82be7'  #1L_Bottle
+# 텍스트
+@text = array(
+  'prefix': array(
+    'success': '\ue4dc',
+    'failure': '\ue4de',
+    'warn': '\ue4dd',
+    'info': '\ue4e3',
+    'broadcast': '\ue4db'
+  )
 )
-@bots_name = array(
-  'dohun1', #dohun1
-  'Loplove', #Loplove
-  'Geralt_w', #Geralt_w
-  'AppleCrepe', #AppleCrepe
-  'creamcrepe',  #CreamCrepe
-  '1L_Bottle' #1L_Bottle
-)
-@reconnectable_players = array()
-@players_data = array()
-@text = array()
 async_read('files/font_space.json', closure(@value) {
   @text['space_fonts'] = json_decode(@value)
 })
@@ -30,14 +28,46 @@ async_read('files/general_emoji.json', closure(@value) {
   @text['general_emoji'] = json_decode(@value)
 })
 
-## Gameplay Data
+## 플레이어 관련 데이터
+
+/* 봇 인식 (구 플러그인 메시지)
+  @bots = array(
+    'c45537c6-39d3-459e-9a48-86f938a9c0dd', #dohun1
+    'b5ee7eb3-f4e8-4ab4-82e4-e97c60a6b8c1', #Loplove
+    'ff1cb130-7152-4609-8cbc-76884c7444bd', #Geralt_w
+    '5c400342-2909-4571-8c45-7833a076b1dd', #AppleCrepe
+    'bee4cc4e-ebd4-472c-9751-32d2655e9848', #CreamCrepe
+    '9dfadbe7-9ad1-4048-9cdd-228f8db82be7'  #1L_Bottle
+  )
+  @bots_name = array(
+    'dohun1', #dohun1
+    'Loplove', #Loplove
+    'Geralt_w', #Geralt_w
+    'AppleCrepe', #AppleCrepe
+    'creamcrepe',  #CreamCrepe
+    '1L_Bottle' #1L_Bottle
+  )
+*/
+
+# 서버 이동중으로 인식할 플레이어 목록
+@reconnectable_players = array()
+
+# 플레이어 개인 데이터
+@players_data = array()
+
+## 게임 플레이 관련 데이터
+# 블럭 피통
 @hp_blocks = array()
+
+# 광물 스펙
 @minerals_spec = array()
 async_read('files/minerals_spec.json', closure(@value) {
   foreach(@mineral: @spec in json_decode(@value)) {
     @minerals_spec[@mineral] = @spec
   }
 })
+
+# 작물 스펙
 @crops_spec = array()
 async_read('files/crops_spec.json', closure(@value) {
   foreach(@crop: @spec in json_decode(@value)) {
@@ -45,7 +75,9 @@ async_read('files/crops_spec.json', closure(@value) {
   }
 })
 
-## Initial Including Procedure
+### Initial Including Procedure
+## 화면 관련
+# 액션바
 proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
   switch(@player_data['setting'][1]) {
   case true:
@@ -75,8 +107,7 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
       @channel = '\ue3fe'
     }
   }
-  #hub 표사
-  #broadcast(@player_data['skill_manager'][2])
+  #hub 표시
 
   @item = pinv(@player, pheld_slot(@player))
   if(!is_null(@item)) {
@@ -364,6 +395,7 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
   action_msg(@player, @left_surface.@chat_hud.@left_void.@skill_hud.@right_void.@right_surface)
 }
 
+# 팁 메시지 보여주기
 proc _set_tips(@player, @uuid, @players_data) {
   @tips = @players_data[@uuid]['cache']['tips']
   if(array_size(@tips) > 0) {
@@ -382,6 +414,7 @@ proc _set_tips(@player, @uuid, @players_data) {
   update_bar('tip.'.@uuid, @tip_bossbar_data)
 }
 
+# 팁 메시지 목록에 추가하기
 proc _add_tips(@player, @uuid, @players_data, @message, @countdown, @is_warn, @sound) {
   @tips = @players_data[@uuid]['cache']['tips']
   @tip = array(
@@ -408,6 +441,7 @@ proc _add_tips(@player, @uuid, @players_data, @message, @countdown, @is_warn, @s
   }
 }
 
+# 인디케이터
 proc _set_indicator(@player, @uuid, @players_data, @text) {
   @indicator_data = @players_data[@uuid]['cache']['indicator']
   if(!is_null(@indicator_data)) {
@@ -541,34 +575,38 @@ proc _set_indicator(@player, @uuid, @players_data, @text) {
   }
 }
 
-proc _all_players(@bots) {
-  @players_uuid = bukkitlinked_get_all_players()
-  foreach(@bot in @bots) {
-    array_remove_values(@players_uuid, @bot)
+/* 번지코드 관련 (봇 제외 모든 플레이어 구하기, 플러그인 메시지 보내기 등)
+  proc _all_players(@bots) {
+    @players_uuid = bukkitlinked_get_all_players()
+    foreach(@bot in @bots) {
+      array_remove_values(@players_uuid, @bot)
+    }
+    return(@players_uuid)
   }
-  return(@players_uuid)
-}
 
-proc _send_plugin_message(@request_bot, @channel_messages) {
-  @byte_array = byte_array()
-  foreach(@channel_message in @channel_messages) {
-    ba_put_string(@byte_array, @channel_message)
+  proc _send_plugin_message(@request_bot, @channel_messages) {
+    @byte_array = byte_array()
+    foreach(@channel_message in @channel_messages) {
+      ba_put_string(@byte_array, @channel_message)
+    }
+    send_plugin_message(@request_bot, 'BungeeCord', @byte_array)
   }
-  send_plugin_message(@request_bot, 'BungeeCord', @byte_array)
-}
 
-proc _bungeecord_foward(@player, @identifier, @data) {
-  @data_array = byte_array()
-  ba_put_string(@data_array, json_encode(@data))
-  @byte_array = byte_array()
-  ba_put_string(@byte_array, 'Forward')
-  ba_put_string(@byte_array, 'ALL')
-  ba_put_string(@byte_array, @identifier)
-  ba_put_short(@byte_array, array_size(@data_array))
-  ba_put_bytes(@byte_array, @data_array)
-  send_plugin_message(@player, 'BungeeCord', @byte_array)
-}
+  proc _bungeecord_foward(@player, @identifier, @data) {
+    @data_array = byte_array()
+    ba_put_string(@data_array, json_encode(@data))
+    @byte_array = byte_array()
+    ba_put_string(@byte_array, 'Forward')
+    ba_put_string(@byte_array, 'ALL')
+    ba_put_string(@byte_array, @identifier)
+    ba_put_short(@byte_array, array_size(@data_array))
+    ba_put_bytes(@byte_array, @data_array)
+    send_plugin_message(@player, 'BungeeCord', @byte_array)
+  }
+*/
 
+## 기타 proc
+# 배열 나누기
 proc _paging(@array, @size) {
   @pages = array()
   @asize = array_size(@array)
@@ -581,6 +619,7 @@ proc _paging(@array, @size) {
   return(@pages)
 }
 
+# 배수와 편차로 나눠진 랜덤 정수 구하기
 proc _multiply_value(@value, @multiply, @deviation) {
   @multiply_value = @value * @multiply + @value * @deviation * 0.5 - @value * @deviation * rand()
   # 9 + 0.45 - 0~0.9
@@ -589,30 +628,6 @@ proc _multiply_value(@value, @multiply, @deviation) {
   if(@rest > rand()) { @quota += 1 }
   return(integer(@quota))
 }
-
-register_command('resourceurl', array(
-  'description': 'You can set resourcepack download url.',
-  'permission': '*',
-  'usage': '/resourceurl <url>',
-  'tabcompleter': closure(@command, @player, @args) { return(array()) },
-  'executor': closure(@command, @player, @args) {
-    if(pisop(@player)) {
-      if(array_size(@args) == 1) {
-        store_value('resourcepack', @args[0])
-        @server['resourcepack'] = @args[0]
-        @data = array(
-          'url': @args[0]
-        )
-        _bungeecord_foward(@player, 'ch_resourcepack_url_update', @data)
-        return(true)
-      } else {
-        return(false)
-      }
-    } else {
-      return(false)
-    }
-  }
-))
 
 # 상점 리코딩 후 제거 예정
 array proc _clone(array @arr) { return(array_deep_clone(@arr)) }

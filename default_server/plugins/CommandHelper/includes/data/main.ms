@@ -1,7 +1,6 @@
-console('EvaData loaded')
-
 ## Data Procedure
 proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
+  # cache
   @players_data[@uuid]['cache'] = array(
     'resolution_setting': false,
     'last_weapon_effect': 0,
@@ -9,14 +8,29 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
     'indicator': null,
     'tips': array()
   )
+  # setting
   @players_data[@uuid]['setting'] = cup_get('SETTING', @uuid)
   if(is_null(@players_data[@uuid]['setting'])) {
-    _new_data(@uuid, @players_data)
+    _new_setting(@uuid, @players_data)
   }
+  # chat
+  @players_data[@uuid]['chat'] = cup_get('CHAT', @uuid)
+  if(is_null(@players_data[@uuid]['chat'])) {
+    _new_chat(@uuid, @players_data)
+  }
+  # decoration
+  @players_data[@uuid]['decoration'] = cup_get('DECORATION', @uuid)
+  if(is_null(@players_data[@uuid]['decoration'])) {
+    _new_decoration(@uuid, @players_data)
+  }
+  # skill
   _load_skills(@uuid, @players_data, @skills_spec)
+  
+  # bossbar
   @bossbars = get_bars()
+
+  ## 인디케이터
   @indicator_id = 'indicator.'.@uuid
-  @tip_id = 'tip.'.@uuid
   if(array_contains(@bossbars, @indicator_id)) {
     remove_bar(@indicator_id)
   }
@@ -26,6 +40,9 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
   )
   create_bar(@indicator_id, @indicator_bossbar_data)
   bar_add_player(@indicator_id, @player)
+
+  ## 툴팁
+  @tip_id = 'tip.'.@uuid
   if(array_contains(@bossbars, @tip_id)) {
     remove_bar(@tip_id)
   }
@@ -35,6 +52,8 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
   )
   create_bar(@tip_id, @tip_bossbar_data)
   bar_add_player(@tip_id, @player)
+
+  # item
   @players_data[@uuid]['item'] = array(
     'is_inv_open': false,
     'main_hand': null,
@@ -52,30 +71,53 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
     'armor': get_inventory_item(@uuid, 36)
   )
   _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text)
-  _load_tip_data(@player, @uuid, @players_data)
+  
+  #_load_tip_data(@player, @uuid, @players_data)
 }
 
-proc _new_data(@uuid, @players_data) {
+proc _new_setting(@uuid, @players_data) {
   @players_data[@uuid]['setting'] = array(
-    'default',
-    false,
-    'default',
-    'default',
-    true,
-    true,
-    true,
-    true,
-    false,
-    true,
-    true,
-    array('\uf01e', '\uf01f', '\uf020', '\uf021')[rand(0, 4)], #테스트 코드
-    427,
-    true
+    427,  // 해상도
+    true, // 오른손 사용중인지
+    json_encode(array(  // 소리 들을지 설정
+      'mention': true,
+      'chat': true,
+      'gui': true
+    )),
+    json_encode(array()) // 더미 세팅
   )
   cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
 }
 
-proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @server) {
+proc _new_chat(@uuid, @players_data) {
+  @players_data[@uuid]['chat'] = array(
+    'default', // 사용중인 채팅 채널
+    false, // enko여부
+    json_encode(array('default', 'local', 'town')), // 듣기 활성화 할 채널들
+    false, // 채팅 옵저버모드
+    '',    // 마지막 귓말한사람
+    '',    // 마지막 채팅친사람
+    false, // 메신저채팅 여부
+    false  // 채팅 이름부분 정렬 여부
+  )
+  cup_set('SETTING', @uuid, @players_data[@uuid]['chat'])
+}
+
+proc _new_decoration(@uuid, @players_data) {
+  @players_data[@uuid]['decoration'] = array(
+    array('\uf01e', '\uf01f', '\uf020', '\uf021')[rand(0, 4)], // 임시 뱃지
+    '', // 머리장식
+    '', // 네임태그
+    '', // 더미
+    json_encode(array()), // 뱃지 목록
+    json_encode(array()), // 머리장식 목록
+    json_encode(array()), // 네임태그 목록
+    json_encode(array())  // 더미
+  )
+  cup_set('SETTING', @uuid, @players_data[@uuid]['decoration'])
+}
+
+proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @resourcepack) {
   @join_spec = array(
     'location': ploc(@player),
     'effects': get_peffect(@player),
@@ -91,7 +133,7 @@ proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @ser
     @join_spec['gamemode'] = 'SURVIVAL'
   }
   set_pmode(@player, 'SPECTATOR')
-  send_resourcepack(@player, @server['resourcepack'])
+  send_resourcepack(@player, @resourcepack['url'])
   title(@player, '§a예§7를 눌러주세요!', '§7서버 리소스팩 사용은 필수입니다.', 0, 99999999, 0)
   @resource_pack_event_id = 'pack_download_checker.'.@uuid
   if(has_bind(@resource_pack_event_id)) { unbind(@resource_pack_event_id) }
@@ -129,43 +171,22 @@ proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @
   })
 }
 
-proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @bots, @skills_spec, @text, @server) {
-  if(!array_contains(@bots, @uuid)) {
-    #broadcast('봇아님' @player)
-    runas('~console', '/recipe give '.@player.' *')
-    if(!array_index_exists(@reconnectable_players, @uuid)) {
-      _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @server)
-    } else {
-      #set_timeout(500, closure() {
-        _load_data(@player, @uuid, @players_data, @skills_spec, @text)
-        array_remove(@reconnectable_players, @uuid)
-      #})
-    }
+proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @text, @resourcepack) {
+  runas('~console', '/recipe give '.@player.' *')
+  if(!array_index_exists(@reconnectable_players, @uuid)) {
+    _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @resourcepack)
   } else {
-    #broadcast('봇임' @player)
-    ## Channel Register
-    if(!is_channel_registered('BungeeCord')) {
-      register_channel('BungeeCord')
-    }
-    set_timeout(10, closure() {
-      if(ponline(@player)) {
-        set_pmode(@player, 'SPECTATOR')
-      }
-    })
+    #set_timeout(500, closure() {
+      _load_data(@player, @uuid, @players_data, @skills_spec, @text)
+      array_remove(@reconnectable_players, @uuid)
+    #})
   }
 }
 
-proc _quit_event(@player, @uuid, @players_data, @bots) {
-  if(!array_contains(@bots , @uuid)) {
-    @all_players = all_players()
-    array_remove_values(@all_players, @player)
-    @data = array(
-      'uuid': @uuid
-    )
-    _bungeecord_foward(@all_players[0], 'ch_player_quit', @data)
-    _update_tip_data(@uuid, @players_data)
-    array_remove(@players_data, @uuid)
-  }
+proc _quit_event(@uuid, @players_data) {
+  kafka_send('ch.inform_player_quit', @uuid)
+  array_remove(@players_data, @uuid)
+  #_update_tip_data(@uuid, @players_data)
 }
 
 proc _countdown_reconnectable_players(@reconnectable_players) {
@@ -181,29 +202,17 @@ proc _countdown_reconnectable_players(@reconnectable_players) {
 # EVENT / TASK BINDER
 foreach(@player in all_players()) { #조인 이벤트로 변경 리로드 명령어
   @uuid = puuid(@player)
-  if(!array_contains(@bots, @uuid)) {
-    #broadcast('봇아님' @player)
-    set_timeout(1, closure() {
-      _load_data(@player, @uuid, @players_data, @skills_spec, @text)
-    })
-  } else {
-    #broadcast('봇임' @player)
-    ## Channel Register
-    if(!is_channel_registered('BungeeCord')) {
-      register_channel('BungeeCord')
-    }
-    set_timeout(10, closure() {
-      set_pmode(@player, 'SPECTATOR')
-    })
-  }
+  set_timeout(1, closure() {
+    _load_data(@player, @uuid, @players_data, @skills_spec, @text)
+  })
 }
 
-bind('player_join', null, null, @event, @reconnectable_players, @players_data, @bots, @skills_spec, @text, @server) {
+bind('player_join', null, null, @event, @reconnectable_players, @players_data, @skills_spec, @text, @resourcepack) {
   @player = @event['player']
   @uuid = puuid(@player)
   modify_event('join_message', null)
   set_timeout(100, closure() {
-    _join_event(@player, @uuid, @reconnectable_players, @players_data, @bots, @skills_spec, @text, @server)
+    _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @text, @resourcepack)
   })
 }
 
@@ -254,7 +263,7 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
         _set_tips(@player, @uuid, @players_data)
       }
 
-      # 액티브 스킬 카운드다운 코드 있는 스킬들은 카운트 다운하기 (지속시간 다 달았을때 특정 코드 작동하기)
+      # 액티브 스킬 카운드다운
       foreach(@skill: @active_skill in @player_data['active_skill']) { // 활성화된 액티브 스킬 포리치
         @proc_name = "_apply_countdown_by_@skill"
         if(is_proc(@proc_name)) {
@@ -266,7 +275,7 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
       _apply_passive_armor_enchantment(@player, @player_data)
 
       #apply nether field effects
-      if(@server['name'] == 'nether') {
+      if(@server == 'nether') {
         if(array_contains(array('SURVIVAL', 'ADVENTURE'), pmode(@player)) && !array_index_exists(get_peffect(@player), 'fire_resistance') && entity_onfire(@uuid) < 20) {
           switch(@player_data['item']['enchantments']['armor']) {
           case '반엔트로피':
@@ -289,11 +298,6 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
 })
 
 @cron_task = set_cron('*/1 * * * *', closure() {
-  foreach(@bot_name in @bots_name) {
-    if(ponline(@bot_name) && pmode(@bot_name) != 'SPECTATOR') {
-      set_pmode(@bot_name, 'SPECTATOR')
-    }
-  }
   foreach(@id: @hp_block in @hp_blocks) {
     if(@hp_block['reset_countdown'] > 0) {
       @hp_block['reset_countdown'] -= 1
@@ -304,67 +308,48 @@ bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
   }
 })
 
-bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @reconnectable_players, @players_data, @server, @bots, @log_data) {
-  if(ponline(@event['player'])) {
-    @identifier_size = -1
-    foreach(@key: @byte in @event['bytes']) {
-      #broadcast(@key @byte )
-      if(@key != 0) {
-        #if(@byte == 0) {
-        if(@byte == 123) {
-          @identifier_size = @key - 6 #-2
-          break()
-        }
-      }
+bind('kafka_receive', null, null, @event, @reconnectable_players, @players_data, @resourcepack) {
+  switch(@event['key']) {
+  case 'ch.inform_player_quit':
+    @uuid = @evnet['value']
+    @reconnectable_players[@uuid] = 10
+    break()
+  case 'ch.update_resourcepack_url':
+    @url = @evnet['value']
+    @resourcepack['url'] = @url
+    store_value('resourcepack', @url)
+    break()
+  case 'ch.send_defaultchat':
+    @data = json_decode(@evnet['value'])
+    _default_chat(@data, @players_data)
+    break()
+  case 'ch.send_townchat':
+    @data = json_decode(@evnet['value'])
+    _town_chat(@data, @players_data)
+    break()
+  case 'ch.send_localchat':
+    @data = json_decode(@evnet['value'])
+    _local_chat(@data, @players_data)
+    break()
+  case 'ch.send_adminchat':
+    @data = json_decode(@evnet['value'])
+    _admin_chat(@data, @players_data)
+    break()
+  case 'ch.send_whisper':
+    @data = json_decode(@evnet['value'])
+    _whisper(@data)
+    break()
+  case 'ch.send_broadcast':
+    @data = json_decode(@evnet['value'])
+    foreach(@receiver_name in all_players()) {
+      tellraw(@receiver_name, @data['raw'])
+      play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
     }
-    #
-    if(@identifier_size != -1) {
-      @value_string = string(ba_get_bytes(@event['bytes'], array_size(@event['bytes']) - @identifier_size - 6, @identifier_size + 6))
-      if(string_starts_with(@value_string, '{"') &&string_ends_with(@value_string, '}')) {
-        @data = array(
-          'identifier': string(ba_get_bytes(@event['bytes'], @identifier_size, 2)),
-          'value': json_decode(@value_string)
-        )
-        switch(@data['identifier']) {
-        case 'ch_player_quit':
-          @uuid = @data['value']['uuid']
-          @reconnectable_players[@uuid] = 10
-          break()
-        case 'ch_default_chat':
-          _default_chat(@data['value'], @players_data, @bots)
-          break()
-        case 'ch_local_chat':
-          _local_chat(@data['value'], @players_data, @bots)
-          break()
-        case 'ch_guild_chat':
-          _guild_chat(@data['value'], @players_data, @bots)
-          break()
-        case 'ch_admin_chat':
-          _admin_chat(@data['value'], @players_data, @bots)
-          break()
-        case 'ch_whisper':
-          _whisper(@data['value'], @log_data)
-          break()
-        case 'ch_broadcast':
-          @receiver_uuids = _all_players(@bots)
-          foreach(@receiver_uuid in @receiver_uuids) {
-            @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
-            if(ponline(@receiver_name)) {
-              tellraw(@receiver_name, @data['value']['raw'])
-              play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
-            }
-          }
-          break()
-        case 'ch_resourcepack_url_update':
-          @server['resourcepack'] = @data['value']['url']
-          store_value('resourcepack', @data['value']['url'])
-        }
-      }
-    }
+    break()
   }
 }
 
-bind('block_place', null, null, @event, @players_data, @skills_spec, @server) {
+bind('block_place', null, null, @event, @players_data, @skills_spec) {
   @player = @event['player']
   @uuid = puuid(@player)
   if(!is_cancelled() && pmode(@player) == 'SURVIVAL') {
@@ -411,10 +396,10 @@ bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spe
   @player = @event['player']
   @uuid = puuid(@player)
   if(pmode(@player) == 'SURVIVAL') {
-    if(@server['name'] == 'main' && pworld(@player) == 'spawn_minecraft_residence') {
+    if(@server == 'main' && pworld(@player) == 'spawn_minecraft_residence') {
       _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skills_spec, @text)
     }
-    if(@server['name'] != 'main') {
+    if(@server != 'main') {
       _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @minerals_spec, @skills_spec, @text)
       @stones = array(
         'STONE': 1,
@@ -435,7 +420,7 @@ bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spe
         @skill_data = @players_data[@uuid]['skill_data']['mining'][@skill]
         _add_epxerience(@uuid, @skill, @skill_data, @default_xp, @extra_xp)
       }
-      if(@server['name'] == 'nether') {
+      if(@server == 'nether') {
         if(array_contains(array('SURVIVAL', 'ADVENTURE'), pmode(@player))) {
           @location = array('x': @event['location']['x'], 'y': @event['location']['y'], 'z': @event['location']['z'], 'world': @event['location']['world'])
           switch(@players_data[@uuid]['item']['enchantments']['main_hand']) {
@@ -930,7 +915,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
     }
   }
   ## farming (if canceled it didn't work)
-  if(@server['name'] == 'main') {
+  if(@server == 'main') {
     if(@event['action'] == 'right_click_block') {
       # bone mealing
       if(!is_null(@event['item']) && @event['item']['name'] == 'BONE_MEAL' && array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
@@ -1043,7 +1028,7 @@ bind('inventory_click', null, null, @event) {
 }
 
 
-if(@server['name'] == 'main') {
+if(@server == 'main') {
   bind('player_interact_entity', null, array('clicked': 'PLAYER', 'hand': 'main_hand'), @event, @stores, @shop_log_data) {
     @player = @event['player']
     @uuid = puuid(@player)

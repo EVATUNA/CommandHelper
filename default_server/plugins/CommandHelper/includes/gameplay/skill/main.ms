@@ -91,6 +91,7 @@ proc _get_skill_manager(@uuid) {
     )
     @default_selected_runes = array(
     )
+    @default_scroll_gauge = 0
     # 스킬 메니저 션언
     @skill_manager = array(
       @default_level,
@@ -98,7 +99,8 @@ proc _get_skill_manager(@uuid) {
       @default_total_point,
       @default_rune_slot,
       @default_selected_methods,
-      @default_selected_runes
+      @default_selected_runes,
+      @default_scroll_gauge
     )
     # cup에 저장
     _set_skill_manager(@uuid, @skill_manager)
@@ -252,19 +254,41 @@ proc _open_combat_skill(@player, @uuid, @skill_manager, @invested_point, @skills
   }
   # 스킬 배치
   @skill_setup = array(
-    'sweeping': 10,
-    'knockback': 12,
-    'cleaving': 14,
-    'blocking': 16,
-    'bow_mastery': 28,
-    'crossbow_mastery': 30,
-    'health_traing': 32
+    'sweeping': array(
+      'icon': 10,
+      'button': 19
+    ),
+    'knockback': array(
+      'icon': 12,
+      'button': 21
+    ),
+    'cleaving': array(
+      'icon': 14,
+      'button': 23
+    ),
+    'blocking': array(
+      'icon': 16,
+      'button': 25
+    ),
+    'bow_mastery': array(
+      'icon': 28,
+      'button': 37
+    ),
+    'crossbow_mastery': array(
+      'icon': 30,
+      'button': 39
+    ),
+    'health_traing': array(
+      'icon': 32,
+      'button': 41
+    )
   )
-  foreach(@skill: @slot in @skill_setup) {
+  foreach(@skill: @slots in @skill_setup) {
     @skill_point = @skills_data[@skill][0]
     @skill_max_point = @skills_data[@skill][1]
     @skill_info = @skills_info[@skill]
     @skill_name = @skill_info['name']
+    @skill_icon = @skill_info['icon']
     @skill_desriptions = @skill_info['desriptions'][@skill_point]
     if(array_size(@skill_desriptions) > 0) {
       if(array_size(@skill_desriptions) - 1 < @skill_point) {
@@ -276,8 +300,9 @@ proc _open_combat_skill(@player, @uuid, @skill_manager, @invested_point, @skills
     } else {
       @skill_desription = array()
     }
-    @inventory[@slot]['meta']['display'] = "§fLv.@skill_point @skill_name"
-    @inventory[@slot]['meta']['lore'] = @skill_desription
+    @inventory[@slots['icon']]['meta']['display'] = "§fLv.@skill_point @skill_name"
+    @inventory[@slots['icon']]['meta']['lore'] = @skill_desription
+    @inventory[@slots['icon']]['meta']['model'] = @skill_icon
   }
   # GUI 이벤트 익스큐터 설정
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @skill_manager, @invested_point, @skills_data, @skills_info, @text) {
@@ -2463,7 +2488,7 @@ proc _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skill
     }
   }
   # 지옥 필드 효과 반영
-  if(@server['name'] != 'nether') { //지옥이 아닐경수 효과 없도록 배수 1로 설정
+  if(@server != 'nether') { //지옥이 아닐경수 효과 없도록 배수 1로 설정
     @nether_field_effect_multiply = 1
   }
   @event['amount'] *= @nether_field_effect_multiply // 반영

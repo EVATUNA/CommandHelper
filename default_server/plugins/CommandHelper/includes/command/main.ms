@@ -1,4 +1,4 @@
-# 접두사 선언
+## 자주 쓰는 접두사 선언
 @prefix = array(
   'success': '\ue4dc',
   'failure': '\ue4de',
@@ -6,7 +6,31 @@
   'info': '\ue4e3',
   'broadcast': '\ue4db'
 )
-# 명령어 proc
+
+## 명령어
+
+# 리소스팩 링크 업데이트
+register_command('resourceurl', array(
+  'description': 'You can set resourcepack download url.',
+  'permission': '*',
+  'usage': '/resourceurl <url>',
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    if(pisop(@player)) {
+      if(array_size(@args) == 1) {
+        store_value('resourcepack', @args[0])
+        @resourcepack['url'] = @args[0]
+        kafka_send('ch_resourcepack_url_update', @args[0])
+        return(true)
+      } else {
+        return(false)
+      }
+    } else {
+      return(false)
+    }
+  }
+))
+
 proc _is_command_registered(@command) {
   return(array_index_exists(get_commands(), @command))
 }
@@ -178,38 +202,6 @@ set_timeout(1000, closure() {
     }
   ))
 })
-/*
-
-*/
-
-/*
-
-
-  // set_timeout(4000, closure(){
-  //   msg('')
-  //   msg('§7  유저분들의 놀거리와 재미를 위해 기초를 탄탄하게 §6계획§7하였고')
-  //   msg('§7  기반으로 §9설계§7, §8개발§7하였습니다.')
-  //   msg('')
-  //   set_timeout(4000, closure(){
-  //       msg('')
-  //       msg('§7  부족한 부분이 있다면 여러 시스템들이 더 잘 어우러질 수 있도록')
-  //       msg('§7  §e보완§7하고, §a업데이트§7해 나갈 것 입니다.')
-  //       msg('')
-  //       set_timeout(4000, closure(){
-  //         msg('')
-  //         msg('§7  여러 시스템이 적용되어 있고 야생 유저분들께는 생소할 수 있다 생각하여')
-  //         msg('§7  Wiki를 자세히 써 두었습니다.')
-  //         msg('')
-  //         set_timeout(3000, closure(){
-  //           msg('')
-  //           msg('§7  Wiki : /wiki')
-  //           msg('§7  그리고 /'.@cmd'info 명령어를 통해 저희 서버의 정보를 받아보세요.')
-  //           msg('')
-  //         })
-  //       })
-  //   })
-  // })
-*/
 
 ###
 ### 관리자 명령어 (모든 서버에서 작동되도록 수정 해야함)
@@ -512,7 +504,7 @@ register_command('whisper', array(
           @sender_raw = array(
             array(
               'text': 'To ',
-              'color': 'gray',
+              'color': '#7F8C8D',
             ),
             array(
               'text': @data['target_name'],
@@ -1042,7 +1034,7 @@ register_command('hud', array(
 */
 # 워프
 proc _warp_command(@command, @player, @args, @prefix, @text, @server) {
-  if(@server['name'] == 'main') {
+  if(@server == 'main') {
     @random_teleport = @text['space_fonts']['space.-1'].'\uec09'.@text['space_fonts']['space.-1'].'\uec10'.@text['space_fonts']['space.-1'].'\uec17'
     @random_teleport_item = array(
       'name': 'STRUCTURE_VOID',
@@ -1128,7 +1120,7 @@ proc _warp_command(@command, @player, @args, @prefix, @text, @server) {
         case 6..8:
         case 15..17:
         case 24..26:
-          if(@server['name'] == 'main') {
+          if(@server == 'main') {
             runas(@player, '/randomteleport')
           }
           break()
