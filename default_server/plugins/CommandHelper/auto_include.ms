@@ -629,6 +629,15 @@ proc _multiply_value(@value, @multiply, @deviation) {
   return(integer(@quota))
 }
 
+proc _color(@color) {
+  if(reg_count('^#[a-fA-F0-9]{6}$', @color)) {
+    return('§x§'.@color[1].'§'.@color[2].'§'.@color[3].'§'.@color[4].'§'.@color[5].'§'.@color[6])
+  } else {
+    return(color(@color))
+  }
+}
+
 # 상점 리코딩 후 제거 예정
 array proc _clone(array @arr) { return(array_deep_clone(@arr)) }
 boolean proc _existsGui(string @guiid) { return(array_contains(get_virtual_inventories(), @guiid)) }
+

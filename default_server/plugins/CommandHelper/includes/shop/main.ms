@@ -1,5 +1,5 @@
 @shop_log_data = array()
-if(@server['name'] == 'main') {
+if(@server == 'main') {
   @date = simple_date('yyyy-MM-dd')
   @shop_log_data = array(
     'date': @date,

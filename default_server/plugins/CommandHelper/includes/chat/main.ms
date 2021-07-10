@@ -607,7 +607,7 @@ proc _town_chat(@data, @players_data) {
   }
 }
 
-proc _local_chat(@data, @players_data, @bots, @log_data) {
+proc _local_chat(@data, @players_data) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -810,7 +810,7 @@ proc _local_chat(@data, @players_data, @bots, @log_data) {
   }
 }
 
-proc _admin_chat(@data, @players_data, @bots, @log_data) {
+proc _admin_chat(@data, @players_data) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1101,7 +1101,7 @@ bind('async_player_chat', null , null, @event, @players_data, @text) {
   }
 }
 
-proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @bots, @log_data) {
+proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting) {
   @enko = @setting[1]
   if(@enko) {
     @modified_message = _convert_eng_to_kor(@unmodified_message)

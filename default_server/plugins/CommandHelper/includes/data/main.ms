@@ -216,23 +216,21 @@ bind('player_join', null, null, @event, @reconnectable_players, @players_data, @
   })
 }
 
-bind('player_quit', null, null, @event, @players_data, @bots) {
+bind('player_quit', null, null, @event, @players_data) {
   @player = @event['player']
   @uuid = puuid(@player)
   modify_event('message', null)
-  _quit_event(@player, @uuid, @players_data, @bots)
+  _quit_event(@uuid, @players_data)
 }
 
-bind('player_toggle_sneak', null, null, @event, @players_data, @bots) {
+bind('player_toggle_sneak', null, null, @event, @players_data) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(!array_contains(@bots , @player)) {
-    if(array_index_exists(@players_data, @uuid) && @players_data[@uuid]['item']['enchantments']['armor'] == '깃털') {
-      if(@event['sneaking']) {
-        set_peffect(@player, 'SLOW_FALLING', 0, 0, false, true)
-      } else {
-        set_peffect(@player, 'SLOW_FALLING', 4, 11.5, false, true)
-      }
+  if(array_index_exists(@players_data, @uuid) && @players_data[@uuid]['item']['enchantments']['armor'] == '깃털') {
+    if(@event['sneaking']) {
+      set_peffect(@player, 'SLOW_FALLING', 0, 0, false, true)
+    } else {
+      set_peffect(@player, 'SLOW_FALLING', 4, 11.5, false, true)
     }
   }
 }

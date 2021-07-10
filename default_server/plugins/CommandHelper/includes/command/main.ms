@@ -379,7 +379,7 @@ register_command('whisper', array(
   'tabcompleter': closure(@command, @player, @args) {
     if(array_size(@args) == 1) {
       @online_players = array()
-      foreach(@target_uuid in _all_players(@bots)) {
+      foreach(@target_uuid in bukkitlinked_get_all_players()) {
         @online_players[] = bukkitlinked_get_player_name(@target_uuid)
       }
       array_remove_values(@online_players, @player)
@@ -402,7 +402,7 @@ register_command('whisper', array(
           'sender_setting': @players_data[@sender_uuid]['setting']
         )
         @is_target_exists = false
-        @all_players_uuid = _all_players(@bots)
+        @all_players_uuid = bukkitlinked_get_all_players()
         array_remove_values(@all_players_uuid, @sender_uuid)
         @receivers = array()
         foreach(@receiver_uuid in @all_players_uuid) {
@@ -1213,7 +1213,7 @@ register_command('broadcast', array(
         if(array_index_exists(@players_data, @sender_uuid) && array_size(@args) > 0) {
           @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
           @setting = @players_data[@sender_uuid]['setting']
-          _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @bots, @log_data)
+          _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting)
         } else {
           tmsg(@player, color('yellow')'/'.@command'<message>')
         }
@@ -1226,7 +1226,7 @@ register_command('broadcast', array(
       if(array_size(@args) > 0) {
         @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
         @setting = array('broadcast', false)
-        _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @bots, @log_data)
+        _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting)
       } else {
         console(color('yellow')'/'.@command'<message>')
       }
