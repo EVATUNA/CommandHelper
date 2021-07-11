@@ -1,5 +1,5 @@
 /hex = >>>
-  broadcast(replace(hexcolor("#ffffff"), '§', '&'))
+  broadcast(replace(_color("#ffffff"), '§', '&'))
   #'§'
 <<<
 

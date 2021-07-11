@@ -140,7 +140,7 @@ proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @res
   bind('resource_pack_status', array('id': @resource_pack_event_id), array('player': @player), @event, @player, @uuid, @join_spec, @players_data, @skills_spec, @text) {
     switch(@event['status']) {
     case 'DECLINED':
-      pkick(@player, hexcolor('#ff4040').'§l서버 리소스팩을 사용하도록 설정해 주시기 바랍니다.\n'.hexcolor('#c0c0c0').'§l에바참치 서버를 선택한 후, 수정 버튼을 눌러\n서버 리소스팩을 사용으로 설정해 주세요.\n\n'.hexcolor('#ffff80').'§l버그 문의: ')
+      pkick(@player, _color('#ff4040').'§l서버 리소스팩을 사용하도록 설정해 주시기 바랍니다.\n'._color('#c0c0c0').'§l에바참치 서버를 선택한 후, 수정 버튼을 눌러\n서버 리소스팩을 사용으로 설정해 주세요.\n\n'._color('#ffff80').'§l버그 문의: ')
       unbind()
       break()
     case 'SUCCESSFULLY_LOADED':
@@ -604,7 +604,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
             # 사용중으로 설정
             export(@gui_id, @player)
             # gui 세팅
-            @texture_layer = @text['space_fonts']['space.-8'].'§f\ue3fb'.@text['space_fonts']['space.-169'].hexcolor('#404040')
+            @texture_layer = @text['space_fonts']['space.-8'].'§f\ue3fb'.@text['space_fonts']['space.-169']._color('#404040')
             @message = '마법 작업대'
             @inventory = array()
             for(@index = 0, @index < 27, @index++) {

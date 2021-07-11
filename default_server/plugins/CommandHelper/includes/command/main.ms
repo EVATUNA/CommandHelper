@@ -1244,7 +1244,7 @@ proc _chreload_command(@command, @player, @args, @prefix, @players_data) {
     }
   }
   set_timeout(1, closure() {
-    broadcast(@prefix['broadcast'] hexcolor('#80c8ff').'인스턴스 패치가 진행되어 일부 데이터가 초기화 되었습니다.')
+    broadcast(@prefix['broadcast'] _color('#80c8ff').'인스턴스 패치가 진행되어 일부 데이터가 초기화 되었습니다.')
     run('/reloadalias')
   })
 }

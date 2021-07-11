@@ -47,7 +47,7 @@ proc _get_enchanted_item(@enchanting_item, @entries, @luck) {
   @enchanted_item['meta']['lore'] = array_get(@enchanting_item['meta']['lore'], cslice(0, @lore_size - 1))
   if(!is_null(@final_entry)) {
     @enchanted_item['meta']['lore'][@lore_size] = ''
-    @enchanted_item['meta']['lore'][@lore_size + 1] = '§f'.@final_entry['icon'].' '.hexcolor(@final_entry['color']).@final_entry['name']
+    @enchanted_item['meta']['lore'][@lore_size + 1] = '§f'.@final_entry['icon'].' '._color(@final_entry['color']).@final_entry['name']
     @descriptions = @final_entry['descriptions']
     foreach(@key: @description in @descriptions) {
       @enchanted_item['meta']['lore'][@lore_size + 2 + @key] = '§7'.@description

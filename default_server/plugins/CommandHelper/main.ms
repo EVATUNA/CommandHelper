@@ -12,10 +12,9 @@
 #include('includes/data/main.ms')
 
 @p = 'aaaa__'
-broadcast(bukkitlinked_get_all_players())
-broadcast(bukkitlinked_get_player_uuid(@p))
-broadcast(bukkitlinked_get_player_name(puuid(@p)))
-
-broadcast(bukkitlinked_is_player_op(puuid(@p)))
-bukkitlinked_send_message(@p, 'asdf')
-#bukkitlinked_connect_to_server(@p, 'main')
+broadcast(bukkitlinked_send_message(puuid(@p), 'asdf'))
+#broadcast(bukkitlinked_get_all_players())
+#broadcast(bukkitlinked_get_player_uuid(@p))
+#broadcast(bukkitlinked_get_player_name(puuid(@p)))]
+#broadcast(bukkitlinked_is_player_op(puuid(@p)))
+#bukkitlinked_connect_to_server('aaaa__', 'guest')
