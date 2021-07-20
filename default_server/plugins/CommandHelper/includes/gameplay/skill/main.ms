@@ -23,49 +23,11 @@ foreach(@category in @categories) {
         })
         break()
       case 'load.ms':
-        proc("_apply_loading_by_@skill", @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @selected_combat_method, @selected_sowing_method, @selected_harvesting_method, @selected_runes) {
-          # 내부에서 사용 가능한 변수:
-          # @player_data, @player, @uuid,
-          # @category, @skill, @skill_spec, @point,
-          # @selected_combat_method, @selected_sowing_method, @selected_harvesting_method, @selected_runes
-          include(@file_path)
-        }
-        break()
       case 'attack.ms':
-        proc("_apply_attacking_by_@skill", @event, @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @attack_cooldown, @attribute_attack_damage, @attribute_attack_speed) {
-          # 내부에서 사용 가능한 변수:
-          # @event, @player_data, @player, @uuid,
-          # @category, @skill, @skill_spec, @point,
-          # @attack_cooldown, @attribute_attack_damage, @attribute_attack_speed
-          include(@file_path)
-        }
-        break()
       case 'update_item.ms':
-        proc("_apply_item_update_by_@skill", @player_data, @player, @uuid, @skill, @skill_spec, @point, @item, @vanilla_enchants) {
-          # 내부에서 사용 가능한 변수:
-          # @player_data, @player, @uuid,
-          # @skill, @skill_spec, @point,
-          # @item, @vanilla_enchants
-          include(@file_path)
-        }
-        break()
       case 'active.ms':
-        proc("_apply_active_by_@skill", @player_data, @player, @uuid, @skill, @skill_spec, @point, @active_skill) {
-          # 내부에서 사용 가능한 변수:
-          # @player_data, @player, @uuid,
-          # @skill, @skill_spec, @point,
-          # @active_skill
-          include(@file_path)
-        }
-        break()
       case 'countdown.ms':
-        proc("_apply_countdown_by_@skill", @player_data, @player, @uuid, @skill, @skill_spec, @point, @active_skill) {
-          # 내부에서 사용 가능한 변수:
-          # @player_data, @player, @uuid,
-          # @skill, @skill_spec, @point,
-          # @active_skill
-          include(@file_path)
-        }
+        include(@file_path)
         break()
       }
     }
@@ -84,13 +46,14 @@ proc _get_skill_manager(@uuid) {
     @default_experience = 0
     @default_total_point = 0
     @default_rune_slot = 1
-    @default_selected_methods = array(
-      'combat_method': '',
-      'harvesting_method': '',
-      'sowing_method': ''
+    @default_selected_methods = json_encode(
+      array(
+        'combat_method': '',
+        'harvesting_method': '',
+        'sowing_method': ''
+      )
     )
-    @default_selected_runes = array(
-    )
+    @default_selected_runes = json_encode(array())
     @default_scroll_gauge = 0
     # 스킬 메니저 션언
     @skill_manager = array(
@@ -177,9 +140,11 @@ proc _reset_active_skill(@player_data, @uuid, @skill) {
     @reseted_is_activated
   )
   # cup에 저장
-  _save_active_skill(@uuid, @skill, @active_skill)
+  _save_active_skill(@uuid, @skill, @reseted_active_skill)
   # 플레이어 데이터에서 삭제
-  array_remove(@player_data['active_skill'], @skill)
+  if(array_index_exists(@player_data['active_skill'], @skill)) {
+    array_remove(@player_data['active_skill'], @skill)
+  }
 }
 # 액티브 스킬 save
 proc _save_active_skill(@uuid, @skill, @active_skill) {
@@ -200,6 +165,8 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
   @selected_runes = json_decode(@skill_manager[5])
   # 투자한 총 포인트 선언
   @invested_point = 0
+  # 액티브 스킬 배열 선언
+  @player_data['active_skill'] = array()
   # 스킬 데이터 로드 및, 스킬 효과 적용 (모든 스킬 데이터 로드시 선택한 스킬,룬 이라면 로드.ms 작동해야 함)
   foreach(@skill: @skill_spec in @skills_spec) {
     # 카테고리 선언

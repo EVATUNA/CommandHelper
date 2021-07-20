@@ -1,34 +1,41 @@
 ## Data Procedure
 proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
+  # 배열로 선언
+  @players_data[@uuid] = array()
+  @player_data = @players_data[@uuid]
+
   # cache
-  @players_data[@uuid]['cache'] = array(
+  @player_data['cache'] = array(
     'resolution_setting': false,
     'last_weapon_effect': 0,
     'last_armor_effect': 0,
     'indicator': null,
     'tips': array()
   )
+
   # setting
-  @players_data[@uuid]['setting'] = cup_get('SETTING', @uuid)
-  if(is_null(@players_data[@uuid]['setting'])) {
-    _new_setting(@uuid, @players_data)
+  @player_data['setting'] = cup_get('SETTING', @uuid)
+  if(is_null(@player_data['setting'])) {
+    _new_setting(@uuid, @player_data)
   }
+
   # chat
-  @players_data[@uuid]['chat'] = cup_get('CHAT', @uuid)
-  if(is_null(@players_data[@uuid]['chat'])) {
-    _new_chat(@uuid, @players_data)
+  @player_data['chat'] = cup_get('CHAT', @uuid)
+  if(is_null(@player_data['chat'])) {
+    _new_chat(@uuid, @player_data)
   }
+
   # decoration
-  @players_data[@uuid]['decoration'] = cup_get('DECORATION', @uuid)
-  if(is_null(@players_data[@uuid]['decoration'])) {
-    _new_decoration(@uuid, @players_data)
+  @player_data['decoration'] = cup_get('DECORATION', @uuid)
+  if(is_null(@player_data['decoration'])) {
+    _new_decoration(@uuid, @player_data)
   }
+
   # skill
-  _load_skills(@uuid, @players_data, @skills_spec)
+  _load_skills(@player_data, @player, @uuid, @skills_spec)
   
   # bossbar
   @bossbars = get_bars()
-
   ## 인디케이터
   @indicator_id = 'indicator.'.@uuid
   if(array_contains(@bossbars, @indicator_id)) {
@@ -40,7 +47,6 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
   )
   create_bar(@indicator_id, @indicator_bossbar_data)
   bar_add_player(@indicator_id, @player)
-
   ## 툴팁
   @tip_id = 'tip.'.@uuid
   if(array_contains(@bossbars, @tip_id)) {
@@ -54,7 +60,7 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
   bar_add_player(@tip_id, @player)
 
   # item
-  @players_data[@uuid]['item'] = array(
+  @player_data['item'] = array(
     'is_inv_open': false,
     'main_hand': null,
     'off_hand': null,
@@ -70,13 +76,14 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
     'off_hand': get_inventory_item(@uuid, 40),
     'armor': get_inventory_item(@uuid, 36)
   )
-  _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text)
+
+  _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text)
   
   #_load_tip_data(@player, @uuid, @players_data)
 }
 
-proc _new_setting(@uuid, @players_data) {
-  @players_data[@uuid]['setting'] = array(
+proc _new_setting(@uuid, @player_data) {
+  @player_data['setting'] = array(
     427,  // 해상도
     true, // 오른손 사용중인지
     json_encode(array(  // 소리 들을지 설정
@@ -86,11 +93,11 @@ proc _new_setting(@uuid, @players_data) {
     )),
     json_encode(array()) // 더미 세팅
   )
-  cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+  cup_set('SETTING', @uuid, @player_data['setting'])
 }
 
-proc _new_chat(@uuid, @players_data) {
-  @players_data[@uuid]['chat'] = array(
+proc _new_chat(@uuid, @player_data) {
+  @player_data['chat'] = array(
     'default', // 사용중인 채팅 채널
     false, // enko여부
     json_encode(array('default', 'local', 'town')), // 듣기 활성화 할 채널들
@@ -100,11 +107,11 @@ proc _new_chat(@uuid, @players_data) {
     false, // 메신저채팅 여부
     false  // 채팅 이름부분 정렬 여부
   )
-  cup_set('SETTING', @uuid, @players_data[@uuid]['chat'])
+  cup_set('CHAT', @uuid, @player_data['chat'])
 }
 
 proc _new_decoration(@uuid, @players_data) {
-  @players_data[@uuid]['decoration'] = array(
+  @player_data['decoration'] = array(
     array('\uf01e', '\uf01f', '\uf020', '\uf021')[rand(0, 4)], // 임시 뱃지
     '', // 머리장식
     '', // 네임태그
@@ -114,7 +121,7 @@ proc _new_decoration(@uuid, @players_data) {
     json_encode(array()), // 네임태그 목록
     json_encode(array())  // 더미
   )
-  cup_set('SETTING', @uuid, @players_data[@uuid]['decoration'])
+  cup_set('DECORATION', @uuid, @player_data['decoration'])
 }
 
 proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @resourcepack) {
@@ -309,36 +316,36 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
 bind('kafka_receive', null, null, @event, @reconnectable_players, @players_data, @resourcepack) {
   switch(@event['key']) {
   case 'ch.inform_player_quit':
-    @uuid = @evnet['value']
-    @reconnectable_players[@uuid] = 10
+    @uuid = @event['value']
+    @reconnectable_players[@uuid] = 5
     break()
   case 'ch.update_resourcepack_url':
-    @url = @evnet['value']
+    @url = @event['value']
     @resourcepack['url'] = @url
     store_value('resourcepack', @url)
     break()
   case 'ch.send_defaultchat':
-    @data = json_decode(@evnet['value'])
+    @data = json_decode(@event['value'])
     _default_chat(@data, @players_data)
     break()
   case 'ch.send_townchat':
-    @data = json_decode(@evnet['value'])
+    @data = json_decode(@event['value'])
     _town_chat(@data, @players_data)
     break()
   case 'ch.send_localchat':
-    @data = json_decode(@evnet['value'])
+    @data = json_decode(@event['value'])
     _local_chat(@data, @players_data)
     break()
   case 'ch.send_adminchat':
-    @data = json_decode(@evnet['value'])
+    @data = json_decode(@event['value'])
     _admin_chat(@data, @players_data)
     break()
   case 'ch.send_whisper':
-    @data = json_decode(@evnet['value'])
+    @data = json_decode(@event['value'])
     _whisper(@data)
     break()
   case 'ch.send_broadcast':
-    @data = json_decode(@evnet['value'])
+    @data = json_decode(@event['value'])
     foreach(@receiver_name in all_players()) {
       tellraw(@receiver_name, @data['raw'])
       play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))

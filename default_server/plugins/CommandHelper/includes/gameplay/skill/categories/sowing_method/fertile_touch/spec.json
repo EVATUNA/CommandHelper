@@ -1,4 +1,5 @@
 {
+  "category": "sowing_method",
 	"default_max_point": 3,
 	"effect_by_point": [
 		{

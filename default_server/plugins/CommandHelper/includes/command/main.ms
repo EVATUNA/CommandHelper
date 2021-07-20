@@ -280,13 +280,13 @@ register_command('enko', array(
   'executor': closure(@command, @player, @args) {
     @uuid = puuid(@player)
     if(array_index_exists(@players_data, @uuid)) {
-      if(@players_data[@uuid]['setting'][1]) {
-        @players_data[@uuid]['setting'][1] = false
-        cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+      if(@players_data[@uuid]['chat'][1]) {
+        @players_data[@uuid]['chat'][1] = false
+        cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
         _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
       } else {
-        @players_data[@uuid]['setting'][1] = true
-        cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+        @players_data[@uuid]['chat'][1] = true
+        cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
         _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
       }
     }

@@ -28,27 +28,6 @@ async_read('files/general_emoji.json', closure(@value) {
   @text['general_emoji'] = json_decode(@value)
 })
 
-## 플레이어 관련 데이터
-
-/* 봇 인식 (구 플러그인 메시지)
-  @bots = array(
-    'c45537c6-39d3-459e-9a48-86f938a9c0dd', #dohun1
-    'b5ee7eb3-f4e8-4ab4-82e4-e97c60a6b8c1', #Loplove
-    'ff1cb130-7152-4609-8cbc-76884c7444bd', #Geralt_w
-    '5c400342-2909-4571-8c45-7833a076b1dd', #AppleCrepe
-    'bee4cc4e-ebd4-472c-9751-32d2655e9848', #CreamCrepe
-    '9dfadbe7-9ad1-4048-9cdd-228f8db82be7'  #1L_Bottle
-  )
-  @bots_name = array(
-    'dohun1', #dohun1
-    'Loplove', #Loplove
-    'Geralt_w', #Geralt_w
-    'AppleCrepe', #AppleCrepe
-    'creamcrepe',  #CreamCrepe
-    '1L_Bottle' #1L_Bottle
-  )
-*/
-
 # 서버 이동중으로 인식할 플레이어 목록
 @reconnectable_players = array()
 
@@ -79,9 +58,9 @@ async_read('files/crops_spec.json', closure(@value) {
 ## 화면 관련
 # 액션바
 proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
-  switch(@player_data['setting'][1]) {
+  switch(@player_data['chat'][1]) {
   case true:
-    switch(@player_data['setting'][0]) {
+    switch(@player_data['chat'][0]) {
     case 'general':
       @channel = '\ue3fd'
     case 'guild':
@@ -94,7 +73,7 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
       @channel = '\ue3fd'
     }
   case false:
-  switch(@player_data['setting'][0]) {
+  switch(@player_data['chat'][0]) {
     case 'general':
       @channel = '\ue3fe'
     case 'guild':
@@ -363,7 +342,7 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
     @hotbar = @text['space_fonts']['space.23']
     @icon = @text['space_fonts']['space.17']
   }
-  if(@player_data['setting'][13]) {
+  if(@player_data['setting'][1]) {
     @left_hotbar = @text['space_fonts']['space.23']
     @left_icon = @text['space_fonts']['space.17']
     @right_hotbar = @hotbar
@@ -376,7 +355,7 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
   }
   @left_surface = '§c\ue3f8§r'.@text['space_fonts']['space.-8'].'\ue006'.@text['space_fonts']['space.-8'].'\ue007'.@text['space_fonts']['space.-1']
   @right_surface = '§c\ue3f8§r'.@text['space_fonts']['space.-2']
-  @resolution = @player_data['setting'][12]
+  @resolution = @player_data['setting'][0]
   if(@resolution % 2 == 0) {
     @left_resolution = integer(@resolution / 2)
     @right_resolution = integer(@resolution / 2)

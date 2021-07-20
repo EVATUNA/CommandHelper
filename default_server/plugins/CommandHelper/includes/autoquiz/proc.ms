@@ -7,8 +7,8 @@ export('evaquiz.reward', 0)
 export('evaquiz.status', 0)
 export('evaquiz.settime', 0)
 export('evaquiz.chance', 0)
-export('evaquiz.proverb.ko', split('\n', comp_read('proverb_ko.txt')))
-export('evaquiz.proverb.en', split('\n', comp_read('proverb_en.txt')))
+//export('evaquiz.proverb.ko', split('\n', comp_read('proverb_ko.txt')))
+//export('evaquiz.proverb.en', split('\n', comp_read('proverb_en.txt')))
 
 register_command('quiztest', array(
     permission: 'admin.use',
