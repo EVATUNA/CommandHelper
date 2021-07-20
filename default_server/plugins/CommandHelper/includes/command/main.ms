@@ -299,8 +299,8 @@ register_command('channel', array(
     if(array_size(@args) == 1) {
       @return = array('default', 'local')
       @uuid = puuid(@player)
-      if(!is_null(moori_get_player_guild_id(@uuid))) {
-        @return[] = 'guild'
+      if(!is_null(tunalands_get_player_rank(@uuid))) {
+        @return[] = 'town'
       }
       if(pisop(@player)) {
         @return[] = 'admin'
@@ -314,58 +314,58 @@ register_command('channel', array(
     @uuid = puuid(@player)
     if(array_index_exists(@players_data, @uuid)) {
       if(array_size(@args) == 0) {
-        switch(@players_data[@uuid]['setting'][0]) {
+        switch(@players_data[@uuid]['chat'][0]) {
         case 'local':
-          if(!is_null(moori_get_player_guild_id(@uuid))) {
-            @players_data[@uuid]['setting'][0] = 'guild'
+          if(!is_null(tunalands_get_player_rank(@uuid))) {
+            @players_data[@uuid]['chat'][0] = 'town'
           } else {
             if(pisop(@player)) {
-              @players_data[@uuid]['setting'][0] = 'admin'
+              @players_data[@uuid]['chat'][0] = 'admin'
             } else {
-              @players_data[@uuid]['setting'][0] = 'default'
+              @players_data[@uuid]['chat'][0] = 'default'
             }
           }
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
           break()
-        case 'guild':
+        case 'town':
           if(pisop(@player)) {
-            @players_data[@uuid]['setting'][0] = 'admin'
+            @players_data[@uuid]['chat'][0] = 'admin'
           } else {
-            @players_data[@uuid]['setting'][0] = 'default'
+            @players_data[@uuid]['chat'][0] = 'default'
           }
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
           break()
         case 'admin':
-          @players_data[@uuid]['setting'][0] = 'default'
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          @players_data[@uuid]['chat'][0] = 'default'
+          cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
           break()
         default:
-          @players_data[@uuid]['setting'][0] = 'local'
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          @players_data[@uuid]['chat'][0] = 'local'
+          cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
           break()
         }
         _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
       } else if(array_size(@args) == 1) {
         switch(@args[0]) {
         case 'local':
-          @players_data[@uuid]['setting'][0] = 'local'
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          @players_data[@uuid]['chat'][0] = 'local'
+          cup_set('chat', @uuid, @players_data[@uuid]['chat'])
           break()
-        case 'guild':
-          if(!is_null(moori_get_player_guild_id(@uuid))) {
-            @players_data[@uuid]['setting'][0] = 'guild'
-            cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+        case 'town':
+          if(!is_null(tunalands_get_player_rank(@uuid))) {
+            @players_data[@uuid]['chat'][0] = 'town'
+            cup_set('chat', @uuid, @players_data[@uuid]['chat'])
           }
           break()
         case 'admin':
           if(pisop(@player)) {
-            @players_data[@uuid]['setting'][0] = 'admin'
-            cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+            @players_data[@uuid]['chat'][0] = 'admin'
+            cup_set('chat', @uuid, @players_data[@uuid]['chat'])
           }
           break()
         default:
-          @players_data[@uuid]['setting'][0] = 'default'
-          cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+          @players_data[@uuid]['chat'][0] = 'default'
+          cup_set('chat', @uuid, @players_data[@uuid]['chat'])
           break()
         }
         _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
@@ -374,7 +374,7 @@ register_command('channel', array(
   }
 ))
 
-register_command('whisper', array(
+register_command('whisper', array( // last whisper 저장해서 /r 명령어 사용 가능하도록 만들기
   'aliases': array('w', 'm', 'msg', 'tell', '귓속말', '귓'),
   'tabcompleter': closure(@command, @player, @args) {
     if(array_size(@args) == 1) {
@@ -645,7 +645,7 @@ register_command('setting', array(
 ))
 # 화면 설정 (GUI)
 proc _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @skills_spec, @text) {
-  @is_using_right_hand = @players_data[@uuid]['setting'][13]
+  @is_using_right_hand = @players_data[@uuid]['setting'][1]
   if(@is_using_right_hand) {
     @left_skill_hud = '\uec1b'
     @right_skill_hud = '\uec1c'
@@ -654,7 +654,7 @@ proc _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @s
     @right_skill_hud = '\uec1b'
   }
   @texture_layer = @text['space_fonts']['space.-8'].'\uebff'.@text['space_fonts']['space.-169'].'\uec00'.@text['space_fonts']['space.-80'].@left_skill_hud.@text['space_fonts']['space.85'].@right_skill_hud.@text['space_fonts']['space.-146']
-  @message = 'HUD 표시 너비 설정 :: '.@players_data[@uuid]['setting'][12]
+  @message = 'HUD 표시 너비 설정 :: '.@players_data[@uuid]['setting'][0]
   @inventory = array()
   for(@index = 0, @index < 27, @index++) {
     @inventory[@index] = array(
@@ -809,33 +809,33 @@ proc _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @s
 
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_spec, @text) {
     bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_spec, @text) {
-      @is_using_right_hand = @players_data[@uuid]['setting'][13]
+      @is_using_right_hand = @players_data[@uuid]['setting'][1]
       cancel()
       if(@event['action'] == 'PICKUP_ALL') {
         @is_size_changed = false
-        @new_resolution = @players_data[@uuid]['setting'][12]
+        @new_resolution = @players_data[@uuid]['setting'][0]
         @new_is_using_right_hand = null
         switch(@event['rawslot']) {
         case 1:
-          @new_resolution = @players_data[@uuid]['setting'][12] - 100
+          @new_resolution = @players_data[@uuid]['setting'][0] - 100
           break()
         case 2:
-          @new_resolution = @players_data[@uuid]['setting'][12] - 10
+          @new_resolution = @players_data[@uuid]['setting'][0] - 10
           break()
         case 3:
-          @new_resolution = @players_data[@uuid]['setting'][12] - 1
+          @new_resolution = @players_data[@uuid]['setting'][0] - 1
           break()
         case 4:
           @new_resolution = 427
           break()
         case 5:
-          @new_resolution = @players_data[@uuid]['setting'][12] + 1
+          @new_resolution = @players_data[@uuid]['setting'][0] + 1
           break()
         case 6:
-          @new_resolution = @players_data[@uuid]['setting'][12] + 10
+          @new_resolution = @players_data[@uuid]['setting'][0] + 10
           break()
         case 7:
-          @new_resolution = @players_data[@uuid]['setting'][12] + 100
+          @new_resolution = @players_data[@uuid]['setting'][0] + 100
           break()
         case 19:
           @new_is_using_right_hand = false
@@ -847,7 +847,7 @@ proc _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @s
           break()
         }
         if(!is_null(@new_is_using_right_hand) && @is_using_right_hand != @new_is_using_right_hand) {
-          @players_data[@uuid]['setting'][13] = @new_is_using_right_hand
+          @players_data[@uuid]['setting'][1] = @new_is_using_right_hand
           cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           if(@new_is_using_right_hand) {
             @left_skill_hud = '\uec1b'
@@ -864,14 +864,14 @@ proc _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @s
         } else if(@new_resolution > 32767) {
           @new_resolution = 32767
         }
-        if(@new_resolution != @players_data[@uuid]['setting'][12]) {
-          @players_data[@uuid]['setting'][12] = @new_resolution
+        if(@new_resolution != @players_data[@uuid]['setting'][0]) {
+          @players_data[@uuid]['setting'][0] = @new_resolution
           cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
           @is_size_changed = true
         }
         if(@is_size_changed) {
           _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
-          @message = 'HUD 표시 너비 설정 :: '.@players_data[@uuid]['setting'][12]
+          @message = 'HUD 표시 너비 설정 :: '.@players_data[@uuid]['setting'][0]
           _show_gui(@player, 'screen_setting', 27, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_spec, @text)
         }
       }
@@ -891,11 +891,11 @@ register_command('screen', array(
 proc _hud_command(@command, @player, @args, @prefix, @uuid, @players_data, @skills_spec, @text) {
   switch(array_size(@args)) {
   case 0:
-    msg('\ue4dd §e/hud <너비>§7를 통해 HUD 표시 너비를 수정할 수 있습니다. (현재 너비:'.@players_data[@uuid]['setting'][12].')')
+    msg('\ue4dd §e/hud <너비>§7를 통해 HUD 표시 너비를 수정할 수 있습니다. (현재 너비:'.@players_data[@uuid]['setting'][0].')')
     break()
   case 1:
     if(is_integral(@args[0]) && integer(@args[0]) >= 256 && integer(@args[0]) < 32768 ) {
-      @players_data[@uuid]['setting'][12] = integer(@args[0])
+      @players_data[@uuid]['setting'][0] = integer(@args[0])
       _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
       cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
     } else {
@@ -1147,8 +1147,8 @@ proc _setbadge_command(@command, @player, @args, @prefix, @players_data) {
     if(ponline(@target_name)) {
       @target_uuid = puuid(@target_name)
       @badge = char_from_unicode(parse_int(replace(@args[1], '\\u', ''), 16))
-      @players_data[@target_uuid]['setting'][11] = @badge
-      cup_set('SETTING', @target_uuid, @players_data[@target_uuid]['setting'])
+      @players_data[@target_uuid]['decoration'][0] = @badge
+      cup_set('DECORATION', @target_uuid, @players_data[@target_uuid]['decoration'])
     }
   }
 }
@@ -1166,16 +1166,17 @@ register_command('setbadge', array(
     _setbadge_command(@command, @player, @args, @prefix, @players_data)
   }
 ))
+
 proc _chatobserver_command(@command, @player, @args, @prefix, @players_data) {
   @uuid = puuid(@player)
-  @chat_observer_mode = @players_data[@uuid]['setting'][8]
+  @chat_observer_mode = @players_data[@uuid]['chat'][3]
   if(@chat_observer_mode == true) {
-    @players_data[@uuid]['setting'][8] = false
-    cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+    @players_data[@uuid]['chat'][3] = false
+    cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
     msg('감시 오프')
   } else {
-    @players_data[@uuid]['setting'][8] = true
-    cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
+    @players_data[@uuid]['chat'][3] = true
+    cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
     msg('감시 온')
   }
 }

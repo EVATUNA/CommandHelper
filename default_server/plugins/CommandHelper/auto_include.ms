@@ -528,7 +528,7 @@ proc _set_indicator(@player, @uuid, @players_data, @text) {
       @ui = '\ue4b2'
       break()
     }
-    @resolution = @players_data[@uuid]['setting'][12]
+    @resolution = @players_data[@uuid]['setting'][0]
     if(@resolution % 2 == 0) {
       @left_resolution = integer(@resolution / 2)
       @right_resolution = integer(@resolution / 2)

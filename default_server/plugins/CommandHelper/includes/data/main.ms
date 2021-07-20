@@ -33,7 +33,7 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
 
   # skill
   _load_skills(@player_data, @player, @uuid, @skills_spec)
-  
+
   # bossbar
   @bossbars = get_bars()
   ## 인디케이터
@@ -251,22 +251,22 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
       # action bar msg
       _send_action_msg(@player, @player_data, @skills_spec, @text)
       # boss bar msg
-      if(!is_null(@players_data[@uuid]['cache']['indicator'])) {
-        if(@players_data[@uuid]['cache']['indicator']['countdown'] > 0) {
-          @players_data[@uuid]['cache']['indicator']['countdown'] -= 1
-        } else {
-          @players_data[@uuid]['cache']['indicator'] = null
-        }
-        _set_indicator(@player, @uuid, @players_data, @text)
-      }
-      if(array_size(@players_data[@uuid]['cache']['tips']) > 0) {
-        if(@players_data[@uuid]['cache']['tips'][0]['countdown'] > 0) {
-          @players_data[@uuid]['cache']['tips'][0]['countdown'] -= 1
-        } else {
-          array_remove(@players_data[@uuid]['cache']['tips'], 0)
-        }
-        _set_tips(@player, @uuid, @players_data)
-      }
+      //if(!is_null(@players_data[@uuid]['cache']['indicator'])) {
+      //  if(@players_data[@uuid]['cache']['indicator']['countdown'] > 0) {
+      //    @players_data[@uuid]['cache']['indicator']['countdown'] -= 1
+      //  } else {
+      //    @players_data[@uuid]['cache']['indicator'] = null
+      //  }
+      //  _set_indicator(@player, @uuid, @players_data, @text)
+      //}
+      //if(array_size(@players_data[@uuid]['cache']['tips']) > 0) {
+      //  if(@players_data[@uuid]['cache']['tips'][0]['countdown'] > 0) {
+      //    @players_data[@uuid]['cache']['tips'][0]['countdown'] -= 1
+      //  } else {
+      //    array_remove(@players_data[@uuid]['cache']['tips'], 0)
+      //  }
+      //  _set_tips(@player, @uuid, @players_data)
+      //}
 
       # 액티브 스킬 카운드다운
       foreach(@skill: @active_skill in @player_data['active_skill']) { // 활성화된 액티브 스킬 포리치

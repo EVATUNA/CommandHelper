@@ -1,6 +1,8 @@
-/hex = >>>
-  broadcast(replace(_color("#ffffff"), '§', '&'))
-  #'§'
+/tu test = >>>
+broadcast(tunalands_get_player_rank(puuid()))
+broadcast(tunalands_get_player_lands_member_list(puuid()))
+tunalands_get_player_rank(puuid())
+tunalands_get_player_lands_member_list(puuid())
 <<<
 
 /sattr $attr $id $amount $oper = >>>

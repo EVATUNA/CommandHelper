@@ -166,6 +166,7 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
   # 투자한 총 포인트 선언
   @invested_point = 0
   # 액티브 스킬 배열 선언
+  @player_data['skill_data'] = array()
   @player_data['active_skill'] = array()
   # 스킬 데이터 로드 및, 스킬 효과 적용 (모든 스킬 데이터 로드시 선택한 스킬,룬 이라면 로드.ms 작동해야 함)
   foreach(@skill: @skill_spec in @skills_spec) {
