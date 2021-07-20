@@ -196,99 +196,6 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
 # 버튼이랑 메인 나누기
 # 버튼 누를시 포인트 찍은거 인식
 
-proc _open_combat_skill(@player, @uuid, @skill_manager, @invested_point, @skills_data, @skills_info, @text) {
-  # 레벨
-  @level = @skill_manager[0]
-  # 경험치
-  @experience = @skill_manager[1]
-  # 포인트
-  @total_point = @skill_manager[2]
-  @remaining_point = @total_point - @invested_point
-  # 선택한 전투 방식
-  @selected_methods = @skill_manager[4]
-  @selected_combat_method = @selected_methods['combat_method']
-  # GUI 기본 데이터 선언
-  @texture_layer = ''
-  @message = '전투'
-  @inventory = array()
-  for(@index = 0, @index < 27, @index++) {
-    @inventory[@index] = array(
-      'name': 'STRUCTURE_VOID',
-      'meta': array(
-        'display': ' ',
-        'model': 1
-      )
-    )
-  }
-  # 스킬 배치
-  @skill_setup = array(
-    'sweeping': array(
-      'icon': 10,
-      'button': 19
-    ),
-    'knockback': array(
-      'icon': 12,
-      'button': 21
-    ),
-    'cleaving': array(
-      'icon': 14,
-      'button': 23
-    ),
-    'blocking': array(
-      'icon': 16,
-      'button': 25
-    ),
-    'bow_mastery': array(
-      'icon': 28,
-      'button': 37
-    ),
-    'crossbow_mastery': array(
-      'icon': 30,
-      'button': 39
-    ),
-    'health_traing': array(
-      'icon': 32,
-      'button': 41
-    )
-  )
-  foreach(@skill: @slots in @skill_setup) {
-    @skill_point = @skills_data[@skill][0]
-    @skill_max_point = @skills_data[@skill][1]
-    @skill_info = @skills_info[@skill]
-    @skill_name = @skill_info['name']
-    @skill_icon = @skill_info['icon']
-    @skill_desriptions = @skill_info['desriptions'][@skill_point]
-    if(array_size(@skill_desriptions) > 0) {
-      if(array_size(@skill_desriptions) - 1 < @skill_point) {
-        @desription_index = array_size(@skill_desriptions) - 1
-      } else {
-        @desription_index = @skill_point
-      }
-      @skill_desription = @skill_desriptions[@desription_index]
-    } else {
-      @skill_desription = array()
-    }
-    @inventory[@slots['icon']]['meta']['display'] = "§fLv.@skill_point @skill_name"
-    @inventory[@slots['icon']]['meta']['lore'] = @skill_desription
-    @inventory[@slots['icon']]['meta']['model'] = @skill_icon
-  }
-  # GUI 이벤트 익스큐터 설정
-  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @skill_manager, @invested_point, @skills_data, @skills_info, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @id, @skill_manager, @invested_point, @skills_data, @skills_info, @text) {
-      cancel()
-      if(@event['action'] == 'PICKUP_ALL') {
-        switch(@event['rawslot']) {
-        case 0:
-          break()
-        }
-      }
-    }
-  }
-  # GUI 보여주기
-  _show_gui(@player, 'skillbook_combat', 54, @texture_layer, @message, @inventory, @closure, @skill_manager, @invested_point, @skills_data, @skills_info, @text)
-}
-
-
 # @skill_manager = @player_data['skill_manager']
 # @invested_point = @player_data['invested_point']
 #  # 룬 슬롯 갯수
@@ -301,6 +208,155 @@ proc _open_combat_skill(@player, @uuid, @skill_manager, @invested_point, @skills
 #  # 선택한 룬들
 #  @selected_runes = @skill_manager[5]
 # _open_skill_???page() 쓰기전 위의 변수들 선언 되어야 함
+
+proc _open_combat_skill(@player, @uuid, @player_data, @skills_info, @text) {
+  # 스킬 매니저
+  @skill_manager = @player_data['skill_manager']
+  # 스킬 데이터
+  @skills_data = @player_data['skill_data']
+  # 사용 포인트
+  @invested_point = @player_data['invested_point']
+  # 레벨
+  @level = @skill_manager[0]
+  # 경험치
+  @experience = @skill_manager[1]
+  # 총 포인트, 남은 포인트
+  @total_point = @skill_manager[2]
+  @remaining_point = @total_point - @invested_point
+  # 선택한 전투 방식
+  @selected_methods = json_decode(@skill_manager[4])
+  @selected_combat_method = @selected_methods['combat_method']
+  # GUI 기본 데이터 선언
+  @texture_layer = ''
+  @message = '전투'
+  @inventory = array()
+  for(@index = 0, @index < 54, @index++) {
+    @inventory[@index] = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': ' ',
+        'model': 1
+      )
+    )
+  }
+  # 스킬 배치
+  @skill_setup = array(
+    'sweeping': array(
+      'slot_type': 'combat_method',
+      'icon': 10,
+      'button': 19
+    ),
+    'knockback': array(
+      'slot_type': 'combat_method',
+      'icon': 12,
+      'button': 21
+    ),
+    'cleaving': array(
+      'slot_type': 'combat_method',
+      'icon': 14,
+      'button': 23
+    ),
+    'blocking': array(
+      'slot_type': 'combat_method',
+      'icon': 16,
+      'button': 25
+    ),
+    'bow_mastery': array(
+      'slot_type': 'subcombat',
+      'icon': 28,
+      'button': 37
+    ),
+    'crossbow_mastery': array(
+      'slot_type': 'subcombat',
+      'icon': 30,
+      'button': 39
+    ),
+    'health_traing': array(
+      'slot_type': 'subcombat',
+      'icon': 32,
+      'button': 41
+    )
+  )
+  broadcast(@remaining_point '/' @total_point '( 사용한 포인트:'@invested_point')')
+  foreach(@skill: @slots in @skill_setup) {
+    @skill_point = @skills_data[@skill][0]
+    @skill_max_point = @skills_data[@skill][1]
+    @skill_info = @skills_info[@skill]
+    @skill_icon = @skill_info['icon']
+    @skill_display = @skill_info['display']
+    @skill_desriptions = @skill_info['desriptions']
+    if(array_size(@skill_desriptions) > 0) {
+      if(array_size(@skill_desriptions) - 1 < @skill_point) {
+        @desription_index = array_size(@skill_desriptions) - 1
+      } else {
+        @desription_index = @skill_point
+      }
+      @skill_desription = @skill_desriptions[@desription_index]
+    } else {
+      @skill_desription = ''//array()
+    }
+    @inventory[@slots['icon']]['name'] = 'STONE' // 제거해야 함
+    @inventory[@slots['icon']]['skill'] = @skill
+    @inventory[@slots['icon']]['slot_type'] = @slots['slot_type']
+    @inventory[@slots['icon']]['meta']['display'] = "§fLv.@skill_point @skill_display"
+    @inventory[@slots['icon']]['meta']['lore'] = array(@skill_desription) //@skill_desriptio
+    @inventory[@slots['icon']]['meta']['model'] = 10 //@skill_icon
+
+    if(@skills_data[@skill][0] < @skills_data[@skill][1]) { //앞에 남은 포인트가 있을시 조건 추가하기
+      @inventory[@slots['button']]['name'] = 'DIRT' // 제거해야 함
+      @inventory[@slots['button']]['skill'] = @skill
+      @inventory[@slots['button']]['slot_type'] = 'button'
+      @inventory[@slots['button']]['meta']['display'] = '좌클릭 시, 포인트를 사용합니다.'
+      @inventory[@slots['button']]['meta']['lore'] = '설명'
+    }
+  }
+  # GUI 이벤트 익스큐터 설정
+  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @player_data, @skills_info, @text) {
+    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @player_data, @skills_info, @text) {
+      cancel()
+      # 스킬 매니저
+      @skill_manager = @player_data['skill_manager']
+      # 스킬 데이터
+      @skills_data = @player_data['skill_data']
+      # 사용 포인트
+      @invested_point = @player_data['invested_point']
+      @slot = @event['rawslot']
+      //broadcast(@inventory[@slot])
+      if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
+        switch(@inventory[@slot]['slot_type']) {
+        case 'combat_method':
+          @skill = @inventory[@slot]['skill']
+          broadcast(A @skill @skills_data[@skill])
+          break()
+        case 'subcombat':
+          break()
+        case 'button':
+          @skill = @inventory[@slot]['skill']
+          broadcast(@skills_data[@skill])
+          @skills_data[@skill][0] += 1
+          broadcast(A1 @player_data['invested_point'])
+          @player_data['invested_point'] += 1
+          broadcast(B @player_data['invested_point'])
+          _set_skill_data(@uuid, @skill, @skills_data[@skill])
+          broadcast(B @skill @skills_data[@skill])
+          runas(@player, '/skill')
+          break()
+        }
+      }
+      if(@event['action'] == 'PICKUP_ALL') {
+        switch(@event['rawslot']) {
+        case 0:
+          break()
+        }
+      }
+    }
+  }
+  # GUI 보여주기
+  _show_gui(@player, 'skillbook_combat', 54, @texture_layer, @message, @inventory, @closure, @player_data, @skills_info, @text)
+}
+
+
+
 
 
 proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, @text) {
@@ -1372,189 +1428,6 @@ proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, 
     break()
   }
 }
-
-register_command('skillbook', array(
-  'description': 'can see skill book',
-  'usage': '/skillbook',
-  'aliases': array('skill', 'abilitybook', 'ability', 'masterybook', 'mastery', '스킬북', '스킬', '어빌리티북', '어빌리티', '마스터리북', '마스터리'),
-  'tabcompleter': closure(@command, @player, @args) { return(array()) },
-  'executor': closure(@command, @player, @args) { 
-    @uuid = puuid(@player)
-    @player_skill_data = @players_data[@uuid]['skill_data']
-    if(array_size(@args) > 0) {
-      switch(@args[0]) {
-      case 'open':
-        switch(@args[1]) {
-        case 'combat':
-          _open_skillbook(@player, 'combat', null, @players_data, @skills_info, @text)
-          break()
-        case 'combat_method':
-          _open_skillbook(@player, 'combat_method', null, @players_data, @skills_info, @text)
-          break()
-        case 'combat_inclination':
-          if(array_size(@args) == 2) {
-            @subpage = 0
-          } else {
-            @subpage = @args[2]
-          }
-          _open_skillbook(@player, 'combat_inclination', @subpage, @players_data, @skills_info, @text)
-          break()
-        case 'farming':
-          if(array_size(@args) == 2) {
-            @subpage = 0
-          } else {
-            @subpage = @args[2]
-          }
-          _open_skillbook(@player, 'farming', @subpage, @players_data, @skills_info, @text)
-          break()
-        case 'farming_method':
-          _open_skillbook(@player, 'farming_method', null, @players_data, @skills_info, @text)
-          break()
-        case 'mining':
-          if(array_size(@args) == 2) {
-            @subpage = 0
-          } else {
-            @subpage = @args[2]
-          }
-          _open_skillbook(@player, 'mining', @subpage, @players_data, @skills_info, @text)
-          break()
-        }
-        break()
-      case 'select':
-        switch(@args[1]) {
-        case 'combat_method':
-          @players_data[@uuid]['skill_manager'][2] = @args[2]
-          cup_set('SKILL_MANAGER', @uuid, @players_data[@uuid]['skill_manager'])
-          _reset_skill_effect(@uuid, 'combat_method')
-          @level = @players_data[@uuid]['skill_data']['combat_method'][@args[2]][0]
-          _set_skill_effect(@uuid, 'combat_method', @args[2], @level, @players_data, @skills_spec)
-          _open_skillbook(@player, 'combat_method', null, @players_data, @skills_info, @text)
-          break()
-        case 'combat_inclination':
-          _open_skillbook(@player, 'combat_inclination', @args[2], @players_data, @skills_info, @text)
-          break()
-        case 'harvesting_method':
-          @players_data[@uuid]['skill_manager'][3] = @args[2]
-          cup_set('SKILL_MANAGER', @uuid, @players_data[@uuid]['skill_manager'])
-          _reset_skill_effect(@uuid, 'combat_method')
-          @level = @players_data[@uuid]['skill_data']['harvesting_method'][@args[2]][0]
-          _set_skill_effect(@uuid, 'harvesting_method', @args[2], @level, @players_data, @skills_spec)
-          _open_skillbook(@player, 'farming_method', null, @players_data, @skills_info, @text)
-          break()
-        case 'sowing_method':
-          @players_data[@uuid]['skill_manager'][4] = @args[2]
-          cup_set('SKILL_MANAGER', @uuid, @players_data[@uuid]['skill_manager'])
-          _reset_skill_effect(@uuid, 'combat_method')
-          @level = @players_data[@uuid]['skill_data']['sowing_method'][@args[2]][0]
-          _set_skill_effect(@uuid, 'sowing_method', @args[2], @level, @players_data, @skills_spec)
-          _open_skillbook(@player, 'farming_method', null, @players_data, @skills_info, @text)
-          break()
-        }
-        _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
-        break()
-      case 'unselect':
-        switch(@args[1]) {
-        case 'combat_method':
-          @players_data[@uuid]['skill_manager'][2] = ''
-          cup_set('SKILL_MANAGER', @uuid, @players_data[@uuid]['skill_manager'])
-          _reset_skill_effect(@uuid, 'combat_method')
-          _open_skillbook(@player, 'combat_method', null, @players_data, @skills_info, @text)
-          break()
-        case 'combat_inclination':
-          _open_skillbook(@player, 'combat_inclination', @args[2], @players_data, @skills_info, @text)
-          break()
-        case 'harvesting_method':
-          @players_data[@uuid]['skill_manager'][3] = ''
-          cup_set('SKILL_MANAGER', @uuid, @players_data[@uuid]['skill_manager'])
-          _reset_skill_effect(@uuid, 'combat_method')
-          _open_skillbook(@player, 'farming_method', null, @players_data, @skills_info, @text)
-          break()
-        case 'sowing_method':
-          @players_data[@uuid]['skill_manager'][4] = ''
-          cup_set('SKILL_MANAGER', @uuid, @players_data[@uuid]['skill_manager'])
-          _reset_skill_effect(@uuid, 'combat_method')
-          _open_skillbook(@player, 'farming_method', null, @players_data, @skills_info, @text)
-          break()
-        }
-        _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
-        break()
-      }
-    } else {
-      _open_skillbook(@player, 'combat', null, @players_data, @skills_info, @text)
-    }
-    
-    /*
-      
-      if(array_size(@args) == 1) {
-        switch(@args[0]) {
-        case 'open_combat_inclination':
-          _combat_inclination_page(@player, @player_skill_data, 0, @mastery_info, @text)
-          break()
-        case 'open_combat_method': 
-          _open_skillbook(@player, 'combat_method', null, @players_data, @skills_info, @text)
-          break()
-        case 'open_farming_method': 
-          _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
-          break()
-        case 'open_sowing_method': 
-          _sowing_method_page(@player, @player_skill_data, @mastery_info, @text)
-          break()
-        }
-      } else if(array_size(@args) == 2) {
-        switch(@args[0]) {
-        case 'open_combat_inclination':
-          _combat_inclination_page(@player, @player_skill_data, @args[1], @mastery_info, @text)
-          break()
-        }
-      } else if(array_size(@args) >= 3) {
-        @mastery = array_implode(array_get(@args, cslice(2, array_size(@args) - 1)), ' ')
-        switch(@args[0]) {
-        case 'select_combat_inclination':
-          @players_data[@uuid]['skill']['skills_manager']['selected_combat_inclinations'][] = @mastery
-          _combat_inclination_page(@player, @player_skill_data, @args[1], @mastery_info, @text)
-          break()
-        case 'unselect_combat_inclination':
-          array_remove_values(@players_data[@uuid]['skill']['skills_manager']['selected_combat_inclinations'], @mastery)
-          _combat_inclination_page(@player, @player_skill_data, @args[1], @mastery_info, @text)
-          break()
-        case 'select_combat_method':
-          @players_data[@uuid]['skill']['skills_manager']['selected_combat_method'] = array(
-            'name': @mastery
-          )
-          _combat_method_page(@player, @player_skill_data, @mastery_info, @text)
-          break()
-        case 'unselect_combat_method':
-          @players_data[@uuid]['skill']['skills_manager']['selected_combat_method'] = null
-          _combat_method_page(@player, @player_skill_data, @mastery_info, @text)
-          break()
-        case 'select_sowing_method':
-          @players_data[@uuid]['skill']['skills_manager']['selected_sowing_method'] = array(
-            'name': @mastery
-          )
-          _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
-          break()
-        case 'unselect_sowing_method':
-          @players_data[@uuid]['skill']['skills_manager']['selected_sowing_method'] = null
-          _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
-          break()
-        case 'select_harvesting_method':
-          @players_data[@uuid]['skill']['skills_manager']['selected_harvesting_method'] = array(
-            'name': @mastery
-          )
-          _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
-          break()
-        case 'unselect_harvesting_method':
-          @players_data[@uuid]['skill']['skills_manager']['selected_harvesting_method'] = null
-          _farming_method_page(@player, @player_skill_data, @mastery_info, @text)
-          break()
-        }
-      } else {
-        
-      }
-    */
-    #_open_masterybook(@player, @player_skill, @mastery_info, @text)
-  }
-))
 
 proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @minerals_spec, @skills_spec, @text) {
   @player_data = @players_data[@uuid]

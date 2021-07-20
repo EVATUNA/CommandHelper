@@ -539,7 +539,7 @@ register_command('whisper', array( // last whisper 저장해서 /r 명령어 사
 ))
 
 ###
-### GUI 명령어 (유틸, 설정)
+### GUI 명령어 (유틸, 설정, 스킬, 워프)
 ###
 
 #\\uF801\\ue540\\uF801\\ue540\\uF801\\ue540\\uF801\\ue540\\uF801\\ue56f\\uF801\\ue540\\uF801\\ue540\\uF801\\ue540\\uF801\\ue540\\uF81C\\uF81A\\uF802\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF81C\\uF81A\\uF802\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF81C\\uF81A\\uF802TunaLands
@@ -576,10 +576,7 @@ proc _util_command(@command, @player, @args, @prefix, @text) {
           runas(@player, '/warp')
           break()
         case 12:
-          close_pinv(@player)
-          set_timeout(1, closure() {
-            runas(@player, '/skill')
-          })
+          runas(@player, '/skill')
           break()
         case 14:
           break()
@@ -887,11 +884,12 @@ register_command('screen', array(
     _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @skills_spec, @text)
   }
 ))
+
 # 화면 설정 (명령어)
-proc _hud_command(@command, @player, @args, @prefix, @uuid, @players_data, @skills_spec, @text) {
+proc _hud_command(@command, @player, @args, @uuid, @players_data, @skills_spec, @text) {
   switch(array_size(@args)) {
   case 0:
-    msg('\ue4dd §e/hud <너비>§7를 통해 HUD 표시 너비를 수정할 수 있습니다. (현재 너비:'.@players_data[@uuid]['setting'][0].')')
+    msg(@text['prefix']['info']'§e/hud <너비>§7를 통해 HUD 표시 너비를 수정할 수 있습니다. (현재 너비:'.@players_data[@uuid]['setting'][0].')')
     break()
   case 1:
     if(is_integral(@args[0]) && integer(@args[0]) >= 256 && integer(@args[0]) < 32768 ) {
@@ -899,7 +897,7 @@ proc _hud_command(@command, @player, @args, @prefix, @uuid, @players_data, @skil
       _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
       cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
     } else {
-      msg('\ue4de §7256이상 32768미만의 정수만 입력 가능합니다.')
+      msg(@text['prefix']['failure']'§7256이상 32768미만의 정수만 입력 가능합니다.')
     }
     break()
   }
@@ -910,7 +908,7 @@ register_command('hud', array(
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
     @uuid = puuid(@player)
-    _hud_command(@command, @player, @args, @prefix, @uuid, @players_data, @skills_spec, @text)
+    _hud_command(@command, @player, @args, @uuid, @players_data, @skills_spec, @text)
   }
 ))
 
@@ -1138,6 +1136,44 @@ register_command('warp', array(
     _warp_command(@command, @player, @args, @prefix, @text, @server)
   }
 ))
+
+# 스킬
+proc _skill_command(@command, @player, @args, @text, @player_data, @skills_data, @skills_info) {
+  @uuid = puuid()
+  if(array_size(@args) == 0) {
+    @args[0] = 'combat'
+  }
+  switch(@args[0]) {
+  case 'combat':
+  case 'pvp':
+  case '전투':
+    _open_combat_skill(@player, @uuid, @player_data, @skills_info, @text)
+    break()
+  case 'farming':
+  case '농사':
+
+    break()
+  case 'mining':
+  case '채광':
+  case '채굴':
+  
+    break()
+  default:
+    msg(@text['prefix']['warn']'§7해당 스킬 카테고리를 찾을 수 없습니다.')
+    msg(' §e/'.@command.' [스킬 카테고리]§7를 통해 스킬북을 열 수 있습니다.')
+    break()
+  }
+}
+register_command('skillbook', array(
+  'aliases': array('skill', 'abilitybook', 'ability', 'masterybook', 'mastery', '스킬북', '스킬', '어빌리티북', '어빌리티', '마스터리북', '마스터리'),
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    @uuid = puuid(@player)
+    @player_data = @players_data[@uuid]
+    _skill_command(@command, @player, @args, @text, @player_data, @skills_data, @skills_info)
+  }
+))
+
 ###
 ### 어드민 명령어
 ###
@@ -1234,7 +1270,6 @@ register_command('broadcast', array(
     }
   }
 ))
-
 
 proc _chreload_command(@command, @player, @args, @prefix, @players_data) {
   foreach(@target_name in all_players()) {
