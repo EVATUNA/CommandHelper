@@ -1220,13 +1220,12 @@ bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_s
       }
       # 액티브 스킬을 쓸수 있을시
       if(@skill != '' && array_index_exists(@player_data['active_skill'], @skill)) {
-        @active_skill = @player_data['active_skill'][@skill]
         @point = @player_data['skill_data'][@skill][0]
         @skill_spec = @skills_spec[@skill]
         @proc_name = "_apply_active_by_@skill"
         if(is_proc(@proc_name)) {
-          call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skill_spec, @point, @active_skill)
-          _send_action_msg(@player, @player_data, @skills_spec, @text) // 액션바 설정
+          call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skill_spec, @point)
+          //_send_action_msg(@player, @player_data, @skills_spec, @text) // 액션바 설정
         }
       }
     }
