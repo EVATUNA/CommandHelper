@@ -86,30 +86,52 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
       @channel = '\ue3fe'
     }
   }
-  #hub 표시
-
-  @item = pinv(@player, pheld_slot(@player))
-  if(!is_null(@item)) {
-    if(array_contains(array('WOODEN_HOE', 'STONE_HOE', 'IRON_HOE', 'GOLDEN_HOE', 'DIAMOND_HOE', 'NETHERITE_HOE'), @item['name']) && @player_data['skill_manager'][3] != '') {
-      @category = 'harvesting_method'
-      @skill = @player_data['skill_manager'][3]
-    } else if(array_contains(array('WHEAT_SEEDS', 'BEETROOT_SEEDS', 'POTATO', 'CARROT', 'PUMPKIN_SEEDS', 'MELON_SEEDS', 'SWEET_BERRIES'), @item['name']) && @player_data['skill_manager'][4] != '') {
-      @category = 'sowing_method'
-      @skill = @player_data['skill_manager'][4]
+  # 스킬 매니징
+  @skill_manager = @player_data['skill_manager']
+  @selected_methods = json_decode(@skill_manager[4])
+  # 손에 든 아이템 구하기
+  @main_hand_item = @player_data['item']['main_hand']
+  @hoes = array(
+    'WOODEN_HOE',
+    'STONE_HOE',
+    'IRON_HOE',
+    'GOLDEN_HOE',
+    'DIAMOND_HOE',
+    'NETHERITE_HOE'
+  )
+  @seeds = array(
+    'WHEAT_SEEDS',
+    'BEETROOT_SEEDS',
+    'POTATO',
+    'CARROT',
+    'PUMPKIN_SEEDS',
+    'MELON_SEEDS',
+    'SWEET_BERRIES'
+  )
+  # 손에든 아이템에 따라 사용할 액티브 스킬 설정
+  if(!is_null(@main_hand_item)) { // 무언가 들고 있을시
+    if(array_contains(@hoes, @main_hand_item['name'])) {
+      @skill = @selected_methods['harvesting_method']
+    } else if(array_contains(@seeds, @main_hand_item['name'])) {
+      @skill = @selected_methods['sowing_method']
     } else {
-      @category = 'combat_method'
-      @skill = @player_data['skill_manager'][2]
+      @skill = @selected_methods['combat_method']
     }
-  } else {
-    @category = 'combat_method'
-    @skill = @player_data['skill_manager'][2]
+    if(@skill == '') { // 파종, 수확 스킬 선택 안했을시
+      @skill = @selected_methods['combat_method']
+    }
+  } else { // 특별한 도구 든거 없을시
+    @skill = @selected_methods['combat_method']
   }
-  if(@skill != '' && array_index_exists(@player_data, 'active_skill') && array_index_exists(@player_data['active_skill'], @category) && array_index_exists(@player_data['active_skill'][@category], @skill)) {
-    @level = @player_data['skill_data'][@category][@skill][0]
-    if(@skills_spec[@category][@skill]['levels'][@level]['active']['count'] == 0) {
-      if(@player_data['active_skill'][@category][@skill][1] > 0) {
-        @max_duration = @skills_spec[@category][@skill]['levels'][@level]['active']['duration']
-        @duration = @player_data['active_skill'][@category][@skill][1]
+  # 액티브 스킬을 쓸수 있을시
+  if(@skill != '' && array_index_exists(@player_data['active_skill'], @skill)) {
+    @active_skill = @player_data['active_skill'][@skill]
+    @point = @player_data['skill_data'][@skill][0]
+    @skill_spec = @skills_spec[@skill]
+    if(@skill_spec['effect_by_point'][@point]['active']['count'] == 0) {
+      @duration = @active_skill[1]
+      if(@duration > 0) {
+        @max_duration = @skill_spec['active_skill'][@skill]['active']['duration']
         @index = integer(@duration / @max_duration * 10)
         switch(@index) {
         case 0:
@@ -147,8 +169,8 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
           break()
         }
       } else {
-        @max_cooldown = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
-        @remain_cooldown = @max_cooldown - @player_data['active_skill'][@category][@skill][0]
+        @max_cooldown = @skill_spec['effect_by_point'][@point]['active']['cooldown']
+        @remain_cooldown = @max_cooldown - @active_skill[0]
         @index = integer(@remain_cooldown / @max_cooldown * 10)
         switch(@index) {
         case 0:
@@ -187,11 +209,10 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
         }
       }
     } else {
-      @max_cooldown = @skills_spec[@category][@skill]['levels'][@level]['active']['cooldown']
-      @remain_cooldown = @max_cooldown - @player_data['active_skill'][@category][@skill][0]
-      @skill_count = @player_data['active_skill'][@category][@skill][2]
+      @max_cooldown = @skill_spec['effect_by_point'][@point]['active']['cooldown']
+      @remain_cooldown = @max_cooldown - @active_skill[0]
+      @skill_count = @active_skill[2]
       @index = integer(@remain_cooldown / @max_cooldown * 10)
-      #broadcast(@skill_count @index @player_data['active_skill'][@category][@skill] @max_cooldown)
       switch(@skill_count) {
       case 0:
         switch(@index) {

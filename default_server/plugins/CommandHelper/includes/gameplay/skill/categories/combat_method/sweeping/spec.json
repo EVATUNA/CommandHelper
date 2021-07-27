@@ -20,7 +20,7 @@
 			},
 			"active": {
 				"attack_speed": 0.2,
-				"cooldown": 240,
+				"cooldown": 3,
 				"duration": 15,
 				"count": 0,
 				"energy": 0

@@ -327,19 +327,20 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
           if(@skills_data[@skill][0] > 0) {
             if(@selected_methods['combat_method'] == @skill) {
               @selected_methods['combat_method'] = ''
-              #broadcast('선택 해제')
               _reset_active_skill(@player_data, @uuid, @skill)
             } else {
+              # 사용중이였던 스킬 있을시 쿨탐 언로드
+              if(@selected_methods['combat_method'] != '') {
+                _reset_active_skill(@player_data, @uuid, @selected_methods['combat_method'])
+              }
+              # 선택한 스킬 액티브 스킬로 지정 및 쿨탐 로드
               @selected_methods['combat_method'] = @skill
-              #broadcast('스킬 선택')
               @point = @skills_data[@skill][0]
               @skill_spec = @skills_spec[@skill]
               _load_active_skill(@player_data, @uuid, @skill, @point, @skill_spec)
             }
             @skill_manager[4] = json_encode(@selected_methods)
-            #broadcast(@skill_manager)
           }
-          #broadcast(A @skill @skills_data[@skill])
           break()
         case 'subcombat':
           break()

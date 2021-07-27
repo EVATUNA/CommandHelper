@@ -243,7 +243,6 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
 }
 
 @interval_task = set_interval(1000, closure() {
-  #broadcast(@players_data)
   _countdown_reconnectable_players(@reconnectable_players)
   foreach(@uuid: @player_data in @players_data) {
     @player = player(@uuid)
@@ -269,13 +268,14 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
       //}
 
       # 액티브 스킬 카운드다운
+      broadcast(@player_data['active_skill'])
       foreach(@skill: @active_skill in @player_data['active_skill']) { // 활성화된 액티브 스킬 포리치
         @proc_name = "_apply_countdown_by_@skill"
         @skill_spec = @skills_spec[@skill]
         @point = @player_data['skill_data'][@skill][0]
         if(is_proc(@proc_name)) {
-          broadcast(@proc_name @player @skill @point @active_skill)
-          call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skill_spec, @point, @active_skill)
+          #broadcast(@proc_name @player @skill @point @active_skill)
+          call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skill_spec, @point)
         }
       }
 
