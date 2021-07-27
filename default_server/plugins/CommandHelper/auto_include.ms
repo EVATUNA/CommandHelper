@@ -129,10 +129,9 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
     @point = @player_data['skill_data'][@skill][0]
     @skill_spec = @skills_spec[@skill]
     if(@skill_spec['effect_by_point'][@point]['active']['count'] == 0) {
-      @duration = @active_skill[1]
-      if(@duration > 0) {
+      if(@active_skill[1] > 0) {
         @max_duration = @skill_spec['active_skill'][@skill]['active']['duration']
-        @index = integer(@duration / @max_duration * 10)
+        @index = integer(@active_skill[1] / @max_duration * 10)
         switch(@index) {
         case 0:
           @hotbar = '\ue406'
@@ -211,9 +210,8 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
     } else {
       @max_cooldown = @skill_spec['effect_by_point'][@point]['active']['cooldown']
       @remain_cooldown = @max_cooldown - @active_skill[0]
-      @skill_count = @active_skill[2]
       @index = integer(@remain_cooldown / @max_cooldown * 10)
-      switch(@skill_count) {
+      switch(@active_skill[2]) {
       case 0:
         switch(@index) {
         case 0:

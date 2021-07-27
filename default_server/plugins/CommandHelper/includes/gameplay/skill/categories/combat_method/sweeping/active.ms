@@ -5,9 +5,13 @@
 
 proc("_apply_active_by_@skill", @player_data, @player, @uuid, @skill, @skill_spec, @point) {
   @active_skill = @player_data['active_skill'][@skill]
-  if(@active_skill[2] > 0) { // 스킬 횟수 있을시
-    @active_skill[2] -= 1 // 스킬 횟소 차감
-    @active_skill[1] = @skill_spec['effect_by_point'][@point]['active']['duration'] // 스킬 지속시간 설정
+  #if(@active_skill[2] > 0) { // 스킬 횟수 있을시
+  
+    @active_skill[1] = 2 // 1 인덱스를 설정시 active
+    #@active_skill[2] = 2 //
+
+    #@active_skill[2] -= 1 // 스킬 횟소 차감
+    #@active_skill[1] = @skill_spec['effect_by_point'][@point]['active']['duration'] // 스킬 지속시간 설정
     # 어트리뷰트 설정
     @active_attack_speed = @skill_spec['effect_by_point'][@point]['active']['attack_speed']
     @modifier = array(
@@ -17,7 +21,7 @@ proc("_apply_active_by_@skill", @player_data, @player, @uuid, @skill, @skill_spe
       'name': 'sweeping_active'
     )
     add_entity_attribute_modifier(@uuid, @modifier)
-  }
+  #}
   # active_skill index:
   # 0 - countdown
   #@countdown = @active_skill[0]

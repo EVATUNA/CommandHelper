@@ -1224,6 +1224,7 @@ bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_s
         @skill_spec = @skills_spec[@skill]
         @proc_name = "_apply_active_by_@skill"
         if(is_proc(@proc_name)) {
+          broadcast('R' @player_data['active_skill'])
           call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skill_spec, @point)
           //_send_action_msg(@player, @player_data, @skills_spec, @text) // 액션바 설정
         }
