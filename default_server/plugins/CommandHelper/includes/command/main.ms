@@ -1,14 +1,3 @@
-## 자주 쓰는 접두사 선언
-@prefix = array(
-  'success': '\ue4dc',
-  'failure': '\ue4de',
-  'warn': '\ue4dd',
-  'info': '\ue4e3',
-  'broadcast': '\ue4db'
-)
-
-## 명령어
-
 # 리소스팩 링크 업데이트
 register_command('resourceurl', array(
   'description': 'You can set resourcepack download url.',
@@ -31,15 +20,18 @@ register_command('resourceurl', array(
   }
 ))
 
+# 프로시저
 proc _is_command_registered(@command) {
   return(array_index_exists(get_commands(), @command))
 }
+
+# 프리셋 명령어( help 등 )
 set_timeout(1000, closure() {
   ###
   ### 서버 정보 명령어
   ###
-  proc _info_command(@command, @player, @args, @prefix) {
-    msg(@prefix['info'].' §b서버 정보')
+  proc _info_command(@command, @player, @args, @text) {
+    msg(@text['prefix']['info'].' §b서버 정보')
     msg(' §7서버명: §f에바참치 §7(§fEvatuna§7)')
     msg(' §7서버 장르: 야생')
     msg(' §7총 관리자: 앨리스(§btele§f: @alicearcade, §7dis§f: AA_2#1787)')
@@ -58,23 +50,23 @@ set_timeout(1000, closure() {
       return(array())
     },
     'executor': closure(@command, @player, @args) {
-      _info_command(@command, @player, @args, @prefix)
+      _info_command(@command, @player, @args, @text)
     }
   ))
 
   register_command('cafe', array(
     'executor': closure(@cmd, @sender, @cArgs){
-      msg(@prefix['info']'§aNaverCafe §r : https://cafe.evatuna.fish')
+      msg(@text['prefix']['info']'§aNaverCafe §r : https://cafe.evatuna.fish')
     }
   ))
   register_command('discord', array(
     'executor': closure(@cmd, @sender, @cArgs){
-      msg(@prefix['info']'§7Discord §r : https://discord.evatuna.fish/')
+      msg(@text['prefix']['info']'§7Discord §r : https://discord.evatuna.fish/')
     }
   ))
   register_command('site', array(
     'executor': closure(@cmd, @sender, @cArgs){
-      msg(@prefix['info']'§9EvatunaOffical §r : https://evatuna.fish/')
+      msg(@text['prefix']['info']'§9EvatunaOffical §r : https://evatuna.fish/')
     }
   ))
   ###
@@ -123,7 +115,7 @@ set_timeout(1000, closure() {
     }
     _tellraw(@player, @raw)
   }
-  proc _help_commnad(@command, @player, @args, @prefix) {
+  proc _help_commnad(@command, @player, @args, @text) {
     # 페이지 구하기
     switch(array_size(@args)) {
     case 0:
@@ -143,7 +135,7 @@ set_timeout(1000, closure() {
     # 페이지에 따른 메시지
     @max_page = 4
     if(!is_null(@page)) {
-      msg(@prefix['info'].' §b/'.@command.' ['.@page.'/'.@max_page.'] §7< > = 필수 인자, [ ] = 선택 인자')
+      msg(@text['prefix']['info'].' §b/'.@command.' ['.@page.'/'.@max_page.'] §7< > = 필수 인자, [ ] = 선택 인자')
       msg('§e 명령어 좌클릭 시, 채팅창에 명령어가 입력됩니다.')
       switch(@page) {
       case 1:
@@ -190,7 +182,7 @@ set_timeout(1000, closure() {
         break()
       }
     } else {
-      msg(@prefix['warn'].' §e'.@command.' [페이지]')
+      msg(@text['prefix']['warn'].' §e'.@command.' [페이지]')
     }
   }
 
@@ -198,7 +190,7 @@ set_timeout(1000, closure() {
     'aliases': array('command', 'commands', 'cmd', 'cmds', '도움말', '명령어', '헬프', '커맨드'),
     'tabcompleter': closure(@command, @player, @args) { return(array()) },
     'executor': closure(@command, @player, @args) {
-      _help_commnad(@command, @player, @args, @prefix)
+      _help_commnad(@command, @player, @args, @text)
     }
   ))
 })
@@ -545,7 +537,7 @@ register_command('whisper', array( // last whisper 저장해서 /r 명령어 사
 #\\uF801\\ue540\\uF801\\ue540\\uF801\\ue540\\uF801\\ue540\\uF801\\ue56f\\uF801\\ue540\\uF801\\ue540\\uF801\\ue540\\uF801\\ue540\\uF81C\\uF81A\\uF802\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF801\\ue5a0\\uF81C\\uF81A\\uF802\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF801\\ue600\\uF81C\\uF81A\\uF802TunaLands
 
 # 유틸
-proc _util_command(@command, @player, @args, @prefix, @text) {
+proc _util_command(@command, @player, @args, @text) {
   @texture_layer = @text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-162'].@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-162'].@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-162']
   @message = '유틸'
   @inventory = array()
@@ -593,11 +585,11 @@ register_command('util', array(
   'aliases': array('유틸'),
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
-    _util_command(@command, @player, @args, @prefix, @text)
+    _util_command(@command, @player, @args, @text)
   }
 ))
 # 설정
-proc _setting_command(@command, @player, @args, @prefix, @text) {
+proc _setting_command(@command, @player, @args, @text) {
   @uuid = puuid(@player)
   @texture_layer = @text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-1'].'\ue540'.@text['space_fonts']['space.-162'].@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue59f'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-1'].'\ue5a0'.@text['space_fonts']['space.-162'].@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-1'].'\ue600'.@text['space_fonts']['space.-162']
   @message = '설정'
@@ -637,11 +629,11 @@ register_command('setting', array(
   'aliases': array('설정'),
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
-    _setting_command(@command, @player, @args, @prefix, @text)
+    _setting_command(@command, @player, @args, @text)
   }
 ))
 # 화면 설정 (GUI)
-proc _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @skills_spec, @text) {
+proc _screen_command(@command, @player, @args, @text, @uuid, @players_data, @skills_spec) {
   @is_using_right_hand = @players_data[@uuid]['setting'][1]
   if(@is_using_right_hand) {
     @left_skill_hud = '\uec1b'
@@ -881,12 +873,12 @@ register_command('screen', array(
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
     @uuid = puuid(@player)
-    _screen_command(@command, @player, @args, @prefix, @uuid, @players_data, @skills_spec, @text)
+    _screen_command(@command, @player, @args, @text, @uuid, @players_data, @skills_spec)
   }
 ))
 
 # 화면 설정 (명령어)
-proc _hud_command(@command, @player, @args, @uuid, @players_data, @skills_spec, @text) {
+proc _hud_command(@command, @player, @args, @text, @uuid, @players_data, @skills_spec) {
   switch(array_size(@args)) {
   case 0:
     msg(@text['prefix']['info']'§e/hud <너비>§7를 통해 HUD 표시 너비를 수정할 수 있습니다. (현재 너비:'.@players_data[@uuid]['setting'][0].')')
@@ -908,7 +900,7 @@ register_command('hud', array(
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
     @uuid = puuid(@player)
-    _hud_command(@command, @player, @args, @uuid, @players_data, @skills_spec, @text)
+    _hud_command(@command, @player, @args, @text, @uuid, @players_data, @skills_spec)
   }
 ))
 
@@ -1031,7 +1023,7 @@ register_command('hud', array(
   _show_gui(@player, 'chat_setting', 27, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_spec, @text)
 */
 # 워프
-proc _warp_command(@command, @player, @args, @prefix, @text, @server) {
+proc _warp_command(@command, @player, @args, @text, @server) {
   if(@server == 'main') {
     @random_teleport = @text['space_fonts']['space.-1'].'\uec09'.@text['space_fonts']['space.-1'].'\uec10'.@text['space_fonts']['space.-1'].'\uec17'
     @random_teleport_item = array(
@@ -1133,13 +1125,13 @@ register_command('warp', array(
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
     @uuid = puuid(@player)
-    _warp_command(@command, @player, @args, @prefix, @text, @server)
+    _warp_command(@command, @player, @args, @text, @server)
   }
 ))
 
 # 스킬
-proc _skill_command(@command, @player, @args, @text, @player_data, @skills_data, @skills_info) {
-  @uuid = puuid()
+proc _skill_command(@command, @player, @args, @text, @players_data, @skills_info, @skills_spec) {
+  @uuid = puuid(@player)
   if(array_size(@args) == 0) {
     @args[0] = 'combat'
   }
@@ -1147,7 +1139,7 @@ proc _skill_command(@command, @player, @args, @text, @player_data, @skills_data,
   case 'combat':
   case 'pvp':
   case '전투':
-    _open_combat_skill(@player, @uuid, @player_data, @skills_info, @text)
+    _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spec, @text)
     break()
   case 'farming':
   case '농사':
@@ -1168,16 +1160,14 @@ register_command('skillbook', array(
   'aliases': array('skill', 'abilitybook', 'ability', 'masterybook', 'mastery', '스킬북', '스킬', '어빌리티북', '어빌리티', '마스터리북', '마스터리'),
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
-    @uuid = puuid(@player)
-    @player_data = @players_data[@uuid]
-    _skill_command(@command, @player, @args, @text, @player_data, @skills_data, @skills_info)
+    _skill_command(@command, @player, @args, @text, @players_data, @skills_info, @skills_spec)
   }
 ))
 
 ###
 ### 어드민 명령어
 ###
-proc _setbadge_command(@command, @player, @args, @prefix, @players_data) {
+proc _setbadge_command(@command, @player, @args, @text, @players_data) {
   if(array_size(@args) == 2) {
     @target_name = @args[0]
     if(ponline(@target_name)) {
@@ -1199,11 +1189,11 @@ register_command('setbadge', array(
     return(@return)
   },
   'executor': closure(@command, @player, @args) {
-    _setbadge_command(@command, @player, @args, @prefix, @players_data)
+    _setbadge_command(@command, @player, @args, @text, @players_data)
   }
 ))
 
-proc _chatobserver_command(@command, @player, @args, @prefix, @players_data) {
+proc _chatobserver_command(@command, @player, @args, @text, @players_data) {
   @uuid = puuid(@player)
   @chat_observer_mode = @players_data[@uuid]['chat'][3]
   if(@chat_observer_mode == true) {
@@ -1220,7 +1210,7 @@ register_command('chatobserver', array(
   permission: 'chatobserver',
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
-    _chatobserver_command(@command, @player, @args, @prefix, @players_data)
+    _chatobserver_command(@command, @player, @args, @text, @players_data)
   }
 ))
 
@@ -1271,7 +1261,7 @@ register_command('broadcast', array(
   }
 ))
 
-proc _chreload_command(@command, @player, @args, @prefix, @players_data) {
+proc _chreload_command(@command, @player, @args, @text, @players_data) {
   foreach(@target_name in all_players()) {
     @target_uuid = puuid(@target_name)
     @inv_holder = pinventory_holder(@target_name)
@@ -1280,7 +1270,7 @@ proc _chreload_command(@command, @player, @args, @prefix, @players_data) {
     }
   }
   set_timeout(1, closure() {
-    broadcast(@prefix['broadcast'] _color('#80c8ff').'인스턴스 패치가 진행되어 일부 데이터가 초기화 되었습니다.')
+    broadcast(@text['prefix']['broadcast'] _color('#80c8ff').'인스턴스 패치가 진행되어 일부 데이터가 초기화 되었습니다.')
     run('/reloadalias')
   })
 }
@@ -1288,6 +1278,6 @@ register_command('chreload', array(
   permission: 'chreload',
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
-    _chreload_command(@command, @player, @args, @prefix, @players_data)
+    _chreload_command(@command, @player, @args, @text, @players_data)
   }
 ))

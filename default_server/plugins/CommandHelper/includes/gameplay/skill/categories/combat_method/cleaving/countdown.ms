@@ -2,7 +2,6 @@
 # @player_data, @player, @uuid,
 # @skill, @skill_spec, @point,
 # @active_skill
-
 proc("_apply_countdown_by_@skill", @player_data, @player, @uuid, @skill, @skill_spec, @point, @active_skill) {
   # active_skill index:
   # 0 - countdown
@@ -13,7 +12,6 @@ proc("_apply_countdown_by_@skill", @player_data, @player, @uuid, @skill, @skill_
   @count = @active_skill[2]
   # 3 - energy
   # 4 - is_activated
-
   if(@count == 0) {
     if(@duration > 0) { // 스킬 지속시간 있을시
       @duration -= 1 // 지속 시간 감소

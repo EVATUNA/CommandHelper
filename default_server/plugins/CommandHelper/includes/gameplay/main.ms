@@ -80,8 +80,8 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
         'point': @player_data['skill_data'][@selected_combat_method][0],
         'proc_name': @skill_proc_name
       )
+      @applying_skills[@selected_combat_method] = @applying_skill_data
     }
-    @applying_skills[@selected_combat_method] = @applying_skill_data
   }
   # 룬
   foreach(@selected_rune in @selected_runes) {

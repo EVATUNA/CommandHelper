@@ -40,11 +40,11 @@ foreach(@category in @categories) {
 # 스킬 매니저 get
 proc _get_skill_manager(@uuid) {
   @skill_manager = cup_get('SKILL_MANAGER', @uuid)
-  if(is_null(@skill_manager)) {
+  if(!is_null(@skill_manager)) {
     # 기본 값
     @default_level = 0
     @default_experience = 0
-    @default_total_point = 0
+    @default_total_point = 10 //0
     @default_rune_slot = 1
     @default_selected_methods = json_encode(
       array(
@@ -79,7 +79,7 @@ proc _set_skill_manager(@uuid, @skill_manager) {
 # 스킬 데이터 get
 proc _get_skill_data(@uuid, @skill, @skill_spec) {
   @skill_data = cup_get('SKILL_DATA', @uuid.'_'.@skill)
-  if(is_null(@skill_data)) {
+  if(!is_null(@skill_data)) {
     # 기본 값
     @default_point = 0
     @default_max_point = @skill_spec['default_max_point']
@@ -164,7 +164,7 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
   @selected_harvesting_method = @selected_methods['harvesting_method']
   @selected_runes = json_decode(@skill_manager[5])
   # 투자한 총 포인트 선언
-  @invested_point = 0
+  @player_data['invested_point'] = 0
   # 액티브 스킬 배열 선언
   @player_data['skill_data'] = array()
   @player_data['active_skill'] = array()
@@ -178,7 +178,7 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
     # 투자 포인트 계산
     @point = @skill_data[0]
     if(@category != 'rune') {
-      @invested_point += @point
+      @player_data['invested_point'] += @point
     }
     # 스킬 효과 적용 (로드시)
     @proc_name = "_apply_loading_by_@skill"
@@ -186,8 +186,6 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
       call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @selected_combat_method, @selected_sowing_method, @selected_harvesting_method, @selected_runes)
     }
   }
-  # 투자한 총 포인트 저장
-  @player_data['invested_point'] = @invested_point
 }
 
 
@@ -209,23 +207,19 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
 #  @selected_runes = @skill_manager[5]
 # _open_skill_???page() 쓰기전 위의 변수들 선언 되어야 함
 
-proc _open_combat_skill(@player, @uuid, @player_data, @skills_info, @text) {
-  # 스킬 매니저
+proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spec, @text) {
+  @player_data = @players_data[@uuid]
   @skill_manager = @player_data['skill_manager']
-  # 스킬 데이터
   @skills_data = @player_data['skill_data']
-  # 사용 포인트
-  @invested_point = @player_data['invested_point']
   # 레벨
   @level = @skill_manager[0]
   # 경험치
   @experience = @skill_manager[1]
-  # 총 포인트, 남은 포인트
+  # 포인트
   @total_point = @skill_manager[2]
-  @remaining_point = @total_point - @invested_point
+  @remaining_point = @total_point - @player_data['invested_point']
   # 선택한 전투 방식
   @selected_methods = json_decode(@skill_manager[4])
-  @selected_combat_method = @selected_methods['combat_method']
   # GUI 기본 데이터 선언
   @texture_layer = ''
   @message = '전투'
@@ -277,7 +271,7 @@ proc _open_combat_skill(@player, @uuid, @player_data, @skills_info, @text) {
       'button': 41
     )
   )
-  broadcast(@remaining_point '/' @total_point '( 사용한 포인트:'@invested_point')')
+  broadcast(@remaining_point '/' @total_point '( 사용한 포인트:'@player_data['invested_point']')')
   foreach(@skill: @slots in @skill_setup) {
     @skill_point = @skills_data[@skill][0]
     @skill_max_point = @skills_data[@skill][1]
@@ -301,8 +295,9 @@ proc _open_combat_skill(@player, @uuid, @player_data, @skills_info, @text) {
     @inventory[@slots['icon']]['meta']['display'] = "§fLv.@skill_point @skill_display"
     @inventory[@slots['icon']]['meta']['lore'] = array(@skill_desription) //@skill_desriptio
     @inventory[@slots['icon']]['meta']['model'] = 10 //@skill_icon
+    // 슬롯 타입이 전투 방식이면서 해당 스킬 레벨이 0 보다 클 시 해당 스킬 적용상태에 따른 로어 추가
 
-    if(@skills_data[@skill][0] < @skills_data[@skill][1]) { //앞에 남은 포인트가 있을시 조건 추가하기
+    if(@remaining_point > 0 && @skills_data[@skill][0] < @skills_data[@skill][1]) {
       @inventory[@slots['button']]['name'] = 'DIRT' // 제거해야 함
       @inventory[@slots['button']]['skill'] = @skill
       @inventory[@slots['button']]['slot_type'] = 'button'
@@ -311,34 +306,47 @@ proc _open_combat_skill(@player, @uuid, @player_data, @skills_info, @text) {
     }
   }
   # GUI 이벤트 익스큐터 설정
-  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @player_data, @skills_info, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @player_data, @skills_info, @text) {
+  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_info, @skills_spec, @text) {
+    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
       cancel()
-      # 스킬 매니저
+      # 데이터 선언
+      @player_data = @players_data[@uuid]
       @skill_manager = @player_data['skill_manager']
-      # 스킬 데이터
       @skills_data = @player_data['skill_data']
-      # 사용 포인트
-      @invested_point = @player_data['invested_point']
+      # 포인트
+      @total_point = @skill_manager[2]
+      @remaining_point = @total_point - @player_data['invested_point']
+      # 선택한 전투 방식
+      @selected_methods = json_decode(@skill_manager[4])
+      # 슬롯
       @slot = @event['rawslot']
-      //broadcast(@inventory[@slot])
       if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
         switch(@inventory[@slot]['slot_type']) {
         case 'combat_method':
           @skill = @inventory[@slot]['skill']
-          broadcast(A @skill @skills_data[@skill])
+          if(@skills_data[@skill][0] > 0) {
+            if(@selected_methods['combat_method'] == @skill) {
+              @selected_methods['combat_method'] = ''
+              #broadcast('선택 해제')
+              _reset_active_skill(@player_data, @uuid, @skill)
+            } else {
+              @selected_methods['combat_method'] = @skill
+              #broadcast('스킬 선택')
+              @point = @skills_data[@skill][0]
+              @skill_spec = @skills_spec[@skill]
+              _load_active_skill(@player_data, @uuid, @skill, @point, @skill_spec)
+            }
+            @skill_manager[4] = json_encode(@selected_methods)
+            #broadcast(@skill_manager)
+          }
+          #broadcast(A @skill @skills_data[@skill])
           break()
         case 'subcombat':
           break()
         case 'button':
           @skill = @inventory[@slot]['skill']
-          broadcast(@skills_data[@skill])
           @skills_data[@skill][0] += 1
-          broadcast(A1 @player_data['invested_point'])
           @player_data['invested_point'] += 1
-          broadcast(B @player_data['invested_point'])
-          _set_skill_data(@uuid, @skill, @skills_data[@skill])
-          broadcast(B @skill @skills_data[@skill])
           runas(@player, '/skill')
           break()
         }
@@ -352,10 +360,8 @@ proc _open_combat_skill(@player, @uuid, @player_data, @skills_info, @text) {
     }
   }
   # GUI 보여주기
-  _show_gui(@player, 'skillbook_combat', 54, @texture_layer, @message, @inventory, @closure, @player_data, @skills_info, @text)
+  _show_gui(@player, 'skillbook_combat', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
 }
-
-
 
 
 

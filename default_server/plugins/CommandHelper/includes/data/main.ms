@@ -271,8 +271,11 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
       # 액티브 스킬 카운드다운
       foreach(@skill: @active_skill in @player_data['active_skill']) { // 활성화된 액티브 스킬 포리치
         @proc_name = "_apply_countdown_by_@skill"
+        @skill_spec = @skills_spec[@skill]
+        @point = @player_data['skill_data'][@skill][0]
         if(is_proc(@proc_name)) {
-          call_proc(@proc_name, @var)
+          broadcast(@proc_name @player @skill @point @active_skill)
+          call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skill_spec, @point, @active_skill)
         }
       }
 
