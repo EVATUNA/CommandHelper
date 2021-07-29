@@ -1,7 +1,7 @@
 ## Include
-include('crafting/main.ms')
-include('enchant/main.ms')
-include('skill/main.ms')
+include('crafting/crafting.ms')
+include('enchant/enchant.ms')
+include('skill/skill.ms')
 
 ## Item Management
 @effective_items = array(

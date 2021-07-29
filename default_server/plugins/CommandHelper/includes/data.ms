@@ -1,3 +1,4 @@
+broadcast(A)
 ## Data Procedure
 proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
   # 배열로 선언
