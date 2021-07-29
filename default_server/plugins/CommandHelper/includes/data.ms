@@ -1,4 +1,3 @@
-broadcast(A)
 ## Data Procedure
 proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
   # 배열로 선언
@@ -249,6 +248,8 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
     @player = player(@uuid)
     if(ponline(@player)) {
       # action bar msg
+      #broadcast(A @players_data[@uuid]['active_skill'])
+      #broadcast(B @player_data['active_skill'])
       _send_action_msg(@player, @player_data, @skills_spec, @text)
       # boss bar msg
       //if(!is_null(@players_data[@uuid]['cache']['indicator'])) {
@@ -269,7 +270,7 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
       //}
 
       # 액티브 스킬 카운드다운
-      broadcast(@player_data['active_skill'])
+      
       foreach(@skill: @active_skill in @player_data['active_skill']) { // 활성화된 액티브 스킬 포리치
         @proc_name = "_apply_countdown_by_@skill"
         @skill_spec = @skills_spec[@skill]

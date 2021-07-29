@@ -1,6 +1,3 @@
-
-
-
 proc _gui_exists(@id) {
   return(array_contains(get_virtual_inventories(), @id))
 }

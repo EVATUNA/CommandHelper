@@ -26,7 +26,7 @@ foreach(@category in @categories) {
       case 'attack.ms':
       case 'update_item.ms':
       case 'active.ms':
-      //case 'countdown.ms':
+      case 'countdown.ms':
         include(@file_path)
         break()
       }
@@ -187,9 +187,6 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
     }
   }
 }
-
-
-
 
 # 버튼이랑 메인 나누기
 # 버튼 누를시 포인트 찍은거 인식

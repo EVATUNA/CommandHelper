@@ -128,9 +128,10 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
     @active_skill = @player_data['active_skill'][@skill]
     @point = @player_data['skill_data'][@skill][0]
     @skill_spec = @skills_spec[@skill]
+    broadcast(@skill_spec)
     if(@skill_spec['effect_by_point'][@point]['active']['count'] == 0) {
       if(@active_skill[1] > 0) {
-        @max_duration = @skill_spec['active_skill'][@skill]['active']['duration']
+        @max_duration = @skill_spec['effect_by_point'][@point]['active']['duration']
         @index = integer(@active_skill[1] / @max_duration * 10)
         switch(@index) {
         case 0:
