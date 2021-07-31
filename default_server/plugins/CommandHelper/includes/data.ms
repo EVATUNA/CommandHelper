@@ -33,10 +33,49 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
 
   # skill
   _load_skills(@player_data, @player, @uuid, @skills_spec)
-
+  
   # bossbar
   @bossbars = get_bars()
-  ## 인디케이터
+  ## 참치 레벨
+  ### 보스바 id 재생성
+  @tunalevel_id = "tunalevel.@uuid"
+  if(array_contains(@bossbars, @tunalevel_id)) {
+    remove_bar(@tunalevel_id)
+  }
+  ### 레벨
+  @tuna_level = @player_data['skill_manager'][0]
+  @tuna_level = 31 // 테스트용 레벨
+  @tunalevel_text = _replace_tunalevel_text(@tuna_level)
+  ### 경험치
+  @tuna_experience = @player_data['skill_manager'][1]
+  @tuna_experience = 100 // 테스트용 경험치
+  @max_tuna_experience = 500 // 테스트용 맥스 경험치 나중에 레벨별 멕스 경치가 반영되도록 수정해야 함
+  @tuna_experience_persent = @tuna_experience / @max_tuna_experience
+  if(@tuna_experience_persent < 0) { @tuna_experience_persent = 0 }
+  if(@tuna_experience_persent > 1) { @tuna_experience_persent = 1 }
+  ### 보스바 데이터 설정
+  @tunalevel_bossbar_data = array(
+    'title': @tunalevel_text,
+    'percent': @tuna_experience_persent,
+    'color': 'BLUE'
+  )
+  ### 보스바 생성 및 보여주기
+  create_bar(@tunalevel_id, @tunalevel_bossbar_data)
+  bar_add_player(@tunalevel_id, @player)
+
+  ## 더미 보스바
+  @dummy_id = "dummy.@uuid"
+  if(array_contains(@bossbars, @dummy_id)) {
+    remove_bar(@dummy_id)
+  }
+  @dummy_bossbar_data = array(
+    'title': '',
+    'percent': 0
+  )
+  create_bar(@dummy_id, @dummy_bossbar_data)
+  bar_add_player(@dummy_id, @player)
+
+  ## 인디케이터(/ 툴팁) 보스바
   @indicator_id = 'indicator.'.@uuid
   if(array_contains(@bossbars, @indicator_id)) {
     remove_bar(@indicator_id)
@@ -47,7 +86,9 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
   )
   create_bar(@indicator_id, @indicator_bossbar_data)
   bar_add_player(@indicator_id, @player)
-  ## 툴팁
+  // skill manager 바뀌는 카프카 cupset 인식하여 레벨 경험치 화면에 보여지게 해야함 
+
+  ## 구 툴팁 (제거 예정)
   @tip_id = 'tip.'.@uuid
   if(array_contains(@bossbars, @tip_id)) {
     remove_bar(@tip_id)

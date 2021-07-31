@@ -636,6 +636,59 @@ proc _color(@color) {
   }
 }
 
+# 참치 레벨 텍스트 생성
+proc _replace_tunalevel_text(@level) {
+  if(@tuna_level == 0) {
+    @tunalevel_text = ''
+  } else {
+    //\uf136\uf137\uf138\uf139\uf13a\uf13b\uf13c\uf13d\uf13e\uf13f
+    @text = replace(
+      replace(
+        replace(
+          replace(
+            replace(
+              replace(
+                replace(
+                  replace(
+                    replace(
+                      replace(
+                        @level, '0', '\uf136\uf801'
+                      ), '1', '\uf137\uf801'
+                    ), '2', '\uf138\uf801'
+                  ), '3', '\uf139\uf801'
+                ), '4', '\uf13a\uf801'
+              ), '5', '\uf13b\uf801'
+            ), '6', '\uf13c\uf801'
+          ), '7', '\uf13d\uf801'
+        ), '8', '\uf13e\uf801'
+      ), '9', '\uf13f\uf801'
+    )
+    @background = replace(
+      replace(
+        replace(
+          replace(
+            replace(
+              replace(
+                replace(
+                  replace(
+                    replace(
+                      replace(
+                        @level, '0', '\uf802\uf12c\uf801'
+                      ), '1', '\uf802\uf12d\uf801'
+                    ), '2', '\uf802\uf12e\uf801'
+                  ), '3', '\uf802\uf12f\uf801'
+                ), '4', '\uf802\uf130\uf801'
+              ), '5', '\uf802\uf131\uf801'
+            ), '6', '\uf802\uf132\uf801'
+          ), '7', '\uf802\uf133\uf801'
+        ), '8', '\uf802\uf134\uf801'
+      ), '9', '\uf802\uf135\uf801'
+    )
+    @tunalevel_text = '\uf801'.@background.string_multiply('\uF804', length(string(@level))).@text
+  }
+  return(@tunalevel_text)
+}
+
 # 상점 리코딩 후 제거 예정
 array proc _clone(array @arr) { return(array_deep_clone(@arr)) }
 boolean proc _existsGui(string @guiid) { return(array_contains(get_virtual_inventories(), @guiid)) }
