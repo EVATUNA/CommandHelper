@@ -128,7 +128,6 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
     @active_skill = @player_data['active_skill'][@skill]
     @point = @player_data['skill_data'][@skill][0]
     @skill_spec = @skills_spec[@skill]
-    broadcast(@skill_spec)
     if(@skill_spec['effect_by_point'][@point]['active']['count'] == 0) {
       if(@active_skill[1] > 0) {
         @max_duration = @skill_spec['effect_by_point'][@point]['active']['duration']
@@ -574,36 +573,6 @@ proc _set_indicator(@player, @uuid, @players_data, @text) {
   }
 }
 
-/* 번지코드 관련 (봇 제외 모든 플레이어 구하기, 플러그인 메시지 보내기 등)
-  proc _all_players(@bots) {
-    @players_uuid = bukkitlinked_get_all_players()
-    foreach(@bot in @bots) {
-      array_remove_values(@players_uuid, @bot)
-    }
-    return(@players_uuid)
-  }
-
-  proc _send_plugin_message(@request_bot, @channel_messages) {
-    @byte_array = byte_array()
-    foreach(@channel_message in @channel_messages) {
-      ba_put_string(@byte_array, @channel_message)
-    }
-    send_plugin_message(@request_bot, 'BungeeCord', @byte_array)
-  }
-
-  proc _bungeecord_foward(@player, @identifier, @data) {
-    @data_array = byte_array()
-    ba_put_string(@data_array, json_encode(@data))
-    @byte_array = byte_array()
-    ba_put_string(@byte_array, 'Forward')
-    ba_put_string(@byte_array, 'ALL')
-    ba_put_string(@byte_array, @identifier)
-    ba_put_short(@byte_array, array_size(@data_array))
-    ba_put_bytes(@byte_array, @data_array)
-    send_plugin_message(@player, 'BungeeCord', @byte_array)
-  }
-*/
-
 ## 기타 proc
 # 배열 나누기
 proc _paging(@array, @size) {
@@ -641,7 +610,6 @@ proc _replace_tunalevel_text(@level) {
   if(@tuna_level == 0) {
     @tunalevel_text = ''
   } else {
-    //\uf136\uf137\uf138\uf139\uf13a\uf13b\uf13c\uf13d\uf13e\uf13f
     @text = replace(
       replace(
         replace(
