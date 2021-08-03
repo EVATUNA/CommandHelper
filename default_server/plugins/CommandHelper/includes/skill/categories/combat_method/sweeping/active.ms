@@ -1,7 +1,6 @@
 # include 내부에서 사용 가능한 변수:
 # @player_data, @player, @uuid,
-# @skill, @skill_spec, @point,
-# @active_skill
+# @skill, @skill_spec, @point
 
 proc("_apply_active_by_@skill", @player_data, @player, @uuid, @skill, @skill_spec, @point) {
   @active_skill = @player_data['active_skill'][@skill]

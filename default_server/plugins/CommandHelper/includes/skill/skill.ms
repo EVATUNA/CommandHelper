@@ -220,7 +220,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
   @selected_combat_method = @selected_methods['combat_method']
   # GUI 기본 데이터 선언
   @texture_layer = @text['space_fonts']['space.-8'].'\uec1d'.@text['space_fonts']['space.-169'].@text['space_fonts']['space.-1'].'\ue720'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue991'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue75b'.@text['space_fonts']['space.126'].@text['space_fonts']['space.-1'].'\ue720'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue992'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue75c'.@text['space_fonts']['space.-162']
-  @message = "전투 ( 남은 포인트: @remaining_point / @total_point )"
+  @message = "전투 방식 / 보조 전투( 남은 포인트: @remaining_point / @total_point )"
   @inventory = array()
   for(@index = 0, @index < 54, @index++) {
     @inventory[@index] = array(
@@ -262,7 +262,6 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
       'button': 41
     )
   )
-  //broadcast(@remaining_point '/' @total_point '( 사용한 포인트:'@player_data['invested_point']')')
   foreach(@skill: @slots in @skill_setup) {
     @skill_point = @skills_data[@skill][0]
     @skill_max_point = @skills_data[@skill][1]
@@ -373,7 +372,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
       )
     }
   }
-  @inventory[45]['meta']['display'] = '§f농사 방식'
+  @inventory[45]['meta']['display'] = '§f파종 방식 / 수확 방식'
   @inventory[53]['meta']['display'] = '§f채광'
   # GUI 이벤트 익스큐터 설정
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_info, @skills_spec, @text) {
@@ -405,7 +404,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
               @selected_methods['combat_method'] = @selected_combat_method
               @skill_manager[4] = json_encode(@selected_methods)
               if(is_proc(@new_skill_proc_name)) {
-                call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_combat_method, @selected_sowing_method)
+                call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_combat_method)
               }
             } else { // 스킬 선택시
               @old_skill = @selected_combat_method
@@ -460,604 +459,313 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
   _show_gui(@player, 'skillbook_combat', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
 }
 
-
-
-proc _open_skillbook(@player, @category, @subpage, @players_data, @skills_info, @text) {
-  @uuid = puuid(@player)
-  switch(@category) {
-  case 'farming_method':
-    @harvesting_methods_info = @skills_info['harvesting_method']
-    @harvesting_methods = @players_data[@uuid]['skill_data']['harvesting_method']
-    @selected_harvesting_method = @players_data[@uuid]['skill_manager'][3]
-    @content = array(array('text': '- 수확 방식 목록'))
-    foreach(@harvesting_method_info in @harvesting_methods_info) {
-      @harvesting_method_data = @harvesting_methods[@harvesting_method_info['name']]
-      if(array_size(@harvesting_method_info['desription']) - 1 < @harvesting_method_data[0]) {
-        @desription_index = array_size(@harvesting_method_info['desription']) - 1
-      } else {
-        @desription_index = @harvesting_method_data[0]
-      }
-      if(@harvesting_method_data[0] == 0) {
-        @icon = '\ue00f'
-        @name = '???'
-      } else {
-        @icon = @harvesting_method_info['icon']
-        @name = string('Lv.'.@harvesting_method_data[0] @harvesting_method_info['display'])
-      }
-      @desription = string(@name.'\n'.@harvesting_method_info['desription'][@desription_index].'\n\n')
-      @raw0 = array(
-        array(
-          'text': '\n'.@text['space_fonts']['space.18'],
-          'color': 'white',
-          'hoverEvent': array(
-            'action': 'show_text'
-          )
-        ),
-        array(
-          'text': ' Lv.'.@harvesting_method_data[0]'('.@harvesting_method_data[1].'/'.@harvesting_method_data[3].')\n',
-          'color': 'black'
-        )
-      )
-      @raw1 = array(
-        array(
-          'text': @text['space_fonts']['space.1'].@icon,
-          'color': 'white',
-          'hoverEvent': array(
-            'action': 'show_text'
-          )
-        ),
-        array(
-          'text': ' ',
-          'color': 'white'
-        ),
-        array(
-          'text': string_multiply('', integer(@harvesting_method_data[1] / @harvesting_method_data[3] * 50)).'\n',
-          'color': 'green'
-        )
-      )
-      #broadcast(@selected_harvesting_method  @harvesting_method_info['name'])
-      if(@harvesting_method_data[0] > 0) {
-        if(@selected_harvesting_method == @harvesting_method_info['name']) {
-          @select_box = array(
-            'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'],
-            'color': 'white'
-          )
-          array_insert(@raw1, @select_box, 1)
-          @desription = @desription.'§c좌클릭 시, 해당 방식 사용을 해제합니다.'
-          @clickevent = array(
-            'action': 'run_command',
-            'value': '/skillbook unselect harvesting_method '.@harvesting_method_info['name']
-          )
-        } else {
-          @desription = @desription.'§c좌클릭 시, 해당 방식을 사용합니다.'
-          @clickevent = array(
-            'action': 'run_command',
-            'value': '/skillbook select harvesting_method '.@harvesting_method_info['name']
-          )
-        }
-        @raw0[0]['clickEvent'] = @clickevent
-        @raw1[0]['clickEvent'] = @clickevent
-      } else {
-        @desription = @desription.'§c숙련 레벨을 올린 후,\n해당 방식을 사용할 수 있습니다.'
-      }
-      @raw0[0]['hoverEvent']['value'] = @desription
-      @raw1[0]['hoverEvent']['value'] = @desription
-      @content = array_merge(@content, array_merge(@raw0, @raw1))
-    }
-    @sowing_methods_info = @skills_info['sowing_method']
-    @sowing_methods = @players_data[@uuid]['skill_data']['sowing_method']
-    @selected_sowing_method = @players_data[@uuid]['skill_manager'][4]
-    @content[] = array('text': '\n- 파종 방식 목록')
-    foreach(@sowing_method_info in @sowing_methods_info) {
-      @sowing_method_data = @sowing_methods[@sowing_method_info['name']]
-      if(array_size(@sowing_method_info['desription']) - 1 < @sowing_method_data[0]) {
-        @desription_index = array_size(@sowing_method_info['desription']) - 1
-      } else {
-        @desription_index = @sowing_method_data[0]
-      }
-      if(@sowing_method_data[0] == 0) {
-        @icon = '\ue00f'
-        @name = '???'
-      } else {
-        @icon = @sowing_method_info['icon']
-        @name = string('Lv.'.@sowing_method_data[0] @sowing_method_info['display'])
-      }
-      @desription = string(@name.'\n'.@sowing_method_info['desription'][@desription_index].'\n\n')
-      @raw0 = array(
-        array(
-          'text': '\n'.@text['space_fonts']['space.18'],
-          'color': 'white',
-          'hoverEvent': array(
-            'action': 'show_text'
-          )
-        ),
-        array(
-          'text': ' Lv.'.@sowing_method_data[0]'('.@sowing_method_data[1].'/'.@sowing_method_data[3].')\n',
-          'color': 'black'
-        )
-      )
-      @raw1 = array(
-        array(
-          'text': @text['space_fonts']['space.1'].@icon,
-          'color': 'white',
-          'hoverEvent': array(
-            'action': 'show_text'
-          )
-        ),
-        array(
-          'text': ' ',
-          'color': 'white'
-        ),
-        array(
-          'text': string_multiply('', integer(@sowing_method_data[1] / @sowing_method_data[3] * 50)).'\n',
-          'color': 'green'
-        )
-      )
-      if(@sowing_method_data[0] > 0) {
-        if(@selected_sowing_method == @sowing_method_info['name']) {
-          @select_box = array(
-            'text': @text['space_fonts']['space.-18'].'\ue00e'.@text['space_fonts']['space.-1'],
-            'color': 'white'
-          )
-          array_insert(@raw1, @select_box, 1)
-          @desription = @desription.'§c좌클릭 시, 해당 방식 사용을 해제합니다.'
-          @clickevent = array(
-            'action': 'run_command',
-            'value': '/skillbook unselect sowing_method '.@sowing_method_info['name']
-          )
-        } else {
-          @desription = @desription.'§c좌클릭 시, 해당 방식을 사용합니다.'
-          @clickevent = array(
-            'action': 'run_command',
-            'value': '/skillbook select sowing_method '.@sowing_method_info['name']
-          )
-        }
-        @raw0[0]['clickEvent'] = @clickevent
-        @raw1[0]['clickEvent'] = @clickevent
-      } else {
-        @desription = @desription.'§c숙련 레벨을 올린 후,\n해당 방식을 사용할 수 있습니다.'
-      }
-      @raw0[0]['hoverEvent']['value'] = @desription
-      @raw1[0]['hoverEvent']['value'] = @desription
-      @content = array_merge(@content, array_merge(@raw0, @raw1))
-    }
-    @arrow = array(
-      array(
-        'text':@text['space_fonts']['space.28'].'\ue00c'.@text['space_fonts']['space.37'].'\ue00d\n',
-        'color': 'white'
-      ),
-      array(
-        'text':@text['space_fonts']['space.28'],
-        'color': 'white'
-      ),
-      array(
-        'text': '\ue00c',
-        'hoverEvent': array(
-          'action': 'show_text',
-          'value': '이전 페이지'
-        ),
-        'clickEvent': array(
-          'action': 'run_command',
-          'value': '/skillbook open combat'
-        )
-      ),
-      array(
-        'text':@text['space_fonts']['space.37'],
-        'color': 'white'
-      ),
-      array(
-        'text': '\ue00d',
-        'hoverEvent': array(
-          'action': 'show_text',
-          'value': '다음 페이지'
-        ),
-        'clickEvent': array(
-          'action': 'run_command',
-          'value': '/skillbook open farming 0'
-        )
+proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @skills_spec, @text) {
+  @player_data = @players_data[@uuid]
+  @skill_manager = @player_data['skill_manager']
+  @skills_data = @player_data['skill_data']
+  # 레벨
+  @level = @skill_manager[0]
+  # 경험치
+  @experience = @skill_manager[1]
+  # 포인트
+  @total_point = @skill_manager[2]
+  @remaining_point = @total_point - @player_data['invested_point']
+  # 선택한 농사 방식
+  @selected_methods = json_decode(@skill_manager[4])
+  @selected_sowing_method = @selected_methods['sowing_method']
+  @selected_harvesting_method = @selected_methods['harvesting_method']
+  # GUI 기본 데이터 선언
+  @texture_layer = @text['space_fonts']['space.-8'].'\uec1d'.@text['space_fonts']['space.-169'].@text['space_fonts']['space.-1'].'\ue720'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue991'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue75b'.@text['space_fonts']['space.126'].@text['space_fonts']['space.-1'].'\ue720'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue992'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue75c'.@text['space_fonts']['space.-162']
+  @message = "파종 방식 / 수확 방식 ( 남은 포인트: @remaining_point / @total_point )"
+  @inventory = array()
+  for(@index = 0, @index < 54, @index++) {
+    @inventory[@index] = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': ' ',
+        'model': 1
       )
     )
-    @content = array_merge(@content, @arrow)
-    open_book(@player, array(json_encode(@content)))
-    break()
-  case 'farming':
-    switch(@subpage) {
-    case 0:
-      @farming_skills_info = array_get(@skills_info['farming'], cslice(0, 3))
-      @farming_skills = @players_data[@uuid]['skill_data']['farming']
-      @content = array(
-        array(
-          'text': '- 농사 숙련\n',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': '적용중인 전투 방식과 전투특성을 간략히 보여줍니다.\n\n§c각각의 아이콘을 클릭하여자세히 확인 할 수 있으며\n전투 방식과 전투 특성을 변경 할 수 있습니다.'
-          )
-        )
-      )
-      foreach(@farming_skill_info in @farming_skills_info) {
-        @farming_skill_data = @farming_skills[@farming_skill_info['name']]
-        if(array_size(@farming_skill_info['desription']) - 1 < @farming_skill_data[0]) {
-          @desription_index = array_size(@farming_skill_info['desription']) - 1
-        } else {
-          @desription_index = @farming_skill_data[0]
-        }
-        if(@farming_skill_data[0] == 0) {
-          @icon = '\ue00f'
-          @name = '???'
-          @desription = string(@name.'\n'.@farming_skill_info['desription'][@desription_index]).'\n\n§c숙련 레벨이 올르면,\n해당 스킬이 적용됩니다.'
-        } else {
-          @icon = @farming_skill_info['icon']
-          @name = string('Lv.'.@farming_skill_data[0] @farming_skill_info['display'])
-          @desription = string(@name.'\n'.@farming_skill_info['desription'][@desription_index])
-        }
-        @raw0 = array(
-          array(
-            'text': '\n'.@text['space_fonts']['space.18'],
-            'color': 'white',
-            'hoverEvent': array(
-              'action': 'show_text'
-            )
-          ),
-          array(
-            'text': ' Lv.'.@farming_skill_data[0]'('.@farming_skill_data[1].'/'.@farming_skill_data[3].')\n',
-            'color': 'black'
-          )
-        )
-        @raw1 = array(
-          array(
-            'text': @text['space_fonts']['space.1'].@icon,
-            'color': 'white',
-            'hoverEvent': array(
-              'action': 'show_text'
-            )
-          ),
-          array(
-            'text': ' ',
-            'color': 'white'
-          ),
-          array(
-            'text': string_multiply('', integer(@farming_skill_data[1] / @farming_skill_data[3] * 50)).'\n',
-            'color': 'green'
-          )
-        )
-        @raw0[0]['hoverEvent']['value'] = @desription
-        @raw1[0]['hoverEvent']['value'] = @desription
-        @content = array_merge(@content, array_merge(@raw0, @raw1))
-      }
-      @arrow = array(
-        array(
-          'text':@text['space_fonts']['space.28'].'\ue00c'.@text['space_fonts']['space.37'].'\ue00d\n',
-          'color': 'white'
-        ),
-        array(
-          'text':@text['space_fonts']['space.28'],
-          'color': 'white'
-        ),
-        array(
-          'text': '\ue00c',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': '이전 페이지'
-          ),
-          'clickEvent': array(
-            'action': 'run_command',
-            'value': '/skillbook open farming_method'
-          )
-        ),
-        array(
-          'text':@text['space_fonts']['space.37'],
-          'color': 'white'
-        ),
-        array(
-          'text': '\ue00d',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': '다음 페이지'
-          ),
-          'clickEvent': array(
-            'action': 'run_command',
-            'value': '/skillbook open farming 1'
-          )
-        )
-      )
-      @content = array_merge(@content, @arrow)
-      open_book(@player, array(json_encode(@content)))
-      break()
-    case 1:
-      @farming_skills_info = array_get(@skills_info['farming'], cslice(4, 7))
-      @farming_skills = @players_data[@uuid]['skill_data']['farming']
-      @content = array(
-        array(
-          'text': '- 농사 숙련\n',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': '적용중인 전투 방식과 전투특성을 간략히 보여줍니다.\n\n§c각각의 아이콘을 클릭하여자세히 확인 할 수 있으며\n전투 방식과 전투 특성을 변경 할 수 있습니다.'
-          )
-        )
-      )
-      foreach(@farming_skill_info in @farming_skills_info) {
-        @farming_skill_data = @farming_skills[@farming_skill_info['name']]
-        if(array_size(@farming_skill_info['desription']) - 1 < @farming_skill_data[0]) {
-          @desription_index = array_size(@farming_skill_info['desription']) - 1
-        } else {
-          @desription_index = @farming_skill_data[0]
-        }
-        if(@farming_skill_data[0] == 0) {
-          @icon = '\ue00f'
-          @name = '???'
-          @desription = string(@name.'\n'.@farming_skill_info['desription'][@desription_index]).'\n\n§c숙련 레벨이 올르면,\n해당 스킬이 적용됩니다.'
-        } else {
-          @icon = @farming_skill_info['icon']
-          @name = string('Lv.'.@farming_skill_data[0] @farming_skill_info['display'])
-          @desription = string(@name.'\n'.@farming_skill_info['desription'][@desription_index])
-        }
-        @raw0 = array(
-          array(
-            'text': '\n'.@text['space_fonts']['space.18'],
-            'color': 'white',
-            'hoverEvent': array(
-              'action': 'show_text'
-            )
-          ),
-          array(
-            'text': ' Lv.'.@farming_skill_data[0]'('.@farming_skill_data[1].'/'.@farming_skill_data[3].')\n',
-            'color': 'black'
-          )
-        )
-        @raw1 = array(
-          array(
-            'text': @text['space_fonts']['space.1'].@icon,
-            'color': 'white',
-            'hoverEvent': array(
-              'action': 'show_text'
-            )
-          ),
-          array(
-            'text': ' ',
-            'color': 'white'
-          ),
-          array(
-            'text': string_multiply('', integer(@farming_skill_data[1] / @farming_skill_data[3] * 50)).'\n',
-            'color': 'green'
-          )
-        )
-        @raw0[0]['hoverEvent']['value'] = @desription
-        @raw1[0]['hoverEvent']['value'] = @desription
-        @content = array_merge(@content, array_merge(@raw0, @raw1))
-      }
-      @arrow = array(
-        array(
-          'text':@text['space_fonts']['space.28'].'\ue00c'.@text['space_fonts']['space.37'].'\ue00d\n',
-          'color': 'white'
-        ),
-        array(
-          'text':@text['space_fonts']['space.28'],
-          'color': 'white'
-        ),
-        array(
-          'text': '\ue00c',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': '이전 페이지'
-          ),
-          'clickEvent': array(
-            'action': 'run_command',
-            'value': '/skillbook open farming 0'
-          )
-        ),
-        array(
-          'text':@text['space_fonts']['space.37'],
-          'color': 'white'
-        ),
-        array(
-          'text': '\ue00d',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': '다음 페이지'
-          ),
-          'clickEvent': array(
-            'action': 'run_command',
-            'value': '/skillbook open mining 0'
-          )
-        )
-      )
-      @content = array_merge(@content, @arrow)
-      open_book(@player, array(json_encode(@content)))
-      break()
-    }
-    break()
-  case 'mining':
-    switch(@subpage) {
-    case 0:
-      @mining_skills_info = array_get(@skills_info['mining'], cslice(0, 3))
-      @mining_skills = @players_data[@uuid]['skill_data']['mining']
-      @content = array(
-        array(
-          'text': '- 채광 숙련\n',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': '적용중인 전투 방식과 전투특성을 간략히 보여줍니다.\n\n§c각각의 아이콘을 클릭하여자세히 확인 할 수 있으며\n전투 방식과 전투 특성을 변경 할 수 있습니다.'
-          )
-        )
-      )
-      foreach(@mining_skill_info in @mining_skills_info) {
-        @mining_skill_data = @mining_skills[@mining_skill_info['name']]
-        if(array_size(@mining_skill_info['desription']) - 1 < @mining_skill_data[0]) {
-          @desription_index = array_size(@mining_skill_info['desription']) - 1
-        } else {
-          @desription_index = @mining_skill_data[0]
-        }
-        if(@mining_skill_data[0] == 0) {
-          @icon = '\ue00f'
-          @name = '???'
-          @desription = string(@name.'\n'.@mining_skill_info['desription'][@desription_index]).'\n\n§c숙련 레벨이 올르면,\n해당 스킬이 적용됩니다.'
-        } else {
-          @icon = @mining_skill_info['icon']
-          @name = string('Lv.'.@mining_skill_data[0] @mining_skill_info['display'])
-          @desription = string(@name.'\n'.@mining_skill_info['desription'][@desription_index])
-        }
-        @raw0 = array(
-          array(
-            'text': '\n'.@text['space_fonts']['space.18'],
-            'color': 'white',
-            'hoverEvent': array(
-              'action': 'show_text'
-            )
-          ),
-          array(
-            'text': ' Lv.'.@mining_skill_data[0]'('.@mining_skill_data[1].'/'.@mining_skill_data[3].')\n',
-            'color': 'black'
-          )
-        )
-        @raw1 = array(
-          array(
-            'text': @text['space_fonts']['space.1'].@icon,
-            'color': 'white',
-            'hoverEvent': array(
-              'action': 'show_text'
-            )
-          ),
-          array(
-            'text': ' ',
-            'color': 'white'
-          ),
-          array(
-            'text': string_multiply('', integer(@mining_skill_data[1] / @mining_skill_data[3] * 50)).'\n',
-            'color': 'green'
-          )
-        )
-        @raw0[0]['hoverEvent']['value'] = @desription
-        @raw1[0]['hoverEvent']['value'] = @desription
-        @content = array_merge(@content, array_merge(@raw0, @raw1))
-      }
-      @arrow = array(
-        array(
-          'text':@text['space_fonts']['space.28'].'\ue00c'.@text['space_fonts']['space.37'].'\ue00d\n',
-          'color': 'white'
-        ),
-        array(
-          'text':@text['space_fonts']['space.28'],
-          'color': 'white'
-        ),
-        array(
-          'text': '\ue00c',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': '이전 페이지'
-          ),
-          'clickEvent': array(
-            'action': 'run_command',
-            'value': '/skillbook open farming 1'
-          )
-        ),
-        array(
-          'text':@text['space_fonts']['space.37'],
-          'color': 'white'
-        ),
-        array(
-          'text': '\ue00d',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': '다음 페이지'
-          ),
-          'clickEvent': array(
-            'action': 'run_command',
-            'value': '/skillbook open mining 1'
-          )
-        )
-      )
-      @content = array_merge(@content, @arrow)
-      open_book(@player, array(json_encode(@content)))
-      break()
-    case 1:
-      @mining_skills_info = array_get(@skills_info['mining'], cslice(4, 6))
-      @mining_skills = @players_data[@uuid]['skill_data']['mining']
-      @content = array(
-        array(
-          'text': '- 채광 숙련\n',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': '적용중인 전투 방식과 전투특성을 간략히 보여줍니다.\n\n§c각각의 아이콘을 클릭하여자세히 확인 할 수 있으며\n전투 방식과 전투 특성을 변경 할 수 있습니다.'
-          )
-        )
-      )
-      foreach(@mining_skill_info in @mining_skills_info) {
-        @mining_skill_data = @mining_skills[@mining_skill_info['name']]
-        if(array_size(@mining_skill_info['desription']) - 1 < @mining_skill_data[0]) {
-          @desription_index = array_size(@mining_skill_info['desription']) - 1
-        } else {
-          @desription_index = @mining_skill_data[0]
-        }
-        if(@mining_skill_data[0] == 0) {
-          @icon = '\ue00f'
-          @name = '???'
-          @desription = string(@name.'\n'.@mining_skill_info['desription'][@desription_index]).'\n\n§c숙련 레벨이 올르면,\n해당 스킬이 적용됩니다.'
-        } else {
-          @icon = @mining_skill_info['icon']
-          @name = string('Lv.'.@mining_skill_data[0] @mining_skill_info['display'])
-          @desription = string(@name.'\n'.@mining_skill_info['desription'][@desription_index])
-        }
-        @raw0 = array(
-          array(
-            'text': '\n'.@text['space_fonts']['space.18'],
-            'color': 'white',
-            'hoverEvent': array(
-              'action': 'show_text'
-            )
-          ),
-          array(
-            'text': ' Lv.'.@mining_skill_data[0]'('.@mining_skill_data[1].'/'.@mining_skill_data[3].')\n',
-            'color': 'black'
-          )
-        )
-        @raw1 = array(
-          array(
-            'text': @text['space_fonts']['space.1'].@icon,
-            'color': 'white',
-            'hoverEvent': array(
-              'action': 'show_text'
-            )
-          ),
-          array(
-            'text': ' ',
-            'color': 'white'
-          ),
-          array(
-            'text': string_multiply('', integer(@mining_skill_data[1] / @mining_skill_data[3] * 50)).'\n',
-            'color': 'green'
-          )
-        )
-        @raw0[0]['hoverEvent']['value'] = @desription
-        @raw1[0]['hoverEvent']['value'] = @desription
-        @content = array_merge(@content, array_merge(@raw0, @raw1))
-      }
-      @arrow = array(
-        array(
-          'text': '\n\n\n'.@text['space_fonts']['space.28'].'\ue00c'.'\n',
-          'color': 'white'
-        ),
-        array(
-          'text': @text['space_fonts']['space.28'],
-          'color': 'white'
-        ),
-        array(
-          'text': '\ue00c',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': '이전 페이지'
-          ),
-          'clickEvent': array(
-            'action': 'run_command',
-            'value': '/skillbook open mining 0'
-          )
-        )
-      )
-      @content = array_merge(@content, @arrow)
-      open_book(@player, array(json_encode(@content)))
-      break()
-    }
-    break()
   }
+  # 스킬 배치
+  @skill_setup = array(
+    'wet_hands': array(
+      'icon': 11,
+      'button': 20
+    ),
+    'fertile_touch': array(
+      'icon': 15,
+      'button': 24
+    ),
+    'wide_hands': array(
+      'icon': 29,
+      'button': 38
+    ),
+    'golden_finger': array(
+      'icon': 33,
+      'button': 42
+    )
+  )
+  foreach(@skill: @slots in @skill_setup) {
+    @skill_point = @skills_data[@skill][0]
+    @skill_max_point = @skills_data[@skill][1]
+    @skill_info = @skills_info[@skill]
+    @skill_spec = @skills_spec[@skill]
+    @category = @skill_spec['category']
+    @skill_display = @skill_info['display']
+    if(@skill_point == 0) {
+      @skill_point_text = "§8Lv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+      @skill_icon = @skill_info['icon']['off']
+      if(@category == 'sowing_method') {
+        @lore = array(
+          '§7포인트를 사용하여 스킬 레벨을 올린 후,',
+          '§7스킬 아이콘 좌클릭 시, 파종 방식이 선택되며',
+          '§7스킬 사용 시, 효과를 받을 수 있습니다.',
+          ''
+        )
+      } else if(@category == 'harvesting_method') {
+        @lore = array(
+          '§7포인트를 사용하여 스킬 레벨을 올린 후,',
+          '§7스킬 아이콘 좌클릭 시, 수확 방식이 선택되며',
+          '§7스킬 사용 시, 효과를 받을 수 있습니다.',
+          ''
+        )
+      }
+    } else {
+      if(@category == 'sowing_method') {
+        if(@skill == @selected_sowing_method) {
+          @skill_point_text = "§bLv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+          @skill_icon = @skill_info['icon']['on']
+          @lore = array(
+            '§7현재 해당 파종 방식 사용중입니다.',
+            '§7좌클릭 시, 해당 파종 방식 사용을 해제합니다.',
+            ''
+          )
+        } else {
+          @skill_point_text = "§8Lv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+          @skill_icon = @skill_info['icon']['off']
+          if(@selected_sowing_method == '') {
+            @lore = array(
+              '§7현재 사용중인 파종 방식이 없습니다.',
+              '§7좌클릭 시, §c'.@skill_display.' §7파종 방식을 사용합니다.',
+              ''
+            )
+          } else {
+            @lore = array(
+              '§7현재 §c'.@skills_info[@selected_sowing_method]['display'].'§7 파종 방식 사용중입니다.',
+              '§7좌클릭 시, §c'.@skill_display.' §7파종 방식을 사용합니다.',
+              ''
+            )
+          }
+        }
+      } else if(@category == 'harvesting_method') {
+        if(@skill == @selected_harvesting_method) {
+          @skill_point_text = "§bLv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+          @skill_icon = @skill_info['icon']['on']
+          @lore = array(
+            '§7현재 해당 수확 방식 사용중입니다.',
+            '§7좌클릭 시, 해당 수확 방식 사용을 해제합니다.',
+            ''
+          )
+        } else {
+          @skill_point_text = "§8Lv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+          @skill_icon = @skill_info['icon']['off']
+          if(@selected_harvesting_method == '') {
+            @lore = array(
+              '§7현재 사용중인 수확 방식이 없습니다.',
+              '§7좌클릭 시, §c'.@skill_display.' §7수확 방식을 사용합니다.',
+              ''
+            )
+          } else {
+            @lore = array(
+              '§7현재 §c'.@skills_info[@selected_harvesting_method]['display'].'§7 수확 방식 사용중입니다.',
+              '§7좌클릭 시, §c'.@skill_display.' §7수확 방식을 사용합니다.',
+              ''
+            )
+          }
+        }
+      }
+    }
+    @skill_desriptions = @skill_info['desriptions']
+    if(array_size(@skill_desriptions) > 0) {
+      if(array_size(@skill_desriptions) != 0) {
+        if(array_size(@skill_desriptions) - 1 < @skill_point) {
+          @desription_index = array_size(@skill_desriptions) - 1
+        } else {
+          @desription_index = @skill_point
+        }
+        @skill_desription = @skill_desriptions[@desription_index]
+        if(array_size(@skill_desriptions) - 1 < @skill_point + 1) {
+          @button_desription_index = array_size(@skill_desriptions) - 1
+        } else {
+          @button_desription_index = @skill_point + 1
+        }
+        @button_desription = @skill_desriptions[@button_desription_index]
+      } else {
+        @skill_desription = array()
+        @button_desription = array()
+      }
+    } else {
+      @skill_desription = array()
+      if(array_size(@skill_desriptions) != 0) {
+        if(array_size(@skill_desriptions) - 1 < @skill_point + 1) {
+          @button_desription_index = array_size(@skill_desriptions) - 1
+        } else {
+          @button_desription_index = @skill_point + 1
+        }
+        @button_desription = @skill_desriptions[@button_desription_index]
+      } else {
+        @button_desription = array()
+      }
+    }
+    @inventory[@slots['icon']]['skill'] = @skill
+    @inventory[@slots['icon']]['slot_type'] = @category
+    @inventory[@slots['icon']]['meta']['display'] = @skill_point_text
+    @inventory[@slots['icon']]['meta']['lore'] = array_merge(@lore, @skill_desription)
+    @inventory[@slots['icon']]['meta']['model'] = @skill_icon
+
+    if(@remaining_point > 0 && @skills_data[@skill][0] < @skills_data[@skill][1]) {
+      @inventory[@slots['button']]['skill'] = @skill
+      @inventory[@slots['button']]['slot_type'] = 'button'
+      @inventory[@slots['button']]['meta']['display'] = '§7좌클릭 시, 포인트 사용'
+      @inventory[@slots['button']]['meta']['model'] = 6
+      @inventory[@slots['button']]['meta']['lore'] = array_merge(
+        array(
+          '§bLv.'.string(@skill_point + 1) @skill_display.' 정보:',
+          ''
+        ),
+        @button_desription
+      )
+    }
+  }
+  @inventory[45]['meta']['display'] = '§f농사'
+  @inventory[53]['meta']['display'] = '§f전투 방식 / 보조 전투'
+  # GUI 이벤트 익스큐터 설정
+  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_info, @skills_spec, @text) {
+    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
+      cancel()
+      # 데이터 선언
+      @player_data = @players_data[@uuid]
+      @skill_manager = @player_data['skill_manager']
+      @skills_data = @player_data['skill_data']
+      # 포인트
+      @total_point = @skill_manager[2]
+      @remaining_point = @total_point - @player_data['invested_point']
+      # 선택한 전투 방식
+      @selected_methods = json_decode(@skill_manager[4])
+      # 슬롯
+      @slot = @event['rawslot']
+      if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
+        switch(@inventory[@slot]['slot_type']) {
+        case 'sowing_method':
+          @new_skill = @inventory[@slot]['skill']
+          if(@skills_data[@new_skill][0] > 0) {
+            @category = 'sowing_method'
+            @selected_sowing_method = @selected_methods['sowing_method']
+            @new_skill_proc_name = "_apply_loading_by_@new_skill"
+            @new_skill_spec = @skills_spec[@new_skill]
+            @new_skill_point = @skills_data[@new_skill][0]
+            if(@selected_sowing_method == @new_skill) { // 스킬 사용 해제시
+              @selected_sowing_method = ''
+              @selected_methods['sowing_method'] = @selected_sowing_method
+              @skill_manager[4] = json_encode(@selected_methods)
+              if(is_proc(@new_skill_proc_name)) {
+                call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_sowing_method)
+              }
+            } else { // 스킬 선택시
+              @old_skill = @selected_sowing_method
+              @selected_sowing_method = @new_skill
+              @selected_methods['sowing_method'] = @selected_sowing_method
+              @skill_manager[4] = json_encode(@selected_methods)
+              if(@old_skill != '') { // 스킬 변경시
+                @old_skill_proc_name = "_apply_loading_by_@old_skill"
+                @old_skill_spec = @skills_spec[@old_skill]
+                @old_skill_point = @skills_data[@old_skill][0]
+                if(is_proc(@old_skill_proc_name)) {
+                  call_proc(@old_skill_proc_name, @player_data, @player, @uuid, @category, @old_skill, @old_skill_spec, @old_skill_point, @selected_sowing_method)
+                }
+              }
+              if(is_proc(@new_skill_proc_name)) {
+                call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_sowing_method)
+              }
+            }
+            runas(@player, '/skill farmingmethod')
+          }
+          break()
+        case 'harvesting_method':
+          @new_skill = @inventory[@slot]['skill']
+          if(@skills_data[@new_skill][0] > 0) {
+            @category = 'harvesting_method'
+            @selected_harvesting_method = @selected_methods['harvesting_method']
+            @new_skill_proc_name = "_apply_loading_by_@new_skill"
+            @new_skill_spec = @skills_spec[@new_skill]
+            @new_skill_point = @skills_data[@new_skill][0]
+            if(@selected_harvesting_method == @new_skill) { // 스킬 사용 해제시
+              @selected_harvesting_method = ''
+              @selected_methods['harvesting_method'] = @selected_harvesting_method
+              @skill_manager[4] = json_encode(@selected_methods)
+              if(is_proc(@new_skill_proc_name)) {
+                call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_harvesting_method)
+              }
+            } else { // 스킬 선택시
+              @old_skill = @selected_harvesting_method
+              @selected_harvesting_method = @new_skill
+              @selected_methods['harvesting_method'] = @selected_harvesting_method
+              @skill_manager[4] = json_encode(@selected_methods)
+              if(@old_skill != '') { // 스킬 변경시
+                @old_skill_proc_name = "_apply_loading_by_@old_skill"
+                @old_skill_spec = @skills_spec[@old_skill]
+                @old_skill_point = @skills_data[@old_skill][0]
+                if(is_proc(@old_skill_proc_name)) {
+                  call_proc(@old_skill_proc_name, @player_data, @player, @uuid, @category, @old_skill, @old_skill_spec, @old_skill_point, @selected_harvesting_method)
+                }
+              }
+              if(is_proc(@new_skill_proc_name)) {
+                call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_harvesting_method)
+              }
+            }
+            runas(@player, '/skill farmingmethod')
+          }
+          break()
+        case 'button':
+          @skill = @inventory[@slot]['skill']
+          @selected_sowing_method = @selected_methods['sowing_method']
+          @selected_harvesting_method = @selected_methods['harvesting_method']
+          @skills_data[@skill][0] += 1
+          @player_data['invested_point'] += 1
+          if(@skill == @selected_sowing_method) {
+            @category = 'sowing_method'
+            @skill_spec = @skills_spec[@skill]
+            @point = @skills_data[@skill][0]
+            @proc_name = "_apply_loading_by_@skill"
+            if(is_proc(@proc_name)) { // 방식 사용중 포인트 사용시 쿨탐, 어트리뷰트 초기화 
+              call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, 0, @selected_sowing_method)
+              call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @selected_sowing_method)
+            }
+          } else if(@skill == @selected_harvesting_method) {
+            @category = 'harvesting_method'
+            @skill_spec = @skills_spec[@skill]
+            @point = @skills_data[@skill][0]
+            @proc_name = "_apply_loading_by_@skill"
+            if(is_proc(@proc_name)) { // 방식 사용중 포인트 사용시 쿨탐, 어트리뷰트 초기화 
+              call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, 0, @selected_harvesting_method)
+              call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @selected_harvesting_method)
+            }
+          }
+          runas(@player, '/skill farmingmethod')
+          break()
+        }
+      }
+      if(@event['action'] == 'PICKUP_ALL') {
+        switch(@event['rawslot']) {
+        case 0:
+          break()
+        }
+      }
+    }
+  }
+  # GUI 보여주기
+  _show_gui(@player, 'skillbook_farming_method', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
 }
 
 proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @minerals_spec, @skills_spec, @text) {

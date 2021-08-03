@@ -341,7 +341,7 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
     case 'blocking':
       @icon = '\ue434'
       break()
-    case 'wide_hand':
+    case 'wide_hands':
       @icon = '\ue435'
       break()
     case 'golden_finger':

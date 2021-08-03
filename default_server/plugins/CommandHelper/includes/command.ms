@@ -1141,6 +1141,10 @@ proc _skill_command(@command, @player, @args, @text, @players_data, @skills_info
   case '전투':
     _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spec, @text)
     break()
+  case 'farmingmethod':
+  case '농사방식':
+    _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @skills_spec, @text)
+    break()
   case 'farming':
   case '농사':
 
