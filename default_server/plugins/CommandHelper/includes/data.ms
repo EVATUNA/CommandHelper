@@ -6,7 +6,7 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
 
   # cache
   @player_data['cache'] = array(
-    'resolution_setting': false,
+    'is_dash': false,
     'last_weapon_effect': 0,
     'last_armor_effect': 0,
     'indicator': null,

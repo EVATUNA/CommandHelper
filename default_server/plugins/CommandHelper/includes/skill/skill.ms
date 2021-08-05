@@ -183,7 +183,20 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
     # 스킬 효과 적용 (로드시)
     @proc_name = "_apply_loading_by_@skill"
     if(is_proc(@proc_name)) {
-      call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @selected_combat_method, @selected_sowing_method, @selected_harvesting_method, @selected_runes)
+      switch(@category) {
+      case 'combat_method':
+        @selected_method = @selected_combat_method
+        break()
+      case 'sowing_method':
+        @selected_method = @selected_sowing_method
+        break()
+      case 'harvesting_method':
+        @selected_method = @selected_harvesting_method
+        break()
+      case 'rune':
+        @selected_method = @selected_runes
+      }
+      call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @selected_method)
     }
   }
 }

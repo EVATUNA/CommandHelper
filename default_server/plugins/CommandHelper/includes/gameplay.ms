@@ -1224,7 +1224,14 @@ bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_s
         @skill_spec = @skills_spec[@skill]
         @proc_name = "_apply_active_by_@skill"
         if(is_proc(@proc_name)) {
-          call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skill_spec, @point)
+          switch(@skill) {
+          case 'knockback':
+            call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skills_spec, @text)
+            break()
+          default:
+            call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skill_spec, @point)
+            break()
+          }
           _send_action_msg(@player, @player_data, @skills_spec, @text) // 액션바 설정
         }
       }
