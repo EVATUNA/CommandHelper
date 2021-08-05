@@ -417,9 +417,10 @@ bind('block_place', null, null, @event, @players_data, @skills_spec) {
         'MELON_STEM'
       )
       if(array_contains(@crops, @event['block'])) {
-        @sowing_method = @players_data[@uuid]['skill_manager'][4]
-        if(@sowing_method != '' && @players_data[@uuid]['active_skill']['sowing_method'][@sowing_method][1] > 0) {
-
+        @player_data = @players_data[@uuid]
+        @skill_manager = @player_data['skill_manager']
+        @sowing_method = @harvesting_method = json_decode(@skill_manager[4])['sowing_method']
+        if(@sowing_method != '' && @player_data['active_skill'][@sowing_method][1] > 0) {
           switch(@sowing_method) {
           case 'wet_hands':
             @farmland_location = array_deep_clone(@event['location'])
@@ -469,7 +470,6 @@ bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spe
         @extra_xp = @stones[@event['block']] - @default_xp
         @skill = 'tough_shoulder'
         @skill_data = @players_data[@uuid]['skill_data']['mining'][@skill]
-        _add_epxerience(@uuid, @skill, @skill_data, @default_xp, @extra_xp)
       }
       if(@server == 'nether') {
         if(array_contains(array('SURVIVAL', 'ADVENTURE'), pmode(@player))) {
@@ -977,7 +977,6 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
           @delta = array('x': 0.25, 'y': 0.125, 'z': 0.25)
           @uuid = puuid(@player)
           #mom_playerparticle(@uuid, 'VILLAGER_HAPPY', @pos['x'], @pos['y'], @pos['z'], 15, @delta['x'], @delta['y'], @delta['z'], 0.0)
-          _add_epxerience(@uuid, 'fertile_touch', @players_data[@uuid]['skill_data']['sowing_method']['fertile_touch'], 1, 0)
           set_timeout(0, closure( set_blockdata(@event['location'], @data) ))
         } else {
           cancel()
@@ -1001,7 +1000,6 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
             play_named_sound(@event['location'], array('sound': 'minecraft:item.bottle.empty', 'category': 'NEUTRAL', 'volum': 1))
             @data['moisture'] = 6
             set_blockdata(@event['location'], @data)
-            _add_epxerience(@uuid, 'wet_hands', @players_data[@uuid]['skill_data']['sowing_method']['wet_hands'], 1, 0)
             if(@event['hand'] =='main_hand') {
               @slot = pheld_slot(@player)
             } else {

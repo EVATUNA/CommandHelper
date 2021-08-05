@@ -3,28 +3,37 @@
 	"default_max_point": 3,
 	"effect_by_point": [
 		{
-			"passive": {
-			}
+			"multiply": 0
 		},
 		{
-			"passive": {
-			}
+			"multiply": 1
 		},
 		{
-			"passive": {
-			}
+			"multiply": 2
 		},
 		{
-			"passive": {
-			}
+			"multiply": 3
 		},
 		{
-			"passive": {
-			}
+			"multiply": 4
 		},
 		{
-			"passive": {
-			}
+			"multiply": 5
+		},
+		{
+			"multiply": 6
+		},
+		{
+			"multiply": 7
+		},
+		{
+			"multiply": 8
+		},
+		{
+			"multiply": 9
+		},
+		{
+			"multiply": 10
 		}
 	]
 }

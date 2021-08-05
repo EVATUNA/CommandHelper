@@ -188,22 +188,8 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
   }
 }
 
-# 버튼이랑 메인 나누기
-# 버튼 누를시 포인트 찍은거 인식
-
-# @skill_manager = @player_data['skill_manager']
-# @invested_point = @player_data['invested_point']
-#  # 룬 슬롯 갯수
-#  @rune_slot = @skill_manager[3]
-#  # 선택한 방식 스킬
-#  @selected_methods = @skill_manager[4]
-#  @selected_combat_method = @selected_methods['combat_method']
-#  @selected_sowing_method = @selected_methods['sowing_method']
-#  @selected_harvesting_method = @selected_methods['harvesting_method']
-#  # 선택한 룬들
-#  @selected_runes = @skill_manager[5]
-# _open_skill_???page() 쓰기전 위의 변수들 선언 되어야 함
-
+## 스킬 gui
+# 전투
 proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spec, @text) {
   @player_data = @players_data[@uuid]
   @skill_manager = @player_data['skill_manager']
@@ -464,7 +450,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
   # GUI 보여주기
   _show_gui(@player, 'skillbook_combat', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
 }
-
+# 농사
 proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @skills_spec, @text) {
   @player_data = @players_data[@uuid]
   @skill_manager = @player_data['skill_manager']
@@ -779,7 +765,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
   # GUI 보여주기
   _show_gui(@player, 'skillbook_farming_method', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
 }
-
+# 농사방식
 proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_spec, @text) {
   @player_data = @players_data[@uuid]
   @skill_manager = @player_data['skill_manager']
@@ -955,7 +941,7 @@ proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_sp
   # GUI 보여주기
   _show_gui(@player, 'skillbook_combat', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
 }
-
+# 채광
 proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spec, @text) {
   @player_data = @players_data[@uuid]
   @skill_manager = @player_data['skill_manager']
@@ -1372,6 +1358,7 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
   
 proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skills_spec, @text) {
   @player_data = @players_data[@uuid]
+  @skill_manager = @player_data['skill_manager']
   # 부순 블럭 선언
   @crop = @event['block']
   # 부순 블럭이 작물일 시
@@ -1472,7 +1459,7 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
     } else { //호박 수박 이외의 작물 수확 시
       @locations = array()
       @center_location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.5, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
-      @harvesting_method = @player_data['skill_manager'][4]['harvesting_method']
+      @harvesting_method = json_decode(@skill_manager[4])['harvesting_method']
       @age = get_blockdata(@center_location)['age']
       set_timeout(1, closure() {
         if(!is_cancelled()) { // 성공적으로 수확 시
@@ -1495,7 +1482,7 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
             }
             @breaking_chance = 1 / (@unbreaking_level + 1)
             # 수확 방식 적용
-            if(@harvesting_method != '' && @player_data['active_skill']['harvesting_method'][@harvesting_method][1] > 0) {
+            if(@harvesting_method != '' && @player_data['active_skill'][@harvesting_method][1] > 0) {
               switch(@harvesting_method) {
               case 'wide_hands':
                 if(@age == @crop_spec['max_age']) {
@@ -1559,7 +1546,7 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
                 @locations[] = @center_location
               }
             }
-            _update_item(@player, @uuid, array('main_hand': @item), @players_data, @skills_spec, @text)
+            _update_item(@player, @uuid, array('main_hand': @item), @player_data, @skills_spec, @text)
             # 루트 테이블 시스템
             @entries = @crop_spec['loot_table']
             @total_weight = 0
