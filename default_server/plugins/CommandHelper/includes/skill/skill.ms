@@ -1730,10 +1730,11 @@ proc _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @ski
   }
 }
 
-proc _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skills_spec, @allowed_entity, @text, @server) {
+proc _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skills_spec, @allowed_entity, @text, @server, @items, @weapons) {
   # 기본 변수 선언
   @player_data = @players_data[@puuid]
   @skill_manager = @player_data['skill_manager']
+  @selected_methods = json_decode(@skill_manager[4])
   @selected_combat_method = @selected_methods['combat_method']
   @selected_runes = @skill_manager[5]
   @skills_data = @player_data['skill_data']
@@ -1759,21 +1760,21 @@ proc _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skill
       @category = 'combat_method'
       @point = @skill_manager
       @skill_spec = @skills_spec[@selected_combat_method]
-      @skill_data = @player_data['skill_data'][@skill]
+      @skill_data = @player_data['skill_data'][@selected_combat_method]
       @point = @skill_data[0]
-      call_proc(@proc_name, @event, @player_data, @player, @uuid, @category, @selected_combat_method, @skill_spec, @point, @attack_cooldown, @attribute_attack_damage, @attribute_attack_speed)
+      call_proc(@proc_name, @event, @player_data, @player, @puuid, @category, @selected_combat_method, @skill_spec, @point, @attack_cooldown, @attribute_attack_damage, @attribute_attack_speed)
     }
   }
   ## 룬
   foreach(@selected_rune in @selected_runes) {
-    @proc_name = "_apply_attacking_by_@selected_combat_method"
+    @proc_name = "_apply_attacking_by_@selected_rune"
     if(is_proc(@proc_name)) {
       @category = 'rune'
       @point = @skill_manager
       @skill_spec = @skills_spec[@selected_rune]
-      @skill_data = @player_data['skill_data'][@skill]
+      @skill_data = @player_data['skill_data'][@selected_rune]
       @point = @skill_data[0]
-      call_proc(@proc_name, @event, @player_data, @player, @uuid, @category, @selected_combat_method, @skill_spec, @point, @attack_cooldown, @attribute_attack_damage, @attribute_attack_speed)
+      call_proc(@proc_name, @event, @player_data, @player, @puuid, @category, @selected_rune, @skill_spec, @point, @attack_cooldown, @attribute_attack_damage, @attribute_attack_speed)
     }
   }
   # 인첸트

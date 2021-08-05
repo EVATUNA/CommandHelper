@@ -1457,7 +1457,7 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text, @s
           'TRIDENT'
         )
         if(array_contains(array_keys(@allowed_entity), @entity_type)) {
-          _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skills_spec, @allowed_entity, @text, @server)
+          _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skills_spec, @allowed_entity, @text, @server, @items, @weapons)
         }
       }
     }
