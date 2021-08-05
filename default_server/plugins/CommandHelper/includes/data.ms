@@ -9,8 +9,7 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
     'is_dash': false,
     'last_weapon_effect': 0,
     'last_armor_effect': 0,
-    'indicator': null,
-    'tips': array()
+    'tooltips': array()
   )
 
   # setting
@@ -62,43 +61,37 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
   ### 보스바 생성 및 보여주기
   create_bar(@tunalevel_id, @tunalevel_bossbar_data)
   bar_add_player(@tunalevel_id, @player)
+  // skill manager 바뀌는 카프카 cupset 인식하여 레벨 경험치 화면에 보여지게 해야함
 
   ## 더미 보스바
+  ### 보스바 id 재생성
   @dummy_id = "dummy.@uuid"
   if(array_contains(@bossbars, @dummy_id)) {
     remove_bar(@dummy_id)
   }
+  ### 보스바 데이터 설정
   @dummy_bossbar_data = array(
     'title': '',
     'percent': 0
   )
+  ### 보스바 생성 및 보여주기
   create_bar(@dummy_id, @dummy_bossbar_data)
   bar_add_player(@dummy_id, @player)
 
-  ## 인디케이터(/ 툴팁) 보스바
-  @indicator_id = 'indicator.'.@uuid
+  ## 인디케이터(and 툴팁) 보스바
+  ### 보스바 id 재생성
+  @indicator_id = 'tooltip.'.@uuid
   if(array_contains(@bossbars, @indicator_id)) {
     remove_bar(@indicator_id)
   }
+  ### 보스바 데이터 설정
   @indicator_bossbar_data = array(
     'title': '',
     'percent': 0
   )
+  ### 보스바 생성 및 보여주기
   create_bar(@indicator_id, @indicator_bossbar_data)
   bar_add_player(@indicator_id, @player)
-  // skill manager 바뀌는 카프카 cupset 인식하여 레벨 경험치 화면에 보여지게 해야함 
-
-  ## 구 툴팁 (제거 예정)
-  @tip_id = 'tip.'.@uuid
-  if(array_contains(@bossbars, @tip_id)) {
-    remove_bar(@tip_id)
-  }
-  @tip_bossbar_data = array(
-    'title': '',
-    'percent': 0
-  )
-  create_bar(@tip_id, @tip_bossbar_data)
-  bar_add_player(@tip_id, @player)
 
   # item
   @player_data['item'] = array(
@@ -289,29 +282,18 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
     @player = player(@uuid)
     if(ponline(@player)) {
       # action bar msg
-      #broadcast(A @players_data[@uuid]['active_skill'])
-      #broadcast(B @player_data['active_skill'])
       _send_action_msg(@player, @player_data, @skills_spec, @text)
       # boss bar msg
-      //if(!is_null(@players_data[@uuid]['cache']['indicator'])) {
-      //  if(@players_data[@uuid]['cache']['indicator']['countdown'] > 0) {
-      //    @players_data[@uuid]['cache']['indicator']['countdown'] -= 1
-      //  } else {
-      //    @players_data[@uuid]['cache']['indicator'] = null
-      //  }
-      //  _set_indicator(@player, @uuid, @players_data, @text)
-      //}
-      //if(array_size(@players_data[@uuid]['cache']['tips']) > 0) {
-      //  if(@players_data[@uuid]['cache']['tips'][0]['countdown'] > 0) {
-      //    @players_data[@uuid]['cache']['tips'][0]['countdown'] -= 1
-      //  } else {
-      //    array_remove(@players_data[@uuid]['cache']['tips'], 0)
-      //  }
-      //  _set_tips(@player, @uuid, @players_data)
-      //}
+      if(array_size(@player_data['cache']['tooltips']) > 0) {
+        if(@player_data['cache']['tooltips'][0]['countdown'] > 0) {
+          @player_data['cache']['tooltips'][0]['countdown'] -= 1
+        } else {
+          array_remove(@player_data['cache']['tooltips'], 0)
+        }
+        _set_tooltips(@player, @uuid, @player_data)
+      }
 
       # 액티브 스킬 카운드다운
-      
       foreach(@skill: @active_skill in @player_data['active_skill']) { // 활성화된 액티브 스킬 포리치
         @proc_name = "_apply_countdown_by_@skill"
         @skill_spec = @skills_spec[@skill]
@@ -469,7 +451,7 @@ bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spe
         @default_xp = integer(@stones[@event['block']])
         @extra_xp = @stones[@event['block']] - @default_xp
         @skill = 'tough_shoulder'
-        @skill_data = @players_data[@uuid]['skill_data']['mining'][@skill]
+        @skill_data = @players_data[@uuid]['skill_data'][@skill]
       }
       if(@server == 'nether') {
         if(array_contains(array('SURVIVAL', 'ADVENTURE'), pmode(@player))) {

@@ -1224,10 +1224,14 @@ register_command('sendwarn', array(
   'executor': closure(@command, @player, @args) {
     @target_name = @args[0]
     @target_uuid = puuid(@target_name)
-    @message = array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' ')
-    @countdown = 3
-    @is_warn = true
-    _add_tips(@target_name, @target_uuid, @players_data, @message, @countdown, @is_warn)
+    @player_data = @players_data[@target_uuid]
+    @tooltip_data = array(
+      'type': 'warn',
+      'message': array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' '),
+      'countdown': 3
+    )
+    _add_tooltip(@target_name, @target_uuid, @player_data, @tooltip_data)
+    _set_tooltips(@target_name, @target_uuid, @player_data)
   }
 ))
 

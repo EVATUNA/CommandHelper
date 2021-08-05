@@ -394,183 +394,125 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
 }
 
 # 팁 메시지 보여주기
-proc _set_tips(@player, @uuid, @players_data) {
-  @tips = @players_data[@uuid]['cache']['tips']
-  if(array_size(@tips) > 0) {
-    @tip_message = @tips[0]['message']
-    if(array_index_exists(@tips[0], 'sound')) {
-      if(@tips[0]['sound_time'] == @tips[0]['countdown']) {
-        play_named_sound(ploc(@player), @tips[0]['sound'], array(@player))
+proc _set_tooltips(@player, @uuid, @player_data) {
+  @tooltips = @player_data['cache']['tooltips']
+  if(array_size(@tooltips) > 0) {
+    @tooltip_message = @tooltips[0]['message']
+    @tooltip_percent = @tooltips[0]['percent']
+    @tooltip_color = @tooltips[0]['color']
+    if(array_index_exists(@tooltips[0], 'sound')) {
+      if(@tooltips[0]['sound_time'] == @tooltips[0]['countdown']) {
+        play_named_sound(ploc(@player), @tooltips[0]['sound'], array(@player))
       }
     }
   } else {
-    @tip_message = ''
+    @tooltip_message = ''
+    @tooltip_percent = 0
+    @tooltip_color = 'WHITE'
   }
-  @tip_bossbar_data = array(
-    'title': @tip_message
+  @tooltip_bossbar_data = array(
+    'title': @tooltip_message,
+    'percent': @tooltip_percent,
+    'color': @tooltip_color
   )
-  update_bar('tip.'.@uuid, @tip_bossbar_data)
+  update_bar('tooltip.'.@uuid, @tooltip_bossbar_data)
 }
 
 # 팁 메시지 목록에 추가하기
-proc _add_tips(@player, @uuid, @players_data, @message, @countdown, @is_warn, @sound) {
-  @tips = @players_data[@uuid]['cache']['tips']
-  @tip = array(
-    'message': @message,
-    'countdown': @countdown,
-    'is_warn': @is_warn
+proc _add_tooltip(@player, @uuid, @player_data, @tooltip_data) {
+  @tooltips = @player_data['cache']['tooltips']
+  @tooltip = array(
+    'message': @tooltip_data['message'],
+    'countdown': @tooltip_data['countdown']
   )
-  if(is_array(@sound)) {
-    @tip['sound'] = @sound
-    if(array_size(@tips) == 0) {
-      @tip['sound_time'] = @countdown - 1
+  if(array_index_exists(@tooltip_data, 'sound') && is_array(@tooltip_data['sound'])) {
+    @tooltip['sound'] = @tooltip_data['sound']
+    if(array_size(@tooltips) == 0) {
+      @tooltip['sound_time'] = @tooltip_data['countdown'] - 1
     } else {
-      @tip['sound_time'] = @countdown
+      @tooltip['sound_time'] = @tooltip_data['countdown']
     }
   }
-  if(@is_warn) {
-    if(array_size(@tips) > 0 && @tips[0]['is_warn']) {
-      @tips[0] = @tip
+  switch(@tooltip_data['type']) {
+  case 'warn':
+    @tooltip['type'] = 'warn'
+    @tooltip['color'] = 'WHITE'
+    @tooltip['percent'] = 0
+    if(array_size(@tooltips) > 0 && (@tooltips[0]['type'] == 'warn' || @tooltips[0]['type'] == 'indicator')) {
+      @tooltips[0] = @tooltip
     } else {
-      array_insert(@tips, @tip, 0)
+      array_insert(@tooltips, @tooltip, 0)
     }
-  } else {
-    @tips[] = @tip
+    break()
+  case 'indicator':
+    @tooltip['type'] = 'indicator'
+    @tooltip['color'] = 'PURPLE'
+    @tooltip['percent'] = @tooltip_data['percent']
+    if(array_size(@tooltips) > 0 && (@tooltips[0]['type'] == 'warn' || @tooltips[0]['type'] == 'indicator')) {
+      @tooltips[0] = @tooltip
+    } else {
+      array_insert(@tooltips, @tooltip, 0)
+    }
+    break()
+  default:
+    @tooltip['type'] = 'default'
+    @tooltip['color'] = 'WHITE'
+    @tooltip['percent'] = 0
+    @tooltips[] = @tooltip
+    break()
   }
 }
 
 # 인디케이터
-proc _set_indicator(@player, @uuid, @players_data, @text) {
-  @indicator_data = @players_data[@uuid]['cache']['indicator']
-  if(!is_null(@indicator_data)) {
-    switch(@indicator_data['block']) {
-    case 'COAL_ORE':
-      @icon = '\ue4c7'
-      break()
-    case 'PETRIFIED_OAK_SLAB':
-      @icon = '\ue4c8'
-      break()
-    case 'IRON_ORE':
-      @icon = '\ue4c9'
-      break()
-    case 'LAPIS_ORE':
-      @icon = '\ue4ca'
-      break()
-    case 'GOLD_ORE':
-      @icon = '\ue4cb'
-      break()
-    case 'NETHER_QUARTZ_ORE':
-      @icon = '\ue4cc'
-      break()
-    case 'NETHER_GOLD_ORE':
-      @icon = '\ue4d6'
-      break()
-    case 'REDSTONE_ORE':
-      @icon = '\ue4cd'
-      break()
-    case 'EMERALD_ORE':
-      @icon = '\ue4ce'
-      break()
-    case 'DIAMOND_ORE':
-      @icon = '\ue4cf'
-      break()
-    case 'ANCIENT_DEBRIS':
-      @icon = '\ue4d0'
-      break()
-    case 'FARMLAND':
-      @icon = '\ue4da'
-      break()
-    }
-    @percentage = integer((1- @indicator_data['hp'] / @indicator_data['max_hp']) * 100)
-    switch(@percentage) {
-    case 100:
-      @ui = '\ue4c6'
-      break()
-    case 95..100:
-      @ui = '\ue4c5'
-      break()
-    case 90..95:
-      @ui = '\ue4c4'
-      break()
-    case 85..90:
-      @ui = '\ue4c3'
-      break()
-    case 80..85:
-      @ui = '\ue4c2'
-      break()
-    case 75..80:
-      @ui = '\ue4c1'
-      break()
-    case 70..75:
-      @ui = '\ue4c0'
-      break()
-    case 65..70:
-      @ui = '\ue4bf'
-      break()
-    case 60..65:
-      @ui = '\ue4be'
-      break()
-    case 55..60:
-      @ui = '\ue4bd'
-      break()
-    case 50..55:
-      @ui = '\ue4bc'
-      break()
-    case 45..50:
-      @ui = '\ue4bb'
-      break()
-    case 40..45:
-      @ui = '\ue4ba'
-      break()
-    case 35..40:
-      @ui = '\ue4b9'
-      break()
-    case 30..35:
-      @ui = '\ue4b8'
-      break()
-    case 25..30:
-      @ui = '\ue4b7'
-      break()
-    case 20..25:
-      @ui = '\ue4b6'
-      break()
-    case 15..20:
-      @ui = '\ue4b5'
-      break()
-    case 10..15:
-      @ui = '\ue4b4'
-      break()
-    case 5..10:
-      @ui = '\ue4b3'
-      break()
-    case 0..5:
-      @ui = '\ue4b2'
-      break()
-    }
-    @resolution = @players_data[@uuid]['setting'][0]
-    if(@resolution % 2 == 0) {
-      @left_resolution = integer(@resolution / 2)
-      @right_resolution = integer(@resolution / 2)
-    } else {
-      @left_resolution = integer(@resolution / 2)
-      @right_resolution = integer(@resolution / 2 + 1)
-    }
-    @left_quota = integer(@left_resolution / 1024)
-    @right_quota = integer(@right_resolution / 1024)
-    @left_rest = @left_resolution % 1024
-    @right_rest = @right_resolution % 1024
-    @left_void = string_multiply(@text['space_fonts']['space.1024'], @left_quota).@text['space_fonts']['space.'.@left_rest]
-    @right_void = string_multiply(@text['space_fonts']['space.1024'], @right_quota).@text['space_fonts']['space.'.@right_rest]
-    @indicator_bossbar_data = array(
-      'title': @text['space_fonts']['space.2'].@ui.@text['space_fonts']['space.-19'].@icon.@text['space_fonts']['space.-21'].@left_void.@right_void
-    )
-    update_bar('indicator.'.@uuid, @indicator_bossbar_data)
-  } else {
-    @indicator_bossbar_data = array(
-      'title': ''
-    )
-    update_bar('indicator.'.@uuid, @indicator_bossbar_data)
+proc _set_indicator(@player, @uuid, @player_data, @indicator_data, @text) {
+  switch(@indicator_data['block']) {
+  case 'COAL_ORE':
+    @icon = '\ue4c7'
+    break()
+  case 'PETRIFIED_OAK_SLAB':
+    @icon = '\ue4c8'
+    break()
+  case 'IRON_ORE':
+    @icon = '\ue4c9'
+    break()
+  case 'LAPIS_ORE':
+    @icon = '\ue4ca'
+    break()
+  case 'GOLD_ORE':
+    @icon = '\ue4cb'
+    break()
+  case 'NETHER_QUARTZ_ORE':
+    @icon = '\ue4cc'
+    break()
+  case 'NETHER_GOLD_ORE':
+    @icon = '\ue4d6'
+    break()
+  case 'REDSTONE_ORE':
+    @icon = '\ue4cd'
+    break()
+  case 'EMERALD_ORE':
+    @icon = '\ue4ce'
+    break()
+  case 'DIAMOND_ORE':
+    @icon = '\ue4cf'
+    break()
+  case 'ANCIENT_DEBRIS':
+    @icon = '\ue4d0'
+    break()
+  case 'FARMLAND':
+    @icon = '\ue4da'
+    break()
   }
+  @percentage = (1- @indicator_data['hp'] / @indicator_data['max_hp']) * 0.8 + 0.15
+  if(@percentage > 0.95) { @percentage = 0.95 }
+  if(@percentage < 0.15) { @percentage = 0.15 }
+  @tooltip_data = array(
+    'type': 'indicator',
+    'message': '\ue4b2'.@text['space_fonts']['space.-178'].@icon.@text['space_fonts']['space.162'],
+    'countdown': @indicator_data['countdown'],
+    'percent': @percentage
+  )
+  _add_tooltip(@player, @uuid, @player_data, @tooltip_data)
 }
 
 ## 기타 proc

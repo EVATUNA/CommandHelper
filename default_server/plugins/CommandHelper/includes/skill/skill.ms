@@ -1276,7 +1276,7 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
           } else {
             set_inventory_item(puuid(@player), @slot, @item)
           }
-          _update_item(@player, @uuid, array('main_hand': @item), @players_data, @skills_spec, @text)
+          _update_item(@player, @uuid, array('main_hand': @item), @player_data, @skills_spec, @text)
         }
         # 인디케이터 데이터 설정
         @indicator_data  = array(
@@ -1286,6 +1286,9 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
           'countdown': 7
         )
       } else { // 채굴 완료시
+        # 선광 숙련, 채광 숙련 평균 구하기 (높은 레벨 유저가 막타 치거나 행운곡 막타 방지)
+        @mining_mastery_multiply = average(@hp_blocks[@id]['logs']['rank_quality_multiplies']) 
+        @max_drop_multiply = average(@hp_blocks[@id]['logs']['max_drop_multiplies'])
         # 채굴 데이터 삭제
         array_remove(@hp_blocks, @id)
         # 채굴 완료 소리
@@ -1295,9 +1298,6 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
           'volume': 0.4,
           'pitch': 1.5
         ), @player)
-        # 선광 숙련, 채광 숙련 평균 구하기 (높은 레벨 유저가 막타 치거나 행운곡 막타 방지)
-        @mining_mastery_multiply = average(@hp_blocks[@id]['logs']['rank_quality_multiplies']) 
-        @max_drop_multiply = average(@hp_blocks[@id]['logs']['max_drop_multiplies'])
         # 루트 테이블 시스템
         @entries = @mineral_spec['loot_table']
         @total_weight = 0
@@ -1362,8 +1362,8 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
       cancel()
     }
     #인디케이터 보여주기
-    @player_data['cache']['indicator'] = @indicator_data
-    _set_indicator(@player, @uuid, @player_data, @text)
+    _set_indicator(@player, @uuid, @player_data, @indicator_data, @text)
+    _set_tooltips(@player, @uuid, @player_data)
     #캔슬은 안됬는데 정상적으로 캔게 아닐떼 템 안떨구도록 해주는 코드
     modify_event('drops', array())
   }

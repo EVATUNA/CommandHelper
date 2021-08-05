@@ -39,6 +39,7 @@ proc _get_result_item_rank(@ingredients_weight, @ingredient_items) { #등급있�
     @ingredient_item_average_rank = average(@ingredient_item_ranks)
     @result_item_rank = round(@ingredient_item_average_rank + rand() * 0.4 - 0.2, 5)
     return(@result_item_rank)
+    broadcast(@result_item_rank)
   } else {
     return(round(rand(), 5))
   }
