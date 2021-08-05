@@ -1147,12 +1147,12 @@ proc _skill_command(@command, @player, @args, @text, @players_data, @skills_info
     break()
   case 'farming':
   case '농사':
-
+    _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_spec, @text)
     break()
   case 'mining':
   case '채광':
   case '채굴':
-  
+    _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spec, @text)
     break()
   default:
     msg(@text['prefix']['warn']'§7해당 스킬 카테고리를 찾을 수 없습니다.')
