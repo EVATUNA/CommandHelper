@@ -60,6 +60,15 @@ include('skill/skill.ms')
 
 # PROC
 proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
+  @seeds = array(
+    'WHEAT_SEEDS',
+    'BEETROOT_SEEDS',
+    'POTATO',
+    'CARROT',
+    'PUMPKIN_SEEDS',
+    'MELON_SEEDS',
+    'SWEET_BERRIES'
+  )
   # 업뎃전 아이템
   @old_items = array_deep_clone(@items)
   # 인첸트 (오른손 왼손 갑빠)
@@ -116,56 +125,56 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
     # 아이템 업뎃발동 했으니 일단 인첸트 없는것으로 선언
     @enchantments['main_hand'] = null
     if(!is_null(@item)) { // 도구 들고 있을 시
-      # 바닐라 인첸 목록 선언
-      @vanilla_enchants = array()
-      # 스킬 적용
-      foreach(@applying_skill: @applying_skill_data in @applying_skills) {
-        @skill_spec = @applying_skill_data['skill_spec']
-        @point = @applying_skill_data['point']
-        @proc_name = @applying_skill_data['proc_name']
-        call_proc(@proc_name, @player_data, @player, @uuid, @applying_skill, @skill_spec, @point, @item, @vanilla_enchants)
-      }
-      # 기타 적용
-      if(@item['name'] == 'TRIDENT') {
-        @vanilla_enchants['loyalty'] = array(
-          'etype': 'LOYALTY',
-          'elevel': 5
-        )
-      }
-      # 인첸트 적용
-      if(!is_null(@item['meta']) && !is_null(@item['meta']['modifiers']) && !is_null(@item['meta']['lore'])) {
-        @modifiers = @item['meta']['modifiers']
-        @lore = @item['meta']['lore']
-        if(array_size(@lore) > array_size(@modifiers)) {
-          @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
-          @enchantments['main_hand'] = @enchantment
-          switch(@enchantment) {
-          case '내구성':
-            @vanilla_enchants['unbreaking'] = array(
-              'etype': 'DURABILITY',
-              'elevel': 5
-            )
-            break()
-          case '효율':
-            @vanilla_enchants['efficiency'] = array(
-              'etype': 'DIG_SPEED',
-              'elevel': 3
-            )
-            break()
-          case '행운':
-            @vanilla_enchants['fortune'] = array(
-              'etype': 'LOOT_BONUS_BLOCKS',
-              'elevel': 2
-            )
-            @vanilla_enchants['looting'] = array(
-              'etype': 'LOOT_BONUS_MOBS',
-              'elevel': 2
-            )
-            break()
+      if(!array_contains(@seeds, @item['name'])) {
+        # 바닐라 인첸 목록 선언
+        @vanilla_enchants = array()
+        # 스킬 적용
+        foreach(@applying_skill: @applying_skill_data in @applying_skills) {
+          @skill_spec = @applying_skill_data['skill_spec']
+          @point = @applying_skill_data['point']
+          @proc_name = @applying_skill_data['proc_name']
+          call_proc(@proc_name, @player_data, @player, @uuid, @applying_skill, @skill_spec, @point, @item, @vanilla_enchants)
+        }
+        # 기타 적용
+        if(@item['name'] == 'TRIDENT') {
+          @vanilla_enchants['loyalty'] = array(
+            'etype': 'LOYALTY',
+            'elevel': 5
+          )
+        }
+        # 인첸트 적용
+        if(!is_null(@item['meta']) && !is_null(@item['meta']['modifiers']) && !is_null(@item['meta']['lore'])) {
+          @modifiers = @item['meta']['modifiers']
+          @lore = @item['meta']['lore']
+          if(array_size(@lore) > array_size(@modifiers)) {
+            @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
+            @enchantments['main_hand'] = @enchantment
+            switch(@enchantment) {
+            case '내구성':
+              @vanilla_enchants['unbreaking'] = array(
+                'etype': 'DURABILITY',
+                'elevel': 5
+              )
+              break()
+            case '효율':
+              @vanilla_enchants['efficiency'] = array(
+                'etype': 'DIG_SPEED',
+                'elevel': 3
+              )
+              break()
+            case '행운':
+              @vanilla_enchants['fortune'] = array(
+                'etype': 'LOOT_BONUS_BLOCKS',
+                'elevel': 2
+              )
+              @vanilla_enchants['looting'] = array(
+                'etype': 'LOOT_BONUS_MOBS',
+                'elevel': 2
+              )
+              break()
+            }
           }
         }
-      }
-      if(array_size(@vanilla_enchants) > 0) {
         if(!@item['meta'] || !@item['meta']['flags']) {
           @item['meta'] = array('flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES'))
         }
@@ -185,40 +194,40 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
     # 아이템 업뎃발동 했으니 일단 인첸트 없는것으로 선언
     @enchantments['off_hand'] = null
     if(!is_null(@item)) { // 도구 들고 있을 시
-      # 바닐라 인첸 목록 선언
-      @vanilla_enchants = array()
-      # 스킬 적용
-      foreach(@applying_skill: @applying_skill_data in @applying_skills) {
-        @skill_spec = @applying_skill_data['skill_spec']
-        @point = @applying_skill_data['point']
-        @proc_name = @applying_skill_data['proc_name']
-        call_proc(@proc_name, @player_data, @player, @uuid, @applying_skill, @skill_spec, @point, @item, @vanilla_enchants)
-      }
-      #기타 적용
-      if(@item['name'] == 'TRIDENT') {
-        @vanilla_enchants['loyalty'] = array(
-          'etype': 'LOYALTY',
-          'elevel': 5
-        )
-      }
-      # 인첸트 적용
-      if(!is_null(@item['meta']) && !is_null(@item['meta']['modifiers']) && !is_null(@item['meta']['lore'])) {
-        @modifiers = @item['meta']['modifiers']
-        @lore = @item['meta']['lore']
-        if(array_size(@lore) > array_size(@modifiers)) {
-          @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
-          @enchantments['off_hand'] = @enchantment
-          switch(@enchantment) {
-          case '내구성':
-            @vanilla_enchants['unbreaking'] = array(
-              'etype': 'DURABILITY',
-              'elevel': 5
-            )
-            break()
+      if(!array_contains(@seeds, @item['name'])) {
+        # 바닐라 인첸 목록 선언
+        @vanilla_enchants = array()
+        # 스킬 적용
+        foreach(@applying_skill: @applying_skill_data in @applying_skills) {
+          @skill_spec = @applying_skill_data['skill_spec']
+          @point = @applying_skill_data['point']
+          @proc_name = @applying_skill_data['proc_name']
+          call_proc(@proc_name, @player_data, @player, @uuid, @applying_skill, @skill_spec, @point, @item, @vanilla_enchants)
+        }
+        #기타 적용
+        if(@item['name'] == 'TRIDENT') {
+          @vanilla_enchants['loyalty'] = array(
+            'etype': 'LOYALTY',
+            'elevel': 5
+          )
+        }
+        # 인첸트 적용
+        if(!is_null(@item['meta']) && !is_null(@item['meta']['modifiers']) && !is_null(@item['meta']['lore'])) {
+          @modifiers = @item['meta']['modifiers']
+          @lore = @item['meta']['lore']
+          if(array_size(@lore) > array_size(@modifiers)) {
+            @enchantment = substr(strip_colors(@lore[array_size(@modifiers) + 1]), 2)
+            @enchantments['off_hand'] = @enchantment
+            switch(@enchantment) {
+            case '내구성':
+              @vanilla_enchants['unbreaking'] = array(
+                'etype': 'DURABILITY',
+                'elevel': 5
+              )
+              break()
+            }
           }
         }
-      }
-      if(array_size(@vanilla_enchants) > 0) {
         if(!@item['meta'] || !@item['meta']['flags']) {
           @item['meta'] = array('flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES'))
         }

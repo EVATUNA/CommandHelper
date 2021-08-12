@@ -533,6 +533,283 @@ bind('block_break', null, null, @event, @players_data, @hp_blocks, @minerals_spe
   }
 }
 
+proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_items, @text) {  
+  @ingredient = @inventory[1]
+  @level = plevel(@player)
+  @backgroundtext = @text['space_fonts']['space.-8'].'\uec1e'.@text['space_fonts']['space.-169']
+  @book_text = @text['space_fonts']['space.-1'].'\uec1f'
+  @magic_items['미약한 마법의 정수']['text'] = @text['space_fonts']['space.18']
+  @magic_items['농축된 마법의 정수']['text'] = @text['space_fonts']['space.18']
+  @magic_items['강력한 마법의 정수']['text'] = @text['space_fonts']['space.18']
+  @magic_items['변환의 끈']['text'] = @text['space_fonts']['space.18']
+  @magic_items['놀라운 변환의 끈']['text'] = @text['space_fonts']['space.18']
+  @magic_items['강력한 변환의 끈']['text'] = @text['space_fonts']['space.18']
+  @magic_items['스킬 포인트 초기화 스크롤']['text'] = @text['space_fonts']['space.18']
+  if(!is_null(@ingredient)) {
+    if(@level >= 30) {
+      switch(@ingredient['name']) {
+      case 'GLASS_BOTTLE':
+        @magic_items['미약한 마법의 정수']['text'] = @text['space_fonts']['space.-1'].'\ue9ef'
+        break()
+      case 'STRING':
+        @magic_items['변환의 끈']['text'] = @text['space_fonts']['space.-1'].'\uea1f'
+        break()
+      }
+    }
+    if(@level >= 60) {
+      switch(@ingredient['name']) {
+      case 'GLASS_BOTTLE':
+        @magic_items['농축된 마법의 정수']['text'] = @text['space_fonts']['space.-1'].'\ue9ef'
+        break()
+      case 'STRING':
+        @magic_items['놀라운 변환의 끈']['text'] = @text['space_fonts']['space.-1'].'\uea1f'
+        break()
+      }
+    }
+    if(@level >= 90) {
+      switch(@ingredient['name']) {
+      case 'GLASS_BOTTLE':
+        @magic_items['강력한 마법의 정수']['text'] = @text['space_fonts']['space.-1'].'\ue9ef'
+        break()
+      case 'STRING':
+        @magic_items['강력한 변환의 끈']['text'] = @text['space_fonts']['space.-1'].'\uea1f'
+        break()
+      }
+    }
+    if(@level >= 120) {
+      switch(@ingredient['name']) {
+      case 'PAPER':
+        @magic_items['스킬 포인트 초기화 스크롤']['text'] = @text['space_fonts']['space.-1'].'\uea7f'
+        break()
+      }
+    }
+  }
+  @line_0 = @text['space_fonts']['space.-1'].'\ue9c2'.@text['space_fonts']['space.-1'].'\ue9c1'.@text['space_fonts']['space.-1'].'\ue9c3'.@text['space_fonts']['space.-1'].'\ue9c1'.@text['space_fonts']['space.-1'].'\ue9c4'.@text['space_fonts']['space.-1'].'\ue9c1'.@text['space_fonts']['space.-108']
+  @line_1 = @magic_items['미약한 마법의 정수']['text'].@text['space_fonts']['space.18'].@magic_items['농축된 마법의 정수']['text'].@text['space_fonts']['space.18'].@magic_items['강력한 마법의 정수']['text'].@text['space_fonts']['space.18'].@text['space_fonts']['space.-108']
+  @line_2 = @magic_items['변환의 끈']['text'].@text['space_fonts']['space.18'].@magic_items['놀라운 변환의 끈']['text'].@text['space_fonts']['space.18'].@magic_items['강력한 변환의 끈']['text'].@text['space_fonts']['space.18'].@text['space_fonts']['space.-108']
+  @line_3 = @text['space_fonts']['space.-1'].'\uea55'.@text['space_fonts']['space.-18']
+  @line_4 = @magic_items['스킬 포인트 초기화 스크롤']['text'].@text['space_fonts']['space.-18']
+  @texture_layer = @backgroundtext.@book_text.@line_0.@line_1.@line_2.@line_3.@line_4
+  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @block_location, @magic_items, @text) {
+    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @id, @texture_layer, @block_location, @magic_items, @text) {
+      @rawslot = @event['rawslot']
+      @action = @event['action']
+      @cursor_item = @event['cursoritem']
+      if(@rawslot >= 0 && @rawslot <= 44) {
+        if(@rawslot == 1) {
+          @change_gui = false
+          switch(@action) {
+          case 'PLACE_ALL':
+            if(is_null(@event['inventory'][1])) {
+              @change_gui = true
+            } else {
+              @change_gui = false
+            }
+            break();
+          case 'PLACE_ONE':
+            @change_gui = true
+            if(@cursor_item['qty'] > 1) {
+              @cursor_item['qty'] -= 1
+              @item = array_deep_clone(@cursor_item)
+              @cursor_item['qty'] = 1
+              modify_event('cursoritem', @cursor_item)
+              @item['qty'] = pgive_item(@player, @item)
+              @ploc = ploc(@player)
+              @ploc['y'] += 1
+              drop_item(@ploc, @item, false)
+            }
+            break();
+          case 'PLACE_SOME':
+            @change_gui = false
+            break();
+          case 'PICKUP_ALL':
+            @change_gui = true
+            @item = @event['inventory'][1]
+            modify_event('slotitem', null)
+            @item['qty'] = pgive_item(@player, @item)
+            @ploc = ploc(@player)
+            @ploc['y'] += 1
+            drop_item(@ploc, @item, false)
+            break();
+          case 'PICKUP_HALF':
+            @change_gui = true
+            @slot_item = @event['inventory'][1]
+            @half = floor(@slot_item['qty'] / 2)
+            @slot_item['qty'] -= @half
+            @item = array_deep_clone(@slot_item)
+            @slot_item['qty'] = @half
+            modify_event('slotitem', null)
+            set_timeout(0, closure() {
+              set_inventory_item(@id, 1, @slot_item)
+            })
+            @item['qty'] = pgive_item(@player, @item)
+            @ploc = ploc(@player)
+            @ploc['y'] += 1
+            drop_item(@ploc, @item, false)
+            break();
+          case 'SWAP_WITH_CURSOR':
+            @change_gui = true
+            @item = @event['inventory'][1]
+            modify_event('slotitem', null)
+            @item['qty'] = pgive_item(@player, @item)
+            @ploc = ploc(@player)
+            @ploc['y'] += 1
+            drop_item(@ploc, @item, false)
+            break();
+          case 'DROP_ONE_SLOT':
+          case 'DROP_ALL_SLOT':
+          case 'HOTBAR_SWAP':
+          case 'HOTBAR_MOVE_AND_READD':
+            if(is_null(@cursor_item)) {
+              @change_gui = true
+            } else {
+              @change_gui = false
+            }
+            break();
+          case 'MOVE_TO_OTHER_INVENTORY':
+            if(is_null(@cursor_item)) {
+              @change_gui = true
+            } else {
+              @change_gui = true
+              @item = @cursor_item
+              modify_event('cursoritem', null)
+              set_timeout(0, closure() {
+                @item['qty'] = pgive_item(@player, @item)
+                @ploc = ploc(@player)
+                @ploc['y'] += 1
+                drop_item(@ploc, @item, false)
+              })
+            }
+            break();
+          default:
+            @change_gui = false
+            broadcast(@change_gui @event['action'] @cursor_item)
+            break();
+          }
+          if(@change_gui) {
+            unbind('close'.@id)
+            set_timeout(1, closure() {
+              @inventory = get_inventory(@id)
+              _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_items, @text)
+            })
+          }
+        } else {
+          cancel()
+          @ingredient = @event['inventory'][1]
+          @converting_level = 0
+          if(!is_null(@ingredient) && @action == 'PICKUP_ALL' && is_null(@cursor_item)) {
+            switch(@rawslot) {
+            case 3:
+              @magic_item = @magic_items['미약한 마법의 정수']
+              @converting_level = 30
+              break()
+            case 5:
+              @magic_item = @magic_items['농축된 마법의 정수']
+              @converting_level = 60
+              break()
+            case 7:
+              @magic_item = @magic_items['강력한 마법의 정수']
+              @converting_level = 90
+              break()
+            case 12:
+              @magic_item = @magic_items['변환의 끈']
+              @converting_level = 30
+              break()
+            case 14:
+              @magic_item = @magic_items['놀라운 변환의 끈']
+              @converting_level = 60
+              break()
+            case 16:
+              @magic_item = @magic_items['강력한 변환의 끈']
+              @converting_level = 90
+              break()
+            case 30:
+              @magic_item = @magic_items['스킬 포인트 초기화 스크롤']
+              @converting_level = 120
+              break()
+            }
+            if(@converting_level > 0 && @magic_item['text'] != @text['space_fonts']['space.18']) {
+              unbind('close'.@id)
+              @item = @ingredient
+              @item['qty'] -= 1
+              set_timeout(0, closure() {
+                @item['qty'] = pgive_item(@player, @item)
+                @ploc = ploc(@player)
+                @ploc['y'] += 1
+                drop_item(@ploc, @item, false)
+              })
+              close_pinv(@player)
+              @location = array('x': @block_location['x'] + 0.5, 'y': @block_location['y'] + 1.01, 'z': @block_location['z'] + 0.5, 'world': @block_location['world'])
+              set_pcooldown(@player, 'CAVE_AIR', @converting_level)
+              @task = array('tick': integer(@converting_level / 3), 'id': null)
+              @id = set_interval(100 , closure() {
+                if(ponline(@player) && ploc(@player)['world'] == @block_location['world']) {
+                  if(@task['tick'] > 0) {
+                    @ploc = ploc(@player)
+                    play_named_sound(@location, array('sound': 'minecraft:entity.player.levelup', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
+                    @pos = array(
+                      'x': @ploc['x'] + rand() / 2 - 0.25,
+                      'y': @ploc['y'] + rand() * 1.5 + 1,
+                      'z': @ploc['z'] + rand() / 2 - 0.25
+                    )
+                    @delta = array(
+                      'x': (@location['x'] - @pos['x']) / 2,
+                      'y': (@location['y'] - @pos['y']) / 2,
+                      'z': (@location['z'] - @pos['z']) / 2
+                    )
+                    mom_playerparticle(@uuid, 'TOTEM', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 1.0)
+                    @task['tick'] -= 1
+                  } else {
+                    clear_task()
+                    play_named_sound(@location, array('sound': 'minecraft:block.enchantment_table.use', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
+                    set_plevel(@player, plevel(@player) - @converting_level)
+                    drop_item(@location, @magic_item, false)
+                  }
+                } else {
+                  @item = @ingredient
+                  @item['qty'] = 1
+                  drop_item(@location, @item, false)
+                  clear_task()
+                }
+              })
+              @task['id'] = @id
+            }
+          }
+        }
+      } else if(@action == 'MOVE_TO_OTHER_INVENTORY') {
+        if(!is_null(@cursor_item)) {
+          @item = @cursor_item
+          modify_event('cursoritem', null)
+          set_timeout(0, closure() {
+            @item['qty'] = pgive_item(@player, @item)
+            @ploc = ploc(@player)
+            @ploc['y'] += 1
+            drop_item(@ploc, @item, false)
+          })
+        }
+        unbind('close'.@id)
+        set_timeout(0, closure() {
+          @inventory = get_inventory(@id)
+          _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_items, @text)
+        })
+      }
+    }
+    #아이템 안뽑고 그냥 닫을시
+    set_timeout(1, closure() {
+      bind('inventory_close', array('id': 'close'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @magic_items) {
+        @item = @event['inventory'][1]
+        if(!is_null(@item)) {
+          @item['qty'] = pgive_item(@player, @item)
+          @ploc = ploc(@player)
+          @ploc['y'] += 1
+          drop_item(@ploc, @item, false)
+        }
+      }
+    })
+  }
+  _show_gui(@player, 'level_converter', 45, @texture_layer, '', @inventory, @closure, @block_location, @magic_items, @text)
+}
+
 bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_spec, @essences, @server, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
@@ -548,12 +825,29 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
   if(!is_cancelled() && is_null(get_inventory_item(@uuid, 36)) && !is_null(@event['item']) && array_contains(@armors, @event['item']['name']) && array_contains(array('right_click_block', 'right_click_air'), @event['action'])) {
     _update_item(@player, @uuid, array('armor': @event['item']), @players_data, @skills_spec, @text)
   }
-  # use skill scroll
-  if(!is_null(@event['item']) && @event['item']['name'] == 'ENCHANTED_BOOK' && !is_null(@event['item']['meta']) && !is_null(@event['item']['meta']) && @event['item']['meta']['model'] > 0) {
+  # 스크롤, 룬석 사용
+  if(!is_null(@event['item']) && @event['item']['name'] == 'ENCHANTED_BOOK' && !is_null(@event['item']['meta']) && @event['item']['meta']['model'] > 0) {
     #take_from_inventory(@uuid, 'PAPER', 1)
-  # use enchant
   }
-  if(!is_null(@event['item']) && @event['item']['name'] == 'EXPERIENCE_BOTTLE' && !is_null(@event['item']['meta']) && !is_null(@event['item']['meta']) && @event['item']['meta']['model'] > 0) {
+  /* 이름표 사용시 이름설정
+  if(@event['hand'] == 'main_hand' && psneaking(@player) && !is_null(@event['item']) && @event['item']['name'] == 'NAME_TAG') {
+    @texture_layer = ''
+    @message = '이름 설정'
+    @inventory = array(
+    )
+    @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @text) {
+      #set_inventory(@id, @inventory)
+      broadcast(get_inventory(@id))
+      bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @id) {
+        #cancel()
+        broadcast(@event)
+      }
+    }
+    _show_gui(@player, 'name_tag', 'ANVIL', @texture_layer, @message, @inventory, @closure, @text)
+  }
+  */
+  # 마법의 정수 투척 방지
+  if(!is_null(@event['item']) && @event['item']['name'] == 'EXPERIENCE_BOTTLE' && !is_null(@event['item']['meta'])  && @event['item']['meta']['model'] > 0) {
     cancel()
   }
   # cancel using disabled blocks & block system
@@ -904,44 +1198,147 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       }
       break()
     case 'ENCHANTING_TABLE':
-      cancel()
       if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
-        @location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 1.01, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
-        if(plevel(@player) >= 30) {
-          if(pcooldown(@player, 'CAVE_AIR') == 0) {
-            set_pcooldown(@player, 'CAVE_AIR', 30)
-            @task = array('tick': 10, 'id': null)
-            @id = set_interval(100 , closure() {
-              if(ponline(@player)) {
-                if(@task['tick'] > 0) {
-                  @ploc = ploc(@player)
-                  play_named_sound(@location, array('sound': 'minecraft:entity.player.levelup', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
-                  @pos = array(
-                    'x': @ploc['x'] + rand() / 2 - 0.25,
-                    'y': @ploc['y'] + rand() * 1.5 + 1,
-                    'z': @ploc['z'] + rand() / 2 - 0.25
-                  )
-                  @delta = array(
-                    'x': (@location['x'] - @pos['x']) / 2,
-                    'y': (@location['y'] - @pos['y']) / 2,
-                    'z': (@location['z'] - @pos['z']) / 2
-                  )
-                  mom_playerparticle(@uuid, 'TOTEM', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 1.0)
-                  @task['tick'] -= 1
-                } else {
-                  clear_task()
-                  play_named_sound(@location, array('sound': 'minecraft:block.enchantment_table.use', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
-                  set_plevel(@player, plevel(@player) - 30)
-                  @essence_name = array_rand(array(/*'희미한 마법의 정수', */'미약한 마법의 정수', '농축된 마법의 정수'/*, '강력한 마법의 정수', '찬란한 마법의 정수'*/), 1, false)[0]
-                  #broadcast(@essence_name)
-                  drop_item(@location, @essences[@essence_name]['item'], false)
-                }
-              } else {
-                clear_task()
-              }
-            })
-            @task['id'] = @id
+        cancel()
+        if(pcooldown(@player, 'CAVE_AIR') == 0) {
+          @magic_items = array(
+            '미약한 마법의 정수': array_deep_clone(@essences['미약한 마법의 정수']['item']),
+            '농축된 마법의 정수': array_deep_clone(@essences['농축된 마법의 정수']['item']),
+            '강력한 마법의 정수': array_deep_clone(@essences['강력한 마법의 정수']['item']),
+            '변환의 끈': array(
+              'name': 'ENCHANTED_BOOK',
+              'meta': array(
+                'display': '§b변환의 끈',
+                'lore': array(
+                  '§7이 마법의 끈으로 비법서를 묶을 시,',
+                  '§7비법서의 스킬 종류가 변환됩니다.',
+                  '',
+                  '§7같은 카테고리의 스킬로만 변환됩니다.',
+                  '§7변환 후 스크롤의 레벨이 미약하게 감소합니다.'
+                ),
+                'model': 2
+              )
+            ),
+            '놀라운 변환의 끈': array(
+              'name': 'ENCHANTED_BOOK',
+              'meta': array(
+                'display': '§b놀라운 변환의 끈',
+                'lore': array(
+                  '§7이 마법의 끈으로 비법서를 묶을 시,',
+                  '§7비법서의 스킬 종류가 변환됩니다.',
+                  '',
+                  '§7다른 카테고리의 스킬로 변환될 수 있습니다.',
+                  '§7변환 후 스크롤의 레벨이 약간 감소합니다.'
+                ),
+                'model': 3
+              )
+            ),
+            '강력한 변환의 끈': array(
+              'name': 'ENCHANTED_BOOK',
+              'meta': array(
+                'display': '§b강력한 변환의 끈',
+                'lore': array(
+                  '§7이 마법의 끈으로 비법서를 묶을 시,',
+                  '§7비법서의 레벨이 변환됩니다.',
+                  '',
+                  '§7다른 변환의 끈과 달리,',
+                  '§7스킬의 종류가 변환되지 않는 대신 변환 후',
+                  '§7스크롤의 레벨이 감소되거나 증가될 수 있습니다.'
+                ),
+                'model': 4
+              )
+            ),
+            '스킬 포인트 초기화 스크롤': array(
+              'name': 'ENCHANTED_BOOK',
+              'meta': array(
+                'display': '§b스킬 포인트 초기화 스크롤',
+                'lore': array(
+                  '§7해당 스크롤 사용 시,',
+                  '§7스킬에 사용한 포인트가 모두 반환되어',
+                  '§7다시 스킬 포인트를 분배 할 수 있습니다.'
+                ),
+                'model': 1
+              )
+            )
+          )
+          @inventory = array()
+          for(@index = 0, @index < 45, @index++) {
+            @inventory[@index] = array(
+              'name': 'STRUCTURE_VOID',
+              'meta': array(
+                'display': ' ',
+                'model': 1
+              )
+            )
           }
+          # 재료
+          @inventory[1] = null
+          # 설명
+          @info = array(
+            'name': 'STRUCTURE_VOID',
+            'meta': array(
+              'display': '§f재료 아이템을 넣은 후, 만들 아이템을 선택하세요.',
+              'lore': array(
+                '§7재료 아이템과 추출된 경험 레벨을 이용하여,',
+                '§7새로운 특수한 아이템을 만들 수 있습니다.',
+                '',
+                '§7추출되는 만큼 경험 레벨이 감소합니다.'
+              ),
+              'model': 1
+            )
+          )
+          @inventory[9] = @info
+          @inventory[10] = @info
+          @inventory[11] = @info
+          @inventory[18] = @info
+          @inventory[19] = @info
+          @inventory[20] = @info
+          @inventory[27] = @info
+          @inventory[28] = @info
+          @inventory[29] = @info
+          # 30
+          @inventory[3] = array_deep_clone(@magic_items['미약한 마법의 정수'])
+          @inventory[3]['meta']['lore'][] = ''
+          @inventory[3]['meta']['lore'][] = '§e- 재료'
+          @inventory[3]['meta']['lore'][] = '§f 유리병'
+          @inventory[3]['meta']['lore'][] = '§f 30 경험 레벨'
+          @inventory[12] = array_deep_clone(@magic_items['변환의 끈'])
+          @inventory[12]['meta']['lore'][] = ''
+          @inventory[12]['meta']['lore'][] = '§e- 재료'
+          @inventory[12]['meta']['lore'][] = '§f 실'
+          @inventory[12]['meta']['lore'][] = '§f 30 경험 레벨'
+          # 60
+          @inventory[5] = array_deep_clone(@magic_items['농축된 마법의 정수'])
+          @inventory[5]['meta']['lore'][] = ''
+          @inventory[5]['meta']['lore'][] = '§e- 재료'
+          @inventory[5]['meta']['lore'][] = '§f 유리병'
+          @inventory[5]['meta']['lore'][] = '§f 60 경험 레벨'
+          @inventory[14] = array_deep_clone(@magic_items['놀라운 변환의 끈'])
+          @inventory[14]['meta']['lore'][] = ''
+          @inventory[14]['meta']['lore'][] = '§e- 재료'
+          @inventory[14]['meta']['lore'][] = '§f 실'
+          @inventory[14]['meta']['lore'][] = '§f 60 경험 레벨'
+          # 90
+          @inventory[7] = array_deep_clone(@magic_items['강력한 마법의 정수'])
+          @inventory[7]['meta']['lore'][] = ''
+          @inventory[7]['meta']['lore'][] = '§e- 재료'
+          @inventory[7]['meta']['lore'][] = '§f 유리병'
+          @inventory[7]['meta']['lore'][] = '§f 90 경험 레벨'
+          @inventory[16] = array_deep_clone(@magic_items['강력한 변환의 끈'])
+          @inventory[16]['meta']['lore'][] = ''
+          @inventory[16]['meta']['lore'][] = '§e- 재료'
+          @inventory[16]['meta']['lore'][] = '§f 실'
+          @inventory[16]['meta']['lore'][] = '§f 90 경험 레벨'
+          # 120
+          @inventory[30] = array_deep_clone(@magic_items['스킬 포인트 초기화 스크롤'])
+          @inventory[30]['meta']['lore'][] = ''
+          @inventory[30]['meta']['lore'][] = '§e- 재료'
+          @inventory[30]['meta']['lore'][] = '§f 종이'
+          @inventory[30]['meta']['lore'][] = '§f 120 경험 레벨'
+          # location
+          @block_location = @event['location']
+          # proc
+          _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_items, @text)
         }
       }
       break()
