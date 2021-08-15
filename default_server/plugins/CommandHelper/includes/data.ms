@@ -813,130 +813,453 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
 bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_spec, @essences, @server, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  # equip armor
-  @armors = array(
-    'LEATHER_BOOTS',
-    'CHAINMAIL_BOOTS',
-    'IRON_BOOTS',
-    'GOLDEN_BOOTS',
-    'DIAMOND_BOOTS',
-    'NETHERITE_BOOTS'
-  )
-  if(!is_cancelled() && is_null(get_inventory_item(@uuid, 36)) && !is_null(@event['item']) && array_contains(@armors, @event['item']['name']) && array_contains(array('right_click_block', 'right_click_air'), @event['action'])) {
-    _update_item(@player, @uuid, array('armor': @event['item']), @players_data, @skills_spec, @text)
-  }
-  # 스크롤, 룬석 사용
-  if(!is_null(@event['item']) && @event['item']['name'] == 'ENCHANTED_BOOK' && !is_null(@event['item']['meta']) && @event['item']['meta']['model'] > 0) {
-    #take_from_inventory(@uuid, 'PAPER', 1)
-  }
-  /* 이름표 사용시 이름설정
-  if(@event['hand'] == 'main_hand' && psneaking(@player) && !is_null(@event['item']) && @event['item']['name'] == 'NAME_TAG') {
-    @texture_layer = ''
-    @message = '이름 설정'
-    @inventory = array(
+  @player_data = @players_data[@uuid]
+  if(@event['button'] == 'right') {
+    # equip armor
+    @armors = array(
+      'LEATHER_BOOTS',
+      'CHAINMAIL_BOOTS',
+      'IRON_BOOTS',
+      'GOLDEN_BOOTS',
+      'DIAMOND_BOOTS',
+      'NETHERITE_BOOTS'
     )
-    @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @text) {
-      #set_inventory(@id, @inventory)
-      broadcast(get_inventory(@id))
-      bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @id) {
-        #cancel()
-        broadcast(@event)
-      }
+    if(!is_cancelled() && is_null(get_inventory_item(@uuid, 36)) && !is_null(@event['item']) && array_contains(@armors, @event['item']['name'])) {
+      _update_item(@player, @uuid, array('armor': @event['item']), @player_data, @skills_spec, @text)
     }
-    _show_gui(@player, 'name_tag', 'ANVIL', @texture_layer, @message, @inventory, @closure, @text)
-  }
-  */
-  # 마법의 정수 투척 방지
-  if(!is_null(@event['item']) && @event['item']['name'] == 'EXPERIENCE_BOTTLE' && !is_null(@event['item']['meta'])  && @event['item']['meta']['model'] > 0) {
-    cancel()
-  }
-  # cancel using disabled blocks & block system
-  if(@event['action'] == 'right_click_block') {
-    @action = null
-    switch(@event['block']) {
-    case 'END_PORTAL_FRAME':
-    #case 'ENDER_CHEST':
-    case 'GRINDSTONE':
-    case 'SWEET_BERRY_BUSH':
-    case 'ANVIL':
-    case 'CHIPPED_ANVIL':
-    case 'DAMAGED_ANVIL':
-      if(psneaking(@player)) {
-        cancel()
-      }
-      break()
-    case 'SMITHING_TABLE':
-      cancel()
-      if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
-        if(pworld(@player) == 'spawn') {
-          @location = array('x': integer(@event['location']['x']), 'y': integer(@event['location']['y']), 'z': integer(@event['location']['z']), 'world': @event['location']['world'])
-          @gui_id = 'enchant_table.'.@location['x'].'.'.@location['y'].'.'.@location['z']
-          # 인첸트 되는 아이템 위치 설정
-          @item_location = array_deep_clone(@location)
-          @item_location['x'] += 1.25
-          @item_location['z'] += 0.5
-          @item_location['y'] -= 0.7
-          @item_location['yaw'] = 90
-          @item_armorstand = _preset_item_armorstand(@item_location)
-          # 마법의 정수 위치 설정
-          @essence_location = array_deep_clone(@location)
-          @essence_location['x'] += 0.75
-          @essence_location['z'] += 1.5
-          @essence_location['y'] += 1
-          @essence_location['yaw'] = -90
-          @essence_armorstand = _preset_essence_armorstand(@essence_location)
-          # 아머스탠드 정보 기준 사용중인 유저
-          @user_by_armorstand = get_mob_name(@item_armorstand)
-          # 실제 사용중인 유저
-          @user_by_commandhelper = import(@gui_id, '')
-          # 시각 효과 진행중인지 여부
-          @is_effect_progressing = boolean(get_mob_name(@essence_armorstand))
-          
-          # 조건 시작
-          @item = get_mob_equipment(@item_armorstand)['helmet']
-          @can_take_out_item = false
-          @can_enchant = false
-          #tmsg('aaaa__', @user_by_armorstand @user_by_commandhelper)
-          if(@user_by_armorstand != '' && @user_by_armorstand == @user_by_commandhelper) { # 주인이 가져갈 때
-            #tmsg('aaaa__', 주인)
-            if(@user_by_commandhelper == @player && !@is_effect_progressing && !is_null(@item)) {
-              @can_take_out_item = true
-            }
-          } else { # 남이 가져갈 때 
-            if(!@is_effect_progressing) {
-              if(!is_null(@item)) {
+    # use item
+    @is_item_available = false
+    if(@event['hand'] == 'main_hand' && !is_null(@event['item'])) {
+      @is_item_available = true
+    }
+    # block interacting
+    if(@event['action'] == 'right_click_block') {
+      # 블럭 사용
+      switch(@event['block']) {
+      # BANNED BLOCKS
+      case 'END_PORTAL_FRAME':
+      //case 'ENDER_CHEST':
+      case 'GRINDSTONE':
+      case 'SWEET_BERRY_BUSH':
+      case 'ANVIL':
+      case 'CHIPPED_ANVIL':
+      case 'DAMAGED_ANVIL':
+      case 'BREWING_STAND':
+      //case 'FLETCHING_TABLE': // 기능 없음
+        if(!psneaking(@player)) {
+          cancel() // 사용 금지
+        }
+        break()
+      # COSTOMED BLOCKS
+      case 'SMITHING_TABLE':
+        if(!psneaking(@player)) {
+          if(@is_item_available) {
+            @is_item_available = false
+          }
+        }
+        if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
+          cancel()
+          if(pworld(@player) == 'spawn') {
+            @location = array('x': integer(@event['location']['x']), 'y': integer(@event['location']['y']), 'z': integer(@event['location']['z']), 'world': @event['location']['world'])
+            @gui_id = 'enchant_table.'.@location['x'].'.'.@location['y'].'.'.@location['z']
+            # 인첸트 되는 아이템 위치 설정
+            @item_location = array_deep_clone(@location)
+            @item_location['x'] += 1.25
+            @item_location['z'] += 0.5
+            @item_location['y'] -= 0.7
+            @item_location['yaw'] = 90
+            @item_armorstand = _preset_item_armorstand(@item_location)
+            # 마법의 정수 위치 설정
+            @essence_location = array_deep_clone(@location)
+            @essence_location['x'] += 0.75
+            @essence_location['z'] += 1.5
+            @essence_location['y'] += 1
+            @essence_location['yaw'] = -90
+            @essence_armorstand = _preset_essence_armorstand(@essence_location)
+            # 아머스탠드 정보 기준 사용중인 유저
+            @user_by_armorstand = get_mob_name(@item_armorstand)
+            # 실제 사용중인 유저
+            @user_by_commandhelper = import(@gui_id, '')
+            # 시각 효과 진행중인지 여부
+            @is_effect_progressing = boolean(get_mob_name(@essence_armorstand))
+            
+            # 조건 시작
+            @item = get_mob_equipment(@item_armorstand)['helmet']
+            @can_take_out_item = false
+            @can_enchant = false
+            #tmsg('aaaa__', @user_by_armorstand @user_by_commandhelper)
+            if(@user_by_armorstand != '' && @user_by_armorstand == @user_by_commandhelper) { # 주인이 가져갈 때
+              #tmsg('aaaa__', 주인)
+              if(@user_by_commandhelper == @player && !@is_effect_progressing && !is_null(@item)) {
                 @can_take_out_item = true
-              } else {
-                @can_enchant = true
+              }
+            } else { # 남이 가져갈 때 
+              if(!@is_effect_progressing) {
+                if(!is_null(@item)) {
+                  @can_take_out_item = true
+                } else {
+                  @can_enchant = true
+                }
               }
             }
+            # 아이템 올려져 있고 아이템 꺼낼수 있을시 아이템 주기
+            if(@can_take_out_item) {
+              set_mob_equipment(@item_armorstand, array(
+                'helmet': null
+              ))
+              set_mob_equipment(@essence_armorstand, array(
+                'helmet': null
+              ))
+              @item['qty'] = pgive_item(@player, @item)
+              @drop_location = array_deep_clone(@location)
+              @drop_location['x'] += 0.5
+              @drop_location['z'] += 0.5
+              @drop_location['y'] += 1
+              drop_item(@drop_location, @item, false)
+              export(@gui_id, '')
+              set_mob_name(@item_armorstand, '')
+            }
+            # 아무도 이용중이지 않고 올려진 아이템도 없을시 gui 열기
+            if(@can_enchant) {
+              # 사용중으로 설정
+              export(@gui_id, @player)
+              # gui 세팅
+              @texture_layer = @text['space_fonts']['space.-8'].'§f\ue3fb'.@text['space_fonts']['space.-169']._color('#404040')
+              @message = '마법 작업대'
+              @inventory = array()
+              for(@index = 0, @index < 27, @index++) {
+                @inventory[@index] = array(
+                  'name': 'STRUCTURE_VOID',
+                  'meta': array(
+                    'display': ' ',
+                    'model': 1
+                  )
+                )
+              }
+              @inventory[22] = null
+              set_mob_name(@item_armorstand, @player)
+              # 이벤트 세팅
+              @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @essences, @location, @uuid, @item_armorstand, @essence_armorstand, @text) {
+                #인첸트 안하고 그냥 인벤 닫을시
+                bind('inventory_close', array('id': 'close'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @item_armorstand, @essence_armorstand) {
+                  @item = @event['inventory'][22]
+                  if(!is_null(@item)) {
+                    @item['qty'] = pgive_item(@player, @item)
+                    @ploc = ploc(@player)
+                    @ploc['y'] += 1
+                    drop_item(@ploc, @item, false)
+                  }
+                  export(@gui_id, '')
+                  set_mob_name(@item_armorstand, '')
+                  set_mob_name(@essence_armorstand, '')
+                  #broadcast(초기화 완료)
+                }
+                #인첸트 할시
+                bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @id, @location, @item_armorstand, @essence_armorstand, @essences) {
+                  @enchantable_items = array(
+                    'LEATHER_BOOTS': array(
+                      'luck': 1.5,
+                      'entries_type': 'armor_entries'
+                    ),
+                    'CHAINMAIL_BOOTS': array(
+                      'luck': 0.5,
+                      'entries_type': 'armor_entries'
+                    ),
+                    'IRON_BOOTS': array(
+                      'luck': 0.9,
+                      'entries_type': 'armor_entries'
+                    ),
+                    'GOLDEN_BOOTS': array(
+                      'luck': 2.5,
+                      'entries_type': 'armor_entries'
+                    ),
+                    'DIAMOND_BOOTS': array(
+                      'luck': 1.0,
+                      'entries_type': 'armor_entries'
+                    ),
+                    'NETHERITE_BOOTS': array(
+                      'luck': 1.5,
+                      'entries_type': 'armor_entries'
+                    ),
+                    'WOODEN_SWORD': array(
+                      'luck': 1.0,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'WOODEN_SHOVEL': array(
+                      'luck': 1.0,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'WOODEN_PICKAXE': array(
+                      'luck': 1.0,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'WOODEN_AXE': array(
+                      'luck': 1.0,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'WOODEN_HOE': array(
+                      'luck': 1.0,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'STONE_SWORD': array(
+                      'luck': 0.9,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'STONE_SHOVEL': array(
+                      'luck': 0.9,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'STONE_PICKAXE': array(
+                      'luck': 0.9,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'STONE_AXE': array(
+                      'luck': 0.9,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'STONE_HOE': array(
+                      'luck': 0.9,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'IRON_SWORD': array(
+                      'luck': 1.4,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'IRON_SHOVEL': array(
+                      'luck': 0.9,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'IRON_PICKAXE': array(
+                      'luck': 0.9,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'IRON_AXE': array(
+                      'luck': 0.9,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'IRON_HOE': array(
+                      'luck': 0.9,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'GOLDEN_SWORD': array(
+                      'luck': 2.2,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'GOLDEN_SHOVEL': array(
+                      'luck': 2.2,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'GOLDEN_PICKAXE': array(
+                      'luck': 2.2,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'GOLDEN_AXE': array(
+                      'luck': 2.2,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'GOLDEN_HOE': array(
+                      'luck': 2.2,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'DIAMOND_SWORD': array(
+                      'luck': 1.0,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'DIAMOND_SHOVEL': array(
+                      'luck': 1.0,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'DIAMOND_PICKAXE': array(
+                      'luck': 1.0,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'DIAMOND_AXE': array(
+                      'luck': 1.0,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'DIAMOND_HOE': array(
+                      'luck': 1.0,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'NETHERITE_SWORD': array(
+                      'luck': 1.5,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'NETHERITE_SHOVEL': array(
+                      'luck': 1.5,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'NETHERITE_PICKAXE': array(
+                      'luck': 1.5,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'NETHERITE_AXE': array(
+                      'luck': 1.5,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'NETHERITE_HOE': array(
+                      'luck': 1.5,
+                      'entries_type': 'weapon_entries'
+                    ),
+                    'TRIDENT': array(
+                      'luck': 1.0,
+                      'entries_type': 'weapon_entries'
+                    )
+                  )
+                  @rawslot = @event['rawslot']
+                  if(@rawslot >= 0 && @rawslot <= 26) {
+                    @clicked_item = @event['inventory'][@rawslot]
+                    if(!is_null(@clicked_item) && @clicked_item['name'] == 'STRUCTURE_VOID') {
+                      cancel()
+                    }
+                    @cursor_item = @event['cursoritem']
+                    if(!is_null(@cursor_item) && @cursor_item['name'] == 'EXPERIENCE_BOTTLE' && !is_null(@cursor_item['meta']) && !is_null(@cursor_item['meta']['display']) && @rawslot == 22 && @event['action'] == 'SWAP_WITH_CURSOR') {
+                      @cursor_item['qty'] -= 1
+                      @enchanting_item = @event['inventory'][@rawslot]
+                      @enchantable_item = @enchantable_items[@enchanting_item['name']]
+                      @enchanted_item = @enchanting_item
+                      if(!is_null(@enchanting_item) && array_index_exists(@enchantable_items, @enchanting_item['name'])) {
+                        @essence_name = strip_colors(@cursor_item['meta']['display'])
+                        if(array_index_exists(@essences, @essence_name)) {
+                          @entries = @essences[@essence_name][@enchantable_item['entries_type']]
+                          @enchanted_item = _get_enchanted_item(@enchanting_item, @entries, @enchantable_item['luck'])
+                        }
+                        cancel()
+                        unbind('close'.@id)
+                        modify_event('cursoritem', @cursor_item)
+                        close_pinv(@player)
+                        # 시각 효과
+                        set_mob_name(@essence_armorstand, true)
+                        # 아이템 배치
+                        set_timeout(1000, closure() {
+                          set_mob_equipment(@item_armorstand, array( 'helmet': @enchanted_item ))
+                          play_named_sound(@location, array('sound': 'minecraft:item.armor.equip_diamond', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 0.5))
+                          @pos = array(
+                            'x': @location['x'] + 0.5,
+                            'y': @location['y'] + 1.1,
+                            'z': @location['z'] + 0.5
+                          )
+                          @delta = array(
+                            'x': 0.02,
+                            'y': 0.0,
+                            'z': 0.02
+                          )
+                          mom_playerparticle(@uuid, 'CRIT_MAGIC', @pos['x'], @pos['y'], @pos['z'], 10, @delta['x'], @delta['y'], @delta['z'], 0.25)
+                        })
+                        #정수 배치
+                        set_timeout(5000, closure() {
+                          @cursor_item['qty'] = 1
+                          set_mob_equipment(@essence_armorstand, array( 'helmet': @cursor_item ))
+                          @interval = array('tick': 20, 'id': null)
+                          @interval_id = set_interval(150 , closure() {
+                            if(@interval['tick'] > 0) {
+                              play_named_sound(@location, array('sound': 'minecraft:entity.player.levelup', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
+                              @particle_location = array_deep_clone(@location)
+                              @particle_location['x'] += (0.5 + rand() / 5 - 0.1)
+                              @particle_location['y'] += (2.15 + rand() / 5 - 0.1)
+                              @particle_location['z'] += (0.5 + rand() / 5 - 0.1)
+                              spawn_particle(@particle_location, 'TOTEM')
+                              #@delta = array(
+                              #  'x': rand() / 5 - 0.1,
+                              #  'y': -1.0,
+                              #  'z': rand() / 5 - 0.1
+                              #)
+                              #mom_playerparticle(@uuid, 'TOTEM', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 1.0)
+                              @interval['tick'] -= 1
+                            } else {
+                              clear_task()
+                              play_named_sound(@location, array('sound': 'minecraft:block.enchantment_table.use', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
+                              set_mob_equipment(@essence_armorstand, array( 'helmet': null ))
+                              set_mob_name(@essence_armorstand, '')
+                            }
+                          })
+                          @interval['id'] = @interval_id
+                        })
+                        set_timeout(60000, closure() {
+                          export(@gui_id, '')
+                        })
+                      }
+                    }
+                  }
+                }
+              }
+              _show_gui(@player, @gui_id, 27, @texture_layer, @message, @inventory, @closure, @essences, @location, @uuid, @item_armorstand, @essence_armorstand, @text)
+            }
           }
-          # 아이템 올려져 있고 아이템 꺼낼수 있을시 아이템 주기
-          if(@can_take_out_item) {
-            set_mob_equipment(@item_armorstand, array(
-              'helmet': null
-            ))
-            set_mob_equipment(@essence_armorstand, array(
-              'helmet': null
-            ))
-            @item['qty'] = pgive_item(@player, @item)
-            @drop_location = array_deep_clone(@location)
-            @drop_location['x'] += 0.5
-            @drop_location['z'] += 0.5
-            @drop_location['y'] += 1
-            drop_item(@drop_location, @item, false)
-            export(@gui_id, '')
-            set_mob_name(@item_armorstand, '')
+        }
+        break()
+      case 'ENCHANTING_TABLE':
+        if(!psneaking(@player)) {
+          if(@is_item_available) {
+            @is_item_available = false
           }
-          # 아무도 이용중이지 않고 올려진 아이템도 없을시 gui 열기
-          if(@can_enchant) {
-            # 사용중으로 설정
-            export(@gui_id, @player)
-            # gui 세팅
-            @texture_layer = @text['space_fonts']['space.-8'].'§f\ue3fb'.@text['space_fonts']['space.-169']._color('#404040')
-            @message = '마법 작업대'
+        }
+        if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
+          cancel()
+          if(pcooldown(@player, 'CAVE_AIR') == 0) {
+            @magic_items = array(
+              '미약한 마법의 정수': array_deep_clone(@essences['미약한 마법의 정수']['item']),
+              '농축된 마법의 정수': array_deep_clone(@essences['농축된 마법의 정수']['item']),
+              '강력한 마법의 정수': array_deep_clone(@essences['강력한 마법의 정수']['item']),
+              '변환의 끈': array(
+                'name': 'ENCHANTED_BOOK',
+                'meta': array(
+                  'display': '§b변환의 끈',
+                  'lore': array(
+                    '§7이 마법의 끈으로 비법서를 묶을 시,',
+                    '§7비법서의 스킬 종류가 변환됩니다.',
+                    '',
+                    '§7같은 카테고리의 스킬로만 변환됩니다.',
+                    '§7변환 후 스크롤의 레벨이 미약하게 감소합니다.'
+                  ),
+                  'model': 2
+                )
+              ),
+              '놀라운 변환의 끈': array(
+                'name': 'ENCHANTED_BOOK',
+                'meta': array(
+                  'display': '§b놀라운 변환의 끈',
+                  'lore': array(
+                    '§7이 마법의 끈으로 비법서를 묶을 시,',
+                    '§7비법서의 스킬 종류가 변환됩니다.',
+                    '',
+                    '§7다른 카테고리의 스킬로 변환될 수 있습니다.',
+                    '§7변환 후 스크롤의 레벨이 약간 감소합니다.'
+                  ),
+                  'model': 3
+                )
+              ),
+              '강력한 변환의 끈': array(
+                'name': 'ENCHANTED_BOOK',
+                'meta': array(
+                  'display': '§b강력한 변환의 끈',
+                  'lore': array(
+                    '§7이 마법의 끈으로 비법서를 묶을 시,',
+                    '§7비법서의 레벨이 변환됩니다.',
+                    '',
+                    '§7다른 변환의 끈과 달리,',
+                    '§7스킬의 종류가 변환되지 않는 대신 ',
+                    '§7변환 후, 스크롤의 레벨이 감소되거나',
+                    '§7증가될 수 있습니다.'
+                  ),
+                  'model': 4
+                )
+              ),
+              '스킬 포인트 초기화 스크롤': array(
+                'name': 'ENCHANTED_BOOK',
+                'meta': array(
+                  'display': '§b스킬 포인트 초기화 스크롤',
+                  'lore': array(
+                    '§7해당 스크롤 사용 시,',
+                    '§7스킬에 사용한 포인트가 모두 반환되어',
+                    '§7다시 스킬 포인트를 분배 할 수 있습니다.'
+                  ),
+                  'model': 1
+                )
+              )
+            )
             @inventory = array()
-            for(@index = 0, @index < 27, @index++) {
+            for(@index = 0, @index < 45, @index++) {
               @inventory[@index] = array(
                 'name': 'STRUCTURE_VOID',
                 'meta': array(
@@ -945,471 +1268,217 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
                 )
               )
             }
-            @inventory[22] = null
-            set_mob_name(@item_armorstand, @player)
-            # 이벤트 세팅
-            @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @essences, @location, @uuid, @item_armorstand, @essence_armorstand, @text) {
-              #인첸트 안하고 그냥 인벤 닫을시
-              bind('inventory_close', array('id': 'close'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @item_armorstand, @essence_armorstand) {
-                @item = @event['inventory'][22]
-                if(!is_null(@item)) {
-                  @item['qty'] = pgive_item(@player, @item)
-                  @ploc = ploc(@player)
-                  @ploc['y'] += 1
-                  drop_item(@ploc, @item, false)
-                }
-                export(@gui_id, '')
-                set_mob_name(@item_armorstand, '')
-                set_mob_name(@essence_armorstand, '')
-                #broadcast(초기화 완료)
-              }
-              #인첸트 할시
-              bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @id, @location, @item_armorstand, @essence_armorstand, @essences) {
-                @enchantable_items = array(
-                  'LEATHER_BOOTS': array(
-                    'luck': 1.5,
-                    'entries_type': 'armor_entries'
-                  ),
-                  'CHAINMAIL_BOOTS': array(
-                    'luck': 0.5,
-                    'entries_type': 'armor_entries'
-                  ),
-                  'IRON_BOOTS': array(
-                    'luck': 0.9,
-                    'entries_type': 'armor_entries'
-                  ),
-                  'GOLDEN_BOOTS': array(
-                    'luck': 2.5,
-                    'entries_type': 'armor_entries'
-                  ),
-                  'DIAMOND_BOOTS': array(
-                    'luck': 1.0,
-                    'entries_type': 'armor_entries'
-                  ),
-                  'NETHERITE_BOOTS': array(
-                    'luck': 1.5,
-                    'entries_type': 'armor_entries'
-                  ),
-                  'WOODEN_SWORD': array(
-                    'luck': 1.0,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'WOODEN_SHOVEL': array(
-                    'luck': 1.0,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'WOODEN_PICKAXE': array(
-                    'luck': 1.0,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'WOODEN_AXE': array(
-                    'luck': 1.0,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'WOODEN_HOE': array(
-                    'luck': 1.0,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'STONE_SWORD': array(
-                    'luck': 0.9,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'STONE_SHOVEL': array(
-                    'luck': 0.9,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'STONE_PICKAXE': array(
-                    'luck': 0.9,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'STONE_AXE': array(
-                    'luck': 0.9,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'STONE_HOE': array(
-                    'luck': 0.9,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'IRON_SWORD': array(
-                    'luck': 1.4,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'IRON_SHOVEL': array(
-                    'luck': 0.9,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'IRON_PICKAXE': array(
-                    'luck': 0.9,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'IRON_AXE': array(
-                    'luck': 0.9,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'IRON_HOE': array(
-                    'luck': 0.9,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'GOLDEN_SWORD': array(
-                    'luck': 2.2,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'GOLDEN_SHOVEL': array(
-                    'luck': 2.2,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'GOLDEN_PICKAXE': array(
-                    'luck': 2.2,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'GOLDEN_AXE': array(
-                    'luck': 2.2,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'GOLDEN_HOE': array(
-                    'luck': 2.2,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'DIAMOND_SWORD': array(
-                    'luck': 1.0,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'DIAMOND_SHOVEL': array(
-                    'luck': 1.0,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'DIAMOND_PICKAXE': array(
-                    'luck': 1.0,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'DIAMOND_AXE': array(
-                    'luck': 1.0,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'DIAMOND_HOE': array(
-                    'luck': 1.0,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'NETHERITE_SWORD': array(
-                    'luck': 1.5,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'NETHERITE_SHOVEL': array(
-                    'luck': 1.5,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'NETHERITE_PICKAXE': array(
-                    'luck': 1.5,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'NETHERITE_AXE': array(
-                    'luck': 1.5,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'NETHERITE_HOE': array(
-                    'luck': 1.5,
-                    'entries_type': 'weapon_entries'
-                  ),
-                  'TRIDENT': array(
-                    'luck': 1.0,
-                    'entries_type': 'weapon_entries'
-                  )
-                )
-                @rawslot = @event['rawslot']
-                if(@rawslot >= 0 && @rawslot <= 26) {
-                  @clicked_item = @event['inventory'][@rawslot]
-                  if(!is_null(@clicked_item) && @clicked_item['name'] == 'STRUCTURE_VOID') {
-                    cancel()
-                  }
-                  @cursor_item = @event['cursoritem']
-                  if(!is_null(@cursor_item) && @cursor_item['name'] == 'EXPERIENCE_BOTTLE' && !is_null(@cursor_item['meta']) && !is_null(@cursor_item['meta']['display']) && @rawslot == 22 && @event['action'] == 'SWAP_WITH_CURSOR') {
-                    @cursor_item['qty'] -= 1
-                    @enchanting_item = @event['inventory'][@rawslot]
-                    @enchantable_item = @enchantable_items[@enchanting_item['name']]
-                    @enchanted_item = @enchanting_item
-                    if(!is_null(@enchanting_item) && array_index_exists(@enchantable_items, @enchanting_item['name'])) {
-                      @essence_name = strip_colors(@cursor_item['meta']['display'])
-                      if(array_index_exists(@essences, @essence_name)) {
-                        @entries = @essences[@essence_name][@enchantable_item['entries_type']]
-                        @enchanted_item = _get_enchanted_item(@enchanting_item, @entries, @enchantable_item['luck'])
-                      }
-                      cancel()
-                      unbind('close'.@id)
-                      modify_event('cursoritem', @cursor_item)
-                      close_pinv(@player)
-                      # 시각 효과
-                      set_mob_name(@essence_armorstand, true)
-                      # 아이템 배치
-                      set_timeout(1000, closure() {
-                        set_mob_equipment(@item_armorstand, array( 'helmet': @enchanted_item ))
-                        play_named_sound(@location, array('sound': 'minecraft:item.armor.equip_diamond', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 0.5))
-                        @pos = array(
-                          'x': @location['x'] + 0.5,
-                          'y': @location['y'] + 1.1,
-                          'z': @location['z'] + 0.5
-                        )
-                        @delta = array(
-                          'x': 0.02,
-                          'y': 0.0,
-                          'z': 0.02
-                        )
-                        mom_playerparticle(@uuid, 'CRIT_MAGIC', @pos['x'], @pos['y'], @pos['z'], 10, @delta['x'], @delta['y'], @delta['z'], 0.25)
-                      })
-                      #정수 배치
-                      set_timeout(5000, closure() {
-                        @cursor_item['qty'] = 1
-                        set_mob_equipment(@essence_armorstand, array( 'helmet': @cursor_item ))
-                        @interval = array('tick': 20, 'id': null)
-                        @interval_id = set_interval(150 , closure() {
-                          if(@interval['tick'] > 0) {
-                            play_named_sound(@location, array('sound': 'minecraft:entity.player.levelup', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
-                            @particle_location = array_deep_clone(@location)
-                            @particle_location['x'] += (0.5 + rand() / 5 - 0.1)
-                            @particle_location['y'] += (2.15 + rand() / 5 - 0.1)
-                            @particle_location['z'] += (0.5 + rand() / 5 - 0.1)
-                            spawn_particle(@particle_location, 'TOTEM')
-                            #@delta = array(
-                            #  'x': rand() / 5 - 0.1,
-                            #  'y': -1.0,
-                            #  'z': rand() / 5 - 0.1
-                            #)
-                            #mom_playerparticle(@uuid, 'TOTEM', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 1.0)
-                            @interval['tick'] -= 1
-                          } else {
-                            clear_task()
-                            play_named_sound(@location, array('sound': 'minecraft:block.enchantment_table.use', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
-                            set_mob_equipment(@essence_armorstand, array( 'helmet': null ))
-                            set_mob_name(@essence_armorstand, '')
-                          }
-                        })
-                        @interval['id'] = @interval_id
-                      })
-                      set_timeout(60000, closure() {
-                        export(@gui_id, '')
-                      })
-                    }
-                  }
-                }
-              }
-            }
-            _show_gui(@player, @gui_id, 27, @texture_layer, @message, @inventory, @closure, @essences, @location, @uuid, @item_armorstand, @essence_armorstand, @text)
-          }
-        }
-      }
-      break()
-    case 'ENCHANTING_TABLE':
-      if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
-        cancel()
-        if(pcooldown(@player, 'CAVE_AIR') == 0) {
-          @magic_items = array(
-            '미약한 마법의 정수': array_deep_clone(@essences['미약한 마법의 정수']['item']),
-            '농축된 마법의 정수': array_deep_clone(@essences['농축된 마법의 정수']['item']),
-            '강력한 마법의 정수': array_deep_clone(@essences['강력한 마법의 정수']['item']),
-            '변환의 끈': array(
-              'name': 'ENCHANTED_BOOK',
-              'meta': array(
-                'display': '§b변환의 끈',
-                'lore': array(
-                  '§7이 마법의 끈으로 비법서를 묶을 시,',
-                  '§7비법서의 스킬 종류가 변환됩니다.',
-                  '',
-                  '§7같은 카테고리의 스킬로만 변환됩니다.',
-                  '§7변환 후 스크롤의 레벨이 미약하게 감소합니다.'
-                ),
-                'model': 2
-              )
-            ),
-            '놀라운 변환의 끈': array(
-              'name': 'ENCHANTED_BOOK',
-              'meta': array(
-                'display': '§b놀라운 변환의 끈',
-                'lore': array(
-                  '§7이 마법의 끈으로 비법서를 묶을 시,',
-                  '§7비법서의 스킬 종류가 변환됩니다.',
-                  '',
-                  '§7다른 카테고리의 스킬로 변환될 수 있습니다.',
-                  '§7변환 후 스크롤의 레벨이 약간 감소합니다.'
-                ),
-                'model': 3
-              )
-            ),
-            '강력한 변환의 끈': array(
-              'name': 'ENCHANTED_BOOK',
-              'meta': array(
-                'display': '§b강력한 변환의 끈',
-                'lore': array(
-                  '§7이 마법의 끈으로 비법서를 묶을 시,',
-                  '§7비법서의 레벨이 변환됩니다.',
-                  '',
-                  '§7다른 변환의 끈과 달리,',
-                  '§7스킬의 종류가 변환되지 않는 대신 변환 후',
-                  '§7스크롤의 레벨이 감소되거나 증가될 수 있습니다.'
-                ),
-                'model': 4
-              )
-            ),
-            '스킬 포인트 초기화 스크롤': array(
-              'name': 'ENCHANTED_BOOK',
-              'meta': array(
-                'display': '§b스킬 포인트 초기화 스크롤',
-                'lore': array(
-                  '§7해당 스크롤 사용 시,',
-                  '§7스킬에 사용한 포인트가 모두 반환되어',
-                  '§7다시 스킬 포인트를 분배 할 수 있습니다.'
-                ),
-                'model': 1
-              )
-            )
-          )
-          @inventory = array()
-          for(@index = 0, @index < 45, @index++) {
-            @inventory[@index] = array(
+            # 재료
+            @inventory[1] = null
+            # 설명
+            @info = array(
               'name': 'STRUCTURE_VOID',
               'meta': array(
-                'display': ' ',
+                'display': '§f재료 아이템을 넣은 후, 만들 아이템을 선택하세요.',
+                'lore': array(
+                  '§7재료 아이템과 추출된 경험 레벨을 이용하여,',
+                  '§7새로운 특수한 아이템을 만들 수 있습니다.',
+                  '',
+                  '§7추출되는 만큼 경험 레벨이 감소합니다.'
+                ),
                 'model': 1
               )
             )
+            @inventory[9] = @info
+            @inventory[10] = @info
+            @inventory[11] = @info
+            @inventory[18] = @info
+            @inventory[19] = @info
+            @inventory[20] = @info
+            @inventory[27] = @info
+            @inventory[28] = @info
+            @inventory[29] = @info
+            # 30
+            @inventory[3] = array_deep_clone(@magic_items['미약한 마법의 정수'])
+            @inventory[3]['meta']['lore'][] = ''
+            @inventory[3]['meta']['lore'][] = '§e- 재료'
+            @inventory[3]['meta']['lore'][] = '§f 유리병'
+            @inventory[3]['meta']['lore'][] = '§f 30 경험 레벨'
+            @inventory[12] = array_deep_clone(@magic_items['변환의 끈'])
+            @inventory[12]['meta']['lore'][] = ''
+            @inventory[12]['meta']['lore'][] = '§e- 재료'
+            @inventory[12]['meta']['lore'][] = '§f 실'
+            @inventory[12]['meta']['lore'][] = '§f 30 경험 레벨'
+            # 60
+            @inventory[5] = array_deep_clone(@magic_items['농축된 마법의 정수'])
+            @inventory[5]['meta']['lore'][] = ''
+            @inventory[5]['meta']['lore'][] = '§e- 재료'
+            @inventory[5]['meta']['lore'][] = '§f 유리병'
+            @inventory[5]['meta']['lore'][] = '§f 60 경험 레벨'
+            @inventory[14] = array_deep_clone(@magic_items['놀라운 변환의 끈'])
+            @inventory[14]['meta']['lore'][] = ''
+            @inventory[14]['meta']['lore'][] = '§e- 재료'
+            @inventory[14]['meta']['lore'][] = '§f 실'
+            @inventory[14]['meta']['lore'][] = '§f 60 경험 레벨'
+            # 90
+            @inventory[7] = array_deep_clone(@magic_items['강력한 마법의 정수'])
+            @inventory[7]['meta']['lore'][] = ''
+            @inventory[7]['meta']['lore'][] = '§e- 재료'
+            @inventory[7]['meta']['lore'][] = '§f 유리병'
+            @inventory[7]['meta']['lore'][] = '§f 90 경험 레벨'
+            @inventory[16] = array_deep_clone(@magic_items['강력한 변환의 끈'])
+            @inventory[16]['meta']['lore'][] = ''
+            @inventory[16]['meta']['lore'][] = '§e- 재료'
+            @inventory[16]['meta']['lore'][] = '§f 실'
+            @inventory[16]['meta']['lore'][] = '§f 90 경험 레벨'
+            # 120
+            @inventory[30] = array_deep_clone(@magic_items['스킬 포인트 초기화 스크롤'])
+            @inventory[30]['meta']['lore'][] = ''
+            @inventory[30]['meta']['lore'][] = '§e- 재료'
+            @inventory[30]['meta']['lore'][] = '§f 종이'
+            @inventory[30]['meta']['lore'][] = '§f 120 경험 레벨'
+            # location
+            @block_location = @event['location']
+            # proc
+            _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_items, @text)
           }
-          # 재료
-          @inventory[1] = null
-          # 설명
-          @info = array(
-            'name': 'STRUCTURE_VOID',
-            'meta': array(
-              'display': '§f재료 아이템을 넣은 후, 만들 아이템을 선택하세요.',
-              'lore': array(
-                '§7재료 아이템과 추출된 경험 레벨을 이용하여,',
-                '§7새로운 특수한 아이템을 만들 수 있습니다.',
-                '',
-                '§7추출되는 만큼 경험 레벨이 감소합니다.'
-              ),
-              'model': 1
-            )
-          )
-          @inventory[9] = @info
-          @inventory[10] = @info
-          @inventory[11] = @info
-          @inventory[18] = @info
-          @inventory[19] = @info
-          @inventory[20] = @info
-          @inventory[27] = @info
-          @inventory[28] = @info
-          @inventory[29] = @info
-          # 30
-          @inventory[3] = array_deep_clone(@magic_items['미약한 마법의 정수'])
-          @inventory[3]['meta']['lore'][] = ''
-          @inventory[3]['meta']['lore'][] = '§e- 재료'
-          @inventory[3]['meta']['lore'][] = '§f 유리병'
-          @inventory[3]['meta']['lore'][] = '§f 30 경험 레벨'
-          @inventory[12] = array_deep_clone(@magic_items['변환의 끈'])
-          @inventory[12]['meta']['lore'][] = ''
-          @inventory[12]['meta']['lore'][] = '§e- 재료'
-          @inventory[12]['meta']['lore'][] = '§f 실'
-          @inventory[12]['meta']['lore'][] = '§f 30 경험 레벨'
-          # 60
-          @inventory[5] = array_deep_clone(@magic_items['농축된 마법의 정수'])
-          @inventory[5]['meta']['lore'][] = ''
-          @inventory[5]['meta']['lore'][] = '§e- 재료'
-          @inventory[5]['meta']['lore'][] = '§f 유리병'
-          @inventory[5]['meta']['lore'][] = '§f 60 경험 레벨'
-          @inventory[14] = array_deep_clone(@magic_items['놀라운 변환의 끈'])
-          @inventory[14]['meta']['lore'][] = ''
-          @inventory[14]['meta']['lore'][] = '§e- 재료'
-          @inventory[14]['meta']['lore'][] = '§f 실'
-          @inventory[14]['meta']['lore'][] = '§f 60 경험 레벨'
-          # 90
-          @inventory[7] = array_deep_clone(@magic_items['강력한 마법의 정수'])
-          @inventory[7]['meta']['lore'][] = ''
-          @inventory[7]['meta']['lore'][] = '§e- 재료'
-          @inventory[7]['meta']['lore'][] = '§f 유리병'
-          @inventory[7]['meta']['lore'][] = '§f 90 경험 레벨'
-          @inventory[16] = array_deep_clone(@magic_items['강력한 변환의 끈'])
-          @inventory[16]['meta']['lore'][] = ''
-          @inventory[16]['meta']['lore'][] = '§e- 재료'
-          @inventory[16]['meta']['lore'][] = '§f 실'
-          @inventory[16]['meta']['lore'][] = '§f 90 경험 레벨'
-          # 120
-          @inventory[30] = array_deep_clone(@magic_items['스킬 포인트 초기화 스크롤'])
-          @inventory[30]['meta']['lore'][] = ''
-          @inventory[30]['meta']['lore'][] = '§e- 재료'
-          @inventory[30]['meta']['lore'][] = '§f 종이'
-          @inventory[30]['meta']['lore'][] = '§f 120 경험 레벨'
-          # location
-          @block_location = @event['location']
-          # proc
-          _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_items, @text)
         }
+        break()
+      # NORMAL INTERACTIVE BLOCKS
+      case 'BARREL':
+      case 'BEACON':
+      case 'BED':
+      case 'BELL':
+      case 'BLAST_FURNACE':
+      case 'CAKE':
+      case 'CARTOGRAPHY_TABLE':
+      case 'CHEST':
+      case 'COMPARATOR':
+      case 'COMPOSTER': // 조건적 반응 (꽉 차있어서 뺫가루 얻어낼 수 있을시)
+      case 'CRAFTING_TABLE':
+      case 'DAYLIGHT_DETECTOR':
+      case 'DISPENSER':
+      case 'DROPPER':
+      case 'FURNACE':
+      case 'HOPPER':
+      case 'LECTERN':
+      case 'LEVER':
+      case 'LOOM':
+      case 'NOTE_BLOCK':
+      case 'REDSTONE_ORE':
+      case 'REPEATER':
+      case 'RESPAWN_ANCHOR':
+      case 'SHULKER_BOX':
+      case 'SMOKER':
+      case 'STONECUTTER':
+      case 'TRAPPED_CHEST':
+      # + 버튼들 , 철제외 문과 트랩도어, 울타리문
+        if(!psneaking(@player)) {
+          if(@is_item_available) {
+            @is_item_available = false
+          }
+        }
+        break()
       }
-      break()
-    }
-  }
-  ## farming (if canceled it didn't work)
-  if(@server == 'main') {
-    if(@event['action'] == 'right_click_block') {
-      # bone mealing
-      if(!is_null(@event['item']) && @event['item']['name'] == 'BONE_MEAL' && array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
-        @data = get_blockdata(@event['location'])
-        if(@data['age'] == 0) {
-          @data['age'] = 1
-          @pos = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.2, 'z': @event['location']['z'] + 0.5)
-          @delta = array('x': 0.25, 'y': 0.125, 'z': 0.25)
-          @uuid = puuid(@player)
-          #mom_playerparticle(@uuid, 'VILLAGER_HAPPY', @pos['x'], @pos['y'], @pos['z'], 15, @delta['x'], @delta['y'], @delta['z'], 0.0)
-          set_timeout(0, closure( set_blockdata(@event['location'], @data) ))
-        } else {
-          cancel()
-        }
-      }
-      # watering
-      if(!is_null(@event['item']) && @event['item']['name'] == 'POTION' && @event['item']['meta']['base']['type'] == 'WATER') {
-        if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'ATTACHED_PUMPKIN_STEM', 'ATTACHED_MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
-          @event['location']['y'] -= 1
-          @is_farmland = true
-          cancel()
-        } else if(@event['block'] == 'FARMLAND') {
-          @is_farmland = true
-          cancel()
-        } else {
-          @is_farmland = false
-        }
-        if(@is_farmland) {
+      # 농사
+      if(@server == 'main') {
+        # bone mealing
+        if(!is_null(@event['item']) && @event['item']['name'] == 'BONE_MEAL' && array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
           @data = get_blockdata(@event['location'])
-          if(@data['block'] == 'farmland') {
-            play_named_sound(@event['location'], array('sound': 'minecraft:item.bottle.empty', 'category': 'NEUTRAL', 'volum': 1))
-            @data['moisture'] = 6
-            set_blockdata(@event['location'], @data)
-            if(@event['hand'] =='main_hand') {
-              @slot = pheld_slot(@player)
-            } else {
-              @slot = 40
-            }
-            @event['item']['qty'] -= 1
-            if(pmode(@player) != 'CREATIVE') {
-              if(@event['item']['qty'] > 0) {
-                set_inventory_item(@uuid, @slot, @event['item'])
-                pgive_item(@player, array('name': 'GLASS_BOTTLE'))
+          if(@data['age'] == 0) {
+            @data['age'] = 1
+            @pos = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.2, 'z': @event['location']['z'] + 0.5)
+            @delta = array('x': 0.25, 'y': 0.125, 'z': 0.25)
+            @uuid = puuid(@player)
+            #mom_playerparticle(@uuid, 'VILLAGER_HAPPY', @pos['x'], @pos['y'], @pos['z'], 15, @delta['x'], @delta['y'], @delta['z'], 0.0)
+            set_timeout(0, closure( set_blockdata(@event['location'], @data) ))
+          } else {
+            cancel()
+          }
+        }
+        # watering
+        if(!is_null(@event['item']) && @event['item']['name'] == 'POTION' && @event['item']['meta']['base']['type'] == 'WATER') {
+          if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'ATTACHED_PUMPKIN_STEM', 'ATTACHED_MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
+            @event['location']['y'] -= 1
+            @is_farmland = true
+            cancel()
+          } else if(@event['block'] == 'FARMLAND') {
+            @is_farmland = true
+            cancel()
+          } else {
+            @is_farmland = false
+          }
+          if(@is_farmland) {
+            @data = get_blockdata(@event['location'])
+            if(@data['block'] == 'farmland') {
+              play_named_sound(@event['location'], array('sound': 'minecraft:item.bottle.empty', 'category': 'NEUTRAL', 'volum': 1))
+              @data['moisture'] = 6
+              set_blockdata(@event['location'], @data)
+              if(@event['hand'] =='main_hand') {
+                @slot = pheld_slot(@player)
               } else {
-                set_inventory_item(@uuid, @slot, array('name': 'GLASS_BOTTLE'))
+                @slot = 40
+              }
+              @event['item']['qty'] -= 1
+              if(pmode(@player) != 'CREATIVE') {
+                if(@event['item']['qty'] > 0) {
+                  set_inventory_item(@uuid, @slot, @event['item'])
+                  pgive_item(@player, array('name': 'GLASS_BOTTLE'))
+                } else {
+                  set_inventory_item(@uuid, @slot, array('name': 'GLASS_BOTTLE'))
+                }
               }
             }
           }
         }
-      }
-    }
-    set_timeout(1, closure() {
-      if(@event['action'] == 'right_click_block') {
-        if(!is_cancelled()) {
-          # sowing
-          if(pmode(@player) == 'SURVIVAL') {
-            @is_sowing_allowed = true
-            if(@is_sowing_allowed) {
-              _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @skills_spec, @text)
+        set_timeout(1, closure() {
+          if(!is_cancelled()) {
+            # cultivating
+            if(pmode(@player) == 'SURVIVAL') {
+              @is_sowing_allowed = true
+              if(@is_sowing_allowed) {
+                _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @skills_spec, @text)
+              }
             }
           }
-        }
+        })
       }
-    })
+    }
+    if(@is_item_available) {
+      switch(@event['item']['name']) {
+      case 'ENCHANTED_BOOK':
+        # 스크롤, 비법서, 마법의 끈 사용시
+        if(!is_null(@event['item']['meta'])) {
+          switch(@event['item']['meta']['model']) {
+          case 1: // 스킬 포인트 초기화 비법서
+            break()
+          }
+          broadcast(is_cancelled())
+          broadcast(A @event)
+        }
+        break();
+      case 'EXPERIENCE_BOTTLE':
+        if(!is_null(@event['item']['meta']) && @event['item']['meta']['model'] > 0) {
+          cancel()
+        }
+        break();
+      case 'NAME_TAG':
+        if(psneaking(@player)) {
+          # 이름 수정
+          /*
+          @texture_layer = ''
+          @message = '이름 설정'
+          @inventory = array(
+          )
+          @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @text) {
+            #set_inventory(@id, @inventory)
+            broadcast(get_inventory(@id))
+            bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @id) {
+              #cancel()
+              broadcast(@event)
+            }
+          }
+          _show_gui(@player, 'name_tag', 'ANVIL', @texture_layer, @message, @inventory, @closure, @text)
+          */
+        }
+        break();
+      }
+    }
   }
 }
 
