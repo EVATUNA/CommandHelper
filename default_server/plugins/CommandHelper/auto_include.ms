@@ -54,6 +54,61 @@ async_read('files/crops_spec.json', closure(@value) {
   }
 })
 
+## Item Management
+@effective_items = array(
+  'armor': array(
+    'LEATHER_BOOTS',
+    'CHAINMAIL_BOOTS',
+    'IRON_BOOTS',
+    'GOLDEN_BOOTS',
+    'DIAMOND_BOOTS',
+    'NETHERITE_BOOTS'
+  ),
+  'weapon': array(
+    'WOODEN_SWORD',
+    'WOODEN_SHOVEL',
+    'WOODEN_PICKAXE',
+    'WOODEN_AXE',
+    'WOODEN_HOE',
+    'STONE_SWORD',
+    'STONE_SHOVEL',
+    'STONE_PICKAXE',
+    'STONE_AXE',
+    'STONE_HOE',
+    'GOLDEN_SWORD',
+    'GOLDEN_SHOVEL',
+    'GOLDEN_PICKAXE',
+    'GOLDEN_AXE',
+    'GOLDEN_HOE',
+    'IRON_SWORD',
+    'IRON_SHOVEL',
+    'IRON_PICKAXE',
+    'IRON_AXE',
+    'IRON_HOE',
+    'DIAMOND_SWORD',
+    'DIAMOND_SHOVEL',
+    'DIAMOND_PICKAXE',
+    'DIAMOND_AXE',
+    'DIAMOND_HOE',
+    'NETHERITE_SWORD',
+    'NETHERITE_SHOVEL',
+    'NETHERITE_PICKAXE',
+    'NETHERITE_AXE',
+    'NETHERITE_HOE',
+    'TRIDENT',
+    'BOW',
+    'CROSSBOW',
+    'SHIELD',
+    'WHEAT_SEEDS',
+    'BEETROOT_SEEDS',
+    'POTATO',
+    'CARROT',
+    'PUMPKIN_SEEDS',
+    'MELON_SEEDS',
+    'SWEET_BERRIES'
+  )
+)
+
 ### Initial Including Procedure
 ## 화면 관련
 # 액션바

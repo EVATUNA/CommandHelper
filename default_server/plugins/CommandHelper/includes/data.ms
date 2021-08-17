@@ -1,5 +1,5 @@
 ## Data Procedure
-proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
+proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text) {
   # 배열로 선언
   @players_data[@uuid] = array()
   @player_data = @players_data[@uuid]
@@ -105,15 +105,26 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @text) {
       'armor': null
     )
   )
-  @items = array(
-    'main_hand': get_inventory_item(@uuid, pheld_slot(@player)),
-    'off_hand': get_inventory_item(@uuid, 40),
-    'armor': get_inventory_item(@uuid, 36)
-  )
-
+  @items = array()
+  @main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
+  if(!is_null(@main_hand_item) && array_contains(@effective_items['weapon'], @main_hand_item['name'])) {
+    @items['main_hand'] = @main_hand_item
+  } else {
+    @items['main_hand'] = null
+  }
+  @off_hand_item = get_inventory_item(@uuid, 40)
+  if(!is_null(@off_hand_item) && array_contains(@effective_items['weapon'], @off_hand_item['name'])) {
+    @items['off_hand'] = @off_hand_item
+  } else {
+    @items['off_hand'] = null
+  }
+  @armor_item = get_inventory_item(@uuid, 36)
+  if(!is_null(@armor_item) && array_contains(@effective_items['armor'], @armor_item['name'])) {
+    @items['armor'] = @armor_item
+  } else {
+    @items['armor'] = null
+  }
   _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text)
-  
-  #_load_tip_data(@player, @uuid, @players_data)
 }
 
 proc _new_setting(@uuid, @player_data) {
@@ -158,7 +169,7 @@ proc _new_decoration(@uuid, @players_data) {
   cup_set('DECORATION', @uuid, @player_data['decoration'])
 }
 
-proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @resourcepack) {
+proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack) {
   @join_spec = array(
     'location': ploc(@player),
     'effects': get_peffect(@player),
@@ -185,14 +196,14 @@ proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @res
       unbind()
       break()
     case 'SUCCESSFULLY_LOADED':
-      _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @text)
+      _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @effective_items, @text)
       unbind()
       break()
     }
   }
 }
 
-proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @text) {
+proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @effective_items, @text) {
   title(@player, '', '', 0, 1, 0)
   set_timeout(1000, closure() {
     set_ploc(@player, @join_spec['location'])
@@ -208,17 +219,17 @@ proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @
     if(@join_spec['onfire'] > 0) {
       set_entity_onfire(@uuid, @join_spec['onfire'])
     }
-    _load_data(@player, @uuid, @players_data, @skills_spec, @text)
+    _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text)
   })
 }
 
-proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @text, @resourcepack) {
+proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack) {
   runas('~console', '/recipe give '.@player.' *')
   if(!array_index_exists(@reconnectable_players, @uuid)) {
-    _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @text, @resourcepack)
+    _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack)
   } else {
     #set_timeout(500, closure() {
-      _load_data(@player, @uuid, @players_data, @skills_spec, @text)
+      _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text)
       array_remove(@reconnectable_players, @uuid)
     #})
   }
@@ -244,16 +255,16 @@ proc _countdown_reconnectable_players(@reconnectable_players) {
 foreach(@player in all_players()) { #조인 이벤트로 변경 리로드 명령어
   @uuid = puuid(@player)
   set_timeout(1, closure() {
-    _load_data(@player, @uuid, @players_data, @skills_spec, @text)
+    _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text)
   })
 }
 
-bind('player_join', null, null, @event, @reconnectable_players, @players_data, @skills_spec, @text, @resourcepack) {
+bind('player_join', null, null, @event, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack) {
   @player = @event['player']
   @uuid = puuid(@player)
   modify_event('join_message', null)
   set_timeout(100, closure() {
-    _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @text, @resourcepack)
+    _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack)
   })
 }
 
@@ -846,7 +857,9 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       case 'DAMAGED_ANVIL':
       case 'BREWING_STAND':
       //case 'FLETCHING_TABLE': // 기능 없음
-        if(!psneaking(@player)) {
+        @main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
+        @off_hand_item = get_inventory_item(@uuid, 40)
+        if(!psneaking(@player) || (is_null(@main_hand_item) && is_null(@off_hand_item))) {
           cancel() // 사용 금지
         }
         break()
@@ -1448,7 +1461,6 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
           case 1: // 스킬 포인트 초기화 비법서
             break()
           }
-          broadcast(is_cancelled())
           broadcast(A @event)
         }
         break();
