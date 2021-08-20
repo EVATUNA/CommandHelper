@@ -40,7 +40,7 @@ foreach(@category in @categories) {
 # 스킬 매니저 get
 proc _get_skill_manager(@uuid) {
   @skill_manager = cup_get('SKILL_MANAGER', @uuid)
-  if(!is_null(@skill_manager)) {
+  if(is_null(@skill_manager)) {
     # 기본 값
     @default_level = 0
     @default_experience = 0
@@ -79,7 +79,7 @@ proc _set_skill_manager(@uuid, @skill_manager) {
 # 스킬 데이터 get
 proc _get_skill_data(@uuid, @skill, @skill_spec) {
   @skill_data = cup_get('SKILL_DATA', @uuid.'_'.@skill)
-  if(!is_null(@skill_data)) {
+  if(is_null(@skill_data)) {
     # 기본 값
     @default_point = 0
     @default_max_point = @skill_spec['default_max_point']
