@@ -1009,7 +1009,6 @@ proc _open_anvil(@player, @uuid, @inventory, @text) {
         default:
           break()
         }
-
       }
       /*
           case 'PLACE_ALL':
@@ -1870,7 +1869,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
             if(pmode(@player) == 'SURVIVAL') {
               @is_sowing_allowed = true
               if(@is_sowing_allowed) {
-                _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @skills_spec, @text)
+                _farmland_cultivate_event(@event, @player, @uuid, @players_data, @hp_blocks, @skills_spec, @text)
               }
             }
           }
@@ -1886,7 +1885,6 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
           case 1: // 스킬 포인트 초기화 비법서
             break()
           }
-          broadcast(A @event)
         }
         break();
       case 'EXPERIENCE_BOTTLE':

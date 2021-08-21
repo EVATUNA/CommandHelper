@@ -1614,7 +1614,7 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
   }
 }
 
-proc _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @skills_spec, @text) {
+proc _farmland_cultivate_event(@event, @player, @uuid, @players_data, @hp_blocks, @skills_spec, @text) {
   @player_data = @players_data[@uuid]
   @block = @event['block']
   if(@event['action'] == 'right_click_block' && array_contains(array('GRASS_BLOCK', 'DIRT'), @event['block']) && !is_null(@event['item']) && array_index_exists(@event, 'location')) {
@@ -1681,8 +1681,8 @@ proc _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @ski
             'hp': @hp,
             'countdown': 3
           )
-          @player_data['cache']['indicator'] = @indicator_data
-          _set_indicator(@player, @uuid, @player_data, @text)
+          _set_indicator(@player, @uuid, @player_data, @indicator_data, @text)
+          _set_tooltips(@player, @uuid, @player_data)
           set_block(@location, @block)
           if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
             @damage = 0
@@ -1722,8 +1722,8 @@ proc _farmland_sow_event(@event, @player, @uuid, @players_data, @hp_blocks, @ski
             'hp': @hp,
             'countdown': 1
           )
-          @player_data['cache']['indicator'] = @indicator_data
-          _set_indicator(@player, @uuid, @player_data, @text)
+          _set_indicator(@player, @uuid, @player_data, @indicator_data, @text)
+          _set_tooltips(@player, @uuid, @player_data)
         }
       }
     }
