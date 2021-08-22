@@ -884,7 +884,7 @@ proc _open_anvil(@player, @uuid, @inventory, @text) {
       'lore': array(
         '§7좌클릭 시, 아이템을 수리합니다',
         '',
-        '§c우측에서 수리 확률과 수리 결과를',
+        '§c수리 확률과 수리 결과를',
         '§c잘 확인한 후 수리하세요!'
       ),
       'model': 14
@@ -906,10 +906,11 @@ proc _open_anvil(@player, @uuid, @inventory, @text) {
     'meta': array(
       'display': '§b수리 결과 새로고침',
       'lore': array(
-        '§7좌클릭 시, 수리 성공/ 실패 확률과',
-        '§7수리 후 아이템 상태를 확인할 수 있습니다.',
+        '§7좌클릭 시, 수리 성공/실패 확률과',
+        '§7수리 성공 여부에 따른 수리 후의',
+        '§7아이템 상태를 확인할 수 있습니다.',
         '',
-        '§f수리 재료의 변화가 감지되었습니다.',
+        '§7수리 재료의 변화가 감지되었습니다.',
         '§c좌클릭하여 수리 결과를 새로고침 해주세요!',
       ),
       'model': 8
@@ -920,12 +921,47 @@ proc _open_anvil(@player, @uuid, @inventory, @text) {
     'meta': array(
       'display': '§8수리 결과 새로고침',
       'lore': array(
-        '§7좌클릭 시, 수리 성공/ 실패 확률과',
-        '§7수리 후 아이템 상태를 확인할 수 있습니다.'
+        '§7좌클릭 시, 수리 성공/실패 확률과',
+        '§7수리 성공 여부에 따른 수리 후의',
+        '§7아이템 상태를 확인할 수 있습니다.'
       ),
       'model': 1
     )
   )
+  # item return
+  for(@index = 4, @index < 9, @index++) {
+    if(!is_null(@inventory[@index]) && @inventory[@index]['name'] != 'STRUCTURE_VOID') {
+      @return_item = @inventory[@index]
+      @return_item['qty'] = pgive_item(@player, @return_item)
+      @ploc = ploc(@player)
+      @ploc['y'] += 1
+      drop_item(@ploc, @return_item, false)
+    }
+    @inventory[@index] = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': ' ',
+        'model': 1
+      )
+    )
+  }
+  for(@index = 13, @index < 18, @index++) {
+    if(!is_null(@inventory[@index]) && @inventory[@index]['name'] != 'STRUCTURE_VOID') {
+      @return_item = @inventory[@index]
+      @return_item['qty'] = pgive_item(@player, @return_item)
+      @ploc = ploc(@player)
+      @ploc['y'] += 1
+      drop_item(@ploc, @return_item, false)
+    }
+    @inventory[@index] = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': ' ',
+        'model': 1
+      )
+    )
+  }
+
   # setting
   @ingredient_name = null
   @backgroundtext = @text['space_fonts']['space.-8'].'\ue3fc'.@text['space_fonts']['space.-169']
