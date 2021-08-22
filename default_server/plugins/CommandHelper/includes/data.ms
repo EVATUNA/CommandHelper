@@ -884,8 +884,8 @@ proc _open_anvil(@player, @uuid, @inventory, @text) {
       'lore': array(
         '§7좌클릭 시, 아이템을 수리합니다',
         '',
-        '§7우측에서 수리 확률과 수리 결과를',
-        '§7잘 확인한 후 수리하세요!.'
+        '§c우측에서 수리 확률과 수리 결과를',
+        '§c잘 확인한 후 수리하세요!'
       ),
       'model': 14
     )
@@ -896,7 +896,7 @@ proc _open_anvil(@player, @uuid, @inventory, @text) {
       'display': '§8수리',
       'lore': array(
         '§7수리할 아이템과 수리 재료를 넣을 시,',
-        '§7해당 수리 버튼이 활성화됩니다.',
+        '§7수리 버튼이 활성화됩니다.',
       ),
       'model': 1
     )
