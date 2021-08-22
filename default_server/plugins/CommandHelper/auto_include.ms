@@ -654,6 +654,40 @@ proc _replace_tunalevel_text(@level) {
   return(@tunalevel_text)
 }
 
+proc _replace_repair_percent(@percent) {
+  @text = replace(
+    replace(
+      replace(
+        replace(
+          replace(
+            replace(
+              replace(
+                replace(
+                  replace(
+                    replace(
+                      @percent, '0', '\uf801\uec20'
+                    ), '1', '\uec21'
+                  ), '2', '\uf801\uec22'
+                ), '3', '\uf801\uec23'
+              ), '4', '\uf801\uec24'
+            ), '5', '\uf801\uec25'
+          ), '6', '\uf801\uec26'
+        ), '7', '\uf801\uec27'
+      ), '8', '\uf801\uec28'
+    ), '9', '\uf801\uec29'
+  ).'\uf801\uec2a'
+  @return = ''
+  switch(length(@percent)) {
+  case '1':
+    @return = '\uF824'.@text.'\uF824'
+    break()
+  case '2':
+    @return = '\uF822'.@text.'\uF822'
+    break()
+  }
+  return(@return)
+}
+
 # 상점 리코딩 후 제거 예정
 array proc _clone(array @arr) { return(array_deep_clone(@arr)) }
 boolean proc _existsGui(string @guiid) { return(array_contains(get_virtual_inventories(), @guiid)) }
