@@ -821,6 +821,150 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
   _show_gui(@player, 'level_converter', 45, @texture_layer, '', @inventory, @closure, @block_location, @magic_items, @text)
 }
 
+proc _get_repair_result(@inventory, @ingredient_name) {
+  @repairing_item = @inventory[1]
+  @total_failure_probability = 0
+  @ingredient_amount = 0
+  for(@index = 4, @index < 9, @index++) {
+    @ingredient = @inventory[@index]
+    if(@ingredient['name'] == @ingredient_name) {
+      @ingredient_amount += 1
+      if(is_array(@ingredient['meta'])) {
+        switch(@ingredient['meta']['model']) {
+        case 1:
+          @total_failure_probability += 30
+          break()
+        case 2:
+          @total_failure_probability += 12
+          break()
+        case 3:
+          @total_failure_probability += 3
+          break()
+        default:
+          @total_failure_probability += 60
+          break()
+        }
+      } else {
+        @total_failure_probability += 60
+      }
+    }
+  }
+  for(@index = 13, @index < 18, @index++) {
+    @ingredient = @inventory[@index]
+    if(@ingredient['name'] == @ingredient_name) {
+      @ingredient_amount += 1
+      if(is_array(@ingredient['meta'])) {
+        switch(@ingredient['meta']['model']) {
+        case 1:
+          @total_failure_probability += 30
+          break()
+        case 2:
+          @total_failure_probability += 12
+          break()
+        case 3:
+          @total_failure_probability += 3
+          break()
+        default:
+          @total_failure_probability += 60
+          break()
+        }
+      } else {
+        @total_failure_probability += 60
+      }
+    }
+  }
+  #
+  @max_durability = 0
+  @failure_probability = null
+  @success_probability = null
+  if(@ingredient_amount != 0) {
+    @max_durability = material_info(@repairing_item['name'], 'maxDurability')
+    @durability = @max_durability - @repairing_item['meta']['damage']
+    @failure_probability = @total_failure_probability / @ingredient_amount
+    switch(@ingredient_amount) {
+    case 1:
+      @repairing_percentage = 5
+      @breaking_percentage = 5
+      break()55
+    case 2:
+      @repairing_percentage = 11
+      @breaking_percentage = 10
+      break()
+    case 3:
+      @repairing_percentage = 18
+      @breaking_percentage = 15
+      break()
+    case 4:
+      @repairing_percentage = 26
+      @breaking_percentage = 20
+      break()
+    case 5:
+      @repairing_percentage = 35
+      @breaking_percentage = 25
+      break()
+    case 6:
+      @repairing_percentage = 45
+      @breaking_percentage = 30
+      break()
+    case 7:
+      @repairing_percentage = 56
+      @breaking_percentage = 35
+      break()
+    case 8:
+      @repairing_percentage = 68
+      @breaking_percentage = 40
+      break()
+    case 9:
+      @repairing_percentage = 81
+      @breaking_percentage = 45
+      break()
+    case 10:
+      @repairing_percentage = 95
+      @breaking_percentage = 50
+      break()
+    }
+    @repairing_durability = @repairing_percentage * 0.01 * @max_durability
+    @breaking_durability = @breaking_percentage * 0.01 * @max_durability
+    # 실패시 아이템 세팅
+    @failure_durability = @durability - @breaking_durability
+    @failure_item = array_deep_clone(@repairing_item)
+    @failure_item['meta']['damage'] = @max_durability - @failure_durability
+    if(@failure_durability < 1) {
+      @oversized_failure_durability = @failure_durability * -1 + 1
+      @penalty = @oversized_failure_durability / @max_durability * 0.25
+      @failure_probability += @penalty
+      @string_penalty = round(@penalty, 2).'%'
+      @failure_item['meta']['display'] = '§c수리 실패시,'
+      @failure_item['meta']['lore'] = array(
+        '§c아이템 파괴됨',
+        " §7@ingredient_amount개의 수리 재료를 사용하였으므로",
+        " §7수리 실패시, @breaking_durability(@breaking_percentage%)의 내구도가 감소합니다.",
+        "§c수리 확률 -@string_penalty",
+        ' §7수리 실패시, 아이템이 파괴될 정도로',
+        ' §7많은 양의 수리 재료를 사용하여',
+        ' §7수리 확률 패널티가 부과됩니다.'
+      )
+    } else {
+      @failure_item['meta']['display'] = '§c수리 실패시,'
+      @failure_item['meta']['lore'] = array(
+        "§c내구도 -@breaking_durability(@breaking_percentage%)",
+        " §7@ingredient_amount개의 수리 재료를 사용하였으므로",
+        " §7수리 실패시, @breaking_durability(@breaking_percentage%)의 내구도가 감소합니다."
+      )
+    }
+    @success_durability = @durability + @repairing_durability
+    @success_item = array_deep_clone(@repairing_item)
+    @success_item['meta']['damage'] = @max_durability - @success_durability
+    if(@success_durability > @max_durability) {
+      
+    } else {
+      
+    }
+    
+  }
+
+}
+
 proc _open_anvil(@player, @uuid, @inventory, @text) {
   # presets
   @repairable_items = array(
@@ -930,8 +1074,8 @@ proc _open_anvil(@player, @uuid, @inventory, @text) {
   )
   # item return
   for(@index = 4, @index < 9, @index++) {
-    if(!is_null(@inventory[@index]) && @inventory[@index]['name'] != 'STRUCTURE_VOID') {
-      @return_item = @inventory[@index]
+    @return_item = @inventory[@index]
+    if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
       @return_item['qty'] = pgive_item(@player, @return_item)
       @ploc = ploc(@player)
       @ploc['y'] += 1
@@ -946,8 +1090,8 @@ proc _open_anvil(@player, @uuid, @inventory, @text) {
     )
   }
   for(@index = 13, @index < 18, @index++) {
-    if(!is_null(@inventory[@index]) && @inventory[@index]['name'] != 'STRUCTURE_VOID') {
-      @return_item = @inventory[@index]
+    @return_item = @inventory[@index]
+    if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
       @return_item['qty'] = pgive_item(@player, @return_item)
       @ploc = ploc(@player)
       @ploc['y'] += 1
@@ -961,7 +1105,6 @@ proc _open_anvil(@player, @uuid, @inventory, @text) {
       )
     )
   }
-
   # setting
   @ingredient_name = null
   @backgroundtext = @text['space_fonts']['space.-8'].'\ue3fc'.@text['space_fonts']['space.-169']
@@ -1034,7 +1177,7 @@ proc _open_anvil(@player, @uuid, @inventory, @text) {
         @slot_item = @event['inventory'][@rawslot]
         @return_items = array()
         switch(@rawslot) {
-        case 1:
+        case 1: // repairing item
           switch(@action) {
           case 'SWAP_WITH_CURSOR':
             if(!is_null(@cursor_item) && array_index_exists(@repairable_items, @cursor_item['name'])) { // 도구를 들고 있을시
@@ -1149,7 +1292,7 @@ proc _open_anvil(@player, @uuid, @inventory, @text) {
           }
           break()
         case 4..8:
-        case 13..17: // ind
+        case 13..17: // ingredient
           if(!(@slot_item['name'] == 'STRUCTURE_VOID' && @slot_item['meta']['model'] == 1)) { // 재료를 놓을 수 있는 칸일 시
             switch(@action) {
             case 'SWAP_WITH_CURSOR':
@@ -1305,11 +1448,21 @@ proc _open_anvil(@player, @uuid, @inventory, @text) {
             cancel()
           }
           break()
-        case 37: // repair
+        case 37: // repair button
+          cancel()
+          if(@action == 'PICKUP_ALL' && @slot_item['meta']['model'] == 14) {
+            @inventory = get_inventory(@id)
+            _get_repair_result(@inventory, @ingredient_name)
+          }
           break()
         case 44: // refresh
+          cancel()
+          if(@action == 'PICKUP_ALL' && @slot_item['meta']['model'] == 8) {
+
+          }
           break()
         default:
+          cancel()
           break()
         }
       }
@@ -1513,15 +1666,32 @@ proc _open_anvil(@player, @uuid, @inventory, @text) {
     #아이템 안뽑고 그냥 닫을시
     set_timeout(1, closure() {
       bind('inventory_close', array('id': 'close'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid) {
-        /*
-        @item = @event['inventory'][1]
-        if(!is_null(@item)) {
-          @item['qty'] = pgive_item(@player, @item)
+        @inventory = @event['inventory']
+        @return_item = @inventory[1]
+        if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
+          @return_item['qty'] = pgive_item(@player, @return_item)
           @ploc = ploc(@player)
           @ploc['y'] += 1
-          drop_item(@ploc, @item, false)
+          drop_item(@ploc, @return_item, false)
         }
-        */
+        for(@index = 4, @index < 9, @index++) {
+          @return_item = @inventory[@index]
+          if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
+            @return_item['qty'] = pgive_item(@player, @return_item)
+            @ploc = ploc(@player)
+            @ploc['y'] += 1
+            drop_item(@ploc, @return_item, false)
+          }
+        }
+        for(@index = 13, @index < 18, @index++) {
+          @return_item = @inventory[@index]
+          if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
+            @return_item['qty'] = pgive_item(@player, @return_item)
+            @ploc = ploc(@player)
+            @ploc['y'] += 1
+            drop_item(@ploc, @return_item, false)
+          }
+        }
       }
     })
   }
