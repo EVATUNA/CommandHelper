@@ -972,7 +972,7 @@ bind('inventory_click', null, null, @event, @players_data, @effective_items, @sk
           }
         }
       } else {
-        if(array_contains(@effective_items['weapon'], @slot_item['name'])) {
+        if(!is_null(@slot_item) && array_contains(@effective_items['weapon'], @slot_item['name'])) {
           if(is_null(get_inventory_item(@uuid, @held_slot))) {
             if(@event['rawslot'] < array_size(@other_inventory)) {
               @is_post_hotbar_slot_empty = false

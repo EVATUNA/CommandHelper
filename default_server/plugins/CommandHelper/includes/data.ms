@@ -264,7 +264,7 @@ bind('player_join', null, null, @event, @reconnectable_players, @players_data, @
   @uuid = puuid(@player)
   modify_event('join_message', null)
   set_timeout(100, closure() {
-    _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack)
+    #_join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack)
   })
 }
 
@@ -923,417 +923,480 @@ proc _get_repair_result(@inventory, @ingredient_name) {
       @breaking_percentage = 50
       break()
     }
-    @repairing_durability = @repairing_percentage * 0.01 * @max_durability
-    @breaking_durability = @breaking_percentage * 0.01 * @max_durability
+    @repairing_durability = integer(round(@repairing_percentage * 0.01 * @max_durability))
+    @breaking_durability = integer(round(@breaking_percentage * 0.01 * @max_durability))
     # 실패시 아이템 세팅
     @failure_durability = @durability - @breaking_durability
     @failure_item = array_deep_clone(@repairing_item)
     @failure_item['meta']['damage'] = @max_durability - @failure_durability
+    @failure_item['meta']['display'] = '§e수리 실패시,'
     if(@failure_durability < 1) {
       @oversized_failure_durability = @failure_durability * -1 + 1
-      @penalty = @oversized_failure_durability / @max_durability * 0.25
+      @penalty = @oversized_failure_durability / @max_durability * 10
       @failure_probability += @penalty
       @string_penalty = round(@penalty, 2).'%'
-      @failure_item['meta']['display'] = '§c수리 실패시,'
       @failure_item['meta']['lore'] = array(
         '§c아이템 파괴됨',
-        " §7@ingredient_amount개의 수리 재료를 사용하였으므로",
-        " §7수리 실패시, @breaking_durability(@breaking_percentage%)의 내구도가 감소합니다.",
-        "§c수리 확률 -@string_penalty",
+        ' §7'.@ingredient_amount.'개의 수리 재료를 사용하였으므로',
+        ' §7수리 실패시, '.@breaking_durability.'('.@breaking_percentage.'%)'.'의 내구도가 감소합니다.',
+        '§c수리 확률 -'.@string_penalty,
         ' §7수리 실패시, 아이템이 파괴될 정도로',
         ' §7많은 양의 수리 재료를 사용하여',
         ' §7수리 확률 패널티가 부과됩니다.'
       )
     } else {
-      @failure_item['meta']['display'] = '§c수리 실패시,'
       @failure_item['meta']['lore'] = array(
-        "§c내구도 -@breaking_durability(@breaking_percentage%)",
-        " §7@ingredient_amount개의 수리 재료를 사용하였으므로",
-        " §7수리 실패시, @breaking_durability(@breaking_percentage%)의 내구도가 감소합니다."
+        '§c내구도 -'.@breaking_durability.'('.@breaking_percentage.'%)',
+        ' §7'.@ingredient_amount.'개의 수리 재료를 사용하였으므로',
+        ' §7수리 실패시, '.@breaking_durability.'('.@breaking_percentage.'%)의 내구도가 감소합니다.'
       )
     }
     @success_durability = @durability + @repairing_durability
     @success_item = array_deep_clone(@repairing_item)
     @success_item['meta']['damage'] = @max_durability - @success_durability
-    if(@success_durability > @max_durability) {
-      
+    @success_item['meta']['display'] = '§e수리 성공시,'
+    if(@success_durability >= @max_durability) {
+      @oversized_success_durability = @success_durability - @max_durability + 1
+      @bonus = @oversized_success_durability / @max_durability * 10
+      @failure_probability -= @bonus
+      @string_bonus = round(@bonus, 2).'%'
+      @success_item['meta']['lore'] = array(
+        '§a아이템 완벽히 수리됨',
+        ' §7'.@ingredient_amount.'개의 수리 재료를 사용하였으므로',
+        ' §7수리 성공시, '.@repairing_durability.'('.@repairing_percentage.'%)의 내구도가 증가합니다.',
+        '§a수리 확률 +'.@string_bonus,
+        ' §7수리 성공시, 아이템이 완벽히 수리될 정도로',
+        ' §7많은 양의 수리 재료를 사용하여',
+        ' §7수리 확률 보너스가 추가됩니다.'
+      )
     } else {
-      
+      @success_item['meta']['lore'] = array(
+        '§a내구도 +'.@repairing_durability.'('.@repairing_percentage.'%)',
+        ' §7'.@ingredient_amount.'개의 수리 재료를 사용하였으므로',
+        ' §7수리 성공시, '.@repairing_durability.'('.@repairing_percentage.'%)의 내구도가 증가합니다.'
+      )
     }
-    
+    @return = array(
+      'failure_probability': @failure_probability,
+      'repairing_durability': @repairing_durability,
+      'breaking_durability': @breaking_durability,
+      'success_item': @success_item,
+      'failure_item': @failure_item
+    )
+  } else {
+    @return = array(
+      'failure_probability': null,
+      'repairing_durability': null,
+      'breaking_durability': null,
+      'success_item': null,
+      'failure_item': null
+    )
   }
-
+  return(@return)
 }
 
-proc _open_anvil(@player, @uuid, @inventory, @text) {
-  # presets
-  @repairable_items = array(
-    # 가죽
-    'LEATHER_BOOTS': array('model': 13,'ingredient': 'LEATHER'),
-    # 구리
-    'CHAINMAIL_BOOTS': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
-    'STONE_SWORD': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
-    'STONE_SHOVEL': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
-    'STONE_PICKAXE': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
-    'STONE_AXE': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
-    'STONE_HOE': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
-    # 철
-    'IRON_BOOTS': array('model': 11, 'ingredient': 'IRON_INGOT'),
-    'IRON_SWORD': array('model': 11, 'ingredient': 'IRON_INGOT'),
-    'IRON_SHOVEL': array('model': 11, 'ingredient': 'IRON_INGOT'),
-    'IRON_PICKAXE': array('model': 11, 'ingredient': 'IRON_INGOT'),
-    'IRON_AXE': array('model': 11, 'ingredient': 'IRON_INGOT'),
-    'IRON_HOE': array('model': 11, 'ingredient': 'IRON_INGOT'),
-    # 금
-    'GOLDEN_BOOTS': array('model': 11, 'ingredient': 'GOLD_INGOT'),
-    'GOLDEN_SWORD': array('model': 11, 'ingredient': 'GOLD_INGOT'),
-    'GOLDEN_SHOVEL': array('model': 11, 'ingredient': 'GOLD_INGOT'),
-    'GOLDEN_PICKAXE': array('model': 11, 'ingredient': 'GOLD_INGOT'),
-    'GOLDEN_AXE': array('model': 11, 'ingredient': 'GOLD_INGOT'),
-    'GOLDEN_HOE': array('model': 11, 'ingredient': 'GOLD_INGOT'),
-    # 다이아몬드
-    'DIAMOND_BOOTS': array('model': 12, 'ingredient': 'DIAMOND'),
-    'DIAMOND_SWORD': array('model': 12, 'ingredient': 'DIAMOND'),
-    'DIAMOND_SHOVEL': array('model': 12, 'ingredient': 'DIAMOND'),
-    'DIAMOND_PICKAXE': array('model': 12, 'ingredient': 'DIAMOND'),
-    'DIAMOND_AXE': array('model': 12, 'ingredient': 'DIAMOND'),
-    'DIAMOND_HOE': array('model': 12, 'ingredient': 'DIAMOND'),
-    'TRIDENT': array('model': 12, 'ingredient': 'DIAMOND'),
-    # 네더라이트
-    'NETHERITE_BOOTS': array('model': 11, 'ingredient': 'NETHERITE_INGOT'),
-    'NETHERITE_SWORD': array('model': 11, 'ingredient': 'NETHERITE_INGOT'),
-    'NETHERITE_SHOVEL': array('model': 11, 'ingredient': 'NETHERITE_INGOT'),
-    'NETHERITE_PICKAXE': array('model': 11, 'ingredient': 'NETHERITE_INGOT'),
-    'NETHERITE_AXE': array('model': 11, 'ingredient': 'NETHERITE_INGOT'),
-    'NETHERITE_HOE': array('model': 11, 'ingredient': 'NETHERITE_INGOT')
-  )
-  @repairing_item_slot = array(
-    'name': 'STRUCTURE_VOID',
-    'meta': array(
-      'display': '§7수리할 아이템을 넣어주세요',
-      'model': 10
+proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @rounded_success_probability, @is_refresh, @block_location, @text) {
+  if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
+    # presets
+    @repairable_items = array(
+      # 가죽
+      'LEATHER_BOOTS': array('model': 13,'ingredient': 'LEATHER'),
+      # 구리
+      'CHAINMAIL_BOOTS': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
+      'STONE_SWORD': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
+      'STONE_SHOVEL': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
+      'STONE_PICKAXE': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
+      'STONE_AXE': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
+      'STONE_HOE': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
+      # 철
+      'IRON_BOOTS': array('model': 11, 'ingredient': 'IRON_INGOT'),
+      'IRON_SWORD': array('model': 11, 'ingredient': 'IRON_INGOT'),
+      'IRON_SHOVEL': array('model': 11, 'ingredient': 'IRON_INGOT'),
+      'IRON_PICKAXE': array('model': 11, 'ingredient': 'IRON_INGOT'),
+      'IRON_AXE': array('model': 11, 'ingredient': 'IRON_INGOT'),
+      'IRON_HOE': array('model': 11, 'ingredient': 'IRON_INGOT'),
+      # 금
+      'GOLDEN_BOOTS': array('model': 11, 'ingredient': 'GOLD_INGOT'),
+      'GOLDEN_SWORD': array('model': 11, 'ingredient': 'GOLD_INGOT'),
+      'GOLDEN_SHOVEL': array('model': 11, 'ingredient': 'GOLD_INGOT'),
+      'GOLDEN_PICKAXE': array('model': 11, 'ingredient': 'GOLD_INGOT'),
+      'GOLDEN_AXE': array('model': 11, 'ingredient': 'GOLD_INGOT'),
+      'GOLDEN_HOE': array('model': 11, 'ingredient': 'GOLD_INGOT'),
+      # 다이아몬드
+      'DIAMOND_BOOTS': array('model': 12, 'ingredient': 'DIAMOND'),
+      'DIAMOND_SWORD': array('model': 12, 'ingredient': 'DIAMOND'),
+      'DIAMOND_SHOVEL': array('model': 12, 'ingredient': 'DIAMOND'),
+      'DIAMOND_PICKAXE': array('model': 12, 'ingredient': 'DIAMOND'),
+      'DIAMOND_AXE': array('model': 12, 'ingredient': 'DIAMOND'),
+      'DIAMOND_HOE': array('model': 12, 'ingredient': 'DIAMOND'),
+      'TRIDENT': array('model': 12, 'ingredient': 'DIAMOND'),
+      # 네더라이트
+      'NETHERITE_BOOTS': array('model': 11, 'ingredient': 'NETHERITE_INGOT'),
+      'NETHERITE_SWORD': array('model': 11, 'ingredient': 'NETHERITE_INGOT'),
+      'NETHERITE_SHOVEL': array('model': 11, 'ingredient': 'NETHERITE_INGOT'),
+      'NETHERITE_PICKAXE': array('model': 11, 'ingredient': 'NETHERITE_INGOT'),
+      'NETHERITE_AXE': array('model': 11, 'ingredient': 'NETHERITE_INGOT'),
+      'NETHERITE_HOE': array('model': 11, 'ingredient': 'NETHERITE_INGOT')
     )
-  )
-  @ingredient_slot = array(
-    'name': 'STRUCTURE_VOID',
-    'meta': array(
-      'display': '§7재료 아이템을 넣어주세요',
-      'model': 1
-    )
-  )
-  @actvated_repair_button = array(
-    'name': 'STRUCTURE_VOID',
-    'meta': array(
-      'display': '§b수리',
-      'lore': array(
-        '§7좌클릭 시, 아이템을 수리합니다',
-        '',
-        '§c수리 확률과 수리 결과를',
-        '§c잘 확인한 후 수리하세요!'
-      ),
-      'model': 14
-    )
-  )
-  @unactvated_repair_button = array(
-    'name': 'STRUCTURE_VOID',
-    'meta': array(
-      'display': '§8수리',
-      'lore': array(
-        '§7수리할 아이템과 수리 재료를 넣을 시,',
-        '§7수리 버튼이 활성화됩니다.',
-      ),
-      'model': 1
-    )
-  )
-  @actvated_refresh_button = array(
-    'name': 'STRUCTURE_VOID',
-    'meta': array(
-      'display': '§b수리 결과 새로고침',
-      'lore': array(
-        '§7좌클릭 시, 수리 성공/실패 확률과',
-        '§7수리 성공 여부에 따른 수리 후의',
-        '§7아이템 상태를 확인할 수 있습니다.',
-        '',
-        '§7수리 재료의 변화가 감지되었습니다.',
-        '§c좌클릭하여 수리 결과를 새로고침 해주세요!',
-      ),
-      'model': 8
-    )
-  )
-  @unactvated_refresh_button = array(
-    'name': 'STRUCTURE_VOID',
-    'meta': array(
-      'display': '§8수리 결과 새로고침',
-      'lore': array(
-        '§7좌클릭 시, 수리 성공/실패 확률과',
-        '§7수리 성공 여부에 따른 수리 후의',
-        '§7아이템 상태를 확인할 수 있습니다.'
-      ),
-      'model': 1
-    )
-  )
-  # item return
-  for(@index = 4, @index < 9, @index++) {
-    @return_item = @inventory[@index]
-    if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
-      @return_item['qty'] = pgive_item(@player, @return_item)
-      @ploc = ploc(@player)
-      @ploc['y'] += 1
-      drop_item(@ploc, @return_item, false)
-    }
-    @inventory[@index] = array(
+    @repairing_item_slot = array(
       'name': 'STRUCTURE_VOID',
       'meta': array(
-        'display': ' ',
+        'display': '§7수리할 아이템을 넣어주세요',
+        'model': 10
+      )
+    )
+    @ingredient_slot = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': '§7재료 아이템을 넣어주세요',
         'model': 1
       )
     )
-  }
-  for(@index = 13, @index < 18, @index++) {
-    @return_item = @inventory[@index]
-    if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
-      @return_item['qty'] = pgive_item(@player, @return_item)
-      @ploc = ploc(@player)
-      @ploc['y'] += 1
-      drop_item(@ploc, @return_item, false)
-    }
-    @inventory[@index] = array(
+    @actvated_repair_button = array(
       'name': 'STRUCTURE_VOID',
       'meta': array(
-        'display': ' ',
+        'display': '§b수리',
+        'lore': array(
+          '§7좌클릭 시, 아이템을 수리합니다',
+          '',
+          '§c수리 확률과 수리 결과를',
+          '§c잘 확인한 후 수리하세요!'
+        ),
+        'model': 14
+      )
+    )
+    @unactvated_repair_button = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': '§8수리',
+        'lore': array(
+          '§7수리할 아이템과 수리 재료를 넣을 시,',
+          '§7수리 버튼이 활성화됩니다.',
+        ),
         'model': 1
       )
     )
-  }
-  # setting
-  @ingredient_name = null
-  @backgroundtext = @text['space_fonts']['space.-8'].'\ue3fc'.@text['space_fonts']['space.-169']
-  @open_slot = @text['space_fonts']['space.18']
-  @close_slot_1 = @text['space_fonts']['space.-1'].'\ue540'
-  @close_slot_2 = @text['space_fonts']['space.-1'].'\ue5a0'
-  @line_1_qty = 0
-  @line_2_qty = 0
-  if(is_null(@inventory[1])) { // 빈칸일시
-    @inventory[1] = @repairing_item_slot
-  } else if(array_index_exists(@repairable_items, @inventory[1]['name'])) { // 아이템이 놓였을 시
-    # 아이템에 따른 재료 세팅
-    @ingredient_slot['meta']['model'] = @repairable_items[@inventory[1]['name']]['model']
-    @ingredient_name = @repairable_items[@inventory[1]['name']]['ingredient']
-    # 내구도에 따른 재료칸 세팅
-    @max_durability = material_info(@inventory[1]['name'], 'maxDurability')
-    @durability = @inventory[1]['meta']['damage']
-    @repairable_qty = ceil(@durability / @max_durability * 10)
-    @quota = integer(@repairable_qty / 5)
-    @rest = @repairable_qty % 5
-    switch(@quota) {
-    case 0:
-      @line_1_qty = @rest
-      @line_2_qty = 0
-      for(@index = 4, @index < 4 + @rest, @index++) {
-        @inventory[@index] = @ingredient_slot
-      }
-      break()
-    case 1:
-      @line_1_qty = 5
-      @line_2_qty = @rest
+    @actvated_refresh_button = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': '§b수리 결과 새로고침',
+        'lore': array(
+          '§7좌클릭 시, 수리 성공/실패 확률과',
+          '§7수리 성공 여부에 따른 수리 후의',
+          '§7아이템 상태를 확인할 수 있습니다.',
+          '',
+          '§7수리 재료의 변화가 감지되었습니다.',
+          '§c좌클릭하여 수리 결과를 새로고침 해주세요!',
+        ),
+        'model': 8
+      )
+    )
+    @unactvated_refresh_button = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': '§8수리 결과 새로고침',
+        'lore': array(
+          '§7좌클릭 시, 수리 성공/실패 확률과',
+          '§7수리 성공 여부에 따른 수리 후의',
+          '§7아이템 상태를 확인할 수 있습니다.'
+        ),
+        'model': 1
+      )
+    )
+    # item return
+    if(!@is_refresh) {
       for(@index = 4, @index < 9, @index++) {
-        @inventory[@index] = @ingredient_slot
-      }
-      for(@index = 13, @index < 13 + @rest, @index++) {
-        @inventory[@index] = @ingredient_slot
-      }
-      break()
-    case 2:
-      @line_1_qty = 5
-      @line_2_qty = 5
-      for(@index = 4, @index < 9, @index++) {
-        @inventory[@index] = @ingredient_slot
+        @return_item = @inventory[@index]
+        if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
+          @return_item['qty'] = pgive_item(@player, @return_item)
+          @ploc = ploc(@player)
+          @ploc['y'] += 1
+          drop_item(@ploc, @return_item, false)
+        }
+        @inventory[@index] = array(
+          'name': 'STRUCTURE_VOID',
+          'meta': array(
+            'display': ' ',
+            'model': 1
+          )
+        )
       }
       for(@index = 13, @index < 18, @index++) {
-        @inventory[@index] = @ingredient_slot
+        @return_item = @inventory[@index]
+        if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
+          @return_item['qty'] = pgive_item(@player, @return_item)
+          @ploc = ploc(@player)
+          @ploc['y'] += 1
+          drop_item(@ploc, @return_item, false)
+        }
+        @inventory[@index] = array(
+          'name': 'STRUCTURE_VOID',
+          'meta': array(
+            'display': ' ',
+            'model': 1
+          )
+        )
       }
-      break()
+      # result item reset
+      @inventory[32] =array(
+        'name': 'STRUCTURE_VOID',
+        'meta': array(
+          'display': ' ',
+          'model': 1
+        )
+      )
+      @inventory[34] = array(
+        'name': 'STRUCTURE_VOID',
+        'meta': array(
+          'display': ' ',
+          'model': 1
+        )
+      )
     }
-
-  }
-  @line_1 = string_multiply(@open_slot, @line_1_qty).string_multiply(@close_slot_1, 5 - @line_1_qty)
-  @line_2 = string_multiply(@open_slot, @line_2_qty).string_multiply(@close_slot_2, 5 - @line_2_qty)
-  @title_text = _color('#404040').'수리할 아이템'.@text['space_fonts']['space.22']._color('#404040').'수리 재료'.color('white')
-  
-  @fail_percent = integer(2)
-  @success_percent = integer(98)
-  @percent_text = @text['space_fonts']['space.-16'].''._replace_repair_percent(@fail_percent).''.@text['space_fonts']['space.20'].''._replace_repair_percent(@success_percent)
-
-  @inventory[18]['meta']['model'] = 7
-  @inventory[37] = @unactvated_repair_button
-  @inventory[44] = @unactvated_refresh_button
-  @texture_layer = @backgroundtext.@text['space_fonts']['space.72'].@line_1.@text['space_fonts']['space.-90'].@line_2.@text['space_fonts']['space.-162'].@title_text.@percent_text
-  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @ingredient_name, @repairable_items, @repairing_item_slot, @ingredient_slot, @actvated_repair_button, @unactvated_repair_button, @actvated_refresh_button, @unactvated_refresh_button, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @id, @texture_layer, @ingredient_name, @repairable_items, @repairing_item_slot, @ingredient_slot, @actvated_repair_button, @unactvated_repair_button, @actvated_refresh_button, @unactvated_refresh_button, @text) {
-      @rawslot = @event['rawslot']
-      @action = @event['action']
-      @cursor_item = @event['cursoritem']
-      if(@rawslot >= 0 && @rawslot <= 44) {
-        @slot_item = @event['inventory'][@rawslot]
-        @return_items = array()
-        switch(@rawslot) {
-        case 1: // repairing item
-          switch(@action) {
-          case 'SWAP_WITH_CURSOR':
-            if(!is_null(@cursor_item) && array_index_exists(@repairable_items, @cursor_item['name'])) { // 도구를 들고 있을시
-              if(array_index_exists(@repairable_items, @slot_item['name'])) { // 슬롯에 도구가 있었을시
-                @change_gui = true
-                @return_items[] = array_deep_clone(@slot_item)
-                modify_event('slotitem', null)
-              } else { // 슬롯이 빈칸일 시
-                @change_gui = true
-                modify_event('slotitem', null)
-              }
-            } else { // 도구를 들고 있지 않을 시
-              @change_gui = false
-              cancel()
+    # setting
+    @ingredient_name = null
+    @backgroundtext = @text['space_fonts']['space.-8'].'\ue3fc'.@text['space_fonts']['space.-169']
+    @open_slot = @text['space_fonts']['space.18']
+    @close_slot_1 = @text['space_fonts']['space.-1'].'\ue540'
+    @close_slot_2 = @text['space_fonts']['space.-1'].'\ue5a0'
+    @line_1_qty = 0
+    @line_2_qty = 0
+    if(is_null(@inventory[1])) { // 빈칸일시
+      @inventory[1] = @repairing_item_slot
+    } else if(array_index_exists(@repairable_items, @inventory[1]['name']) && @inventory[1]['meta']['damage'] > 0) { // 아이템이 놓였을 시
+      # 아이템에 따른 필요 재료 설정
+      @ingredient_slot['meta']['model'] = @repairable_items[@inventory[1]['name']]['model']
+      @ingredient_name = @repairable_items[@inventory[1]['name']]['ingredient']
+      @line_1_qty = 5
+      @line_2_qty = 5
+      # 재료칸 세팅
+      if(!@is_refresh) {
+        for(@index = 4, @index < 9, @index++) {
+          @inventory[@index] = @ingredient_slot
+        }
+        for(@index = 13, @index < 18, @index++) {
+          @inventory[@index] = @ingredient_slot
+        }
+      }
+      /* 내구도에 따른 최대 재료 갯수 설정하는 코드
+        @max_durability = material_info(@inventory[1]['name'], 'maxDurability')
+        @damage = @inventory[1]['meta']['damage']
+        @repairable_qty = ceil(@damage / @max_durability * 10)
+        @quota = integer(@repairable_qty / 5)
+        @rest = @repairable_qty % 5
+        switch(@quota) {
+        case 0:
+          @line_1_qty = @rest
+          @line_2_qty = 0
+          if(!@is_refresh) {
+            for(@index = 4, @index < 4 + @rest, @index++) {
+              @inventory[@index] = @ingredient_slot
             }
-            break()
-          case 'PICKUP_ALL':
-          case 'PICKUP_HALF':
-            if(array_index_exists(@repairable_items, @slot_item['name'])) { // 도구를 꺼냈을 시
-              @change_gui = true
-              @return_items[] = array_deep_clone(@slot_item)
-              modify_event('slotitem', null)
-            } else { // 빈칸 클릭시
-              @change_gui = false
-              cancel()
-            }
-            break()
-          case 'DROP_ONE_SLOT':
-          case 'DROP_ALL_SLOT':
-            if(is_null(@cursor_item)) {
-              if(array_index_exists(@repairable_items, @slot_item['name'])) {
-                @change_gui = true
-              } else {
-                @change_gui = false
-                cancel()
-              }
-            } else {
-              @change_gui = false
-            }
-            break()
-          case 'HOTBAR_SWAP':
-          case 'HOTBAR_MOVE_AND_READD':
-            if(is_null(@cursor_item)) {
-              @swapslot = @event['hotbarbutton']
-              if(@event['hotbarbutton'] == -1 ) { @swapslot = 40 }
-              @swap_item = get_inventory_item(@uuid, @swapslot)
-              if(array_index_exists(@repairable_items, @slot_item['name'])) {
-                if(!is_null(@swap_item)) {
-                  if(array_index_exists(@repairable_items, @swap_item['name'])) {
-                    @change_gui = true  // gui 도구 | 스왑 도구
-                  } else {
-                    @change_gui = false // gui 도구 | 스왑 기타
-                    cancel()
-                  }
-                } else {
-                  @change_gui = true    // gui 도구 | 스왑 빈칸
-                  cancel()
-                  set_inventory_item(@id, @rawslot, @repairing_item_slot)
-                  set_inventory_item(@uuid, @swapslot, @slot_item)
-                }
-              } else {
-                if(!is_null(@swap_item)) {
-                  if(array_index_exists(@repairable_items, @swap_item['name'])) {
-                    @change_gui = true  // gui 빈칸 | 스왑 도구
-                    modify_event('slotitem', null)
-                  } else {
-                    @change_gui = false // gui 빈칸 | 스왑 기타
-                    cancel()
-                  }
-                } else {
-                  @change_gui = false   // gui 빈칸 | 스왑 빈칸
-                  cancel()
-                }
-              }
-            } else {
-              @change_gui = false
-            }
-            break()
-          case 'MOVE_TO_OTHER_INVENTORY':
-            if(array_index_exists(@repairable_items, @slot_item['name'])) {
-              if(is_null(@cursor_item)) {
-                @change_gui = true
-              } else {
-                @change_gui = true
-                @return_items[] = @cursor_item
-                modify_event('cursoritem', null)
-              }
-            } else {
-              @change_gui = false
-              cancel()
-            }
-            break();
-          default:
-            @change_gui = false
-            cancel()
-            break() 
-          }
-          if(@change_gui) {
-            foreach(@return_item in @return_items) {
-              if(!is_null(@return_item)) {
-                @return_item['qty'] = pgive_item(@player, @return_item)
-                @ploc = ploc(@player)
-                @ploc['y'] += 1
-                drop_item(@ploc, @return_item, false)
-              }
-            }
-            unbind('close'.@id)
-            set_timeout(1, closure() {
-              @inventory = get_inventory(@id)
-              _open_anvil(@player, @uuid, @inventory, @text)
-            })
           }
           break()
-        case 4..8:
-        case 13..17: // ingredient
-          if(!(@slot_item['name'] == 'STRUCTURE_VOID' && @slot_item['meta']['model'] == 1)) { // 재료를 놓을 수 있는 칸일 시
+        case 1:
+          @line_1_qty = 5
+          @line_2_qty = @rest
+          if(!@is_refresh) {
+            for(@index = 4, @index < 9, @index++) {
+              @inventory[@index] = @ingredient_slot
+            }
+            for(@index = 13, @index < 13 + @rest, @index++) {
+              @inventory[@index] = @ingredient_slot
+            }
+          }
+          break()
+        case 2:
+          @line_1_qty = 5
+          @line_2_qty = 5
+          if(!@is_refresh) {
+            for(@index = 4, @index < 9, @index++) {
+              @inventory[@index] = @ingredient_slot
+            }
+            for(@index = 13, @index < 18, @index++) {
+              @inventory[@index] = @ingredient_slot
+            }
+          }
+          break()
+        }
+      */
+    }
+    @line_1 = string_multiply(@open_slot, @line_1_qty).string_multiply(@close_slot_1, 5 - @line_1_qty)
+    @line_2 = string_multiply(@open_slot, @line_2_qty).string_multiply(@close_slot_2, 5 - @line_2_qty)
+    @title_text = _color('#404040').'수리할 아이템'.@text['space_fonts']['space.22']._color('#404040').'수리 재료'.color('white')
+    if(!is_null(@rounded_failure_probability)) {
+      if(@is_refresh) {
+        @percent_text = @text['space_fonts']['space.-16'].''._replace_repair_percent(@rounded_failure_probability).''.@text['space_fonts']['space.20'].''._replace_repair_percent(@rounded_success_probability)
+      } else {
+        @percent_text = ''
+      }
+    } else {
+      @percent_text = ''
+    }
+    @inventory[18]['meta']['model'] = 7
+    if(@inventory[37]['meta']['model'] == 1) {
+      @inventory[37] = @unactvated_repair_button
+    }
+    if(@inventory[44]['meta']['model'] == 1) {
+      @inventory[44] = @unactvated_refresh_button
+    }
+    @texture_layer = @backgroundtext.@text['space_fonts']['space.72'].@line_1.@text['space_fonts']['space.-90'].@line_2.@text['space_fonts']['space.-162'].@title_text.@percent_text
+    @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @ingredient_name, @repairable_items, @repairing_item_slot, @ingredient_slot, @actvated_repair_button, @unactvated_repair_button, @actvated_refresh_button, @unactvated_refresh_button, @rounded_failure_probability, @rounded_success_probability, @block_location, @text) {
+      bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @id, @texture_layer, @ingredient_name, @repairable_items, @repairing_item_slot, @ingredient_slot, @actvated_repair_button, @unactvated_repair_button, @actvated_refresh_button, @unactvated_refresh_button, @rounded_failure_probability, @rounded_success_probability, @block_location, @text) {
+        @rawslot = @event['rawslot']
+        @action = @event['action']
+        @cursor_item = @event['cursoritem']
+        if(@rawslot >= 0 && @rawslot <= 44) {
+          @slot_item = @event['inventory'][@rawslot]
+          @return_items = array()
+          switch(@rawslot) {
+          case 1: // repairing item
             switch(@action) {
             case 'SWAP_WITH_CURSOR':
-              @cursor_item_copy = array_deep_clone(@cursor_item)
-              if(!is_null(@cursor_item) && @cursor_item['name'] == @ingredient_name) { // 재료를 들고 있을시
-                if(@slot_item['name'] == @ingredient_name) { // 슬롯에 재료가 있었을시
-                  if(@cursor_item['qty'] == 1) { // 아이템 하나만 들고 있을시 (커서랑 슬롯이랑 스왑시키는 용도)
-                    @change_ingredient = true
-                  } else {
-                    @change_ingredient = false
-                    cancel()
-                  }
+              if(!is_null(@cursor_item) && array_index_exists(@repairable_items, @cursor_item['name'])) { // 도구를 들고 있을시
+                if(array_index_exists(@repairable_items, @slot_item['name'])) { // 슬롯에 도구가 있었을시
+                  @change_gui = true
+                  @return_items[] = array_deep_clone(@slot_item)
+                  modify_event('slotitem', null)
                 } else { // 슬롯이 빈칸일 시
-                  @change_ingredient = true
-                  @cursor_item['qty'] = 1
-                  @cursor_item_copy['qty'] = 63
-                  modify_event('slotitem', @cursor_item_copy)
-                  set_timeout(1, closure() {
-                    set_inventory_item(@id, @rawslot, @cursor_item)
-                  })
+                  @change_gui = true
+                  modify_event('slotitem', null)
                 }
-              } else { // 재료를 들고 있지 않을 시
-                @change_ingredient = false
+              } else { // 도구를 들고 있지 않을 시
+                @change_gui = false
                 cancel()
               }
               break()
             case 'PICKUP_ALL':
             case 'PICKUP_HALF':
-              if(@slot_item['name'] == @ingredient_name) {
-                @change_ingredient = true
-                set_timeout(1, closure() {
-                  set_inventory_item(@id, @rawslot, @ingredient_slot)
-                })
-              } else {
-                @change_ingredient = false
+              if(array_index_exists(@repairable_items, @slot_item['name'])) { // 도구를 꺼냈을 시
+                @change_gui = true
+                @return_items[] = array_deep_clone(@slot_item)
+                modify_event('slotitem', null)
+              } else { // 빈칸 클릭시
+                @change_gui = false
                 cancel()
               }
               break()
             case 'DROP_ONE_SLOT':
             case 'DROP_ALL_SLOT':
               if(is_null(@cursor_item)) {
+                if(array_index_exists(@repairable_items, @slot_item['name'])) {
+                  @change_gui = true
+                } else {
+                  @change_gui = false
+                  cancel()
+                }
+              } else {
+                @change_gui = false
+              }
+              break()
+            case 'HOTBAR_SWAP':
+            case 'HOTBAR_MOVE_AND_READD':
+              if(is_null(@cursor_item)) {
+                @swapslot = @event['hotbarbutton']
+                if(@event['hotbarbutton'] == -1 ) { @swapslot = 40 }
+                @swap_item = get_inventory_item(@uuid, @swapslot)
+                if(array_index_exists(@repairable_items, @slot_item['name'])) {
+                  if(!is_null(@swap_item)) {
+                    if(array_index_exists(@repairable_items, @swap_item['name'])) {
+                      @change_gui = true  // gui 도구 | 스왑 도구
+                    } else {
+                      @change_gui = false // gui 도구 | 스왑 기타
+                      cancel()
+                    }
+                  } else {
+                    @change_gui = true    // gui 도구 | 스왑 빈칸
+                    cancel()
+                    set_inventory_item(@id, @rawslot, @repairing_item_slot)
+                    set_inventory_item(@uuid, @swapslot, @slot_item)
+                  }
+                } else {
+                  if(!is_null(@swap_item)) {
+                    if(array_index_exists(@repairable_items, @swap_item['name'])) {
+                      @change_gui = true  // gui 빈칸 | 스왑 도구
+                      modify_event('slotitem', null)
+                    } else {
+                      @change_gui = false // gui 빈칸 | 스왑 기타
+                      cancel()
+                    }
+                  } else {
+                    @change_gui = false   // gui 빈칸 | 스왑 빈칸
+                    cancel()
+                  }
+                }
+              } else {
+                @change_gui = false
+              }
+              break()
+            case 'MOVE_TO_OTHER_INVENTORY':
+              if(array_index_exists(@repairable_items, @slot_item['name'])) {
+                if(is_null(@cursor_item)) {
+                  @change_gui = true
+                } else {
+                  @change_gui = true
+                  @return_items[] = @cursor_item
+                  modify_event('cursoritem', null)
+                }
+              } else {
+                @change_gui = false
+                cancel()
+              }
+              break();
+            default:
+              @change_gui = false
+              cancel()
+              break() 
+            }
+            if(@change_gui) {
+              foreach(@return_item in @return_items) {
+                if(!is_null(@return_item)) {
+                  @return_item['qty'] = pgive_item(@player, @return_item)
+                  @ploc = ploc(@player)
+                  @ploc['y'] += 1
+                  drop_item(@ploc, @return_item, false)
+                }
+              }
+              if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
+                unbind('close'.@id)
+              }
+              set_timeout(1, closure() {
+                @inventory = get_inventory(@id)
+                @is_refresh = false
+                _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @rounded_success_probability, @is_refresh, @block_location, @text)
+              })
+            }
+            break()
+          case 4..8:
+          case 13..17: // ingredient
+            if(!(@slot_item['name'] == 'STRUCTURE_VOID' && @slot_item['meta']['model'] == 1)) { // 재료를 놓을 수 있는 칸일 시
+              switch(@action) {
+              case 'SWAP_WITH_CURSOR':
+                @cursor_item_copy = array_deep_clone(@cursor_item)
+                if(!is_null(@cursor_item) && @cursor_item['name'] == @ingredient_name) { // 재료를 들고 있을시
+                  if(@slot_item['name'] == @ingredient_name) { // 슬롯에 재료가 있었을시
+                    if(@cursor_item['qty'] == 1) { // 아이템 하나만 들고 있을시 (커서랑 슬롯이랑 스왑시키는 용도)
+                      @change_ingredient = true
+                    } else {
+                      @change_ingredient = false
+                      cancel()
+                    }
+                  } else { // 슬롯이 빈칸일 시
+                    @change_ingredient = true
+                    @cursor_item['qty'] = 1
+                    @cursor_item_copy['qty'] = 63
+                    modify_event('slotitem', @cursor_item_copy)
+                    set_timeout(1, closure() {
+                      set_inventory_item(@id, @rawslot, @cursor_item)
+                    })
+                  }
+                } else { // 재료를 들고 있지 않을 시
+                  @change_ingredient = false
+                  cancel()
+                }
+                break()
+              case 'PICKUP_ALL':
+              case 'PICKUP_HALF':
                 if(@slot_item['name'] == @ingredient_name) {
                   @change_ingredient = true
                   set_timeout(1, closure() {
@@ -1343,95 +1406,301 @@ proc _open_anvil(@player, @uuid, @inventory, @text) {
                   @change_ingredient = false
                   cancel()
                 }
-              } else {
-                @change_ingredient = false
-              }
-              break()
-            case 'HOTBAR_SWAP':
-            case 'HOTBAR_MOVE_AND_READD':
-              if(is_null(@cursor_item)) {
-                @swapslot = @event['hotbarbutton']
-                if(@event['hotbarbutton'] == -1 ) { @swapslot = 40 }
-                @swap_item = get_inventory_item(@uuid, @swapslot)
-                if(@slot_item['name'] == @ingredient_name) {
-                  if(!is_null(@swap_item)) {
-                    if(@swap_item['name'] == @ingredient_name) {
-                      if(@swap_item['qty'] == 1) {
-                        @change_ingredient = true   // gui 재료 | 스왑 재료 1개
-                      } else {
-                        @change_ingredient = false  // gui 재료 | 스왑 재료 n개
-                        cancel()
-                      }
-                    } else {
-                      @change_ingredient = false    // gui 재료 | 스왑 기타
-                      cancel()
-                    }
+                break()
+              case 'DROP_ONE_SLOT':
+              case 'DROP_ALL_SLOT':
+                if(is_null(@cursor_item)) {
+                  if(@slot_item['name'] == @ingredient_name) {
+                    @change_ingredient = true
+                    set_timeout(1, closure() {
+                      set_inventory_item(@id, @rawslot, @ingredient_slot)
+                    })
                   } else {
-                    @change_ingredient = true       // gui 재료 | 스왑 빈칸
+                    @change_ingredient = false
                     cancel()
-                    set_inventory_item(@id, @rawslot, @ingredient_slot)
-                    set_inventory_item(@uuid, @swapslot, @slot_item)
                   }
                 } else {
-                  if(!is_null(@swap_item)) {
-                    if(@swap_item['name'] == @ingredient_name) {
-                      if(@swap_item['qty'] == 1) {
-                        @change_ingredient = true   // gui 빈칸 | 스왑 재료 1개
-                        cancel()
-                        set_inventory_item(@id, @rawslot, @swap_item)
-                        set_inventory_item(@uuid, @swapslot, null)
+                  @change_ingredient = false
+                }
+                break()
+              case 'HOTBAR_SWAP':
+              case 'HOTBAR_MOVE_AND_READD':
+                if(is_null(@cursor_item)) {
+                  @swapslot = @event['hotbarbutton']
+                  if(@event['hotbarbutton'] == -1 ) { @swapslot = 40 }
+                  @swap_item = get_inventory_item(@uuid, @swapslot)
+                  if(@slot_item['name'] == @ingredient_name) {
+                    if(!is_null(@swap_item)) {
+                      if(@swap_item['name'] == @ingredient_name) {
+                        if(@swap_item['qty'] == 1) {
+                          @change_ingredient = true   // gui 재료 | 스왑 재료 1개
+                        } else {
+                          @change_ingredient = false  // gui 재료 | 스왑 재료 n개
+                          cancel()
+                        }
                       } else {
-                        @change_ingredient = true  // gui 빈칸 | 스왑 재료 n개
+                        @change_ingredient = false    // gui 재료 | 스왑 기타
                         cancel()
-                        @swap_item['qty'] -= 1
-                        @swap_item_copy = array_deep_clone(@swap_item)
-                        @swap_item_copy['qty'] = 1
-                        set_inventory_item(@id, @rawslot, @swap_item_copy)
-                        set_inventory_item(@uuid, @swapslot, @swap_item)
                       }
                     } else {
-                      @change_ingredient = false    // gui 빈칸 | 스왑 기타
+                      @change_ingredient = true       // gui 재료 | 스왑 빈칸
                       cancel()
+                      set_inventory_item(@id, @rawslot, @ingredient_slot)
+                      set_inventory_item(@uuid, @swapslot, @slot_item)
                     }
                   } else {
-                    @change_ingredient = false      // gui 빈칸 | 스왑 빈칸
-                    cancel()
+                    if(!is_null(@swap_item)) {
+                      if(@swap_item['name'] == @ingredient_name) {
+                        if(@swap_item['qty'] == 1) {
+                          @change_ingredient = true   // gui 빈칸 | 스왑 재료 1개
+                          cancel()
+                          set_inventory_item(@id, @rawslot, @swap_item)
+                          set_inventory_item(@uuid, @swapslot, null)
+                        } else {
+                          @change_ingredient = true  // gui 빈칸 | 스왑 재료 n개
+                          cancel()
+                          @swap_item['qty'] -= 1
+                          @swap_item_copy = array_deep_clone(@swap_item)
+                          @swap_item_copy['qty'] = 1
+                          set_inventory_item(@id, @rawslot, @swap_item_copy)
+                          set_inventory_item(@uuid, @swapslot, @swap_item)
+                        }
+                      } else {
+                        @change_ingredient = false    // gui 빈칸 | 스왑 기타
+                        cancel()
+                      }
+                    } else {
+                      @change_ingredient = false      // gui 빈칸 | 스왑 빈칸
+                      cancel()
+                    }
                   }
+                } else {
+                  @change_ingredient = false
                 }
-              } else {
-                @change_ingredient = false
-              }
-              break()
-            case 'MOVE_TO_OTHER_INVENTORY':
-              if(@slot_item['name'] == @ingredient_name) {
-                @change_ingredient = true
-                set_timeout(1, closure() {
-                  set_inventory_item(@id, @rawslot, @ingredient_slot)
-                })
-              } else {
+                break()
+              case 'MOVE_TO_OTHER_INVENTORY':
+                if(@slot_item['name'] == @ingredient_name) {
+                  @change_ingredient = true
+                  set_timeout(1, closure() {
+                    set_inventory_item(@id, @rawslot, @ingredient_slot)
+                  })
+                } else {
+                  @change_ingredient = false
+                  cancel()
+                }
+                break();
+              default:
                 @change_ingredient = false
                 cancel()
+                break() 
               }
-              break();
-            default:
-              @change_ingredient = false
+              if(@change_ingredient) {
+                set_timeout(1, closure() {
+                  @inventory = get_inventory(@id)
+                  @is_repairable = false
+                  for(@index = 4, @index < 9, @index++) {
+                    if(is_null(@inventory[@index])) {
+                      set_inventory_item(@id, @index, @ingredient_slot)
+                    } else if(@inventory[@index]['name'] == @ingredient_name) {
+                      @is_repairable = true
+                    }
+                  }
+                  for(@index = 13, @index < 18, @index++) {
+                    if(is_null(@inventory[@index])) {
+                      set_inventory_item(@id, @index, @ingredient_slot)
+                    } else if(@inventory[@index]['name'] == @ingredient_name) {
+                      @is_repairable = true
+                    }
+                  }
+                  if(@is_repairable) {
+                    set_inventory_item(@id, 37, @actvated_repair_button)
+                  } else {
+                    set_inventory_item(@id, 37, @unactvated_repair_button)
+                  }
+                  set_inventory_item(@id, 44, @actvated_refresh_button)
+                })
+              }
+            } else {
               cancel()
-              break() 
             }
-            if(@change_ingredient) {
+            break()
+          case 37: // repair button
+            cancel()
+            if(@action == 'PICKUP_ALL' && @slot_item['meta']['model'] == 14) {
+              @inventory = get_inventory(@id)
+              @repairing_item = @inventory[1]
+              # copy
+              @repairing_item_copy = array_deep_clone(@repairing_item)
+              @ingredients = array()
+              for(@index = 4, @index < 9, @index++) {
+                @ingredient = @inventory[@index]
+                if(@ingredient['name'] == @ingredient_name) {
+                  @ingredients[] = @ingredient
+                }
+              }
+              for(@index = 13, @index < 18, @index++) {
+                @ingredient = @inventory[@index]
+                if(@ingredient['name'] == @ingredient_name) {
+                  @ingredients[] = @ingredient
+                }
+              }
+              # result
+              @return = _get_repair_result(@inventory, @ingredient_name)
+              if(rand() > @return['failure_probability'] * 0.01) {
+                @is_success = true
+              } else {
+                @is_success = false
+              }
+              if(@is_success) { // 성공
+                @repairing_item['meta']['damage'] -= @return['repairing_durability']
+                if(@repairing_item['meta']['damage'] < 0) { @repairing_item['meta']['damage'] = 0 }
+                @result = @repairing_item
+              } else { // 실패
+                @repairing_item['meta']['damage'] += @return['breaking_durability']
+                if(@repairing_item['meta']['damage'] >= material_info(@repairing_item['name'], 'maxDurability')) { 
+                  @result = null
+                } else {
+                  @result = @repairing_item
+                }
+              }
+              if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
+                unbind('close'.@id)
+                for(@i = 5, @i > 0, @i --) {
+                  if(@i > 1) {
+                    queue_push(closure() {
+                      @particle_location = array('x': @block_location['x'] + 0.5, 'y': @block_location['y'] + 1, 'z': @block_location['z'] + 0.5, 'world': @block_location['world'])
+                      if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
+                        play_named_sound(@particle_location, array('sound': 'block.anvil.land', 'category': 'BLOCKS', 'volume': 2, 'pitch': 1.7))
+                        mom_playerparticle(@uuid, 'LAVA', @particle_location['x'], @particle_location['y'], @particle_location['z'], 5, 0.0, 0.0, 0.0, 0.0)
+                      } else {
+                        queue_clear('anvil.'.@player)
+                        @return_item = @repairing_item_copy
+                        if(!is_null(@return_item)) {
+                          drop_item(@particle_location, @return_item, false)
+                        }
+                        foreach(@return_item in @ingredients) {
+                          drop_item(@particle_location, @return_item, false)
+                        }
+                      }
+                    }, 'anvil.'.@player)
+                    queue_delay(1000, 'anvil.'.@player)
+                  } else {
+                    queue_push(closure() {
+                      @particle_location = array('x': @block_location['x'] + 0.5, 'y': @block_location['y'] + 1, 'z': @block_location['z'] + 0.5, 'world': @block_location['world'])
+                      if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
+                        play_named_sound(@particle_location, array('sound': 'block.anvil.land', 'category': 'BLOCKS', 'volume': 2, 'pitch': 1.7))
+                        mom_playerparticle(@uuid, 'LAVA', @particle_location['x'], @particle_location['y'], @particle_location['z'], 5, 0.0, 0.0, 0.0, 0.0)
+                        if(@is_success) {
+                          play_named_sound(@particle_location, array('sound': 'entity.experience_orb.pickup', 'category': 'BLOCKS', 'volume': 2, 'pitch': 1))
+                          mom_playerparticle(@uuid, 'FIREWORKS_SPARK', @particle_location['x'], @particle_location['y'], @particle_location['z'], 5, 0.1, 0.1, 0.1, 0.1)
+                        } else {
+                          play_named_sound(@particle_location, array('sound': 'entity.item.break', 'category': 'BLOCKS', 'volume': 2, 'pitch': 1))
+                          mom_playerparticle(@uuid, 'CLOUD', @particle_location['x'], @particle_location['y'], @particle_location['z'], 5, 0.1, 0.1, 0.1, 0.1)
+                        }
+                        @return_item = @result
+                        if(!is_null(@return_item)) {
+                          drop_item(@particle_location, @return_item, false)
+                        }
+                      } else {
+                        queue_clear('anvil.'.@player)
+                        @return_item = @repairing_item_copy
+                        if(!is_null(@return_item)) {
+                          drop_item(@particle_location, @return_item, false)
+                        }
+                        foreach(@return_item in @ingredients) {
+                          drop_item(@particle_location, @return_item, false)
+                        }
+                      }
+                    }, 'anvil.'.@player)
+                  }
+                }
+              }
+            }
+            close_pinv(@player)
+            break()
+          case 44: // refresh
+            cancel()
+            if(@action == 'PICKUP_ALL' && @slot_item['meta']['model'] == 8) {
+              @inventory = get_inventory(@id)
+              @return = _get_repair_result(@inventory, @ingredient_name)
+              if(!is_null(@return['failure_probability'])) {
+                @rounded_failure_probability = integer(round(@return['failure_probability']))
+                @rounded_success_probability = integer(100 - @rounded_failure_probability)
+                @inventory[32] = @return['failure_item']
+                @inventory[34] = @return['success_item']
+              } else {
+                @rounded_failure_probability = null
+                @rounded_success_probability = null
+                @inventory[32] =array(
+                  'name': 'STRUCTURE_VOID',
+                  'meta': array(
+                    'display': ' ',
+                    'model': 1
+                  )
+                )
+                @inventory[34] = array(
+                  'name': 'STRUCTURE_VOID',
+                  'meta': array(
+                    'display': ' ',
+                    'model': 1
+                  )
+                )
+              }
+              @inventory[44] = @unactvated_refresh_button
+              if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
+                unbind('close'.@id)
+              }
+              set_timeout(1, closure() {
+                @is_refresh = true
+                _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @rounded_success_probability, @is_refresh, @block_location, @text)
+              })
+            }
+            break()
+          default:
+            cancel()
+            break()
+          }
+        } else if(45 <= @rawslot && @rawslot <= 80) {
+          @slot = @event['slot']
+          @inventory = get_inventory(@id)
+          @pinventory = pinv(@player)
+          @old_slot_item = @pinventory[@slot]
+          switch(@action) {
+          case 'MOVE_TO_OTHER_INVENTORY':
+            if(array_index_exists(@repairable_items, @old_slot_item['name'])) {
+              if(@inventory[1]['name'] == 'STRUCTURE_VOID') {
+                @inventory[1] = @old_slot_item
+                set_pinv(@player, @slot, null)
+                if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
+                  unbind('close'.@id)
+                }
+                set_timeout(1, closure() {
+                  @is_refresh = false
+                  _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @rounded_success_probability, @is_refresh, @block_location, @text)
+                })
+              } else {
+                cancel()
+              }
+            } else {
+              cancel()
+            }
+            break()
+          case 'COLLECT_TO_CURSOR':
+            if(@cursor_item['name'] == @ingredient_name) {
+              broadcast(A)
               set_timeout(1, closure() {
                 @inventory = get_inventory(@id)
                 @is_repairable = false
                 for(@index = 4, @index < 9, @index++) {
                   if(is_null(@inventory[@index])) {
-                    set_inventory_item(@id, @rawslot, @ingredient_slot)
+                    set_inventory_item(@id, @index, @ingredient_slot)
                   } else if(@inventory[@index]['name'] == @ingredient_name) {
                     @is_repairable = true
                   }
                 }
                 for(@index = 13, @index < 18, @index++) {
                   if(is_null(@inventory[@index])) {
-                    set_inventory_item(@id, @rawslot, @ingredient_slot)
+                    set_inventory_item(@id, @index, @ingredient_slot)
                   } else if(@inventory[@index]['name'] == @ingredient_name) {
                     @is_repairable = true
                   }
@@ -1444,258 +1713,54 @@ proc _open_anvil(@player, @uuid, @inventory, @text) {
                 set_inventory_item(@id, 44, @actvated_refresh_button)
               })
             }
-          } else {
-            cancel()
+            break()
           }
-          break()
-        case 37: // repair button
-          cancel()
-          if(@action == 'PICKUP_ALL' && @slot_item['meta']['model'] == 14) {
-            @inventory = get_inventory(@id)
-            _get_repair_result(@inventory, @ingredient_name)
-          }
-          break()
-        case 44: // refresh
-          cancel()
-          if(@action == 'PICKUP_ALL' && @slot_item['meta']['model'] == 8) {
-
-          }
-          break()
-        default:
-          cancel()
-          break()
         }
       }
-      /*
-          case 'PLACE_ALL':
-            if(is_null(@event['inventory'][1])) {
-              @change_gui = true
-            } else {
-              @change_gui = false
+      #아이템 안뽑고 그냥 닫을시
+      set_timeout(1, closure() {
+        bind('inventory_drag', array('id': 'drag'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid) {
+          @indexs = array_keys(@event['newitems'])
+          foreach(@index in @indexs) {
+            if(@index <  45) {
+              cancel()
             }
-            break();
-          case 'PLACE_ONE':
-            @change_gui = true
-            if(@cursor_item['qty'] > 1) {
-              @cursor_item['qty'] -= 1
-              @item = array_deep_clone(@cursor_item)
-              @cursor_item['qty'] = 1
-              modify_event('cursoritem', @cursor_item)
-              @item['qty'] = pgive_item(@player, @item)
+          }
+        }
+        bind('inventory_close', array('id': 'close'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid) {
+          @inventory = @event['inventory']
+          @return_item = @inventory[1]
+          if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
+            @return_item['qty'] = pgive_item(@player, @return_item)
+            @ploc = ploc(@player)
+            @ploc['y'] += 1
+            drop_item(@ploc, @return_item, false)
+          }
+          for(@index = 4, @index < 9, @index++) {
+            @return_item = @inventory[@index]
+            if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
+              @return_item['qty'] = pgive_item(@player, @return_item)
               @ploc = ploc(@player)
               @ploc['y'] += 1
-              drop_item(@ploc, @item, false)
+              drop_item(@ploc, @return_item, false)
             }
-            break();
-          case 'PLACE_SOME':
-            @change_gui = false
-            break();
-          case 'PICKUP_ALL':
-            @change_gui = true
-            @item = @event['inventory'][1]
-            modify_event('slotitem', null)
-            @item['qty'] = pgive_item(@player, @item)
-            @ploc = ploc(@player)
-            @ploc['y'] += 1
-            drop_item(@ploc, @item, false)
-            break();
-          case 'PICKUP_HALF':
-            @change_gui = true
-            @slot_item = @event['inventory'][1]
-            @half = floor(@slot_item['qty'] / 2)
-            @slot_item['qty'] -= @half
-            @item = array_deep_clone(@slot_item)
-            @slot_item['qty'] = @half
-            modify_event('slotitem', null)
-            set_timeout(0, closure() {
-              set_inventory_item(@id, 1, @slot_item)
-            })
-            @item['qty'] = pgive_item(@player, @item)
-            @ploc = ploc(@player)
-            @ploc['y'] += 1
-            drop_item(@ploc, @item, false)
-            break();
-          case 'SWAP_WITH_CURSOR':
-            @change_gui = true
-            @item = @event['inventory'][1]
-            modify_event('slotitem', null)
-            @item['qty'] = pgive_item(@player, @item)
-            @ploc = ploc(@player)
-            @ploc['y'] += 1
-            drop_item(@ploc, @item, false)
-            break();
-          case 'DROP_ONE_SLOT':
-          case 'DROP_ALL_SLOT':
-          case 'HOTBAR_SWAP':
-          case 'HOTBAR_MOVE_AND_READD':
-            if(is_null(@cursor_item)) {
-              @change_gui = true
-            } else {
-              @change_gui = false
-            }
-            break();
-          case 'MOVE_TO_OTHER_INVENTORY':
-            if(is_null(@cursor_item)) {
-              @change_gui = true
-            } else {
-              @change_gui = true
-              @item = @cursor_item
-              modify_event('cursoritem', null)
-              set_timeout(0, closure() {
-                @item['qty'] = pgive_item(@player, @item)
-                @ploc = ploc(@player)
-                @ploc['y'] += 1
-                drop_item(@ploc, @item, false)
-              })
-            }
-            break();
-          default:
-            @change_gui = false
-            broadcast(@change_gui @event['action'] @cursor_item)
-            break();
           }
-          if(@change_gui) {
-            unbind('close'.@id)
-            set_timeout(1, closure() {
-              @inventory = get_inventory(@id)
-              _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_items, @text)
-            })
-          }
-        } else {
-          cancel()
-          @ingredient = @event['inventory'][1]
-          @converting_level = 0
-          if(!is_null(@ingredient) && @action == 'PICKUP_ALL' && is_null(@cursor_item)) {
-            switch(@rawslot) {
-            case 3:
-              @magic_item = @magic_items['미약한 마법의 정수']
-              @converting_level = 30
-              break()
-            case 5:
-              @magic_item = @magic_items['농축된 마법의 정수']
-              @converting_level = 60
-              break()
-            case 7:
-              @magic_item = @magic_items['강력한 마법의 정수']
-              @converting_level = 90
-              break()
-            case 12:
-              @magic_item = @magic_items['변환의 끈']
-              @converting_level = 30
-              break()
-            case 14:
-              @magic_item = @magic_items['놀라운 변환의 끈']
-              @converting_level = 60
-              break()
-            case 16:
-              @magic_item = @magic_items['강력한 변환의 끈']
-              @converting_level = 90
-              break()
-            case 30:
-              @magic_item = @magic_items['스킬 포인트 초기화 스크롤']
-              @converting_level = 120
-              break()
-            }
-            if(@converting_level > 0 && @magic_item['text'] != @text['space_fonts']['space.18']) {
-              unbind('close'.@id)
-              @item = @ingredient
-              @item['qty'] -= 1
-              set_timeout(0, closure() {
-                @item['qty'] = pgive_item(@player, @item)
-                @ploc = ploc(@player)
-                @ploc['y'] += 1
-                drop_item(@ploc, @item, false)
-              })
-              close_pinv(@player)
-              @location = array('x': @block_location['x'] + 0.5, 'y': @block_location['y'] + 1.01, 'z': @block_location['z'] + 0.5, 'world': @block_location['world'])
-              set_pcooldown(@player, 'CAVE_AIR', @converting_level)
-              @task = array('tick': integer(@converting_level / 3), 'id': null)
-              @id = set_interval(100 , closure() {
-                if(ponline(@player) && ploc(@player)['world'] == @block_location['world']) {
-                  if(@task['tick'] > 0) {
-                    @ploc = ploc(@player)
-                    play_named_sound(@location, array('sound': 'minecraft:entity.player.levelup', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
-                    @pos = array(
-                      'x': @ploc['x'] + rand() / 2 - 0.25,
-                      'y': @ploc['y'] + rand() * 1.5 + 1,
-                      'z': @ploc['z'] + rand() / 2 - 0.25
-                    )
-                    @delta = array(
-                      'x': (@location['x'] - @pos['x']) / 2,
-                      'y': (@location['y'] - @pos['y']) / 2,
-                      'z': (@location['z'] - @pos['z']) / 2
-                    )
-                    mom_playerparticle(@uuid, 'TOTEM', @pos['x'], @pos['y'], @pos['z'], 0, @delta['x'], @delta['y'], @delta['z'], 1.0)
-                    @task['tick'] -= 1
-                  } else {
-                    clear_task()
-                    play_named_sound(@location, array('sound': 'minecraft:block.enchantment_table.use', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
-                    set_plevel(@player, plevel(@player) - @converting_level)
-                    drop_item(@location, @magic_item, false)
-                  }
-                } else {
-                  @item = @ingredient
-                  @item['qty'] = 1
-                  drop_item(@location, @item, false)
-                  clear_task()
-                }
-              })
-              @task['id'] = @id
+          for(@index = 13, @index < 18, @index++) {
+            @return_item = @inventory[@index]
+            if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
+              @return_item['qty'] = pgive_item(@player, @return_item)
+              @ploc = ploc(@player)
+              @ploc['y'] += 1
+              drop_item(@ploc, @return_item, false)
             }
           }
         }
-      } else if(@action == 'MOVE_TO_OTHER_INVENTORY') {
-        if(!is_null(@cursor_item)) {
-          @item = @cursor_item
-          modify_event('cursoritem', null)
-          set_timeout(0, closure() {
-            @item['qty'] = pgive_item(@player, @item)
-            @ploc = ploc(@player)
-            @ploc['y'] += 1
-            drop_item(@ploc, @item, false)
-          })
-        }
-        unbind('close'.@id)
-        set_timeout(0, closure() {
-          @inventory = get_inventory(@id)
-          _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_items, @text)
-        })
-      }
-      */
+      })
     }
-    #아이템 안뽑고 그냥 닫을시
-    set_timeout(1, closure() {
-      bind('inventory_close', array('id': 'close'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid) {
-        @inventory = @event['inventory']
-        @return_item = @inventory[1]
-        if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
-          @return_item['qty'] = pgive_item(@player, @return_item)
-          @ploc = ploc(@player)
-          @ploc['y'] += 1
-          drop_item(@ploc, @return_item, false)
-        }
-        for(@index = 4, @index < 9, @index++) {
-          @return_item = @inventory[@index]
-          if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
-            @return_item['qty'] = pgive_item(@player, @return_item)
-            @ploc = ploc(@player)
-            @ploc['y'] += 1
-            drop_item(@ploc, @return_item, false)
-          }
-        }
-        for(@index = 13, @index < 18, @index++) {
-          @return_item = @inventory[@index]
-          if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
-            @return_item['qty'] = pgive_item(@player, @return_item)
-            @ploc = ploc(@player)
-            @ploc['y'] += 1
-            drop_item(@ploc, @return_item, false)
-          }
-        }
-      }
-    })
+    _show_gui(@player, 'anvil', 45, @texture_layer, '', @inventory, @closure, @ingredient_name, @repairable_items, @repairing_item_slot, @ingredient_slot, @actvated_repair_button, @unactvated_repair_button, @actvated_refresh_button, @unactvated_refresh_button, @rounded_failure_probability, @rounded_success_probability, @block_location, @text)
+  } else {
+    close_pinv(@player)
   }
-  _show_gui(@player, 'anvil', 45, @texture_layer, '', @inventory, @closure, @ingredient_name, @repairable_items, @repairing_item_slot, @ingredient_slot, @actvated_repair_button, @unactvated_repair_button, @actvated_refresh_button, @unactvated_refresh_button, @text)
 }
 
 bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_spec, @essences, @server, @text) {
@@ -1758,7 +1823,11 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
           }
           @inventory[1] = null
           # proc
-          _open_anvil(@player, @uuid, @inventory, @text)
+          @rounded_failure_probability = null
+          @rounded_success_probability = null
+          @is_refresh = false
+          @block_location = @event['location']
+          _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @rounded_success_probability, @is_refresh, @block_location, @text)
         }
         break()
       case 'SMITHING_TABLE':
