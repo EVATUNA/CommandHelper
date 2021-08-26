@@ -2319,37 +2319,39 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         }
         break()
       # NORMAL INTERACTIVE BLOCKS
-      case 'BARREL':
-      case 'BEACON':
-      case 'BED':
-      case 'BELL':
-      case 'BLAST_FURNACE':
-      case 'CAKE':
-      case 'CARTOGRAPHY_TABLE':
-      case 'CHEST':
-      case 'COMPARATOR':
-      case 'COMPOSTER': // 조건적 반응 (꽉 차있어서 뺫가루 얻어낼 수 있을시)
-      case 'CRAFTING_TABLE':
-      case 'DAYLIGHT_DETECTOR':
-      case 'DISPENSER':
-      case 'DROPPER':
-      case 'FURNACE':
-      case 'HOPPER':
-      case 'LECTERN':
-      case 'LEVER':
-      case 'LOOM':
-      case 'NOTE_BLOCK':
-      case 'REDSTONE_ORE':
-      case 'REPEATER':
-      case 'RESPAWN_ANCHOR':
-      case 'SHULKER_BOX':
-      case 'SMOKER':
-      case 'STONECUTTER':
-      case 'TRAPPED_CHEST':
-      # + 버튼들 , 철제외 문과 트랩도어, 울타리문
-        if(!psneaking(@player)) {
-          if(@is_item_available) {
-            @is_item_available = false
+      #case 'BARREL':
+      #case 'BEACON':
+      #case 'BED':
+      #case 'BELL':
+      #case 'BLAST_FURNACE':
+      #case 'CAKE':
+      #case 'CARTOGRAPHY_TABLE':
+      #case 'CHEST':
+      #case 'COMPARATOR':
+      #case 'COMPOSTER': // 조건적 반응 (꽉 차있어서 뺫가루 얻어낼 수 있을시)
+      #case 'CRAFTING_TABLE':
+      #case 'DAYLIGHT_DETECTOR':
+      #case 'DISPENSER':
+      #case 'DROPPER':
+      #case 'FURNACE':
+      #case 'HOPPER':
+      #case 'LECTERN':
+      #case 'LEVER':
+      #case 'LOOM':
+      #case 'NOTE_BLOCK':
+      #case 'REDSTONE_ORE':
+      #case 'REPEATER':
+      #case 'RESPAWN_ANCHOR':
+      #case 'SHULKER_BOX':
+      #case 'SMOKER':
+      #case 'STONECUTTER':
+      #case 'TRAPPED_CHEST':
+      default:
+        if(material_info(@event['block'], 'isInteractable')) {
+          if(!psneaking(@player)) {
+            if(@is_item_available) {
+              @is_item_available = false
+            }
           }
         }
         break()
@@ -2419,7 +2421,12 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       }
     }
     if(@is_item_available) {
+      broadcast(ITEM USE)
       switch(@event['item']['name']) {
+      case 'BUCKET':
+      case 'FLINT_AND_STEEL':
+        broadcast(@event)
+        break()
       case 'ENCHANTED_BOOK':
         # 스크롤, 비법서, 마법의 끈 사용시
         if(!is_null(@event['item']['meta'])) {

@@ -118,7 +118,7 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
     switch(@player_data['chat'][0]) {
     case 'general':
       @channel = '\ue3fd'
-    case 'guild':
+    case 'town':
       @channel = '\ue3ff'
     case 'local':
       @channel = '\ue401'
@@ -131,7 +131,7 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
   switch(@player_data['chat'][0]) {
     case 'general':
       @channel = '\ue3fe'
-    case 'guild':
+    case 'town':
       @channel = '\ue400'
     case 'local':
       @channel = '\ue402'

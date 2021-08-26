@@ -341,23 +341,23 @@ register_command('channel', array(
         switch(@args[0]) {
         case 'local':
           @players_data[@uuid]['chat'][0] = 'local'
-          cup_set('chat', @uuid, @players_data[@uuid]['chat'])
+          cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
           break()
         case 'town':
           if(!is_null(tunalands_get_player_rank(@uuid))) {
             @players_data[@uuid]['chat'][0] = 'town'
-            cup_set('chat', @uuid, @players_data[@uuid]['chat'])
+            cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
           }
           break()
         case 'admin':
           if(pisop(@player)) {
             @players_data[@uuid]['chat'][0] = 'admin'
-            cup_set('chat', @uuid, @players_data[@uuid]['chat'])
+            cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
           }
           break()
         default:
           @players_data[@uuid]['chat'][0] = 'default'
-          cup_set('chat', @uuid, @players_data[@uuid]['chat'])
+          cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
           break()
         }
         _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
