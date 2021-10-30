@@ -1687,7 +1687,6 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
             break()
           case 'COLLECT_TO_CURSOR':
             if(@cursor_item['name'] == @ingredient_name) {
-              broadcast(A)
               set_timeout(1, closure() {
                 @inventory = get_inventory(@id)
                 @is_repairable = false
@@ -2421,7 +2420,6 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       }
     }
     if(@is_item_available) {
-      broadcast(ITEM USE)
       switch(@event['item']['name']) {
       case 'BUCKET':
       case 'FLINT_AND_STEEL':

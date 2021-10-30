@@ -31,16 +31,33 @@ set_timeout(1000, closure() {
   ### 서버 정보 명령어
   ###
   proc _info_command(@command, @player, @args, @text) {
-    msg(@text['prefix']['info'].' §b서버 정보')
-    msg(' §7서버명: §f에바참치 §7(§fEvatuna§7)')
-    msg(' §7서버 장르: 야생')
-    msg(' §7총 관리자: 앨리스(§btele§f: @alicearcade, §7dis§f: AA_2#1787)')
-    msg(' §7공식 이메일: support@evatuna.fish')
-    msg(' §7공식 홈페이지 : §7/site')
-    msg(' §7공식 카페 : §a(네이버)§7/cafe')
-    msg(' §7공식 디스코드: §7/discord')
-    msg(' §7마인리스트: §7/vote')
-    msg(' §7서버오픈일: 2021년 06월 03일')
+    @raw = array(
+      array(
+        'text': '                              \ue008\n\n\n\n\n\n'
+      ),
+      array(
+        'text': '     환영합니다! 에바참치는 색다른 경험을 제공해주는 성장형 야생 서버입니다.\n\n',
+        'color': '#80c8ff'
+      ),
+      array(
+        'text': '      기존의 마인크래프트 야생과 차별화되는 컨텐츠와 시스템들이 많으므로,\n'
+      ),
+      array(
+        'text': '              지침서에서 제공되는 팁들을 꼭 확인하시길 바랍니다!'
+      )
+    )
+    _tellraw(@player, @raw)
+
+    #msg(@text['prefix']['info'].' §b서버 정보')
+    #msg(' §7서버명: §f에바참치 §7(§fEvatuna§7)')
+    #msg(' §7서버 장르: 야생')
+    #msg(' §7총 관리자: 앨리스(§btele§f: @alicearcade, §7dis§f: AA_2#1787)')
+    #msg(' §7공식 이메일: support@evatuna.fish')
+    #msg(' §7공식 홈페이지 : §7/site')
+    #msg(' §7공식 카페 : §a(네이버)§7/cafe')
+    #msg(' §7공식 디스코드: §7/discord')
+    #msg(' §7마인리스트: §7/vote')
+    #msg(' §7서버오픈일: 2021년 06월 03일')
   }
   if(_is_command_registered('info')) { unregister_command('info') }
   #if(_is_command_registered('version')) { unregister_command('version') }
@@ -1168,6 +1185,25 @@ register_command('skillbook', array(
   }
 ))
 
+# 룬
+proc _rune_command(@command, @player, @args, @text, @players_data, @skills_info, @skills_spec) {
+  @uuid = puuid(@player)
+  if(array_size(@args) == 0) {
+    @page = 0
+    _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page, @text)
+  } else {
+    msg(@text['prefix']['warn']'§7잘못된 인자 입력입니다.')
+    msg(' §e/'.@command.'을 통해 룬 백을 열 수 있습니다.')
+
+  }
+}
+register_command('runebag', array(
+  'aliases': array('rune', '룬백', '룬'),
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    _rune_command(@command, @player, @args, @text, @players_data, @skills_info, @skills_spec)
+  }
+))
 ###
 ### 어드민 명령어
 ###

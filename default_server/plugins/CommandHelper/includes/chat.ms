@@ -783,6 +783,7 @@ proc _local_chat(@data, @players_data) {
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
   @sender_chat_data = @data['sender_chat_data']
+  @sender_badge = @data['sender_badge']
   @is_server_same = @data['is_server_same']
   @near_players = @data['near_players']
   @unmodified_message = @data['message']
@@ -791,23 +792,42 @@ proc _local_chat(@data, @players_data) {
   foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
     @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
     if(array_contains(@near_players, @receiver_name) && array_index_exists(@players_data, @receiver_uuid)) {
-      @receiver_chat_setting = @players_data[@receiver_uuid]['chat']
+      # Data
+      @receiver_data = @players_data[@receiver_uuid]
+      @chat_data = @receiver_data['chat']
+      # Listening Chanel
+      @listening_chanels = json_decode(@chat_data[2])
+      if(array_contains(@listening_chanels, 'local')) {
+        @is_listening = true
+      } else {
+        @is_listening = false
+      }
+      # Receiver Setting
       @receivers[@receiver_uuid] = array(
         'name': @receiver_name,
-        'channel': @receiver_chat_setting[0],
+        'channel': @chat_data[0],
         'is_near_player': true,
-        'is_listening': @receiver_chat_setting[5],
-        'is_observer': @receiver_chat_setting[8],
+        'is_listening': @is_listening,
+        'is_observer': @chat_data[3],
         'is_mentioned': false
       )
     } else {
-      @receiver_chat_setting = cup_get('CHAT', @receiver_uuid)
-      if(!is_null(@receiver_chat_setting) && @receiver_chat_setting[8]) {
+      # Data
+      @chat_data = cup_get('CHAT', @receiver_uuid)
+      if(!is_null(@chat_data) && @chat_data[3]) {
+        # Listening Chanel
+        @listening_chanels = json_decode(@chat_data[2])
+        if(array_contains(@listening_chanels, 'local')) {
+          @is_listening = true
+        } else {
+          @is_listening = false
+        }
+        # Receiver Setting
         @receivers[@receiver_uuid] = array(
           'name': @receiver_name,
-          'channel': @receiver_chat_setting[0],
+          'channel': @chat_data[0],
           'is_near_player': false,
-          'is_listening': @receiver_chat_setting[5],
+          'is_listening': @is_listening,
           'is_observer': true,
           'is_mentioned': false
         )
@@ -821,7 +841,7 @@ proc _local_chat(@data, @players_data) {
       'color': '#D35400'
     ),
     array(
-      'text': @sender_chat_data[11].' ',
+      'text': @sender_badge.' ',
       'color': '#ffffff',
     ),
     array(
@@ -986,6 +1006,7 @@ proc _admin_chat(@data, @players_data) {
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
   @sender_chat_data = @data['sender_chat_data']
+  @sender_badge = @data['sender_badge']
   @unmodified_message = @data['message']
   #리시버 설정
   @receivers = array()
@@ -993,25 +1014,44 @@ proc _admin_chat(@data, @players_data) {
     @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
     if(ponline(@receiver_name)) {
       if(array_index_exists(@players_data, @receiver_uuid) && pisop(@receiver_name)) {
-        @receiver_chat_setting = @players_data[@receiver_uuid]['chat']
+        # Data
+        @receiver_data = @players_data[@receiver_uuid]
+        @chat_data = @receiver_data['chat']
+        # Listening Chanel
+        @listening_chanels = json_decode(@chat_data[2])
+        if(array_contains(@listening_chanels, 'admin')) {
+          @is_listening = true
+        } else {
+          @is_listening = false
+        }
+        # Receiver Setting
         @receivers[@receiver_uuid] = array(
           'name': @receiver_name,
           'is_online': true,
-          'channel': @receiver_chat_setting[0],
-          'is_listening': @receiver_chat_setting[7],
-          'is_observer': @receiver_chat_setting[8],
+          'channel': @chat_data[0],
+          'is_listening': @is_listening,
+          'is_observer': @chat_data[3],
           'is_mentioned': false
         )
       }
     } else {
-      @receiver_chat_setting = cup_get('CHAT', @receiver_uuid)
-      if(!is_null(@receiver_chat_setting) && bukkitlinked_is_player_op(@receiver_uuid)) {
+      # Data
+      @chat_data = cup_get('CHAT', @receiver_uuid)
+      if(!is_null(@chat_data) && bukkitlinked_is_player_op(@receiver_uuid)) {
+        # Listening Chanel
+        @listening_chanels = json_decode(@chat_data[2])
+        if(array_contains(@listening_chanels, 'admin')) {
+          @is_listening = true
+        } else {
+          @is_listening = false
+        }
+        # Receiver Setting
         @receivers[@receiver_uuid] = array(
           'name': @receiver_name,
           'is_online': false,
-          'channel': @receiver_chat_setting[0],
-          'is_listening': @receiver_chat_setting[7],
-          'is_observer': @receiver_chat_setting[8],
+          'channel': @chat_data[0],
+          'is_listening': @is_listening,
+          'is_observer': @chat_data[3],
           'is_mentioned': false
         )
       }
@@ -1024,7 +1064,7 @@ proc _admin_chat(@data, @players_data) {
       'color': '#C0392B',
     ),
     array(
-      'text': @sender_chat_data[11].' ',
+      'text': @sender_badge.' ',
       'color': '#ffffff',
     ),
     array(

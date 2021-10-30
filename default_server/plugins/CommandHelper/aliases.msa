@@ -1,3 +1,232 @@
+/cir = >>>
+  broadcast('')
+  broadcast(simple_date('HH:mm:ss'))
+  @ploc = ploc()
+  @player_location = array('x': integer(@ploc['x']) + 0.5, 'y': integer(@ploc['y']) + 1.5, 'z': integer(@ploc['z']) + 0.5, 'world': @ploc['world'])
+  @offsets = _get_circle_offsets(6)
+  @locations = array()
+  foreach(@key: @offset in @offsets) {
+    @block_location_of_disk = array_deep_clone(@player_location)
+    @block_location_of_disk['x'] += @offset[0]
+    @block_location_of_disk['z'] += @offset[1]
+    @distance = distance(@player_location, @block_location_of_disk)
+    @start = 1
+    @end = 1
+    if(@distance < 1) {
+      @start = -5
+      @end = 4
+    } else if(@distance < 2) {
+      @start = -5
+      @end = 4
+    } else if(@distance < 3) {
+      @start = -4
+      @end = 3
+    } else if(@distance < 4) {
+      @start = -3
+      @end = 2
+    } else if(@distance < 5) {
+      @start = -2
+      @end = 1
+    } else if(@distance < 6) {
+      @start = -2
+      @end = 1
+    } else {
+    }
+
+    for(@start, @start <= 10, @start++) {
+      @block_location = array_deep_clone(@block_location_of_disk)
+      @block_location['y'] += @start
+      @locations[] = @block_location
+    }
+  }
+  #broadcast(array_size(@locations))
+  @state = array(
+    'indoor_factor': 0,
+    'comfortable_factor': 0,
+    'water_factor': 0,
+    'cave_factor': 0,
+    'stone_factor': 0
+  )
+  @comfortable_array = array(
+    'total_weight': 0,
+    'block_qty': 0
+  )
+  @allowed_home_blocks = array(
+    'IRON_BLOCK',
+    'QUARTZ_BLOCK',
+    'SMOOTH_QUARTZ',
+    'SMOOTH_SLAB',
+    'SMOOTH_STAIRS'
+  )
+  @materials_info = array()
+  @light = get_block_light_at(@player_location)
+  @temperature = get_temperature(@player_location)
+  foreach(@location in @locations) {
+    #queue_push(closure() {
+      @block = get_block(@location)
+      if(array_index_exists(@materials_info, @block)) {
+        @material_info = @materials_info[@block]
+      } else {
+        @material_info = material_info(@block)
+        @materials_info[@block] = @material_info
+      }
+      # 블럭별 heat, cave, air, water, etc 가중치
+      @heat = 0
+      @comfortable = 0
+      @stone = 0
+      @water = 0
+      @cave = 0
+      switch(@block) {
+      case 'LAVA': // H: 100, C: 5
+        @heat = 100
+        @comfortable = 5
+        break()
+      case 'MAGMA_BLOCK': // H: 100, C: 0
+        @heat = 80
+        @comfortable = 0
+        break()
+      case 'CAMPFIRE':
+      case 'SOUL_CAMPFIRE': // H: 60, C: 60
+        @heat = 60
+        @comfortable = 60
+        break()
+      case 'FIRE': // H: 60, C: 40
+        @heat = 60
+        @comfortable = 40
+        break()
+      case 'LANTERN':
+      case 'SOUL_LANTERN': // H: 20, C: 40
+        @heat = 20
+        @comfortable = 55
+        break()
+      case 'TORCH':
+      case 'WALL_TORCH':
+      case 'SOUL_TORCH':
+      case 'WALL_SOUL_TORCH':
+      case 'JACK_O_LANTERN':
+      case 'SEA_LANTERN':
+      case 'REDSTONE_LAMP': // H: 10, C: 30
+        @heat = 10
+        @comfortable = 45
+        break()
+      case 'WATER':
+        @water = 1
+        break()
+      case 'CAVE_AIR':
+        @cave = 1
+        break()
+      default: // 0
+        if(!@material_info['isBurnable'] && @material_info['isSolid']) {
+          #broadcast(@block @material_info)
+        }
+        if(!@material_info['isBurnable'] && @material_info['isSolid']) { // 나무제외, 액체, 기체제외
+          if(!@material_info['isInteractable'] || string_contains(@block, 'STAIRS') || @block == 'REDSTONE_ORE' || @block == 'DEEPSLATE_REDSTONE_ORE') { // 상호작용 가능 블럭 제외 (상자같은 블럭은 나무 지만 불타지 않음)
+            if(@material_info['hardness'] >= 0.8 && @material_info['blastResistance'] >= 0.8) { // 사암 이상의 강도를 가졌을 시,
+              if(!string_contains(@block, 'WARPED') && !string_contains(@block, 'CRIMSON')) { // 지옥 나무 제외
+                @stone = 1
+                #broadcast(s)
+              }
+            } else {
+              @allowed_stone = array(
+                'NETHERRACK',
+                'PACKED_ICE'
+              )
+              if(array_contains(@allowed_stone, @block)) {
+                @stone = 1
+                #broadcast(s)
+              }
+            }
+          }
+        }
+        break()
+      }
+      # comfortable weight (안락함 지수 comfortable가중치가 높으면서 플레이어위치의 블럭 light자체도 높아야함)
+      @comfortable_weight = @comfortable / (distance(@location, @player_location) + 1) * 0.01
+      if(@comfortable_weight > 0) {
+        #broadcast(@block @comfortable_weight)
+        @comfortable_array['total_weight'] += @comfortable_weight
+        @comfortable_array['block_qty'] += 1
+      }
+      if(@water > 0) {
+        @state['water_factor'] += @water / (distance(@location, @player_location) + 1) * 0.01
+      }
+      if(@cave > 0) {
+        @state['cave_factor'] += @cave / (distance(@location, @player_location) + 1) * 0.01
+      }
+      if(@stone > 0) {
+        @state['stone_factor'] += @stone / (distance(@location, @player_location) + 1) * 0.01
+      }
+      # indoor or outdoor, (실내/실외 판정 + 타는 블럭으로된 구조물의 실내에있는지도 파악)
+      if(@location['y'] > @player_location['y']) {
+        if(!@material_info['isTransparent']) {
+          @indoor_factor_by_y = (100 - integer((@location['y'] - @player_location['y'] - 2 ) / 2) ** 2 ) * 0.02 # 0 ~ 2
+          @location['y'] = @player_location['y']
+          @indoor_factor_by_xz = 2 ** distance(@location, @player_location)
+          @indoor_factor = @indoor_factor_by_y / @indoor_factor_by_xz
+          if(@material_info['isOccluding']) {
+            @state['indoor_factor'] += @indoor_factor
+          }
+          if((@material_info['isBurnable'] && @material_info['hardness'] > 0 && !string_contains(@block, 'LEAVES')) || array_contains(@allowed_home_blocks, @block)) {
+            broadcast(@block) # 집 블럭들
+            @comfortable_factor = @indoor_factor / 2
+            @state['comfortable_factor'] += @comfortable_factor
+          }
+        }
+      }
+    #}, player().'environment')
+  }
+  #queue_push(closure() {
+    if(@comfortable_array['block_qty'] > 0) {
+      @comfortable_multiple = @comfortable_array['total_weight'] / @comfortable_array['block_qty']
+    } else {
+      @comfortable_multiple = 0
+    }
+    @state['comfortable_factor'] *= @comfortable_multiple
+    broadcast('실내 :' @state['indoor_factor'])
+    broadcast('안락 :' @state['comfortable_factor'])
+    broadcast('수중 :' @state['water_factor'])
+    broadcast('암석 :' @state['stone_factor'])
+    broadcast('동굴 :' @state['cave_factor'])
+    broadcast('')
+    if(@state['comfortable_factor'] > 1 && @state['indoor_factor'] > 10) {
+      broadcast('안락한 실내에 있음')
+    } else {
+      if(@state['indoor_factor'] > 200) {
+        if(@state['stone_factor'] > 2) {
+          broadcast('돌무더기속 매우 좁은 공간에 있음(일자굴)')
+        } else {
+          broadcast('알수 없음A (근처에 돌이 없는데 무언가에 갇혀 있음)')
+        }
+      } else if(@state['indoor_factor'] > 135) {
+        if(@state['stone_factor'] > 1.5) {
+          broadcast('절벽 동굴에 있음')
+        } else {
+          broadcast('알수 없음B (근처에 돌이 없는데 약간 좁은 공간에 갇혀 있음)')
+        }
+      } else if(@state['indoor_factor'] > 30) {
+        if(@state['stone_factor'] > 0.6) {
+          broadcast('절벽 근처에 있음')
+        } else {
+          broadcast('실외에 있음 (흙절벽 근처)')
+        }
+      } else if(@state['indoor_factor'] > 10) {
+        if(@state['stone_factor'] > 0.3) {
+          broadcast('산 근처에 있음')
+        } else {
+          broadcast('실외에 있음 (흙산 근처)')
+        }
+      } else {
+        broadcast('실외에 있음')
+      }
+    }
+    #broadcast(simple_date('HH:mm:ss'))
+  #}, player().'environment')
+<<<
+
+/tem = >>>
+broadcast(get_temperature(ploc()))
+<<<
+
 /tutest1 = >>>
 broadcast(tunalands_get_player_lands_member_list(puuid()))
 <<<

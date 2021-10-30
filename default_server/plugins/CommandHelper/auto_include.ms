@@ -691,3 +691,138 @@ proc _replace_repair_percent(@percent) {
 # 상점 리코딩 후 제거 예정
 array proc _clone(array @arr) { return(array_deep_clone(@arr)) }
 boolean proc _existsGui(string @guiid) { return(array_contains(get_virtual_inventories(), @guiid)) }
+
+
+
+proc _get_circle_offsets(@radius) {
+  @offsets = array(
+    array(0, +@radius),
+    array(0, -@radius),
+    array(+@radius, 0),
+    array(-@radius, 0)
+  )
+  @x = 1
+  @y = @radius
+  @p = 1 - @radius
+  while(@x <= @y) {
+    if(@p < 0) {
+      @p += @x * 2 + 1
+    } else {
+      @p += @x * 2 + 1 - @y * 2
+      @y--
+      for(@i = 0, @i < @x, @i++) {
+        @offsets[] = array(+@y, +@i)
+        @offsets[] = array(-@y, +@i)
+        @offsets[] = array(+@y, -@i)
+        @offsets[] = array(-@y, -@i)
+        @offsets[] = array(+@i, +@y)
+        @offsets[] = array(-@i, +@y)
+        @offsets[] = array(+@i, -@y)
+        @offsets[] = array(-@i, -@y)
+      }
+    }
+    @offsets[] = array(+@x, +@y)
+    @offsets[] = array(+@x, -@y)
+    @offsets[] = array(-@x, +@y)
+    @offsets[] = array(-@x, -@y)
+    @offsets[] = array(+@y, +@x)
+    @offsets[] = array(+@y, -@x)
+    @offsets[] = array(-@y, +@x)
+    @offsets[] = array(-@y, -@x)
+    @x++
+  }
+  for(@i = -@y + 1, @i < @y, @i++) {
+    for(@j = -@y + 1, @j < @y, @j++) {
+      @offsets[] = array(@i, @j)
+    }
+  }
+  return(array_unique(@offsets))
+}
+
+export('circumference_0', array(
+  array(+0,+0)
+))
+
+export('circumference_1', array(
+  array(-1,-1), array(+0,-1), array(+1,-1),
+  array(-1,+0),               array(+1,+0),
+  array(-1,+1), array(+0,+1), array(+1,+1)
+))
+
+export('circumference_2', array(
+                array(-1,-2), array(+0,-2), array(+1,-2),
+  array(-2,-1),                                           array(+2,-1),
+  array(-2,+0),                                           array(+2,+0),
+  array(-2,+1),                                           array(+2,+1),
+                array(-1,+2), array(+0,+2), array(+1,+2)
+))
+
+export('circumference_3', array(
+                              array(-1,-3), array(+0,-3), array(+1,-3),
+                array(-2,-2),                                           array(+2,-2),
+  array(-3,-1),                                                                       array(+3,-1),
+  array(-3,+0),                                                                       array(+3,+0),
+  array(-3,+1),                                                                       array(+3,+1),
+                array(-2,+2),                                           array(+2,+2),
+                              array(-1,+3), array(+0,+3), array(+1,+3)
+))
+
+export('circumference_4', array(
+                              array(-2,-4), array(-1,-4), array(+0,-4), array(+1,-4), array(+2,-4),
+                array(-3,-3), array(-2,-3),                                           array(+2,-3), array(+3,-3),
+  array(-4,-2), array(-3,-2),                                                                       array(+3,-2), array(+4,-2),
+  array(-4,-1),                                                                                                   array(+4,-1),
+  array(-4,+0),                                                                                                   array(+4,+0),
+  array(-4,+1),                                                                                                   array(+4,+1),
+  array(-4,+2), array(-3,+2),                                                                       array(+3,+2), array(+4,+2),
+                array(-3,+3), array(-2,+3),                                           array(+2,+3), array(+3,+3),
+                              array(-2,+4), array(-1,+4), array(+0,+4), array(+1,+4), array(+2,+4)
+))
+
+array(
+                                            array(+0,+0), array(+0,+0), array(+0,+0), array(+0,+0), array(+0,+0),
+                              array(+0,+0),                                                                       array(+0,+0),
+                array(+0,+0),                                                                                                   array(+0,+0),
+  array(+0,+0),                                                                                                                               array(+0,+0),
+  array(+0,+0),                                                                                                                               array(+0,+0),
+  array(+0,+0),                                                                                                                               array(+0,+0),
+  array(+0,+0),                                                                                                                               array(+0,+0),
+  array(+0,+0),                                                                                                                               array(+0,+0),
+                array(+0,+0),                                                                                                   array(+0,+0),
+                              array(+0,+0),                                                                       array(+0,+0),
+                                            array(+0,+0), array(+0,+0), array(+0,+0), array(+0,+0), array(+0,+0)
+)
+
+array(
+                                                          array(+0,+0), array(+0,+0), array(+0,+0), array(+0,+0), array(+0,+0),
+                              array(+0,+0), array(+0,+0),                                                                       array(+0,+0), array(+0,+0),
+                array(+0,+0), array(+0,+0),                                                                                                   array(+0,+0), array(+0,+0),
+                array(+0,+0),                                                                                                                               array(+0,+0),
+  array(+0,+0),                                                                                                                                                           array(+0,+0),
+  array(+0,+0),                                                                                                                                                           array(+0,+0),
+  array(+0,+0),                                                                                                                                                           array(+0,+0),
+  array(+0,+0),                                                                                                                                                           array(+0,+0),
+  array(+0,+0),                                                                                                                                                           array(+0,+0),
+                array(+0,+0),                                                                                                                               array(+0,+0),
+                array(+0,+0), array(+0,+0),                                                                                                   array(+0,+0), array(+0,+0),
+                              array(+0,+0), array(+0,+0),                                                                       array(+0,+0), array(+0,+0),
+                                                          array(+0,+0), array(+0,+0), array(+0,+0), array(+0,+0), array(+0,+0)
+)
+
+array(
+                                                                        array(+0,+0), array(+0,+0), array(+0,+0), array(+0,+0), array(+0,+0),
+                                            array(+0,+0), array(+0,+0),                                                                       array(+0,+0), array(+0,+0),
+                              array(+0,+0),                                                                                                                               array(+0,+0),
+                array(+0,+0),                                                                                                                                                           array(+0,+0),
+                array(+0,+0),                                                                                                                                                           array(+0,+0),
+  array(+0,+0),                                                                                                                                                                                       array(+0,+0),
+  array(+0,+0),                                                                                                                                                                                       array(+0,+0),
+  array(+0,+0),                                                                                                                                                                                       array(+0,+0),
+  array(+0,+0),                                                                                                                                                                                       array(+0,+0),
+  array(+0,+0),                                                                                                                                                                                       array(+0,+0),
+                array(+0,+0),                                                                                                                                                           array(+0,+0),
+                array(+0,+0),                                                                                                                                                           array(+0,+0),
+                              array(+0,+0),                                                                                                                               array(+0,+0),
+                                            array(+0,+0), array(+0,+0),                                                                       array(+0,+0), array(+0,+0),
+                                                                        array(+0,+0), array(+0,+0), array(+0,+0), array(+0,+0), array(+0,+0)
+)

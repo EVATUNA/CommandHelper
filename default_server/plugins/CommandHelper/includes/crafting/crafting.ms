@@ -191,7 +191,8 @@ proc _get_modified_item(@entry, @item) {
           @final_amount = @amount
         }
         #갑옷일시, 곡괭이 일시에 따라서 다른 표기
-        @lore[] = '§f\ue451 채굴 강도 '.string(round(@final_amount, 2))
+        @string_amount = string(round(@final_amount, 2))
+        @lore[] = "§f\ue451§7 @string_amount 채굴 강도"
       case 'farming_power':
         @ch_attribute = 'GENERIC_FOLLOW_RANGE'
         @operation = 'ADD_NUMBER'
@@ -201,7 +202,8 @@ proc _get_modified_item(@entry, @item) {
           @final_amount = @amount
         }
         #갑옷일시, 괭이 일시에 따라서 다른 표기
-        @lore[] = '§f\ue452 경작 강도 '.string(round(@final_amount, 2))
+        @string_amount = string(round(@final_amount, 2))
+        @lore[] = "§f\ue452§7 @string_amount 경작 강도"
       case 'attack_damage':
         @ch_attribute = 'GENERIC_ATTACK_DAMAGE'
         @operation = 'ADD_NUMBER'
@@ -217,7 +219,8 @@ proc _get_modified_item(@entry, @item) {
         } else {
           @final_amount = @amount - @damage_int
         }
-        @lore[] = '§f\ue44e 공격 피해 '.@string.string(round(@final_amount + @damage_int, 2))
+        @string_amount = @string.string(round(@final_amount + @damage_int, 2))
+        @lore[] = "§f\ue44e§7 @string_amount 공격 피해"
       case 'attack_speed':
         @ch_attribute = 'GENERIC_ATTACK_SPEED'
         @operation = 'ADD_NUMBER'
@@ -233,7 +236,8 @@ proc _get_modified_item(@entry, @item) {
         } else {
           @final_amount = @amount - @speed_int
         }
-        @lore[] = '§f\ue44f 공격 속도 '.@string.string(round(@final_amount + @speed_int, 2))
+        @string_amount = @string.string(round(@final_amount + @speed_int, 2))
+        @lore[] = "§f\ue44f§7 @string_amount 공격 속도"
       case 'max_health':
         @ch_attribute = 'GENERIC_MAX_HEALTH'
         @operation = 'ADD_NUMBER'
@@ -242,7 +246,8 @@ proc _get_modified_item(@entry, @item) {
         } else {
           @final_amount = @amount
         }
-        @lore[] = '§7ㅁ 최대 체력 +'.string(round(@final_amount, 2))
+        @string_amount = string(round(@final_amount, 2))
+        @lore[] = "§fㅁ§7 + @string_amount 최대 체력"
       case 'knockback_resistance':
         @ch_attribute = 'GENERIC_KNOCKBACK_RESISTANCE'
         @operation = 'ADD_NUMBER'
@@ -251,7 +256,8 @@ proc _get_modified_item(@entry, @item) {
         } else {
           @final_amount = @amount
         }
-        @lore[] = '§7ㅁ 밀치기 저항 '.string(round(@final_amount, 2))
+        @string_amount = string(round(@final_amount, 2))
+        @lore[] = "§fㅁ§7 @string_amount 밀치기 저항"
       case 'luck':
         @ch_attribute = 'GENERIC_LUCK'
         @operation = 'ADD_NUMBER'
@@ -260,7 +266,8 @@ proc _get_modified_item(@entry, @item) {
         } else {
           @final_amount = @amount
         }
-        @lore[] = '§7ㅁ 행운 +'.string(round(@final_amount, 2))
+        @string_amount = string(round(@final_amount, 2))
+        @lore[] = "§fㅁ§7 + @string_amount 행운"
       case 'movement_speed':
         @ch_attribute = 'GENERIC_MOVEMENT_SPEED'
         @operation = 'ADD_NUMBER'
@@ -269,7 +276,8 @@ proc _get_modified_item(@entry, @item) {
         } else {
           @final_amount = @amount
         }
-        @lore[] = '§7ㅁ 속도 증가 +'.string(round(@final_amount, 2)) ### 나누기 50 한거 보여주기..?
+        @string_amount = string(round(@final_amount, 2)) ### 나누기 50 한거 보여주기..?
+        @lore[] = "§fㅁ§7 @string_amount 속도 증가"
       case 'armor':
         @ch_attribute = 'GENERIC_ARMOR'
         @operation = 'ADD_NUMBER'
@@ -278,7 +286,8 @@ proc _get_modified_item(@entry, @item) {
         } else {
           @final_amount = @amount
         }
-        @lore[] = '§7\ue453 방어 '.string(round(@final_amount, 2))
+        @string_amount = string(round(@final_amount, 2))
+        @lore[] = "§f\ue453§7 @string_amount 방어"
       case 'armor_toughness':
         @ch_attribute = 'GENERIC_ARMOR_TOUGHNESS'
         @operation = 'ADD_NUMBER'
@@ -287,7 +296,8 @@ proc _get_modified_item(@entry, @item) {
         } else {
           @final_amount = @amount
         }
-        @lore[] = '§7\ue454 방어 강도 '.string(round(@final_amount, 2))
+        @string_amount = string(round(@final_amount, 2))
+        @lore[] = "§f\ue454§7 @string_amount 방어 강도"
       default:
         broadcast('알수 없는 어트리뷰트를 발견하였습니다. 즉시 수정하세요.', '*')
       }
