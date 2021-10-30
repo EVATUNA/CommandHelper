@@ -201,6 +201,92 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
   }
 }
 
+## 룬 gui
+proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page, @text) {
+  @player_data = @players_data[@uuid]
+  @skill_manager = @player_data['skill_manager']
+  @skills_data = @player_data['skill_data']
+  # 소유중인 룬, 룬 슬롯갯수, 착용중인 룬
+  @runes = array() // 소유중인 룬 선언
+  @rune_slot = @skill_manager[3]
+  @selected_runes = json_decode(@skill_manager[5])
+  broadcast(@rune_slot)
+  broadcast(@selected_runes)
+  # 룬 슬롯 세팅
+  @empty = @text['space_fonts']['space.-1'].'\ue540'
+  @slot = @text['space_fonts']['space.18']
+  # 텍스트 세팅, 적용된 룬 세팅
+  @rune_slot = 3
+  switch(@rune_slot) {
+  case 1:
+    @line_1 = @empty.@empty.@empty.@empty.@slot.@empty.@empty.@empty.@empty
+    break()
+  case 2:
+    @line_1 = @empty.@empty.@empty.@slot.@empty.@slot.@empty.@empty.@empty
+    break()
+  case 3:
+    @line_1 = @empty.@empty.@slot.@empty.@slot.@empty.@slot.@empty.@empty
+    break()
+  case 4:
+    @line_1 = @empty.@slot.@empty.@slot.@empty.@slot.@empty.@slot.@empty
+    break()
+  case 5:
+    @line_1 = @slot.@empty.@slot.@empty.@slot.@empty.@slot.@empty.@slot
+    break()
+  default:
+    @line_1 = @empty.@empty.@empty.@empty.@empty.@empty.@empty.@empty.@empty
+    break()
+  }
+  @rune_pages = _paging(@runes, 7)
+  if(@page > 0) {
+    @up_arrow = @text['space_fonts']['space.18']
+  } else {
+    @up_arrow = @text['space_fonts']['space.-1'].'\ue600'
+  }
+  if(array_size(@rune_pages) - @page > 4) {
+    @down_arrow = @text['space_fonts']['space.18']
+  } else {
+    @down_arrow = @text['space_fonts']['space.-1'].'\ue720'
+  }
+  
+  @line_2 = string_multiply(@empty, array_size(@rune_pages[@page + 0])).string_multiply(@text['space_fonts']['space.-1'].'\ue600', 7 - 7)
+  @line_3 = string_multiply(@empty, array_size(@rune_pages[@page + 1])).string_multiply(@text['space_fonts']['space.-1'].'\ue660', 7 - 7)
+  @line_4 = string_multiply(@empty, array_size(@rune_pages[@page + 2])).string_multiply(@text['space_fonts']['space.-1'].'\ue6c0', 7 - 7)
+  @line_5 = string_multiply(@empty, array_size(@rune_pages[@page + 3])).string_multiply(@text['space_fonts']['space.-1'].'\ue720', 7 - 7)
+  # GUI 기본 데이터 선언
+  @texture_layer = @text['space_fonts']['space.-8'].'\uec2b'.@text['space_fonts']['space.-169'].@line_1.@text['space_fonts']['space.-18'].@up_arrow.@text['space_fonts']['space.-18'].@down_arrow
+  @message = '룬 백'
+  @inventory = array()
+  
+  for(@index = 0, @index < 54, @index++) {
+    @inventory[@index] = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': ' ',
+        'model': 1
+      )
+    )
+  }
+
+  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_info, @skills_spec, @text) {
+    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
+      cancel()
+      # 데이터 선언
+      @player_data = @players_data[@uuid]
+      @skill_manager = @player_data['skill_manager']
+      @skills_data = @player_data['skill_data']
+      # 슬롯
+      if(@event['action'] == 'PICKUP_ALL') {
+        @slot = @event['rawslot']
+      }
+    }
+  }
+  # GUI 보여주기
+  _show_gui(@player, 'runebag', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
+
+}
+
+
 ## 스킬 gui
 # 전투
 proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spec, @text) {
@@ -441,6 +527,8 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
               @selected_combat_method = @selected_methods['combat_method']
               @skills_data[@skill][0] += 1
               @player_data['invested_point'] += 1
+              _set_skill_data(@uuid, @skill, @skills_data[@skill])
+              _set_skill_manager(@uuid, @skill_manager)
               if(@skill == @selected_combat_method) {
                 @category = 'combat_method'
                 @skill_spec = @skills_spec[@skill]
@@ -747,6 +835,8 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
               @selected_harvesting_method = @selected_methods['harvesting_method']
               @skills_data[@skill][0] += 1
               @player_data['invested_point'] += 1
+              _set_skill_data(@uuid, @skill, @skills_data[@skill])
+              _set_skill_manager(@uuid, @skill_manager)
               if(@skill == @selected_sowing_method) {
                 @category = 'sowing_method'
                 @skill_spec = @skills_spec[@skill]
@@ -942,6 +1032,8 @@ proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_sp
               @skill = @inventory[@slot]['skill']
               @skills_data[@skill][0] += 1
               @player_data['invested_point'] += 1
+              _set_skill_data(@uuid, @skill, @skills_data[@skill])
+              _set_skill_manager(@uuid, @skill_manager)
               runas(@player, '/skill farming')
               break()
             }
@@ -1118,6 +1210,8 @@ proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
               @skill = @inventory[@slot]['skill']
               @skills_data[@skill][0] += 1
               @player_data['invested_point'] += 1
+              _set_skill_data(@uuid, @skill, @skills_data[@skill])
+              _set_skill_manager(@uuid, @skill_manager)
               runas(@player, '/skill mining')
               break()
             }
