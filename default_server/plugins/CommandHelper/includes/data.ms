@@ -43,12 +43,10 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
   }
   ### 레벨
   @tuna_level = @player_data['skill_manager'][0]
-  @tuna_level = 31 // 테스트용 레벨
   @tunalevel_text = _replace_tunalevel_text(@tuna_level)
   ### 경험치
   @tuna_experience = @player_data['skill_manager'][1]
-  @tuna_experience = 100 // 테스트용 경험치
-  @max_tuna_experience = 500 // 테스트용 맥스 경험치 나중에 레벨별 멕스 경치가 반영되도록 수정해야 함
+  @max_tuna_experience = _get_max_tuna_experience(@tuna_level)
   @tuna_experience_persent = @tuna_experience / @max_tuna_experience
   if(@tuna_experience_persent < 0) { @tuna_experience_persent = 0 }
   if(@tuna_experience_persent > 1) { @tuna_experience_persent = 1 }

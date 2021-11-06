@@ -618,7 +618,7 @@ proc _replace_tunalevel_text(@level) {
                     replace(
                       replace(
                         @level, '0', '\uf136\uf801'
-                      ), '1', '\uf137\uf801'
+                      ), '1', '\uf137'
                     ), '2', '\uf138\uf801'
                   ), '3', '\uf139\uf801'
                 ), '4', '\uf13a\uf801'
@@ -639,7 +639,7 @@ proc _replace_tunalevel_text(@level) {
                     replace(
                       replace(
                         @level, '0', '\uf802\uf12c\uf801'
-                      ), '1', '\uf802\uf12d\uf801'
+                      ), '1', '\uf802\uf12d'
                     ), '2', '\uf802\uf12e\uf801'
                   ), '3', '\uf802\uf12f\uf801'
                 ), '4', '\uf802\uf130\uf801'
@@ -649,7 +649,7 @@ proc _replace_tunalevel_text(@level) {
         ), '8', '\uf802\uf134\uf801'
       ), '9', '\uf802\uf135\uf801'
     )
-    @tunalevel_text = '\uf801'.@background.string_multiply('\uF804', length(string(@level))).@text
+    @tunalevel_text = '\uf801'.@background.'\uf801'.string_multiply('\uF804', length(string(@level))).@text
   }
   return(@tunalevel_text)
 }

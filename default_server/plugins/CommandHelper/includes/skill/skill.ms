@@ -44,7 +44,7 @@ proc _get_skill_manager(@uuid) {
     # 기본 값
     @default_level = 0
     @default_experience = 0
-    @default_total_point = 10 //0
+    @default_extra_point = 10 //0
     @default_rune_slot = 1
     @default_selected_methods = json_encode(
       array(
@@ -59,7 +59,7 @@ proc _get_skill_manager(@uuid) {
     @skill_manager = array(
       @default_level,
       @default_experience,
-      @default_total_point,
+      @default_extra_point,
       @default_rune_slot,
       @default_selected_methods,
       @default_selected_runes,
@@ -72,7 +72,70 @@ proc _get_skill_manager(@uuid) {
 }
 # 스킬 매니저 set
 proc _set_skill_manager(@uuid, @skill_manager) {
+  broadcast(@skill_manager)
   cup_set('SKILL_MANAGER', @uuid, @skill_manager)
+}
+
+## 참치 레벨 데이터 관리
+# 레벨 데이터 get
+proc _get_tuna_level_data(@player_data) {
+  @skill_manager = @player_data['skill_manager']
+  @tuna_level_data = array(
+    'level': @skill_manager[0],
+    'experience': @skill_manager[1]
+  )
+  return(@tuna_level_data)
+}
+# 레벨 데이터 set
+proc _set_tuna_level(@uuid, @player_data, @tuna_level_data) {
+  @skill_manager = @player_data['skill_manager']
+  @skill_manager[0] = @tuna_level_data['level']
+  @skill_manager[1] = @tuna_level_data['experience']
+  _set_skill_manager(@uuid, @skill_manager)
+}
+# 튜나 레벨 경험치 추가
+proc _add_tune_experience(@uuid, @player_data, @adding_default_experience, @adding_extra_experience) {
+  @tuna_level_data = _get_tuna_level_data(@player_data)
+  @level = @tuna_level_data['level']
+  # 레벨에 따른 맥스 경험치 구하기
+  @max_experience = _get_max_tuna_experience(@level)
+  # 추가할 경험치 구하기 (@adding_default_experience, @adding_extra_experience에 따라 @adding_experience 구하기)
+  @adding_experience = integer(round(@adding_default_experience + rand() * @adding_extra_experience))
+  # 경험치가 오를시 데이터 설정, 보스바 설정
+  if(@adding_experience > 0) {
+    # 데이터 설정
+    @old_experience = @tuna_level_data['experience']
+    @new_experience = @old_experience + @adding_experience // 기존 경치 + 추가 경치
+    if(@new_experience >= @max_experience) { // 레벨업 했을 시
+      @level += 1
+      @new_experience = (@max_experience - @new_experience) * -1
+    }
+    @tuna_level_data['level'] = @level
+    @tuna_level_data['experience'] = @new_experience
+    _set_tuna_level(@uuid, @player_data, @tuna_level_data)
+    # 보스바 설정
+    @tunalevel_id = "tunalevel.@uuid"
+    @tunalevel_text = _replace_tunalevel_text(@level)
+    @tuna_experience_persent = @new_experience / @max_experience
+    if(@tuna_experience_persent < 0) { @tuna_experience_persent = 0 }
+    if(@tuna_experience_persent > 1) { @tuna_experience_persent = 1 }
+    @tunalevel_bossbar_data = array(
+      'title': @tunalevel_text,
+      'percent': @tuna_experience_persent
+    )
+    update_bar(@tunalevel_id, @tunalevel_bossbar_data)
+  }
+}
+# 해당 레벨의 맥스 경험치 구하기
+proc _get_max_tuna_experience(@level) {
+  if(@level < 17) {
+    @max_experience = @level * 2 + 7
+  } else if(@level < 32) {
+    @max_experience = @level * 5 + 38
+  } else {
+    @max_experience = @level * 9 + 158
+  }
+  return(@max_experience)
 }
 
 ## 스킬 데이터 (현재 포인트, 맥스 포인트)
@@ -201,40 +264,48 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
   }
 }
 
+
+
+## 스킬 리셋 (스킬 포인트 초기화, 액티브 스킬 설정 초기화, )
+
+
 ## 룬 gui
 proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page, @text) {
   @player_data = @players_data[@uuid]
+  _add_tune_experience(@uuid, @player_data, 5, 0)
   @skill_manager = @player_data['skill_manager']
   @skills_data = @player_data['skill_data']
   # 소유중인 룬, 룬 슬롯갯수, 착용중인 룬
-  @runes = array() // 소유중인 룬 선언
+  @runes = array(0,0,0,0,0,0,0) // 소유중인 룬 선언
   @rune_slot = @skill_manager[3]
   @selected_runes = json_decode(@skill_manager[5])
-  broadcast(@rune_slot)
-  broadcast(@selected_runes)
+  #broadcast(@rune_slot)
+  #broadcast(@selected_runes)
+  // 착용한 룬은 소유중인 룬 목록에서 제거해야함
+  
   # 룬 슬롯 세팅
-  @empty = @text['space_fonts']['space.-1'].'\ue540'
-  @slot = @text['space_fonts']['space.18']
+  @filled_slot = @text['space_fonts']['space.-1'].'\ue540'
+  @empty_slot = @text['space_fonts']['space.18']
   # 텍스트 세팅, 적용된 룬 세팅
   @rune_slot = 3
   switch(@rune_slot) {
   case 1:
-    @line_1 = @empty.@empty.@empty.@empty.@slot.@empty.@empty.@empty.@empty
+    @line_1 = @filled_slot.@filled_slot.@filled_slot.@filled_slot.@empty_slot.@filled_slot.@filled_slot.@filled_slot.@filled_slot
     break()
   case 2:
-    @line_1 = @empty.@empty.@empty.@slot.@empty.@slot.@empty.@empty.@empty
+    @line_1 = @filled_slot.@filled_slot.@filled_slot.@empty_slot.@filled_slot.@empty_slot.@filled_slot.@filled_slot.@filled_slot
     break()
   case 3:
-    @line_1 = @empty.@empty.@slot.@empty.@slot.@empty.@slot.@empty.@empty
+    @line_1 = @filled_slot.@filled_slot.@empty_slot.@filled_slot.@empty_slot.@filled_slot.@empty_slot.@filled_slot.@filled_slot
     break()
   case 4:
-    @line_1 = @empty.@slot.@empty.@slot.@empty.@slot.@empty.@slot.@empty
+    @line_1 = @filled_slot.@empty_slot.@filled_slot.@empty_slot.@filled_slot.@empty_slot.@filled_slot.@empty_slot.@filled_slot
     break()
   case 5:
-    @line_1 = @slot.@empty.@slot.@empty.@slot.@empty.@slot.@empty.@slot
+    @line_1 = @empty_slot.@filled_slot.@empty_slot.@filled_slot.@empty_slot.@filled_slot.@empty_slot.@filled_slot.@empty_slot
     break()
   default:
-    @line_1 = @empty.@empty.@empty.@empty.@empty.@empty.@empty.@empty.@empty
+    @line_1 = @filled_slot.@filled_slot.@filled_slot.@filled_slot.@filled_slot.@filled_slot.@filled_slot.@filled_slot.@filled_slot
     break()
   }
   @rune_pages = _paging(@runes, 7)
@@ -248,13 +319,18 @@ proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page
   } else {
     @down_arrow = @text['space_fonts']['space.-1'].'\ue720'
   }
-  
-  @line_2 = string_multiply(@empty, array_size(@rune_pages[@page + 0])).string_multiply(@text['space_fonts']['space.-1'].'\ue600', 7 - 7)
-  @line_3 = string_multiply(@empty, array_size(@rune_pages[@page + 1])).string_multiply(@text['space_fonts']['space.-1'].'\ue660', 7 - 7)
-  @line_4 = string_multiply(@empty, array_size(@rune_pages[@page + 2])).string_multiply(@text['space_fonts']['space.-1'].'\ue6c0', 7 - 7)
-  @line_5 = string_multiply(@empty, array_size(@rune_pages[@page + 3])).string_multiply(@text['space_fonts']['space.-1'].'\ue720', 7 - 7)
+  @rune_pages_size = array(0, 0, 0, 0)
+  foreach(@key: @rune_page in @rune_pages) {
+    if(@key - @page >= 0 && @key - @page < 4) {
+      @rune_pages_size[@key - @page] = array_size(@rune_page)
+    }
+  }
+  @line_2 = string_multiply(@empty_slot, @rune_pages_size[0]).string_multiply(@text['space_fonts']['space.-1'].'\ue600', 7 - @rune_pages_size[0])
+  @line_3 = string_multiply(@empty_slot, @rune_pages_size[1]).string_multiply(@text['space_fonts']['space.-1'].'\ue660', 7 - @rune_pages_size[1])
+  @line_4 = string_multiply(@empty_slot, @rune_pages_size[2]).string_multiply(@text['space_fonts']['space.-1'].'\ue6c0', 7 - @rune_pages_size[2])
+  @line_5 = string_multiply(@empty_slot, @rune_pages_size[3]).string_multiply(@text['space_fonts']['space.-1'].'\ue720', 7 - @rune_pages_size[3])
   # GUI 기본 데이터 선언
-  @texture_layer = @text['space_fonts']['space.-8'].'\uec2b'.@text['space_fonts']['space.-169'].@line_1.@text['space_fonts']['space.-18'].@up_arrow.@text['space_fonts']['space.-18'].@down_arrow
+  @texture_layer = @text['space_fonts']['space.-8'].'\uec2b'.@text['space_fonts']['space.-169'].@line_1.@text['space_fonts']['space.-18'].@up_arrow.@text['space_fonts']['space.-18'].@down_arrow.@text['space_fonts']['space.-144'].@line_2.@text['space_fonts']['space.-126'].@line_3.@text['space_fonts']['space.-126'].@line_4.@text['space_fonts']['space.-126'].@line_5.@text['space_fonts']['space.-144']
   @message = '룬 백'
   @inventory = array()
   
@@ -282,7 +358,7 @@ proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page
     }
   }
   # GUI 보여주기
-  _show_gui(@player, 'runebag', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
+  #_show_gui(@player, 'runebag', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
 
 }
 
