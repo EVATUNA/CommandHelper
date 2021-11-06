@@ -153,7 +153,7 @@ proc _new_chat(@uuid, @player_data) {
   cup_set('CHAT', @uuid, @player_data['chat'])
 }
 
-proc _new_decoration(@uuid, @players_data) {
+proc _new_decoration(@uuid, @player_data) {
   @player_data['decoration'] = array(
     array('\uf01e', '\uf01f', '\uf020', '\uf021')[rand(0, 4)], // 임시 뱃지
     '', // 머리장식
@@ -2419,9 +2419,65 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
     }
     if(@is_item_available) {
       switch(@event['item']['name']) {
-      case 'BUCKET':
-      case 'FLINT_AND_STEEL':
-        broadcast(@event)
+      #case 'BUCKET':
+      case 'TURTLE_HELMET':
+        @block = @event['block']
+        @waterable = false
+        switch(@block) {
+        case 'FARMLAND':
+          @waterable = true
+          @location = array('x': @event['location']['x'], 'y': @event['location']['y'], 'z': @event['location']['z'], 'world': @event['location']['world'])
+          break()
+        case 'WHEAT':
+        case 'BEETROOTS':
+        case 'CARROTS':
+        case 'POTATOES':
+        case 'PUMPKIN_STEM':
+        case 'MELON_STEM':
+        case 'SWEET_BERRY_BUSH':
+          @waterable = true
+          @location = array('x': @event['location']['x'], 'y': @event['location']['y'] - 1, 'z': @event['location']['z'], 'world': @event['location']['world'])
+          break()
+        }
+        if(@waterable) {
+          @watering_locations = array()
+          @range = 3 // 물뿌리개 성능에 따라 변경
+          @power = 2 // 물뿌리개 성능에 따라 변경
+          @pos = array(
+            'x': @location['x'] + 0.5,
+            'y': @location['y'] + 1.2,
+            'z': @location['z'] + 0.5
+          )
+          @delta = array(
+            'x': double(@range) / 4,
+            'y': 0.0,
+            'z': double(@range) / 4
+          )
+          # 파티클
+          @uuid = puuid(@player)
+          @closure = closure() {
+             mom_playerparticle(@uuid, 'WATER_SPLASH', @pos['x'], @pos['y'], @pos['z'], @power * @range, @delta['x'], @delta['y'], @delta['z'], 1.0)
+          }
+          @time = time()
+          for(@i = 0, @i < 10, @i++) {
+            queue_push(@closure, 'wartering.'.@time)
+            queue_delay(10, 'wartering.'.@time)
+          }
+          # 물주기
+          for(@x = 0, @x < @range, @x++) {
+            for(@z = 0, @z < @range, @z++) {
+              @x_offset = @x - integer(@range / 2)
+              @z_offset = @z - integer(@range / 2)
+              @watering_location = array('x': @location['x'] + @x_offset, 'y': @location['y'], 'z': @location['z'] + @z_offset, 'world': @location['world'])
+              if(get_block(@watering_location) == 'FARMLAND') {
+                @blockdata = get_blockdata(@watering_location)
+                @blockdata['moisture'] += @power
+                if(@blockdata['moisture'] > 6) { @blockdata['moisture'] = 6 }
+                set_blockdata(@watering_location,@blockdata)
+              }
+            }
+          }
+        }
         break()
       case 'ENCHANTED_BOOK':
         # 스크롤, 비법서, 마법의 끈 사용시

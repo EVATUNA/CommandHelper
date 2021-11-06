@@ -126,7 +126,7 @@ proc _add_tune_experience(@uuid, @player_data, @adding_default_experience, @addi
     update_bar(@tunalevel_id, @tunalevel_bossbar_data)
   }
 }
-# 해당 레벨의 맥스 경험치 구하기
+# 해당 레벨의 맥스 경험치 구하기 // 튜나 레벨 수식으로 변경 필요
 proc _get_max_tuna_experience(@level) {
   if(@level < 17) {
     @max_experience = @level * 2 + 7

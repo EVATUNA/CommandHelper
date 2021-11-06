@@ -604,7 +604,7 @@ proc _color(@color) {
 
 # 참치 레벨 텍스트 생성
 proc _replace_tunalevel_text(@level) {
-  if(@tuna_level == 0) {
+  if(@level == 0) {
     @tunalevel_text = ''
   } else {
     @text = replace(
