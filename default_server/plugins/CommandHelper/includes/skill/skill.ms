@@ -44,7 +44,7 @@ proc _get_skill_manager(@uuid) {
     # 기본 값
     @default_level = 0
     @default_experience = 0
-    @default_extra_point = 10 //0
+    @default_extra_point = 0
     @default_rune_slot = 1
     @default_selected_methods = json_encode(
       array(
@@ -72,7 +72,6 @@ proc _get_skill_manager(@uuid) {
 }
 # 스킬 매니저 set
 proc _set_skill_manager(@uuid, @skill_manager) {
-  broadcast(@skill_manager)
   cup_set('SKILL_MANAGER', @uuid, @skill_manager)
 }
 
@@ -125,17 +124,6 @@ proc _add_tune_experience(@uuid, @player_data, @adding_default_experience, @addi
     )
     update_bar(@tunalevel_id, @tunalevel_bossbar_data)
   }
-}
-# 해당 레벨의 맥스 경험치 구하기 // 튜나 레벨 수식으로 변경 필요
-proc _get_max_tuna_experience(@level) {
-  if(@level < 17) {
-    @max_experience = @level * 2 + 7
-  } else if(@level < 32) {
-    @max_experience = @level * 5 + 38
-  } else {
-    @max_experience = @level * 9 + 158
-  }
-  return(@max_experience)
 }
 
 ## 스킬 데이터 (현재 포인트, 맥스 포인트)
@@ -264,15 +252,108 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
   }
 }
 
+## 스킬 리셋 (액티브 스킬 설정 초기화, 투자 포인트 초기화, 각각의 스킬 포인트 초기화)
+proc _reset_skills(@player_data, @player, @uuid, @skills_spec) {
+  ## 스킬 매니저 초기화
+  @skill_manager = @player_data['skill_manager']
+  @selected_methods = json_decode(@skill_manager[4])
+  # 액티브 스킬에서 선택한 스킬 방식 초기화
+  @selected_combat_method = @selected_methods['combat_method']
+  _reset_active_skill(@player_data, @uuid, @selected_combat_method)
+  @selected_sowing_method = @selected_methods['sowing_method']
+  _reset_active_skill(@player_data, @uuid, @selected_sowing_method)
+  @selected_harvesting_method = @selected_methods['harvesting_method']
+  _reset_active_skill(@player_data, @uuid, @selected_harvesting_method)
+  # 스킬 메니져에서 선택한 스킬 방식 초기화
+  @skill_manager[4] = json_encode(
+    array(
+      'combat_method': '',
+      'harvesting_method': '',
+      'sowing_method': ''
+    )
+  )
+  # @player_data에서 skill_manager 설정
+  @player_data['skill_manager'] = @skill_manager
+  # cup에 저장
+  _set_skill_manager(@uuid, @skill_manager)
 
+  ## invested_point 설정
+  @player_data['invested_point'] = 0
 
-## 스킬 리셋 (스킬 포인트 초기화, 액티브 스킬 설정 초기화, )
+  ## 스킬 데이터 초기화
+  foreach(@skill: @skill_spec in @skills_spec) {
+    # 카테고리 선언
+    @category = @skill_spec['category']
+    # 스킬 데이터 로드
+    @skill_data = _get_skill_data(@uuid, @skill, @skill_spec)
+    # 룬 제외한 모든 스킬 @skill_data 초기화
+    if(@category != 'rune') {
+      @skill_data[0] = 0
+      # @player_data에서 skill_data 설정
+      @player_data['skill_data'][@skill] = @skill_data
+      # cup에 저장
+      _set_skill_data(@uuid, @skill, @skill_data)
+    }
+  }
+}
+
+# 초기화 주문서 사용
+proc _ask_using_item(@player_data, @player, @uuid, @skills_spec) {
+  @texture_layer = @text['space_fonts']['space.-8'].'\uec2b'.@text['space_fonts']['space.-169']
+  @message = '사용할 아이템'.@text['space_fonts']['space.22'].'해당 아이템을 사용할까요?'
+  @inventory = array()
+  
+  for(@index = 0, @index < 9, @index++) {
+    @inventory[@index] = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': ' ',
+        'model': 1
+      )
+    )
+  }
+
+  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_info, @skills_spec, @text) {
+    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
+      cancel()
+      # 데이터 선언
+      @player_data = @players_data[@uuid]
+      @skill_manager = @player_data['skill_manager']
+      @skills_data = @player_data['skill_data']
+      # 슬롯
+      if(@event['action'] == 'PICKUP_ALL') {
+        @slot = @event['rawslot']
+      }
+    }
+  }
+  # GUI 보여주기
+  #_show_gui(@player, 'runebag', 9, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
+
+}
+
+## 비법서 사용 ()
+proc _add_max_skill_point(@player_data, @player, @uuid, @skill, @power, @skill_spec) {
+  # 스킬 데이터 로드
+  @skill_data = _get_skill_data(@uuid, @skill, @skill_spec)
+
+  #
+  # 맥스 포인트보다 power가 클 경우 + 1 아닐경우 바닐라 경험치 쓸지 물어보기
+  # 작을 경우 2^power * 100 의 바닐라 경험치로 돌려주기
+  #
+
+  # 맥스 포인트 +1
+  @skill_data[1] += 1
+  # @player_data에서 skill_data 설정
+  @player_data['skill_data'][@skill] = @skill_data
+  # cup에 저장
+  _set_skill_data(@uuid, @skill, @skill_data)
+}
 
 
 ## 룬 gui
 proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page, @text) {
   @player_data = @players_data[@uuid]
-  _add_tune_experience(@uuid, @player_data, 5, 0)
+  _add_tune_experience(@uuid, @player_data, 50, 0)
   @skill_manager = @player_data['skill_manager']
   @skills_data = @player_data['skill_data']
   # 소유중인 룬, 룬 슬롯갯수, 착용중인 룬
@@ -362,7 +443,6 @@ proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page
 
 }
 
-
 ## 스킬 gui
 # 전투
 proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spec, @text) {
@@ -374,7 +454,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
   # 경험치
   @experience = @skill_manager[1]
   # 포인트
-  @total_point = @skill_manager[2]
+  @total_point = _get_total_skill_point(@skill_manager)
   @remaining_point = @total_point - @player_data['invested_point']
   # 선택한 전투 방식
   @selected_methods = json_decode(@skill_manager[4])
@@ -544,7 +624,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
       @skill_manager = @player_data['skill_manager']
       @skills_data = @player_data['skill_data']
       # 포인트
-      @total_point = @skill_manager[2]
+      @total_point = _get_total_skill_point(@skill_manager)
       @remaining_point = @total_point - @player_data['invested_point']
       # 선택한 전투 방식
       @selected_methods = json_decode(@skill_manager[4])
@@ -637,7 +717,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
   # 경험치
   @experience = @skill_manager[1]
   # 포인트
-  @total_point = @skill_manager[2]
+  @total_point = _get_total_skill_point(@skill_manager)
   @remaining_point = @total_point - @player_data['invested_point']
   # 선택한 농사 방식
   @selected_methods = json_decode(@skill_manager[4])
@@ -818,7 +898,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
       @skill_manager = @player_data['skill_manager']
       @skills_data = @player_data['skill_data']
       # 포인트
-      @total_point = @skill_manager[2]
+      @total_point = _get_total_skill_point(@skill_manager)
       @remaining_point = @total_point - @player_data['invested_point']
       # 선택한 전투 방식
       @selected_methods = json_decode(@skill_manager[4])
@@ -954,7 +1034,7 @@ proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_sp
   # 경험치
   @experience = @skill_manager[1]
   # 포인트
-  @total_point = @skill_manager[2]
+  @total_point = _get_total_skill_point(@skill_manager)
   @remaining_point = @total_point - @player_data['invested_point']
   # GUI 기본 데이터 선언
   @texture_layer = @text['space_fonts']['space.-8'].'\uec1d'.@text['space_fonts']['space.-169'].@text['space_fonts']['space.-1'].'\ue720'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue991'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue75b'.@text['space_fonts']['space.126'].@text['space_fonts']['space.-1'].'\ue720'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue992'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue75c'.@text['space_fonts']['space.-162']
@@ -1087,7 +1167,7 @@ proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_sp
       @skill_manager = @player_data['skill_manager']
       @skills_data = @player_data['skill_data']
       # 포인트
-      @total_point = @skill_manager[2]
+      @total_point = _get_total_skill_point(@skill_manager)
       @remaining_point = @total_point - @player_data['invested_point']
       # 슬롯
       if(@event['action'] == 'PICKUP_ALL') {
@@ -1132,7 +1212,7 @@ proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
   # 경험치
   @experience = @skill_manager[1]
   # 포인트
-  @total_point = @skill_manager[2]
+  @total_point = _get_total_skill_point(@skill_manager)
   @remaining_point = @total_point - @player_data['invested_point']
   # GUI 기본 데이터 선언
   @texture_layer = @text['space_fonts']['space.-8'].'\uec1d'.@text['space_fonts']['space.-169'].@text['space_fonts']['space.-1'].'\ue720'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue991'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue75b'.@text['space_fonts']['space.126'].@text['space_fonts']['space.-1'].'\ue720'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue992'.@text['space_fonts']['space.-18'].@text['space_fonts']['space.-1'].'\ue75c'.@text['space_fonts']['space.-162']
@@ -1265,7 +1345,7 @@ proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
       @skill_manager = @player_data['skill_manager']
       @skills_data = @player_data['skill_data']
       # 포인트
-      @total_point = @skill_manager[2]
+      @total_point = _get_total_skill_point(@skill_manager)
       @remaining_point = @total_point - @player_data['invested_point']
       # 슬롯
       if(@event['action'] == 'PICKUP_ALL') {

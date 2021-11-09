@@ -602,6 +602,23 @@ proc _color(@color) {
   }
 }
 
+# 참치 경험치 구하는 proc
+proc _get_max_tuna_experience(@level) {
+  if(@level <= 20) {
+    @max_experience = integer(round(1.25 ** (@level + 1) * 50))
+  } else {
+    @max_experience = integer(round(4770 * 1.25 ** (@level + 1 - 21)))
+  }
+  return(@max_experience)
+}
+
+# 참치 레벨 기준 토탈 스킬 포인트 구하는 proc 
+proc _get_total_skill_point(@skill_manager) {
+  @point = @skill_manager[0] + integer(@skill_manager[0] / 5) + @skill_manager[2] // 1 레벨당 1 포인트, 5 레벨당 1 보너스 포안트, 그외 추가 포인트 의 총합
+  return(@point)
+}
+
+
 # 참치 레벨 텍스트 생성
 proc _replace_tunalevel_text(@level) {
   if(@level == 0) {

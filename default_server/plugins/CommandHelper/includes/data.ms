@@ -2362,46 +2362,10 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
             @data['age'] = 1
             @pos = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.2, 'z': @event['location']['z'] + 0.5)
             @delta = array('x': 0.25, 'y': 0.125, 'z': 0.25)
-            @uuid = puuid(@player)
             #mom_playerparticle(@uuid, 'VILLAGER_HAPPY', @pos['x'], @pos['y'], @pos['z'], 15, @delta['x'], @delta['y'], @delta['z'], 0.0)
             set_timeout(0, closure( set_blockdata(@event['location'], @data) ))
           } else {
             cancel()
-          }
-        }
-        # watering
-        if(!is_null(@event['item']) && @event['item']['name'] == 'POTION' && @event['item']['meta']['base']['type'] == 'WATER') {
-          if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'ATTACHED_PUMPKIN_STEM', 'ATTACHED_MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
-            @event['location']['y'] -= 1
-            @is_farmland = true
-            cancel()
-          } else if(@event['block'] == 'FARMLAND') {
-            @is_farmland = true
-            cancel()
-          } else {
-            @is_farmland = false
-          }
-          if(@is_farmland) {
-            @data = get_blockdata(@event['location'])
-            if(@data['block'] == 'farmland') {
-              play_named_sound(@event['location'], array('sound': 'minecraft:item.bottle.empty', 'category': 'NEUTRAL', 'volum': 1))
-              @data['moisture'] = 6
-              set_blockdata(@event['location'], @data)
-              if(@event['hand'] =='main_hand') {
-                @slot = pheld_slot(@player)
-              } else {
-                @slot = 40
-              }
-              @event['item']['qty'] -= 1
-              if(pmode(@player) != 'CREATIVE') {
-                if(@event['item']['qty'] > 0) {
-                  set_inventory_item(@uuid, @slot, @event['item'])
-                  pgive_item(@player, array('name': 'GLASS_BOTTLE'))
-                } else {
-                  set_inventory_item(@uuid, @slot, array('name': 'GLASS_BOTTLE'))
-                }
-              }
-            }
           }
         }
         set_timeout(1, closure() {
@@ -2420,7 +2384,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
     if(@is_item_available) {
       switch(@event['item']['name']) {
       #case 'BUCKET':
-      case 'TURTLE_HELMET':
+      case 'TURTLE_HELMET': // 물뿌리개
         @block = @event['block']
         @waterable = false
         switch(@block) {
@@ -2439,29 +2403,83 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
           @location = array('x': @event['location']['x'], 'y': @event['location']['y'] - 1, 'z': @event['location']['z'], 'world': @event['location']['world'])
           break()
         }
-        if(@waterable) {
-          @watering_locations = array()
-          @range = 3 // 물뿌리개 성능에 따라 변경
-          @power = 2 // 물뿌리개 성능에 따라 변경
-          @pos = array(
-            'x': @location['x'] + 0.5,
-            'y': @location['y'] + 1.2,
-            'z': @location['z'] + 0.5
-          )
-          @delta = array(
-            'x': double(@range) / 4,
-            'y': 0.0,
-            'z': double(@range) / 4
-          )
+        if(!is_null(@event['item']['meta']) && @waterable && pcooldown(@player, 'TURTLE_HELMET') == 0) {
+          switch(@event['item']['meta']['model']) {
+          case 1: // 구리 물뿌리개
+            @range = 1
+            @min_power = 4
+            @max_power = 6
+            break()
+          case 2: // 금 물뿌리개
+            @range = 5
+            @min_power = 0
+            @max_power = 2
+            break()
+          case 3: // 다이아몬드 물뿌리개
+            @range = 3
+            @min_power = 1
+            @max_power = 4
+            break()
+          case 4: // 네더라이트 물뿌리개
+            @range = 5
+            @min_power = 1
+            @max_power = 4
+            break()
+          default:
+            break()
+          }
+          # 쿨타임, 기타 효과, 사운드
+          set_pcooldown(@player, 'TURTLE_HELMET', 14) // 쿨타임 설정
+          pswing_hand(@player, 'main_hand')
+          set_peffect(@player, 'MINING_FATIGUE', 4, 1, false, false)
+          play_named_sound(@location, array('sound': 'block.water.ambient', 'category': 'players', 'volum': 0.5, 'pitch': 2))
           # 파티클
-          @uuid = puuid(@player)
           @closure = closure() {
-             mom_playerparticle(@uuid, 'WATER_SPLASH', @pos['x'], @pos['y'], @pos['z'], @power * @range, @delta['x'], @delta['y'], @delta['z'], 1.0)
+            # 플레이어 위치
+            @ploc = ploc(@player)
+            # 물뿌리개 위치 (물 발사 지점 세팅)
+            @ploc['yaw'] += 45
+            @ploc['pitch'] = 0
+            @player_vector = get_vector(@ploc, 0.5)
+            for(@i = 0, @i < 5, @i++) {
+              @hand_location = array(
+                'x': @ploc['x'] + @player_vector['x'] + (rand() - 0.5) / 10,
+                'y': @ploc['y'] + 2.2 + (rand() - 0.5) / 10,
+                'z': @ploc['z'] + @player_vector['z'] + (rand() - 0.5) / 10
+              )
+              # 타겟 위치 // x z 에 랜덤한 @range 더하기;
+              @target_location = array(
+                'x': @location['x'] + 0.5 + (rand() - 0.5) * @range ** 0.7,
+                'y': @location['y'] + 1.1,
+                'z': @location['z'] + 0.5 + (rand() - 0.5) * @range ** 0.7
+              )
+              # 수평, 수직 거리 구하기
+              @xz_pos1 = array(
+                'x': @hand_location['x'],
+                'y': 0,
+                'z': @hand_location['z'],
+                'world': @location['world']
+              )
+              @xz_pos2 = array(
+                'x': @target_location['x'],
+                'y': 0,
+                'z': @target_location['z'],
+                'world': @location['world']
+              )
+              @xz_distance = distance(@xz_pos1, @xz_pos2) ** 0.25
+              @y_distance = (@hand_location['y'] - @target_location['y']) ** 0.25
+              # 벡터 구하기
+              @vector = array(
+                'x': (@target_location['x'] - @hand_location['x']) * @xz_distance * 0.1 / (@y_distance * 0.9),
+                'y': 0.0,
+                'z': (@target_location['z'] - @hand_location['z']) * @xz_distance * 0.1 / (@y_distance * 0.9)
+              )
+              mom_playerparticle(@uuid, 'WATER_SPLASH', @hand_location['x'], @hand_location['y'], @hand_location['z'], 0, @vector['x'], @vector['y'], @vector['z'], 0.8)
+            }
           }
           @time = time()
-          for(@i = 0, @i < 10, @i++) {
+          for(@i = 0, @i < 20, @i++) {
             queue_push(@closure, 'wartering.'.@time)
-            queue_delay(10, 'wartering.'.@time)
           }
           # 물주기
           for(@x = 0, @x < @range, @x++) {
@@ -2471,7 +2489,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
               @watering_location = array('x': @location['x'] + @x_offset, 'y': @location['y'], 'z': @location['z'] + @z_offset, 'world': @location['world'])
               if(get_block(@watering_location) == 'FARMLAND') {
                 @blockdata = get_blockdata(@watering_location)
-                @blockdata['moisture'] += @power
+                @blockdata['moisture'] += rand(@min_power, @max_power + 1)
                 if(@blockdata['moisture'] > 6) { @blockdata['moisture'] = 6 }
                 set_blockdata(@watering_location,@blockdata)
               }
@@ -2484,6 +2502,9 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         if(!is_null(@event['item']['meta'])) {
           switch(@event['item']['meta']['model']) {
           case 1: // 스킬 포인트 초기화 비법서
+            @player_data = @players_data[@uuid]
+            broadcast(A)
+            _reset_skills(@player_data, @player, @uuid, @skills_spec)
             break()
           }
         }
@@ -2518,6 +2539,12 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
   }
 }
 
+# 작물 성장
+# age가 0일땐 성장하는것 캔슬
+# 
+# 경작지 젖은 정도 변화
+# 젖은 정도가 증가할시, 비또는 천둥이 치면서 하늘이 뚤려 있으며 온도가 높거나 사막 바이옴이 아니여서 비가 내릴 경우에는 젖은 정도를 증가시큼 그렇지 않은 경우엔 캔슬
+#
 bind('block_grow', null, null, @event) {
   if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
     if(get_blockdata(@event['location'])['age'] > 0) {
@@ -2560,7 +2587,7 @@ bind('inventory_click', null, null, @event) {
   }
 }
 
-
+# 스폰 상호 작용
 if(@server == 'main') {
   bind('player_interact_entity', null, array('clicked': 'PLAYER', 'hand': 'main_hand'), @event, @stores, @shop_log_data) {
     @player = @event['player']
