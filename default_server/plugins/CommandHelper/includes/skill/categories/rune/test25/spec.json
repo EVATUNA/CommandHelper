@@ -1,0 +1,8 @@
+{
+  "category": "rune",
+	"default_max_point": 0,
+	"effect_by_point": [
+		{
+		}
+	]
+}

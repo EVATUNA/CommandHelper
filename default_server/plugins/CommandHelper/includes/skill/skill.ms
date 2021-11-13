@@ -400,6 +400,18 @@ proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page
   # 룬 슬롯 갯수 구하기
   @rune_slot = @skill_manager[3]
   @rune_slot = 3 // 테스트 제거해야함
+  @rune_slots = array()
+  array_resize(@rune_slots, @rune_slot, array(
+    'name': 'STRUCTURE_VOID',
+    'meta': array(
+      'display': '§8비어 있음',
+      'lore': array(
+        '§7해당 슬롯에 장착한 룬이 없습니다.',
+        '§7아래, 룬 백에서 룬을 좌클릭하여 룬을 장착할 수 있습니다.'
+      ),
+      'model': 1
+    )
+  ))
   # 룬 슬롯 텍스트
   @filled_slot = @text['space_fonts']['space.-1'].'\ue540'
   @empty_slot = @text['space_fonts']['space.18']
@@ -425,43 +437,100 @@ proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page
   }
   # 착용중인 룬
   @selected_runes = json_decode(@skill_manager[5])
+  #@selected_runes = array('executioner', 'test1') // 제거해야 함
   # 소유중인 룬 목록에서 에서 착용한 룬 제거, (착용중인 룬 효과 반영?)
   foreach(@key: @selected_rune in @selected_runes) {
     array_remove_values(@runes, @selected_rune)
-    broadcast(@key @selected_run)
+    # 룬 레벨
+    @rune_level = @skills_data[@selected_rune][0]
+    # 룬 정보
+    @rune_info = @skills_info[@selected_rune]
+    # 룬 이름
+    @rune_display = @rune_info['display']
+    # 룬 설명
+    @rune_descriptions = @rune_info['descriptions']
+    @rune_descriptions_size = array_size(@rune_descriptions)
+    if(@rune_descriptions_size > 0) {
+      if(@rune_descriptions_size < @rune_level) {
+        @description_index = @rune_descriptions_size - 1 // 마지막 레벨 설명
+      } else {
+        @description_index = @rune_level - 1 // 해당 레벨 설명
+      }
+      @rune_description = @rune_descriptions[@description_index]
+    } else {
+      @rune_description = array()
+    }
+    # 아이템 세팅
+    @item = array(
+      'name': 'ENCHANTED_BOOK',
+      'meta': array(
+        'display': "§8Lv.@rune_level @rune_display @selected_rune",
+        'lore': array(
+          '§7이 슬롯에는§c'@rune_display'§7룬이 장착되어 있습니다.',
+          '§7좌클릭 시, 룬 장착을 해제합니다.',
+          ''
+        ),
+        'model': @rune_info['icon']
+      )
+    )
+    @item['meta']['lore'] = array_merge(@item['meta']['lore'], @rune_description)
+    @item['rune'] = @selected_rune
+    @rune_slots[@key] = @item
   }
-  @all_rune_pages = _paging(@runes, 7)
-  @rune_pages = array(array(), array(), array(), array()) // 제거
+  # 슬롯 세팅
+  foreach(@key: @rune_slot in @rune_slots) {
+    @slot = 5 - array_size(@rune_slots) + @key * 2
+    @inventory[@slot] = @rune_slot
+  }
+  # 소유중인 룬
+  @rune_pages = _paging(@runes, 7)
   # 현 페이지 기준으로 4줄 구하기
   @filled_slots = array(@text['space_fonts']['space.-1'].'\ue600', @text['space_fonts']['space.-1'].'\ue660' , @text['space_fonts']['space.-1'].'\ue6c0', @text['space_fonts']['space.-1'].'\ue720')
   @lines = array()
   for(@i = 0, @i < 4, @i++) {
-    if(array_index_exists(@all_rune_pages, @page + @i)) {
-      @rune_page_size = array_size(@all_rune_pages[@page + @i])
+    if(array_index_exists(@rune_pages, @page + @i)) {
+      @rune_page_size = array_size(@rune_pages[@page + @i])
       @lines[] = string_multiply(@empty_slot, @rune_page_size).string_multiply(@filled_slots[@i], 7 - @rune_page_size)
       # 룬 불러온 후아이템 세팅
-      foreach(@key: @rune in @all_rune_pages[@page + @i]) {
+      foreach(@key: @rune in @rune_pages[@page + @i]) {
         # 룬 레벨
         @rune_level = @skills_data[@rune][0]
-        # 룬 이름, 설명
+        # 룬 정보
         @rune_info = @skills_info[@rune]
+        # 룬 이름
         @rune_display = @rune_info['display']
-        @rune_description = @rune_info['descriptions'][@rune_level]
-
-        broadcast(@rune @rune_data)
-        @rune_pages[@i][@key] = array(
+        # 룬 설명
+        @rune_descriptions = @rune_info['descriptions']
+        @rune_descriptions_size = array_size(@rune_descriptions)
+        if(@rune_descriptions_size > 0) {
+          if(@rune_descriptions_size < @rune_level) {
+            @description_index = @rune_descriptions_size - 1 // 마지막 레벨 설명
+          } else {
+            @description_index = @rune_level - 1 // 해당 레벨 설명
+          }
+          @rune_description = @rune_descriptions[@description_index]
+        } else {
+          @rune_description = array()
+        }
+        # 아이템 세팅
+        @item = array(
           'name': 'ENCHANTED_BOOK',
           'meta': array(
-            'display': @rune_display,
-            'model': 1
+            'display': "§8Lv.@rune_level @rune_display @rune",
+            'lore': array(),
+            'model': @rune_info['icon']
           )
         )
+        @item['meta']['lore'] = array_merge(@item['meta']['lore'], @rune_description)
+        @item['rune'] = @rune
+        # 슬롯 세팅
+        @slot = (@i + 2) * 9 + @key + 1
+        @inventory[@slot] = @item
       }
     } else {
       @lines[] = string_multiply(@filled_slots[@i], 7)
     }
   }
-  broadcast(@rune_pages)
   # 위 화살표
   if(@page > 0) {
     @up_arrow = @text['space_fonts']['space.18']
@@ -479,23 +548,58 @@ proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page
   # GUI 타이틀 세팅
   @texture_layer = @text['space_fonts']['space.-8'].'\uec2b'.@text['space_fonts']['space.-169'].@line_1.@text['space_fonts']['space.-18'].@up_arrow.@text['space_fonts']['space.-18'].@down_arrow.@text['space_fonts']['space.-144'].@lines[0].@text['space_fonts']['space.-126'].@lines[1].@text['space_fonts']['space.-126'].@lines[2].@text['space_fonts']['space.-126'].@lines[3].@text['space_fonts']['space.-144']
   @message = '룬 백'
-
-  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_info, @skills_spec, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
+  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_info, @skills_spec, @page, @text) {
+    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec,@page,  @text) {
       cancel()
       # 데이터 선언
       @player_data = @players_data[@uuid]
       @skill_manager = @player_data['skill_manager']
       @skills_data = @player_data['skill_data']
-      # 슬롯
-      if(@event['action'] == 'PICKUP_ALL') {
-        @slot = @event['rawslot']
+      # 룬 슬롯 갯수
+      @rune_slot = @skill_manager[3]
+      @rune_slot = 3 // 테스트 제거해야함
+      # 착용중인 룬
+      @selected_runes = json_decode(@skill_manager[5])
+      # 클릭
+      @slot = @event['rawslot']
+      if(@event['action'] == 'PICKUP_ALL' && @slot < 54) {
+        @item = @inventory[@slot]
+        if(@item['meta']['display'] != ' ') {
+          switch(@slot) {
+          case 0..8:
+              if(@item['meta']['model'] != 1) {
+                array_remove_values(@selected_runes, @item['rune'])
+                @skill_manager[5] = json_encode(@selected_runes)
+                _set_skill_manager(@uuid, @skill_manager)
+                _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page, @text)
+              }
+            break()
+          case 19..25:
+          case 28..34:
+          case 37..43:
+          case 46..52:
+            if(array_size(@selected_runes) < @rune_slot) {
+              @selected_runes[] = @item['rune']
+              @skill_manager[5] = json_encode(@selected_runes)
+              _set_skill_manager(@uuid, @skill_manager)
+              _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page, @text)
+            }
+            break()
+          case 26:
+            @page -= 1
+            _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page, @text)
+            break()
+          case 53:
+            @page += 1
+            _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page, @text)
+            break()
+          }
+        }
       }
     }
   }
   # GUI 보여주기
-  _show_gui(@player, 'runebag', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
-
+  _show_gui(@player, 'runebag', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @page, @text)
 }
 
 ## 스킬 gui
@@ -684,8 +788,8 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
       # 선택한 전투 방식
       @selected_methods = json_decode(@skill_manager[4])
       # 슬롯
-      if(@event['action'] == 'PICKUP_ALL') {
-        @slot = @event['rawslot']
+      @slot = @event['rawslot']
+      if(@event['action'] == 'PICKUP_ALL' && @slot < 54) {
         switch(@slot) {
         case 45:
           runas(@player, '/skill farmingmethod')
@@ -958,8 +1062,8 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
       # 선택한 전투 방식
       @selected_methods = json_decode(@skill_manager[4])
       # 슬롯
-      if(@event['action'] == 'PICKUP_ALL') {
-        @slot = @event['rawslot']
+      @slot = @event['rawslot']
+      if(@event['action'] == 'PICKUP_ALL' && @slot < 54) {
         switch(@slot) {
         case 45:
           runas(@player, '/skill farming')
@@ -1225,8 +1329,8 @@ proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_sp
       @total_point = _get_total_skill_point(@skill_manager)
       @remaining_point = @total_point - @player_data['invested_point']
       # 슬롯
-      if(@event['action'] == 'PICKUP_ALL') {
-        @slot = @event['rawslot']
+      @slot = @event['rawslot']
+      if(@event['action'] == 'PICKUP_ALL' && @slot < 54) {
         switch(@slot) {
         case 45:
           runas(@player, '/skill mining')
@@ -1403,8 +1507,8 @@ proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
       @total_point = _get_total_skill_point(@skill_manager)
       @remaining_point = @total_point - @player_data['invested_point']
       # 슬롯
-      if(@event['action'] == 'PICKUP_ALL') {
-        @slot = @event['rawslot']
+      @slot = @event['rawslot']
+      if(@event['action'] == 'PICKUP_ALL' && @slot < 54) {
         switch(@slot) {
         case 45:
           runas(@player, '/skill combat')
