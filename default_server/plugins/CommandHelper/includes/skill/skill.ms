@@ -40,6 +40,7 @@ foreach(@category in @categories) {
 # 스킬 매니저 get
 proc _get_skill_manager(@uuid) {
   @skill_manager = cup_get('SKILL_MANAGER', @uuid)
+  broadcast(@skill_manager)
   if(is_null(@skill_manager)) {
     # 기본 값
     @default_level = 0
@@ -252,13 +253,6 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
   }
 }
 
-@a = array(a: 1)
-proc _proc(@a) {
-  @closure = closure(@a) {
-    @a[a] +=1
-  }
-}
-
 ## 스킬 리셋 (액티브 스킬 설정 초기화, 투자 포인트 초기화, 각각의 스킬 포인트 초기화)
 # 사용 확인 gui
 # 아이템 사용
@@ -378,23 +372,37 @@ proc _add_max_skill_point(@player_data, @player, @uuid, @skill, @power, @skill_s
 ## 룬 gui
 proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page, @text) {
   @player_data = @players_data[@uuid]
-  
-  #_add_tune_experience(@uuid, @player_data, 50, 0)
   @skill_manager = @player_data['skill_manager']
   @skills_data = @player_data['skill_data']
-  # 소유중인 룬, 룬 슬롯갯수, 착용중인 룬
-  @runes = array(0,0,0,0,0,0,0) // 소유중인 룬 선언
+  # 인벤토리 프리셋
+  @inventory = array()
+  for(@index = 0, @index < 54, @index++) {
+    @inventory[@index] = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': ' ',
+        'model': 1
+      )
+    )
+  }
+  # 소유중인 룬
+  @runes = array()
+  foreach(@skill: @skill_spec in @skills_spec) {
+    @category = @skill_spec['category']
+    if(@category == 'rune') {
+      @skill_data = @player_data['skill_data'][@skill]
+      if(@skill_data[0] > -1) { // > 0 으로 수정해야 함
+        @runes[] = @skill
+        #broadcast(@skill @skill_data 소지)
+      }
+    }
+  }
+  # 룬 슬롯 갯수 구하기
   @rune_slot = @skill_manager[3]
-  @selected_runes = json_decode(@skill_manager[5])
-  #broadcast(@rune_slot)
-  #broadcast(@selected_runes)
-  // 착용한 룬은 소유중인 룬 목록에서 제거해야함
-  
-  # 룬 슬롯 세팅
+  @rune_slot = 3 // 테스트 제거해야함
+  # 룬 슬롯 텍스트
   @filled_slot = @text['space_fonts']['space.-1'].'\ue540'
   @empty_slot = @text['space_fonts']['space.18']
-  # 텍스트 세팅, 적용된 룬 세팅
-  @rune_slot = 3
   switch(@rune_slot) {
   case 1:
     @line_1 = @filled_slot.@filled_slot.@filled_slot.@filled_slot.@empty_slot.@filled_slot.@filled_slot.@filled_slot.@filled_slot
@@ -415,41 +423,62 @@ proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page
     @line_1 = @filled_slot.@filled_slot.@filled_slot.@filled_slot.@filled_slot.@filled_slot.@filled_slot.@filled_slot.@filled_slot
     break()
   }
-  @rune_pages = _paging(@runes, 7)
+  # 착용중인 룬
+  @selected_runes = json_decode(@skill_manager[5])
+  # 소유중인 룬 목록에서 에서 착용한 룬 제거, (착용중인 룬 효과 반영?)
+  foreach(@key: @selected_rune in @selected_runes) {
+    array_remove_values(@runes, @selected_rune)
+    broadcast(@key @selected_run)
+  }
+  @all_rune_pages = _paging(@runes, 7)
+  @rune_pages = array(array(), array(), array(), array()) // 제거
+  # 현 페이지 기준으로 4줄 구하기
+  @filled_slots = array(@text['space_fonts']['space.-1'].'\ue600', @text['space_fonts']['space.-1'].'\ue660' , @text['space_fonts']['space.-1'].'\ue6c0', @text['space_fonts']['space.-1'].'\ue720')
+  @lines = array()
+  for(@i = 0, @i < 4, @i++) {
+    if(array_index_exists(@all_rune_pages, @page + @i)) {
+      @rune_page_size = array_size(@all_rune_pages[@page + @i])
+      @lines[] = string_multiply(@empty_slot, @rune_page_size).string_multiply(@filled_slots[@i], 7 - @rune_page_size)
+      # 룬 불러온 후아이템 세팅
+      foreach(@key: @rune in @all_rune_pages[@page + @i]) {
+        # 룬 레벨
+        @rune_level = @skills_data[@rune][0]
+        # 룬 이름, 설명
+        @rune_info = @skills_info[@rune]
+        @rune_display = @rune_info['display']
+        @rune_description = @rune_info['descriptions'][@rune_level]
+
+        broadcast(@rune @rune_data)
+        @rune_pages[@i][@key] = array(
+          'name': 'ENCHANTED_BOOK',
+          'meta': array(
+            'display': @rune_display,
+            'model': 1
+          )
+        )
+      }
+    } else {
+      @lines[] = string_multiply(@filled_slots[@i], 7)
+    }
+  }
+  broadcast(@rune_pages)
+  # 위 화살표
   if(@page > 0) {
     @up_arrow = @text['space_fonts']['space.18']
+    @inventory[26]['meta']['display'] = '§7위로'
   } else {
     @up_arrow = @text['space_fonts']['space.-1'].'\ue600'
   }
+  # 아래 화살표
   if(array_size(@rune_pages) - @page > 4) {
     @down_arrow = @text['space_fonts']['space.18']
+    @inventory[53]['meta']['display'] = '§7아래로'
   } else {
     @down_arrow = @text['space_fonts']['space.-1'].'\ue720'
   }
-  @rune_pages_size = array(0, 0, 0, 0)
-  foreach(@key: @rune_page in @rune_pages) {
-    if(@key - @page >= 0 && @key - @page < 4) {
-      @rune_pages_size[@key - @page] = array_size(@rune_page)
-    }
-  }
-  @line_2 = string_multiply(@empty_slot, @rune_pages_size[0]).string_multiply(@text['space_fonts']['space.-1'].'\ue600', 7 - @rune_pages_size[0])
-  @line_3 = string_multiply(@empty_slot, @rune_pages_size[1]).string_multiply(@text['space_fonts']['space.-1'].'\ue660', 7 - @rune_pages_size[1])
-  @line_4 = string_multiply(@empty_slot, @rune_pages_size[2]).string_multiply(@text['space_fonts']['space.-1'].'\ue6c0', 7 - @rune_pages_size[2])
-  @line_5 = string_multiply(@empty_slot, @rune_pages_size[3]).string_multiply(@text['space_fonts']['space.-1'].'\ue720', 7 - @rune_pages_size[3])
-  # GUI 기본 데이터 선언
-  @texture_layer = @text['space_fonts']['space.-8'].'\uec2b'.@text['space_fonts']['space.-169'].@line_1.@text['space_fonts']['space.-18'].@up_arrow.@text['space_fonts']['space.-18'].@down_arrow.@text['space_fonts']['space.-144'].@line_2.@text['space_fonts']['space.-126'].@line_3.@text['space_fonts']['space.-126'].@line_4.@text['space_fonts']['space.-126'].@line_5.@text['space_fonts']['space.-144']
+  # GUI 타이틀 세팅
+  @texture_layer = @text['space_fonts']['space.-8'].'\uec2b'.@text['space_fonts']['space.-169'].@line_1.@text['space_fonts']['space.-18'].@up_arrow.@text['space_fonts']['space.-18'].@down_arrow.@text['space_fonts']['space.-144'].@lines[0].@text['space_fonts']['space.-126'].@lines[1].@text['space_fonts']['space.-126'].@lines[2].@text['space_fonts']['space.-126'].@lines[3].@text['space_fonts']['space.-144']
   @message = '룬 백'
-  @inventory = array()
-  
-  for(@index = 0, @index < 54, @index++) {
-    @inventory[@index] = array(
-      'name': 'STRUCTURE_VOID',
-      'meta': array(
-        'display': ' ',
-        'model': 1
-      )
-    )
-  }
 
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_info, @skills_spec, @text) {
     bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
@@ -465,7 +494,7 @@ proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page
     }
   }
   # GUI 보여주기
-  #_show_gui(@player, 'runebag', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
+  _show_gui(@player, 'runebag', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
 
 }
 
@@ -587,42 +616,42 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
         @lore = array()
       }
     }
-    @skill_desriptions = @skill_info['desriptions']
-    if(array_size(@skill_desriptions) > 0) {
-      if(array_size(@skill_desriptions) != 0) {
-        if(array_size(@skill_desriptions) - 1 < @skill_point) {
-          @desription_index = array_size(@skill_desriptions) - 1
+    @skill_descriptions = @skill_info['descriptions']
+    if(array_size(@skill_descriptions) > 0) {
+      if(array_size(@skill_descriptions) != 0) {
+        if(array_size(@skill_descriptions) - 1 < @skill_point) {
+          @description_index = array_size(@skill_descriptions) - 1
         } else {
-          @desription_index = @skill_point
+          @description_index = @skill_point
         }
-        @skill_desription = @skill_desriptions[@desription_index]
-        if(array_size(@skill_desriptions) - 1 < @skill_point + 1) {
-          @button_desription_index = array_size(@skill_desriptions) - 1
+        @skill_description = @skill_descriptions[@description_index]
+        if(array_size(@skill_descriptions) - 1 < @skill_point + 1) {
+          @button_description_index = array_size(@skill_descriptions) - 1
         } else {
-          @button_desription_index = @skill_point + 1
+          @button_description_index = @skill_point + 1
         }
-        @button_desription = @skill_desriptions[@button_desription_index]
+        @button_description = @skill_descriptions[@button_description_index]
       } else {
-        @skill_desription = array()
-        @button_desription = array()
+        @skill_description = array()
+        @button_description = array()
       }
     } else {
-      @skill_desription = array()
-      if(array_size(@skill_desriptions) != 0) {
-        if(array_size(@skill_desriptions) - 1 < @skill_point + 1) {
-          @button_desription_index = array_size(@skill_desriptions) - 1
+      @skill_description = array()
+      if(array_size(@skill_descriptions) != 0) {
+        if(array_size(@skill_descriptions) - 1 < @skill_point + 1) {
+          @button_description_index = array_size(@skill_descriptions) - 1
         } else {
-          @button_desription_index = @skill_point + 1
+          @button_description_index = @skill_point + 1
         }
-        @button_desription = @skill_desriptions[@button_desription_index]
+        @button_description = @skill_descriptions[@button_description_index]
       } else {
-        @button_desription = array()
+        @button_description = array()
       }
     }
     @inventory[@slots['icon']]['skill'] = @skill
     @inventory[@slots['icon']]['slot_type'] = @category
     @inventory[@slots['icon']]['meta']['display'] = @skill_point_text
-    @inventory[@slots['icon']]['meta']['lore'] = array_merge(@lore, @skill_desription)
+    @inventory[@slots['icon']]['meta']['lore'] = array_merge(@lore, @skill_description)
     @inventory[@slots['icon']]['meta']['model'] = @skill_icon
 
     if(@remaining_point > 0 && @skills_data[@skill][0] < @skills_data[@skill][1]) {
@@ -635,7 +664,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
           '§bLv.'.string(@skill_point + 1) @skill_display.' 정보:',
           ''
         ),
-        @button_desription
+        @button_description
       )
     }
   }
@@ -861,42 +890,42 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
         }
       }
     }
-    @skill_desriptions = @skill_info['desriptions']
-    if(array_size(@skill_desriptions) > 0) {
-      if(array_size(@skill_desriptions) != 0) {
-        if(array_size(@skill_desriptions) - 1 < @skill_point) {
-          @desription_index = array_size(@skill_desriptions) - 1
+    @skill_descriptions = @skill_info['descriptions']
+    if(array_size(@skill_descriptions) > 0) {
+      if(array_size(@skill_descriptions) != 0) {
+        if(array_size(@skill_descriptions) - 1 < @skill_point) {
+          @description_index = array_size(@skill_descriptions) - 1
         } else {
-          @desription_index = @skill_point
+          @description_index = @skill_point
         }
-        @skill_desription = @skill_desriptions[@desription_index]
-        if(array_size(@skill_desriptions) - 1 < @skill_point + 1) {
-          @button_desription_index = array_size(@skill_desriptions) - 1
+        @skill_description = @skill_descriptions[@description_index]
+        if(array_size(@skill_descriptions) - 1 < @skill_point + 1) {
+          @button_description_index = array_size(@skill_descriptions) - 1
         } else {
-          @button_desription_index = @skill_point + 1
+          @button_description_index = @skill_point + 1
         }
-        @button_desription = @skill_desriptions[@button_desription_index]
+        @button_description = @skill_descriptions[@button_description_index]
       } else {
-        @skill_desription = array()
-        @button_desription = array()
+        @skill_description = array()
+        @button_description = array()
       }
     } else {
-      @skill_desription = array()
-      if(array_size(@skill_desriptions) != 0) {
-        if(array_size(@skill_desriptions) - 1 < @skill_point + 1) {
-          @button_desription_index = array_size(@skill_desriptions) - 1
+      @skill_description = array()
+      if(array_size(@skill_descriptions) != 0) {
+        if(array_size(@skill_descriptions) - 1 < @skill_point + 1) {
+          @button_description_index = array_size(@skill_descriptions) - 1
         } else {
-          @button_desription_index = @skill_point + 1
+          @button_description_index = @skill_point + 1
         }
-        @button_desription = @skill_desriptions[@button_desription_index]
+        @button_description = @skill_descriptions[@button_description_index]
       } else {
-        @button_desription = array()
+        @button_description = array()
       }
     }
     @inventory[@slots['icon']]['skill'] = @skill
     @inventory[@slots['icon']]['slot_type'] = @category
     @inventory[@slots['icon']]['meta']['display'] = @skill_point_text
-    @inventory[@slots['icon']]['meta']['lore'] = array_merge(@lore, @skill_desription)
+    @inventory[@slots['icon']]['meta']['lore'] = array_merge(@lore, @skill_description)
     @inventory[@slots['icon']]['meta']['model'] = @skill_icon
 
     if(@remaining_point > 0 && @skills_data[@skill][0] < @skills_data[@skill][1]) {
@@ -909,7 +938,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
           '§bLv.'.string(@skill_point + 1) @skill_display.' 정보:',
           ''
         ),
-        @button_desription
+        @button_description
       )
     }
   }
@@ -1130,42 +1159,42 @@ proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_sp
         @skill_icon = @skill_info['icon']['on']
         @lore = array()
     }
-    @skill_desriptions = @skill_info['desriptions']
-    if(array_size(@skill_desriptions) > 0) {
-      if(array_size(@skill_desriptions) != 0) {
-        if(array_size(@skill_desriptions) - 1 < @skill_point) {
-          @desription_index = array_size(@skill_desriptions) - 1
+    @skill_descriptions = @skill_info['descriptions']
+    if(array_size(@skill_descriptions) > 0) {
+      if(array_size(@skill_descriptions) != 0) {
+        if(array_size(@skill_descriptions) - 1 < @skill_point) {
+          @description_index = array_size(@skill_descriptions) - 1
         } else {
-          @desription_index = @skill_point
+          @description_index = @skill_point
         }
-        @skill_desription = @skill_desriptions[@desription_index]
-        if(array_size(@skill_desriptions) - 1 < @skill_point + 1) {
-          @button_desription_index = array_size(@skill_desriptions) - 1
+        @skill_description = @skill_descriptions[@description_index]
+        if(array_size(@skill_descriptions) - 1 < @skill_point + 1) {
+          @button_description_index = array_size(@skill_descriptions) - 1
         } else {
-          @button_desription_index = @skill_point + 1
+          @button_description_index = @skill_point + 1
         }
-        @button_desription = @skill_desriptions[@button_desription_index]
+        @button_description = @skill_descriptions[@button_description_index]
       } else {
-        @skill_desription = array()
-        @button_desription = array()
+        @skill_description = array()
+        @button_description = array()
       }
     } else {
-      @skill_desription = array()
-      if(array_size(@skill_desriptions) != 0) {
-        if(array_size(@skill_desriptions) - 1 < @skill_point + 1) {
-          @button_desription_index = array_size(@skill_desriptions) - 1
+      @skill_description = array()
+      if(array_size(@skill_descriptions) != 0) {
+        if(array_size(@skill_descriptions) - 1 < @skill_point + 1) {
+          @button_description_index = array_size(@skill_descriptions) - 1
         } else {
-          @button_desription_index = @skill_point + 1
+          @button_description_index = @skill_point + 1
         }
-        @button_desription = @skill_desriptions[@button_desription_index]
+        @button_description = @skill_descriptions[@button_description_index]
       } else {
-        @button_desription = array()
+        @button_description = array()
       }
     }
     @inventory[@slots['icon']]['skill'] = @skill
     @inventory[@slots['icon']]['slot_type'] = @category
     @inventory[@slots['icon']]['meta']['display'] = @skill_point_text
-    @inventory[@slots['icon']]['meta']['lore'] = array_merge(@lore, @skill_desription)
+    @inventory[@slots['icon']]['meta']['lore'] = array_merge(@lore, @skill_description)
     @inventory[@slots['icon']]['meta']['model'] = @skill_icon
 
     if(@remaining_point > 0 && @skills_data[@skill][0] < @skills_data[@skill][1]) {
@@ -1178,7 +1207,7 @@ proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_sp
           '§bLv.'.string(@skill_point + 1) @skill_display.' 정보:',
           ''
         ),
-        @button_desription
+        @button_description
       )
     }
   }
@@ -1308,42 +1337,42 @@ proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
         @skill_icon = @skill_info['icon']['on']
         @lore = array()
     }
-    @skill_desriptions = @skill_info['desriptions']
-    if(array_size(@skill_desriptions) > 0) {
-      if(array_size(@skill_desriptions) != 0) {
-        if(array_size(@skill_desriptions) - 1 < @skill_point) {
-          @desription_index = array_size(@skill_desriptions) - 1
+    @skill_descriptions = @skill_info['descriptions']
+    if(array_size(@skill_descriptions) > 0) {
+      if(array_size(@skill_descriptions) != 0) {
+        if(array_size(@skill_descriptions) - 1 < @skill_point) {
+          @description_index = array_size(@skill_descriptions) - 1
         } else {
-          @desription_index = @skill_point
+          @description_index = @skill_point
         }
-        @skill_desription = @skill_desriptions[@desription_index]
-        if(array_size(@skill_desriptions) - 1 < @skill_point + 1) {
-          @button_desription_index = array_size(@skill_desriptions) - 1
+        @skill_description = @skill_descriptions[@description_index]
+        if(array_size(@skill_descriptions) - 1 < @skill_point + 1) {
+          @button_description_index = array_size(@skill_descriptions) - 1
         } else {
-          @button_desription_index = @skill_point + 1
+          @button_description_index = @skill_point + 1
         }
-        @button_desription = @skill_desriptions[@button_desription_index]
+        @button_description = @skill_descriptions[@button_description_index]
       } else {
-        @skill_desription = array()
-        @button_desription = array()
+        @skill_description = array()
+        @button_description = array()
       }
     } else {
-      @skill_desription = array()
-      if(array_size(@skill_desriptions) != 0) {
-        if(array_size(@skill_desriptions) - 1 < @skill_point + 1) {
-          @button_desription_index = array_size(@skill_desriptions) - 1
+      @skill_description = array()
+      if(array_size(@skill_descriptions) != 0) {
+        if(array_size(@skill_descriptions) - 1 < @skill_point + 1) {
+          @button_description_index = array_size(@skill_descriptions) - 1
         } else {
-          @button_desription_index = @skill_point + 1
+          @button_description_index = @skill_point + 1
         }
-        @button_desription = @skill_desriptions[@button_desription_index]
+        @button_description = @skill_descriptions[@button_description_index]
       } else {
-        @button_desription = array()
+        @button_description = array()
       }
     }
     @inventory[@slots['icon']]['skill'] = @skill
     @inventory[@slots['icon']]['slot_type'] = @category
     @inventory[@slots['icon']]['meta']['display'] = @skill_point_text
-    @inventory[@slots['icon']]['meta']['lore'] = array_merge(@lore, @skill_desription)
+    @inventory[@slots['icon']]['meta']['lore'] = array_merge(@lore, @skill_description)
     @inventory[@slots['icon']]['meta']['model'] = @skill_icon
 
     if(@remaining_point > 0 && @skills_data[@skill][0] < @skills_data[@skill][1]) {
@@ -1356,7 +1385,7 @@ proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
           '§bLv.'.string(@skill_point + 1) @skill_display.' 정보:',
           ''
         ),
-        @button_desription
+        @button_description
       )
     }
   }
