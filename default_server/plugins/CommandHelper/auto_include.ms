@@ -719,7 +719,6 @@ array proc _clone(array @arr) { return(array_deep_clone(@arr)) }
 boolean proc _existsGui(string @guiid) { return(array_contains(get_virtual_inventories(), @guiid)) }
 
 
-
 proc _get_circle_offsets(@radius) {
   @offsets = array(
     array(0, +@radius),

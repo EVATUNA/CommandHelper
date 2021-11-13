@@ -2502,9 +2502,9 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         if(!is_null(@event['item']['meta'])) {
           switch(@event['item']['meta']['model']) {
           case 1: // 스킬 포인트 초기화 비법서
-            @player_data = @players_data[@uuid]
-            broadcast(A)
-            _reset_skills(@player_data, @player, @uuid, @skills_spec)
+            _ask_using_skill_reset_scroll(@player, @uuid, @event['item'], @players_data, @skills_spec, @text)
+            #broadcast(A)
+            #_reset_skills(@player_data, @player, @uuid, @skills_spec)
             break()
           }
         }

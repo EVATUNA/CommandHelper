@@ -252,8 +252,65 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
   }
 }
 
+@a = array(a: 1)
+proc _proc(@a) {
+  @closure = closure(@a) {
+    @a[a] +=1
+  }
+}
+
 ## 스킬 리셋 (액티브 스킬 설정 초기화, 투자 포인트 초기화, 각각의 스킬 포인트 초기화)
-proc _reset_skills(@player_data, @player, @uuid, @skills_spec) {
+# 사용 확인 gui
+# 아이템 사용
+proc _ask_using_skill_reset_scroll(@player, @uuid, @item, @players_data, @skills_spec, @text) {
+  @texture_layer = @text['space_fonts']['space.-8'].'\uec2c'.@text['space_fonts']['space.-169']
+  @message = '사용할 아이템'.@text['space_fonts']['space.21'].'아이템을 사용할까요?'
+  @inventory = array()
+  for(@index = 0, @index < 9, @index++) {
+    @inventory[@index] = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': ' ',
+        'model': 1
+      )
+    )
+  }
+  @inventory[1] = @item
+  @inventory[5]['meta']['display'] = '§a네'
+  @inventory[7]['meta']['display'] = '§c아니요'
+  _reset_skills(@players_data, @player, @uuid, @skills_spec)
+  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @item, @players_data, @skills_spec, @text) {
+    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @item, @players_data, @skills_spec, @text) {
+      cancel()
+      # 슬롯
+      if(@event['action'] == 'PICKUP_ALL') {
+        @slot = @event['rawslot']
+        switch(@slot) { // 네 클릭시
+        case 5:
+          ptake_item(@player, @item)
+          _reset_skills(@players_data, @player, @uuid, @skills_spec)
+          close_pinv(@player)
+          tmsg(@player, @text['prefix']['info'] '§7스킬 포인트가 초기화 되었습니다.')
+          play_named_sound(ploc(@player), array(
+            'sound': 'minecraft:entity.illusioner.cast_spell',
+            'category': 'PLAYERS',
+            'volume': 1,
+            'pitch': 0.675
+          ), @player)
+          break()
+        case 7: // 아니요 클릭시
+          close_pinv(@player)
+          break()
+        }
+      }
+    }
+  }
+  # GUI 보여주기
+  _show_gui(@player, 'asking_skill_reset', 9, @texture_layer, @message, @inventory, @closure, @uuid, @item, @players_data, @skills_spec, @text)
+}
+
+proc _reset_skills(@players_data, @player, @uuid, @skills_spec) {
+  @player_data = @players_data[@uuid]
   ## 스킬 매니저 초기화
   @skill_manager = @player_data['skill_manager']
   @selected_methods = json_decode(@skill_manager[4])
@@ -278,7 +335,9 @@ proc _reset_skills(@player_data, @player, @uuid, @skills_spec) {
   _set_skill_manager(@uuid, @skill_manager)
 
   ## invested_point 설정
+  #broadcast(A @player_data['invested_point'])
   @player_data['invested_point'] = 0
+  #broadcast(B @player_data['invested_point'])
 
   ## 스킬 데이터 초기화
   foreach(@skill: @skill_spec in @skills_spec) {
@@ -295,40 +354,6 @@ proc _reset_skills(@player_data, @player, @uuid, @skills_spec) {
       _set_skill_data(@uuid, @skill, @skill_data)
     }
   }
-}
-
-# 초기화 주문서 사용
-proc _ask_using_item(@player_data, @player, @uuid, @skills_spec) {
-  @texture_layer = @text['space_fonts']['space.-8'].'\uec2b'.@text['space_fonts']['space.-169']
-  @message = '사용할 아이템'.@text['space_fonts']['space.22'].'해당 아이템을 사용할까요?'
-  @inventory = array()
-  
-  for(@index = 0, @index < 9, @index++) {
-    @inventory[@index] = array(
-      'name': 'STRUCTURE_VOID',
-      'meta': array(
-        'display': ' ',
-        'model': 1
-      )
-    )
-  }
-
-  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_info, @skills_spec, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
-      cancel()
-      # 데이터 선언
-      @player_data = @players_data[@uuid]
-      @skill_manager = @player_data['skill_manager']
-      @skills_data = @player_data['skill_data']
-      # 슬롯
-      if(@event['action'] == 'PICKUP_ALL') {
-        @slot = @event['rawslot']
-      }
-    }
-  }
-  # GUI 보여주기
-  #_show_gui(@player, 'runebag', 9, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
-
 }
 
 ## 비법서 사용 ()
@@ -353,7 +378,8 @@ proc _add_max_skill_point(@player_data, @player, @uuid, @skill, @power, @skill_s
 ## 룬 gui
 proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page, @text) {
   @player_data = @players_data[@uuid]
-  _add_tune_experience(@uuid, @player_data, 50, 0)
+  
+  #_add_tune_experience(@uuid, @player_data, 50, 0)
   @skill_manager = @player_data['skill_manager']
   @skills_data = @player_data['skill_data']
   # 소유중인 룬, 룬 슬롯갯수, 착용중인 룬
