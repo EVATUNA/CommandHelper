@@ -1308,10 +1308,37 @@ register_command('broadcast', array(
 proc _chreload_command(@command, @player, @args, @text, @players_data) {
   foreach(@target_name in all_players()) {
     @target_uuid = puuid(@target_name)
+    # 커스텀 인벤 닫기
     @inv_holder = pinventory_holder(@target_name)
     if(is_string(@inv_holder) && @inv_holder != @target_uuid) {
       close_pinv(@target_name)
     }
+    
+    # 액티브 스킬 저장
+    @player_data = @players_data[@target_uuid]
+    @skill_manager = @player_data['skill_manager']
+
+    @selected_methods = json_decode(@skill_manager[4])
+    
+    @selected_combat_method = @selected_methods['combat_method']
+    if(@selected_combat_method != '') {
+      @active_skill = @player_data['active_skill'][@selected_combat_method]
+      _save_active_skill(@target_uuid, @selected_combat_method, @active_skill)
+    }
+
+    @selected_sowing_method = @selected_methods['sowing_method']
+    if(@selected_sowing_method != '') {
+      @active_skill = @player_data['active_skill'][@selected_sowing_method]
+      _save_active_skill(@target_uuid, @selected_sowing_method, @active_skill)
+    }
+
+    @selected_harvesting_method = @selected_methods['harvesting_method']
+    if(@selected_harvesting_method != '') {
+      @active_skill = @player_data['active_skill'][@selected_harvesting_method]
+      _save_active_skill(@target_uuid, @selected_harvesting_method, @active_skill)
+    }
+
+    // 룬에 액티브 스킬 생길시 액티브 스킬도 불어와 저장해야함
   }
   set_timeout(1, closure() {
     broadcast(@text['prefix']['broadcast'] _color('#80c8ff').'인스턴스 패치가 진행되어 일부 데이터가 초기화 되었습니다.')

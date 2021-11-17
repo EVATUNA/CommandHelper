@@ -437,7 +437,6 @@ proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page
   }
   # 착용중인 룬
   @selected_runes = json_decode(@skill_manager[5])
-  #@selected_runes = array('executioner', 'test1') // 제거해야 함
   # 소유중인 룬 목록에서 에서 착용한 룬 제거, (착용중인 룬 효과 반영?)
   foreach(@key: @selected_rune in @selected_runes) {
     array_remove_values(@runes, @selected_rune)
@@ -832,6 +831,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
                     call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_combat_method)
                   }
                 }
+                _set_skill_manager(@uuid, @skill_manager)
                 runas(@player, '/skill')
               }
               break()
@@ -866,7 +866,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
   # GUI 보여주기
   _show_gui(@player, 'skillbook_combat', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
 }
-# 농사
+# 농사 방식
 proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @skills_spec, @text) {
   @player_data = @players_data[@uuid]
   @skill_manager = @player_data['skill_manager']
@@ -1106,6 +1106,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
                     call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_sowing_method)
                   }
                 }
+                _set_skill_manager(@uuid, @skill_manager)
                 runas(@player, '/skill farmingmethod')
               }
               break()
@@ -1141,6 +1142,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
                     call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_harvesting_method)
                   }
                 }
+                _set_skill_manager(@uuid, @skill_manager)
                 runas(@player, '/skill farmingmethod')
               }
               break()
@@ -1183,7 +1185,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
   # GUI 보여주기
   _show_gui(@player, 'skillbook_farming_method', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
 }
-# 농사방식
+# 농사
 proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_spec, @text) {
   @player_data = @players_data[@uuid]
   @skill_manager = @player_data['skill_manager']

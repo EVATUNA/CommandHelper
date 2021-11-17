@@ -3,6 +3,13 @@
 	"default_max_point": 0,
 	"effect_by_point": [
 		{
+			"multiply": 1.02
+		},
+		{
+			"multiply": 1.07
+		},
+		{
+			"multiply": 1.09
 		}
 	]
 }
