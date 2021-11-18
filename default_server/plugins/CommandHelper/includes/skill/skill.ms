@@ -40,7 +40,6 @@ foreach(@category in @categories) {
 # 스킬 매니저 get
 proc _get_skill_manager(@uuid) {
   @skill_manager = cup_get('SKILL_MANAGER', @uuid)
-  broadcast(@skill_manager)
   if(is_null(@skill_manager)) {
     # 기본 값
     @default_level = 0
