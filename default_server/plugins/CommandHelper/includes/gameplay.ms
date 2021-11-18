@@ -254,9 +254,9 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
             )
             break()
           }
+          @item['meta']['enchants'] = @vanilla_enchants
         }
       }
-      @item['meta']['enchants'] = @vanilla_enchants
       set_timeout(0, closure() {
         if(get_inventory_item(@uuid, 36) == @old_items['armor']) {
           set_inventory_item(@uuid, 36, @item)
