@@ -259,11 +259,9 @@ proc _quit_event(@uuid, @players_data) {
       @active_skill = @player_data['active_skill'][@selected_harvesting_method]
       _save_active_skill(@uuid, @selected_harvesting_method, @active_skill)
     }
-
     //룬에도 액티브 스킬 있을 경우 룬 불러와야 함
-    broadcast(A)
+
     array_remove(@players_data, @uuid)
-    broadcast(B)
     #_update_tip_data(@uuid, @players_data)
   }
 }
@@ -377,6 +375,31 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
     }
     #broadcast(@hp_block)
   }
+
+  foreach(@uuid: @player_data in @players_data) {
+    # 액티브 스킬 저장
+    @skill_manager = @player_data['skill_manager']
+    @selected_methods = json_decode(@skill_manager[4])
+    @selected_combat_method = @selected_methods['combat_method']
+    if(@selected_combat_method != '') {
+      @active_skill = @player_data['active_skill'][@selected_combat_method]
+      _save_active_skill(@uuid, @selected_combat_method, @active_skill)
+    }
+
+    @selected_sowing_method = @selected_methods['sowing_method']
+    if(@selected_sowing_method != '') {
+      @active_skill = @player_data['active_skill'][@selected_sowing_method]
+      _save_active_skill(@uuid, @selected_sowing_method, @active_skill)
+    }
+
+    @selected_harvesting_method = @selected_methods['harvesting_method']
+    if(@selected_harvesting_method != '') {
+      @active_skill = @player_data['active_skill'][@selected_harvesting_method]
+      _save_active_skill(@uuid, @selected_harvesting_method, @active_skill)
+    }
+
+  }
+
 })
 
 bind('kafka_receive', null, null, @event, @reconnectable_players, @players_data, @resourcepack) {

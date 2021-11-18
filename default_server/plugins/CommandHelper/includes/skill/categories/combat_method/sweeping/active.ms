@@ -16,5 +16,7 @@ proc("_apply_active_by_@skill", @player_data, @player, @uuid, @skill, @skill_spe
       'name': 'sweeping_active'
     )
     add_entity_attribute_modifier(@uuid, @modifier)
+    # 액티브 스킬 저장
+    _save_active_skill(@uuid, @skill, @active_skill)
   }
 }

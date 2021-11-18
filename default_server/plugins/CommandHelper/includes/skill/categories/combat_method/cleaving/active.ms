@@ -7,5 +7,7 @@ proc("_apply_active_by_@skill", @player_data, @player, @uuid, @skill, @skill_spe
   if(@active_skill[2] > 0) { // 스킬 횟수 있을시
     @active_skill[2] -= 1 // 스킬 횟소 차감
     @active_skill[1] = @skill_spec['effect_by_point'][@point]['active']['duration']  // 스킬 지속시간 설정
+    # 액티브 스킬 저장
+    _save_active_skill(@uuid, @skill, @active_skill)
   }
 }
