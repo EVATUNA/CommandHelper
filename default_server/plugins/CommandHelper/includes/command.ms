@@ -1354,3 +1354,19 @@ register_command('chreload', array(
     _chreload_command(@command, @player, @args, @text, @players_data)
   }
 ))
+
+
+#proc _tunalevel_command()
+
+register_command('tunalevel', array(
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    @target_name = @args[0]
+    @target_uuid = puuid(@target_name)
+    @player_data = @players_data[@target_uuid]
+    @adding_default_experience = 0
+    @adding_default_experience = integer(@args[1])
+    _add_tune_experience(@target_uuid, @player_data, @adding_default_experience, 0)
+
+  }
+))

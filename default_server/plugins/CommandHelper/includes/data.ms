@@ -2592,30 +2592,13 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
 }
 
 # 작물 성장
-# age가 0일땐 성장하는것 캔슬
-# 
-# 경작지 젖은 정도 변화
-# 젖은 정도가 증가할시, 비또는 천둥이 치면서 하늘이 뚤려 있으며 온도가 높거나 사막 바이옴이 아니여서 비가 내릴 경우에는 젖은 정도를 증가시큼 그렇지 않은 경우엔 캔슬
-#
+# age가 0일때, 경작지가 아닌곳에서 작물이 자랄때 성장하는것 캔슬
 bind('block_grow', null, null, @event) {
   if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
     if(get_blockdata(@event['location'])['age'] > 0) {
-      if((has_storm(@event['location']['world']) || has_thunder(@event['location']['world'])) && @event['location'] == get_highest_block_at(@event['location'])) {
-      
-      } else {
-        @under_location = array('x': @event['location']['x'], 'y': @event['location']['y'] - 1, 'z': @event['location']['z'], 'world': @event['location']['world'])
-        if(get_block(@under_location) == 'FARMLAND') {
-          @data = get_blockdata(@under_location)
-          if(@data['moisture'] > 0) {
-            @data['moisture'] -= rand(1, 3)
-            if(@data['moisture'] < 0) { @data['moisture'] = 0}
-            set_blockdata(@under_location, @data)
-          } else {
-            cancel()
-          }
-        } else {
-          cancel()
-        }
+      @under_location = array('x': @event['location']['x'], 'y': @event['location']['y'] - 1, 'z': @event['location']['z'], 'world': @event['location']['world'])
+      if(get_block(@under_location) != 'FARMLAND') {
+        cancel()
       }
     } else {
       cancel()
@@ -2623,6 +2606,7 @@ bind('block_grow', null, null, @event) {
   }
 }
 
+# 경작지 보호
 bind('block_fade', null, null, @event) {
   if(@event['block'] == 'FARMLAND') {
     @upper_location = array('x': @event['location']['x'], 'y': @event['location']['y'] + 1, 'z': @event['location']['z'], 'world': @event['location']['world'])
@@ -2631,6 +2615,43 @@ bind('block_fade', null, null, @event) {
     }
   }
 }
+
+# 경작지 수분
+bind('mom_moisture_change', null, null, @event) {
+  cancel()
+  @new_moisture = @event['moistureLevelAfter']
+  @old_moisture = @event['moisture']
+  @location = array('x': @event['location'][0], 'y': @event['location'][1], 'z': @event['location'][2], 'world': @event['location'][3])
+  @crop_location = array_deep_clone(@location)
+  @crop_location['y'] += 1
+  @is_drying = true
+  if(@new_moisture == 7) {
+    if((has_storm(@location['world']) || has_thunder(@location['world'])) && get_highest_block_at(@location)['y'] <= @crop_location['y']) {
+      @is_drying = false
+    }
+  }
+  if(@is_drying) {
+    if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), get_block(@crop_location))) {
+      @chance = 0.3
+    } else {
+      @chance = 0.2
+    }
+    if(rand() < @chance) {
+      @new_moisture = @old_moisture - 1
+      if(@new_moisture < 0) {@new_moisture = 0}
+      set_blockdata(@location, array('block': 'farmland', 'moisture': @new_moisture))
+    }
+  } else {
+    @new_moisture = @old_moisture + 1
+    if(@new_moisture > 6) {@new_moisture = 6}
+    set_blockdata(@location, array('block': 'farmland', 'moisture': @new_moisture))
+  }
+}
+
+bind('mom_player_bucket_fill', null, null, @event) {
+  #broadcast(@event)
+}
+
 
 bind('inventory_click', null, null, @event) {
   @player = @event['player']
