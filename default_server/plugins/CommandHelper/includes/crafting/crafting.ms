@@ -1,5 +1,3 @@
-console('EvaCrafting loaded')
-
 ## Crafting Data Load
 @craftings = array()
 foreach(@file in list_files('recipe_tables')) {
@@ -182,6 +180,16 @@ proc _get_modified_item(@entry, @item) {
     @lore = array()
     foreach(@attribute: @amount in @attributes) {
       switch(@attribute) {
+      case 'capacity':
+        @ch_attribute = 'HORSE_JUMP_STRENGTH'
+        @operation = 'ADD_NUMBER'
+        if(is_array(@amount)) {
+          @final_amount = integer(@amount['min'] + rand() * (@amount['max'] - @amount['min']))
+        } else {
+          @final_amount = integer(@amount)
+        }
+        @string_amount = string(@final_amount)
+        @lore[] = "§f\ue451§7 @string_amount 용량"
       case 'mining_power':
         @ch_attribute = 'HORSE_JUMP_STRENGTH'
         @operation = 'ADD_NUMBER'

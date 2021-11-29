@@ -2533,19 +2533,33 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
           for(@i = 0, @i < 20, @i++) {
             queue_push(@closure, 'wartering.'.@time)
           }
-          # 물주기
+          # 물뿌리개 물주기
           for(@x = 0, @x < @range, @x++) {
             for(@z = 0, @z < @range, @z++) {
               @x_offset = @x - integer(@range / 2)
               @z_offset = @z - integer(@range / 2)
               @watering_location = array('x': @location['x'] + @x_offset, 'y': @location['y'], 'z': @location['z'] + @z_offset, 'world': @location['world'])
               if(get_block(@watering_location) == 'FARMLAND') {
+                # 경작지 세팅
                 @blockdata = get_blockdata(@watering_location)
                 @blockdata['moisture'] += rand(@min_power, @max_power + 1)
                 if(@blockdata['moisture'] > 6) { @blockdata['moisture'] = 6 }
                 set_blockdata(@watering_location,@blockdata)
               }
             }
+          }
+          # 아이템 세팅
+          @max_durability = material_info('TURTLE_HELMET', 'maxDurability')
+          @item = @event['item']
+          @max_capacity = integer(@item['meta']['modifiers'][0]['amount'])
+          @capacity = integer((@item['meta']['damage'] - 1) / integer(@max_durability / @max_capacity))
+          if(@capacity < @max_capacity - 1) {
+            @item['meta']['damage'] = integer(@max_durability / @max_capacity * (@capacity + 1) + 1)
+            set_inventory_item(@uuid, pheld_slot(@player), @item)
+          } else {
+            @item['name'] = 'BUCKET'
+            @item['meta']['damage'] = 0
+            set_inventory_item(@uuid, pheld_slot(@player), @item)
           }
         }
         break()
@@ -2632,9 +2646,9 @@ bind('mom_moisture_change', null, null, @event) {
   }
   if(@is_drying) {
     if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), get_block(@crop_location))) {
-      @chance = 0.3
+      @chance = 0.5
     } else {
-      @chance = 0.2
+      @chance = 0.3
     }
     if(rand() < @chance) {
       @new_moisture = @old_moisture - 1
@@ -2648,8 +2662,28 @@ bind('mom_moisture_change', null, null, @event) {
   }
 }
 
+# 물뿌리개 물뜨기
 bind('mom_player_bucket_fill', null, null, @event) {
-  #broadcast(@event)
+  @uuid = @event['who']
+  @player = player(@uuid)
+  @main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
+  @off_hand_item = get_inventory_item(@uuid, 40)
+  if(!is_null(@main_hand_item) && @main_hand_item['name'] == 'BUCKET') {
+    @slot = pheld_slot(@player)
+    @item = @main_hand_item
+  } else if(!is_null(@off_hand_item) && @off_hand_item['name'] == 'BUCKET') {
+    @slot = 40
+    @item = @off_hand_item
+  } else {
+    @slot = null
+    @item = null
+  }
+  if(!is_null(@item) && !is_null(@item['meta']) && @item['meta']['model'] > 0 && @item['meta']['model'] < 5) {
+    cancel()
+    @item['name'] = 'TURTLE_HELMET'
+    @item['meta']['damage'] = 1
+    set_inventory_item(@uuid, @slot, @item)
+  }
 }
 
 
