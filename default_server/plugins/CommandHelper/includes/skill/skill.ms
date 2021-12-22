@@ -1555,12 +1555,13 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
     @mining_power = 0
     # 곡괭이 강도 데이터
     @pickaxes_hardness = array(          # 캘수있는 광물
-      'WOODEN_PICKAXE': 1,   #나무         (석탄)
-      'GOLDEN_PICKAXE': 2,   #돌,금        (석탄, 구리)
-      'STONE_PICKAXE': 3,    #구리         (석탄, 구리, 청금석, 철)
-      'IRON_PICKAXE': 4,     #철           (석탄, 구리, 청금석, 철, 금, 레드스톤, 다이아)
-      'DIAMOND_PICKAXE': 5,  #다이아       (석탄, 구리, 청금석, 철, 금, 레드스톤, 다이아, 고대파편)
-      'NETHERITE_PICKAXE': 6 #네더라이트   (석탄, 구리, 청금석, 철, 금, 레드스톤, 다이아, 고대파편)
+      'WOODEN_PICKAXE': 1,   #나무         (돌)
+      #                      #돌           (돌, 구리)
+      'STONE_PICKAXE': 3,    #구리         (돌, 구리, 철)
+      'IRON_PICKAXE': 4,     #철           (돌, 구리, 철, 금)
+      'GOLDEN_PICKAXE': 5,   #금           (돌, 구리, 철, 금, 다이아)
+      'DIAMOND_PICKAXE': 6,  #다이아       (돌, 구리, 철, 금, 다이아, 고대파편)
+      'NETHERITE_PICKAXE': 7 #네더라이트   (돌, 구리, 철, 금, 다이아, 고대파편)
     )
     if(!is_null(@player_data['item']['main_hand']) && array_contains(array_keys(@pickaxes_hardness), @player_data['item']['main_hand']['name'])) { // 곡괭이로 채굴할시
       # 곡괭이 선언

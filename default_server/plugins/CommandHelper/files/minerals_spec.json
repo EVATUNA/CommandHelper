@@ -23,31 +23,32 @@
       }
     ]
   },
-  "NETHER_QUARTZ_ORE": {
-    "hp": 25,
+  "DEEPSLATE_COAL_ORE": {
+    "hp": 15,
     "hardness": 1,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "default_xp": 1,
+    "extra_xp": 0,
     "skills": {
       "mining": {
         "ore_selecting": {
-          "default_xp": 1.25,
-          "extra_xp": 0.5
+          "default_xp": 1,
+          "extra_xp": 0
         }
       }
     },
     "loot_table": [
       {
         "item": {
-          "name": "QUARTZ"
+          "name": "COAL"
         },
         "weight": 100,
         "quality": 0
       }
     ]
   },
-  "PETRIFIED_OAK_SLAB": {
+
+  "COPPER_ORE": {
     "hp": 40,
     "hardness": 2,
     "default_qty": 1,
@@ -69,14 +70,14 @@
     "loot_table": [
       {
         "item": {
-          "name": "GOLD_NUGGET"
+          "name": "COPPER_INGOT"
         },
         "weight": 100,
         "quality": 0
       },
       {
         "item": {
-          "name": "GOLD_NUGGET",
+          "name": "COPPER_INGOT",
           "meta": {
             "display": "§e중급 구리 주괴",
             "model": 1
@@ -87,7 +88,7 @@
       },
       {
         "item": {
-          "name": "GOLD_NUGGET",
+          "name": "COPPER_INGOT",
           "meta": {
             "display": "§b상급 구리 주괴",
             "model": 2
@@ -98,7 +99,7 @@
       },
       {
         "item": {
-          "name": "GOLD_NUGGET",
+          "name": "COPPER_INGOT",
           "meta": {
             "display": "§d최상급 구리 주괴",
             "model": 3
@@ -109,6 +110,69 @@
       }
     ]
   },
+  "DEEPSLATE_COPPER_ORE": {
+    "hp": 40,
+    "hardness": 2,
+    "default_qty": 1,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "mastery": "copper_mining_mastery",
+    "skills": {
+      "mining": {
+        "copper_mining_mastery": {
+          "default_xp": 1,
+          "extra_xp": 0
+        },
+        "ore_selecting": {
+          "default_xp": 2,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "COPPER_INGOT"
+        },
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "item": {
+          "name": "COPPER_INGOT",
+          "meta": {
+            "display": "§e중급 구리 주괴",
+            "model": 1
+          }
+        },
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "item": {
+          "name": "COPPER_INGOT",
+          "meta": {
+            "display": "§b상급 구리 주괴",
+            "model": 2
+          }
+        },
+        "weight": 5,
+        "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "COPPER_INGOT",
+          "meta": {
+            "display": "§d최상급 구리 주괴",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
+      }
+    ]
+  },
+
   "IRON_ORE": {
     "hp": 70,
     "hardness": 3,
@@ -171,16 +235,21 @@
       }
     ]
   },
-  "LAPIS_ORE": {
-    "hp": 50,
+  "DEEPSLATE_IRON_ORE": {
+    "hp": 70,
     "hardness": 3,
-    "default_qty": 4,
+    "default_qty": 1,
     "default_xp": 0.125,
     "extra_xp": 1.5,
+    "mastery": "iron_mining_mastery",
     "skills": {
       "mining": {
+        "iron_mining_mastery": {
+          "default_xp": 1,
+          "extra_xp": 0
+        },
         "ore_selecting": {
-          "default_xp": 5,
+          "default_xp": 4,
           "extra_xp": 0
         }
       }
@@ -188,14 +257,110 @@
     "loot_table": [
       {
         "item": {
-          "name": "LAPIS_LAZULI"
+          "name": "IRON_INGOT"
         },
         "weight": 100,
         "quality": 0
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§e중급 철괴",
+            "model": 1
+          }
+        },
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§b상급 철괴",
+            "model": 2
+          }
+        },
+        "weight": 5,
+        "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "IRON_INGOT",
+          "meta": {
+            "display": "§d최상급 철괴",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
       }
     ]
   },
+
   "GOLD_ORE": {
+    "hp": 50,
+    "hardness": 4,
+    "default_qty": 1,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "mastery": "gold_mining_mastery",
+    "skills": {
+      "mining": {
+        "gold_mining_mastery": {
+          "default_xp": 1,
+          "extra_xp": 0
+        },
+        "ore_selecting": {
+          "default_xp": 7,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "GOLD_INGOT"
+        },
+        "weight": 100,
+        "quality": 0
+      },
+      {
+        "item": {
+          "name": "GOLD_INGOT",
+          "meta": {
+            "display": "§e중급 금괴",
+            "model": 1
+          }
+        },
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "item": {
+          "name": "GOLD_INGOT",
+          "meta": {
+            "display": "§b상급 금괴",
+            "model": 2
+          }
+        },
+        "weight": 5,
+        "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "GOLD_INGOT",
+          "meta": {
+            "display": "§d최상급 금괴",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
+      }
+    ]
+  },
+  "DEEPSLATE_GOLD_ORE": {
     "hp": 50,
     "hardness": 4,
     "default_qty": 1,
@@ -381,33 +546,10 @@
       }
     ]
   },
-  "REDSTONE_ORE": {
-    "hp": 70,
-    "hardness": 4,
-    "default_qty": 4,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
-    "skills": {
-      "mining": {
-        "ore_selecting": {
-          "default_xp": 5,
-          "extra_xp": 0
-        }
-      }
-    },
-    "loot_table": [
-      {
-        "item": {
-          "name": "REDSTONE"
-        },
-        "weight": 100,
-        "quality": 0
-      }
-    ]
-  },
+
   "DIAMOND_ORE": {
     "hp": 100,
-    "hardness": 4,
+    "hardness": 5,
     "default_qty": 1,
     "default_xp": 0.125,
     "extra_xp": 1.5,
@@ -467,16 +609,21 @@
       }
     ]
   },
-  "EMERALD_ORE": {
+  "DEEPSLATE_DIAMOND_ORE": {
     "hp": 100,
-    "hardness": 4,
+    "hardness": 5,
     "default_qty": 1,
     "default_xp": 0.125,
     "extra_xp": 1.5,
+    "mastery": "diamond_mining_mastery",
     "skills": {
       "mining": {
-        "ore_selecting": {
+        "diamond_mining_mastery": {
           "default_xp": 1,
+          "extra_xp": 0
+        },
+        "ore_selecting": {
+          "default_xp": 15,
           "extra_xp": 0
         }
       }
@@ -484,16 +631,50 @@
     "loot_table": [
       {
         "item": {
-          "name": "EMERALD"
+          "name": "DIAMOND"
         },
         "weight": 100,
         "quality": 0
+      },
+      {
+        "item": {
+          "name": "DIAMOND",
+          "meta": {
+            "display": "§e중급 다이아몬드",
+            "model": 1
+          }
+        },
+        "weight": 20,
+        "quality": 1
+      },
+      {
+        "item": {
+          "name": "DIAMOND",
+          "meta": {
+            "display": "§b상급 다이아몬드",
+            "model": 2
+          }
+        },
+        "weight": 5,
+        "quality": 0.5
+      },
+      {
+        "item": {
+          "name": "DIAMOND",
+          "meta": {
+            "display": "§d최상급 다이아몬드",
+            "model": 3
+          }
+        },
+        "weight": 0.5,
+        "quality": 0.1
       }
     ]
   },
+
   "ANCIENT_DEBRIS": {
     "hp": 200,
-    "hardness": 5,
+    "hardness": 6,
     "default_qty": 1,
     "default_xp": 0.125,
     "extra_xp": 1.5,
@@ -550,6 +731,106 @@
         },
         "weight": 0.5,
         "quality": 0.1
+      }
+    ]
+  },
+
+  "NETHER_QUARTZ_ORE": {
+    "hp": 25,
+    "hardness": 1,
+    "default_qty": 1,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "skills": {
+      "mining": {
+        "ore_selecting": {
+          "default_xp": 1.25,
+          "extra_xp": 0.5
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "QUARTZ"
+        },
+        "weight": 100,
+        "quality": 0
+      }
+    ]
+  },
+
+  "LAPIS_ORE": {
+    "hp": 50,
+    "hardness": 3,
+    "default_qty": 4,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "skills": {
+      "mining": {
+        "ore_selecting": {
+          "default_xp": 5,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "LAPIS_LAZULI"
+        },
+        "weight": 100,
+        "quality": 0
+      }
+    ]
+  },
+
+  "REDSTONE_ORE": {
+    "hp": 70,
+    "hardness": 4,
+    "default_qty": 4,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "skills": {
+      "mining": {
+        "ore_selecting": {
+          "default_xp": 5,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "REDSTONE"
+        },
+        "weight": 100,
+        "quality": 0
+      }
+    ]
+  },
+
+  "EMERALD_ORE": {
+    "hp": 100,
+    "hardness": 4,
+    "default_qty": 1,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "skills": {
+      "mining": {
+        "ore_selecting": {
+          "default_xp": 1,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "EMERALD"
+        },
+        "weight": 100,
+        "quality": 0
       }
     ]
   }
