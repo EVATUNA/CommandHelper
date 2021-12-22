@@ -49,7 +49,7 @@
   },
 
   "COPPER_ORE": {
-    "hp": 40,
+    "hp": 30,
     "hardness": 2,
     "default_qty": 1,
     "default_xp": 0.125,
@@ -111,7 +111,7 @@
     ]
   },
   "DEEPSLATE_COPPER_ORE": {
-    "hp": 40,
+    "hp": 30,
     "hardness": 2,
     "default_qty": 1,
     "default_xp": 0.125,
@@ -174,7 +174,7 @@
   },
 
   "IRON_ORE": {
-    "hp": 70,
+    "hp": 50,
     "hardness": 3,
     "default_qty": 1,
     "default_xp": 0.125,
@@ -236,7 +236,7 @@
     ]
   },
   "DEEPSLATE_IRON_ORE": {
-    "hp": 70,
+    "hp": 50,
     "hardness": 3,
     "default_qty": 1,
     "default_xp": 0.125,
@@ -299,7 +299,7 @@
   },
 
   "GOLD_ORE": {
-    "hp": 50,
+    "hp": 70,
     "hardness": 4,
     "default_qty": 1,
     "default_xp": 0.125,
@@ -361,7 +361,7 @@
     ]
   },
   "DEEPSLATE_GOLD_ORE": {
-    "hp": 50,
+    "hp": 70,
     "hardness": 4,
     "default_qty": 1,
     "default_xp": 0.125,
@@ -423,7 +423,7 @@
     ]
   },
   "NETHER_GOLD_ORE": {
-    "hp": 50,
+    "hp": 70,
     "hardness": 4,
     "default_qty": 1,
     "default_xp": 0.125,
@@ -485,7 +485,7 @@
     ]
   },
   "GILDED_BLACKSTONE": {
-    "hp": 50,
+    "hp": 70,
     "hardness": 4,
     "default_qty": 1,
     "default_xp": 0.125,

@@ -524,17 +524,32 @@ proc _set_indicator(@player, @uuid, @player_data, @indicator_data, @text) {
   case 'COAL_ORE':
     @icon = '\ue4c7'
     break()
-  case 'PETRIFIED_OAK_SLAB':
+  case 'DEEPSLATE_COAL_ORE':
+    @icon = '\ue4d1'
+    break()
+  case 'COPPER_ORE':
     @icon = '\ue4c8'
+    break()
+  case 'DEEPSLATE_COPPER_ORE':
+    @icon = '\ue4d2'
     break()
   case 'IRON_ORE':
     @icon = '\ue4c9'
     break()
+  case 'DEEPSLATE_IRON_ORE':
+    @icon = '\ue4d3'
+    break()
   case 'LAPIS_ORE':
     @icon = '\ue4ca'
     break()
+  case 'DEEPSLATE_LAPIS_ORE':
+    @icon = '\ue4ca'
+    break()
   case 'GOLD_ORE':
-    @icon = '\ue4cb'
+    @icon = '\ue4d4'
+    break()
+  case 'DEEPSLATE_GOLD_ORE':
+    @icon = '\ue4d5'
     break()
   case 'NETHER_QUARTZ_ORE':
     @icon = '\ue4cc'
@@ -545,11 +560,20 @@ proc _set_indicator(@player, @uuid, @player_data, @indicator_data, @text) {
   case 'REDSTONE_ORE':
     @icon = '\ue4cd'
     break()
+  case 'DEEPSLATE_REDSTONE_ORE':
+    @icon = '\ue4d7'
+    break()
   case 'EMERALD_ORE':
     @icon = '\ue4ce'
     break()
+  case 'DEEPSLATE_EMERALD_ORE':
+    @icon = '\ue4d8'
+    break()
   case 'DIAMOND_ORE':
     @icon = '\ue4cf'
+    break()
+  case 'DEEPSLATE_DIAMOND_ORE':
+    @icon = '\ue4d9'
     break()
   case 'ANCIENT_DEBRIS':
     @icon = '\ue4d0'

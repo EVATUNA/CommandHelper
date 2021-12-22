@@ -35,14 +35,14 @@ PRODUCTS: ## 판매 아이템 목록
         sell: 1.0
       detail: NONE
   9:
-    name: GOLD_NUGGET
+    name: COPPER_INGOT
     meta:
       price:
         buy: 1.0
         sell: 1.0
       detail: DISPLAY
   10:
-    name: GOLD_NUGGET
+    name: COPPER_INGOT
     meta:
       display: "§e중급 구리 주괴"
       model: 1
@@ -51,7 +51,7 @@ PRODUCTS: ## 판매 아이템 목록
         sell: 1.0
       detail: DISPLAY
   11:
-    name: GOLD_NUGGET
+    name: COPPER_INGOT
     meta:
       display: "§b상급 구리 주괴"
       model: 2
@@ -60,7 +60,7 @@ PRODUCTS: ## 판매 아이템 목록
         sell: 1.0
       detail: DISPLAY
   12:
-    name: GOLD_NUGGET
+    name: COPPER_INGOT
     meta:
       display: "§d최상급 구리 주괴"
       model: 3

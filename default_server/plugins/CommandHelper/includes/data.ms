@@ -1052,12 +1052,12 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
       # 가죽
       'LEATHER_BOOTS': array('model': 13,'ingredient': 'LEATHER'),
       # 구리
-      'CHAINMAIL_BOOTS': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
-      'STONE_SWORD': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
-      'STONE_SHOVEL': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
-      'STONE_PICKAXE': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
-      'STONE_AXE': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
-      'STONE_HOE': array('model': 11, 'ingredient': 'GOLD_NUGGET'),
+      'CHAINMAIL_BOOTS': array('model': 11, 'ingredient': 'COPPER_INGOT'),
+      'STONE_SWORD': array('model': 11, 'ingredient': 'COPPER_INGOT'),
+      'STONE_SHOVEL': array('model': 11, 'ingredient': 'COPPER_INGOT'),
+      'STONE_PICKAXE': array('model': 11, 'ingredient': 'COPPER_INGOT'),
+      'STONE_AXE': array('model': 11, 'ingredient': 'COPPER_INGOT'),
+      'STONE_HOE': array('model': 11, 'ingredient': 'COPPER_INGOT'),
       # 철
       'IRON_BOOTS': array('model': 11, 'ingredient': 'IRON_INGOT'),
       'IRON_SWORD': array('model': 11, 'ingredient': 'IRON_INGOT'),
