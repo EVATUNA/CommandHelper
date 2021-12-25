@@ -784,6 +784,30 @@
       }
     ]
   },
+  "DEEPSLATE_LAPIS_ORE": {
+    "hp": 50,
+    "hardness": 3,
+    "default_qty": 4,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "skills": {
+      "mining": {
+        "ore_selecting": {
+          "default_xp": 5,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "LAPIS_LAZULI"
+        },
+        "weight": 100,
+        "quality": 0
+      }
+    ]
+  },
 
   "REDSTONE_ORE": {
     "hp": 70,
@@ -809,8 +833,56 @@
       }
     ]
   },
+  "DEEPSLATE_REDSTONE_ORE": {
+    "hp": 70,
+    "hardness": 4,
+    "default_qty": 4,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "skills": {
+      "mining": {
+        "ore_selecting": {
+          "default_xp": 5,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "REDSTONE"
+        },
+        "weight": 100,
+        "quality": 0
+      }
+    ]
+  },
 
   "EMERALD_ORE": {
+    "hp": 100,
+    "hardness": 4,
+    "default_qty": 1,
+    "default_xp": 0.125,
+    "extra_xp": 1.5,
+    "skills": {
+      "mining": {
+        "ore_selecting": {
+          "default_xp": 1,
+          "extra_xp": 0
+        }
+      }
+    },
+    "loot_table": [
+      {
+        "item": {
+          "name": "EMERALD"
+        },
+        "weight": 100,
+        "quality": 0
+      }
+    ]
+  },
+  "DEEPSLATE_EMERALD_ORE": {
     "hp": 100,
     "hardness": 4,
     "default_qty": 1,

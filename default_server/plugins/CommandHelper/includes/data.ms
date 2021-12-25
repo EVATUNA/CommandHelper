@@ -33,6 +33,14 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
   # skill
   _load_skills(@player_data, @player, @uuid, @skills_spec)
   
+  # scoreboard
+  @scoreboard = "ch_scoreboard.@uuid"
+  if(!array_contains(get_scoreboards(), @scoreboard)) { create_scoreboard(@scoreboard) }
+  set_pscoreboard(@player, @scoreboard)
+  
+  # sidebar
+  _load_sidebar(@player, @uuid, @player_data, @scoreboard, @text)
+
   # bossbar
   @bossbars = get_bars()
   ## 참치 레벨
@@ -166,6 +174,55 @@ proc _new_decoration(@uuid, @player_data) {
   )
   cup_set('DECORATION', @uuid, @player_data['decoration'])
 }
+
+proc _load_sidebar(@player, @uuid, @player_data, @scoreboard, @text) {
+  @sidebar = 'sidebar'
+  @is_sidebar_exist = false
+  foreach(@objective in get_objectives(@scoreboard, 'DUMMY')) {
+    if(@objective['name'] == 'sidebar') {
+      @is_sidebar_exist = true
+      break() //나중에 해당 스코어 보드에 여러 오브젝티브 사용시 브레이크 제거 해야함
+    }
+  }
+  if(!@is_sidebar_exist) { create_objective(@sidebar, 'DUMMY', @scoreboard) }
+  @psf = @text['space_fonts']['space.64']
+  @nsf = @text['space_fonts']['space.-82']
+  set_objective_display(@sidebar, array('slot': 'SIDEBAR', 'displayname': @nsf), @scoreboard)
+  set_pscore(@sidebar, @psf.'a'.@nsf, 1, @scoreboard)
+  set_pscore(@sidebar, @psf.'b'.@nsf, 1, @scoreboard)
+  set_pscore(@sidebar, @psf.'c'.@nsf, 1, @scoreboard)
+  set_pscore(@sidebar, @psf.'d'.@nsf, 1, @scoreboard)
+  @channel_tags = array(
+    'general_ko': '§1\ue3f9'.@nsf,
+    'general_en': '§1\ue3fa'.@nsf,
+    'town_ko': '§1\ue3fb'.@nsf,
+    'town_en': '§1\ue3fc'.@nsf,
+    'local_ko': '§1\ue3fd'.@nsf,
+    'local_en': '§1\ue3fe'.@nsf,
+    'admin_ko': '§1\ue3ff'.@nsf,
+    'admin_en': '§1\ue400'.@nsf,
+    'party_ko': '§1\ue401'.@nsf,
+    'party_en': '§1\ue402'.@nsf,
+    'dummy_ko': '§1\ue403'.@nsf,
+    'dummy_en': '§1\ue404'.@nsf,
+  )
+  set_pscore(@sidebar, @channel_tags['general_ko'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['general_en'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['town_ko'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['town_en'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['local_ko'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['local_en'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['admin_ko'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['admin_en'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['party_ko'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['party_en'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['dummy_ko'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['dummy_en'], 0, @scoreboard)
+
+  _update_channel_tag(@player, @uuid, @player_data, @text)
+}
+
+
 
 proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack) {
   @join_spec = array(
@@ -1205,7 +1262,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
     }
     # setting
     @ingredient_name = null
-    @backgroundtext = @text['space_fonts']['space.-8'].'\ue3fc'.@text['space_fonts']['space.-169']
+    @backgroundtext = @text['space_fonts']['space.-8'].'\uec2e'.@text['space_fonts']['space.-169']
     @open_slot = @text['space_fonts']['space.18']
     @close_slot_1 = @text['space_fonts']['space.-1'].'\ue540'
     @close_slot_2 = @text['space_fonts']['space.-1'].'\ue5a0'
@@ -1952,7 +2009,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
               # 사용중으로 설정
               export(@gui_id, @player)
               # gui 세팅
-              @texture_layer = @text['space_fonts']['space.-8'].'§f\ue3fb'.@text['space_fonts']['space.-169']._color('#404040')
+              @texture_layer = @text['space_fonts']['space.-8'].'§f\uec2d'.@text['space_fonts']['space.-169']._color('#404040')
               @message = '마법 작업대'
               @inventory = array()
               for(@index = 0, @index < 27, @index++) {

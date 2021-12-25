@@ -38,6 +38,13 @@ async_read('files/general_emoji.json', closure(@value) {
 # 블럭 피통
 @hp_blocks = array()
 
+# 스코어보드 초기화
+foreach(@scoreboard in get_scoreboards()) {
+  if(string_starts_with(@scoreboard, 'ch_scoreboard.')) {
+    remove_scoreboard(@scoreboard)
+  }
+}
+
 # 광물 스펙
 @minerals_spec = array()
 async_read('files/minerals_spec.json', closure(@value) {
@@ -109,38 +116,77 @@ async_read('files/crops_spec.json', closure(@value) {
   )
 )
 
-### Initial Including Procedure
-## 화면 관련
-# 액션바
-proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
+# 사이드바 업데이트
+proc _update_channel_tag(@player, @uuid, @player_data, @text) {
+  @scoreboard = "ch_scoreboard.@uuid"
+  @sidebar = 'sidebar'
+  @psf = @text['space_fonts']['space.64']
+  @nsf = @text['space_fonts']['space.-82']
+  @channel_tags = array(
+    'general_ko': '§1\ue3f9'.@nsf,
+    'general_en': '§1\ue3fa'.@nsf,
+    'town_ko': '§1\ue3fb'.@nsf,
+    'town_en': '§1\ue3fc'.@nsf,
+    'local_ko': '§1\ue3fd'.@nsf,
+    'local_en': '§1\ue3fe'.@nsf,
+    'admin_ko': '§1\ue3ff'.@nsf,
+    'admin_en': '§1\ue400'.@nsf,
+    'party_ko': '§1\ue401'.@nsf,
+    'party_en': '§1\ue402'.@nsf,
+    'dummy_ko': '§1\ue403'.@nsf,
+    'dummy_en': '§1\ue404'.@nsf,
+  )
   switch(@player_data['chat'][1]) {
   case true:
     switch(@player_data['chat'][0]) {
     case 'general':
-      @channel = '\ue3fd'
+      @channel_tag = 'general_ko'
     case 'town':
-      @channel = '\ue3ff'
+      @channel_tag = 'town_ko'
     case 'local':
-      @channel = '\ue401'
+      @channel_tag = 'local_ko'
     case 'admin':
-      @channel = '\ue403'
+      @channel_tag = 'admin_ko'
+    case 'party':
+      @channel_tag = 'party_ko'
     default:
-      @channel = '\ue3fd'
+      @channel_tag = 'general_ko'
     }
   case false:
   switch(@player_data['chat'][0]) {
     case 'general':
-      @channel = '\ue3fe'
+      @channel_tag = 'general_en'
     case 'town':
-      @channel = '\ue400'
+      @channel_tag = 'town_en'
     case 'local':
-      @channel = '\ue402'
+      @channel_tag = 'local_en'
     case 'admin':
-      @channel = '\ue404'
+      @channel_tag = 'admin_en'
+    case 'party':
+      @channel_tag = 'party_en'
     default:
-      @channel = '\ue3fe'
+      @channel_tag = 'general_en'
     }
   }
+  set_pscore(@sidebar, @channel_tags['general_ko'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['general_en'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['town_ko'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['town_en'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['local_ko'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['local_en'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['admin_ko'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['admin_en'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['party_ko'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['party_en'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['dummy_ko'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags['dummy_en'], 0, @scoreboard)
+  set_pscore(@sidebar, @channel_tags[@channel_tag], 2, @scoreboard)
+}
+
+### Initial Including Procedure
+## 화면 관련
+# 액션바
+proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
   # 스킬 매니징
   @skill_manager = @player_data['skill_manager']
   @selected_methods = json_decode(@skill_manager[4])
@@ -427,25 +473,9 @@ proc _send_action_msg(@player, @player_data, @skills_spec, @text) {
     @right_hotbar = @text['space_fonts']['space.23']
     @right_icon = @text['space_fonts']['space.17']
   }
-  @left_surface = '§c\ue3f8§r'.@text['space_fonts']['space.-8'].'\ue006'.@text['space_fonts']['space.-8'].'\ue007'.@text['space_fonts']['space.-1']
-  @right_surface = '§c\ue3f8§r'.@text['space_fonts']['space.-2']
-  @resolution = @player_data['setting'][0]
-  if(@resolution % 2 == 0) {
-    @left_resolution = integer(@resolution / 2)
-    @right_resolution = integer(@resolution / 2)
-  } else {
-    @left_resolution = integer(@resolution / 2)
-    @right_resolution = integer(@resolution / 2 + 1)
-  }
-  @left_quota = integer(@left_resolution / 1024)
-  @right_quota = integer(@right_resolution / 1024)
-  @left_rest = @left_resolution % 1024
-  @right_rest = @right_resolution % 1024
-  @left_void = string_multiply(@text['space_fonts']['space.1024'], @left_quota).@text['space_fonts']['space.'.@left_rest]
-  @right_void = string_multiply(@text['space_fonts']['space.1024'], @right_quota).@text['space_fonts']['space.'.@right_rest]
-  @chat_hud = @text['space_fonts']['space.2'].@channel.@text['space_fonts']['space.-67']
-  @skill_hud = @text['space_fonts']['space.-118'].@text['space_fonts']['space.-2'].@left_hotbar.@text['space_fonts']['space.-20'].@left_icon.@text['space_fonts']['space.198'].@right_hotbar.@text['space_fonts']['space.-20'].@right_icon.@text['space_fonts']['space.-118']
-  action_msg(@player, @left_surface.@chat_hud.@left_void.@skill_hud.@right_void.@right_surface)
+
+  @skill_hud = @text['space_fonts']['space.-2'].@left_hotbar.@text['space_fonts']['space.-20'].@left_icon.@text['space_fonts']['space.198'].@right_hotbar.@text['space_fonts']['space.-20'].@right_icon
+  action_msg(@player, @skill_hud)
 }
 
 # 팁 메시지 보여주기
