@@ -1,0 +1,156 @@
+{
+	"recipe": {
+		"key": "chainmail_boots",
+		"type": "SHAPED",
+		"result": {
+			"name": "CHAINMAIL_BOOTS",
+			"meta": {
+				"display": "§f구리 흉갑",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+		"shape": [
+			"O O",
+			"OOO",
+			"OOO"
+		],
+		"ingredients": {
+			"O": "COPPER_INGOT"
+		},
+		"ingredients_weight": {
+			"COPPER_INGOT": 1
+		}
+	},
+	"pool": {
+		"type": "entries_by_crafting_rank",
+		"entries": [
+			{
+				"type": "rank",
+				"weight": 5,
+				"display": "부서질듯한 구리 흉갑",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 5.0,
+						"max": 6.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 10,
+				"display": "의미를 알 수 없는 구리 흉갑",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 6.0,
+						"max": 7.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 10,
+				"display": "제 기능을 하기 힘든 구리 흉갑",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 7.0,
+						"max": 8.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 25,
+				"display": "무딘 구리 흉갑",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 8.0,
+						"max": 9.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 35,
+				"display": "무난한 구리 흉갑",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 9.0,
+						"max": 10.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 30,
+				"quality": 0,
+				"display": "평범한 구리 흉갑",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 10.0,
+						"max": 11.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 30,
+				"quality": 0,
+				"display": "쓸만한 구리 흉갑",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 11.0,
+						"max": 12.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 30,
+				"display": "잘 만들어진 구리 흉갑",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 12.0,
+						"max": 13.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 20,
+				"display": "예사롭지 않은 구리 흉갑",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 13.0,
+						"max": 14.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 1,
+				"display": "전설적인 구리 흉갑",
+				"model": 0,
+				"broadcast": true,
+				"attributes": {
+					"armor": 15
+				}
+			}
+		]
+	}
+}

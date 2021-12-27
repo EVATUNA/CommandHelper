@@ -1,0 +1,77 @@
+{
+	"recipe": {
+		"key": "golden_watering_can",
+		"type": "SHAPED",
+		"result": {
+			"name": "BUCKET",
+			"meta": {
+				"display": "§f금 물뿌리개",
+				"model": 2,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+		"shape": [
+			"I I",
+			" I "
+		],
+		"ingredients": {
+			"I": "GOLD_INGOT"
+		},
+		"ingredients_weight": {
+			"GOLD_INGOT": 1
+		}
+	},
+	"pool": {
+		"type": "entries_by_crafting_rank",
+		"entries": [
+			{
+				"type": "rank",
+				"weight": 5,
+				"display": "제 기능을 하기 힘든 금 물뿌리개",
+				"model": 2,
+				"attributes": {
+					"capacity": {
+						"min": 1,
+						"max": 7
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 20,
+				"display": "평범한 금 물뿌리개",
+				"model": 2,
+				"attributes": {
+					"capacity": {
+						"min": 7,
+						"max": 15
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 20,
+				"display": "쓸만한 금 물뿌리개",
+				"model": 2,
+				"attributes": {
+					"capacity": {
+						"min": 15,
+						"max": 20
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 5,
+				"display": "전설적인 금 물뿌리개",
+				"model": 2,
+				"attributes": {
+					"capacity": 20
+				}
+			}
+		]
+	}
+}

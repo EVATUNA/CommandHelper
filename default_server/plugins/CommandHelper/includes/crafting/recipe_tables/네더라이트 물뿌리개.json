@@ -1,0 +1,77 @@
+{
+	"recipe": {
+		"key": "netherite_watering_can",
+		"type": "SHAPED",
+		"result": {
+			"name": "BUCKET",
+			"meta": {
+				"display": "§f네더라이트 물뿌리개",
+				"model": 4,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+		"shape": [
+			"I I",
+			" I "
+		],
+		"ingredients": {
+			"I": "NETHERITE_INGOT"
+		},
+		"ingredients_weight": {
+			"NETHERITE_INGOT": 1
+		}
+	},
+	"pool": {
+		"type": "entries_by_crafting_rank",
+		"entries": [
+			{
+				"type": "rank",
+				"weight": 5,
+				"display": "제 기능을 하기 힘든 네더라이트 물뿌리개",
+				"model": 4,
+				"attributes": {
+					"capacity": {
+						"min": 1,
+						"max": 7
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 20,
+				"display": "평범한 네더라이트 물뿌리개",
+				"model": 4,
+				"attributes": {
+					"capacity": {
+						"min": 7,
+						"max": 15
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 20,
+				"display": "쓸만한 네더라이트 물뿌리개",
+				"model": 4,
+				"attributes": {
+					"capacity": {
+						"min": 15,
+						"max": 20
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 5,
+				"display": "전설적인 네더라이트 물뿌리개",
+				"model": 4,
+				"attributes": {
+					"capacity": 20
+				}
+			}
+		]
+	}
+}

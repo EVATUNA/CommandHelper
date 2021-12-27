@@ -2123,7 +2123,7 @@ proc _farmland_cultivate_event(@event, @player, @uuid, @players_data, @hp_blocks
             } else {
               @items = array('main_hand': @item)
             }
-            _update_item(@player, @uuid, @items, @players_data, @skills_spec, @text)
+            _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text)
           }
         } else {
           @hp = 0

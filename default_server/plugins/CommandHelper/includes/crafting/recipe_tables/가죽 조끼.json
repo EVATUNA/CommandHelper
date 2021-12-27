@@ -1,0 +1,152 @@
+{
+	"recipe": {
+		"key": "leather_boots",
+		"type": "SHAPED",
+		"result": {
+			"name": "LEATHER_BOOTS",
+			"meta": {
+				"display": "§f가죽 조끼",
+				"model": 0,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+		"shape": [
+			"O O",
+			"OOO",
+			"OOO"
+		],
+		"ingredients": {
+			"O": "LEATHER"
+		},
+		"ingredients_weight": {
+		}
+	},
+	"pool": {
+		"type": "entries_by_crafting_rank",
+		"entries": [
+			{
+				"type": "rank",
+				"weight": 5,
+				"display": "부서질듯한 가죽 조끼",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 0.0,
+						"max": 1.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 10,
+				"display": "의미를 알 수 없는 가죽 조끼",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 1.0,
+						"max": 2.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 10,
+				"display": "제 기능을 하기 힘든 가죽 조끼",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 2.0,
+						"max": 3.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 25,
+				"display": "무딘 가죽 조끼",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 3.0,
+						"max": 4.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 35,
+				"display": "무난한 가죽 조끼",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 4.0,
+						"max": 5.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 30,
+				"quality": 0,
+				"display": "평범한 가죽 조끼",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 5.0,
+						"max": 6.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 30,
+				"quality": 0,
+				"display": "쓸만한 가죽 조끼",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 6.0,
+						"max": 7.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 30,
+				"display": "잘 만들어진 가죽 조끼",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 7.0,
+						"max": 8.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 20,
+				"display": "예사롭지 않은 가죽 조끼",
+				"model": 0,
+				"attributes": {
+					"armor": {
+						"min": 8.0,
+						"max": 9.0
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 1,
+				"display": "전설적인 가죽 조끼",
+				"model": 0,
+				"broadcast": true,
+				"attributes": {
+					"armor": 10.0
+				}
+			}
+		]
+	}
+}

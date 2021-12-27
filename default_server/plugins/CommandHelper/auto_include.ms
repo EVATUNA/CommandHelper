@@ -123,18 +123,18 @@ proc _update_channel_tag(@player, @uuid, @player_data, @text) {
   @psf = @text['space_fonts']['space.64']
   @nsf = @text['space_fonts']['space.-82']
   @channel_tags = array(
-    'general_ko': '§1\ue3f9'.@nsf,
-    'general_en': '§1\ue3fa'.@nsf,
-    'town_ko': '§1\ue3fb'.@nsf,
-    'town_en': '§1\ue3fc'.@nsf,
-    'local_ko': '§1\ue3fd'.@nsf,
-    'local_en': '§1\ue3fe'.@nsf,
-    'admin_ko': '§1\ue3ff'.@nsf,
-    'admin_en': '§1\ue400'.@nsf,
-    'party_ko': '§1\ue401'.@nsf,
-    'party_en': '§1\ue402'.@nsf,
-    'dummy_ko': '§1\ue403'.@nsf,
-    'dummy_en': '§1\ue404'.@nsf,
+    'general_en': '§1\ue3f9'.@nsf,
+    'general_ko': '§1\ue3fa'.@nsf,
+    'town_en': '§1\ue3fb'.@nsf,
+    'town_ko': '§1\ue3fc'.@nsf,
+    'local_en': '§1\ue3fd'.@nsf,
+    'local_ko': '§1\ue3fe'.@nsf,
+    'admin_en': '§1\ue3ff'.@nsf,
+    'admin_ko': '§1\ue400'.@nsf,
+    'party_en': '§1\ue401'.@nsf,
+    'party_ko': '§1\ue402'.@nsf,
+    'dummy_en': '§1\ue403'.@nsf,
+    'dummy_ko': '§1\ue404'.@nsf,
   )
   switch(@player_data['chat'][1]) {
   case true:

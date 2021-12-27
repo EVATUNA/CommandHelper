@@ -460,6 +460,7 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
 })
 
 bind('kafka_receive', null, null, @event, @reconnectable_players, @players_data, @resourcepack) {
+  //broadcast(@event['key'])
   switch(@event['key']) {
   case 'ch.inform_player_quit':
     @uuid = @event['value']

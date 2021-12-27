@@ -5,28 +5,6 @@
     "default_xp": 0.125,
     "extra_xp": 1.5,
     "mastery": "wheat_farming_mastery",
-    "skills": {
-      "farming": {
-        "wheat_farming_mastery": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "plenty": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      },
-      "harvesting_method": {
-        "wide_hand": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "golden_finger": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -65,28 +43,6 @@
     "default_xp": -0.25,
     "extra_xp": 1,
     "mastery": "beetroot_farming_mastery",
-    "skills": {
-      "farming": {
-        "beetroot_farming_mastery": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "plenty": {
-          "default_xp": -0.5,
-          "extra_xp": 1.75
-        }
-      },
-      "harvesting_method": {
-        "wide_hand": {
-          "default_xp": -0.5,
-          "extra_xp": 1.75
-        },
-        "golden_finger": {
-          "default_xp": -0.5,
-          "extra_xp": 1.75
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -125,28 +81,6 @@
     "default_xp": 0.125,
     "extra_xp": 1.5,
     "mastery": "potato_farming_mastery",
-    "skills": {
-      "farming": {
-        "potato_farming_mastery": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "plenty": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      },
-      "harvesting_method": {
-        "wide_hand": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "golden_finger": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -185,28 +119,6 @@
     "default_xp": 0.125,
     "extra_xp": 1.5,
     "mastery": "carrot_farming_mastery",
-    "skills": {
-      "farming": {
-        "carrot_farming_mastery": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "plenty": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      },
-      "harvesting_method": {
-        "wide_hand": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "golden_finger": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -245,28 +157,6 @@
     "default_xp": -0.25,
     "extra_xp": 1,
     "mastery": "berries_farming_mastery",
-    "skills": {
-      "farming": {
-        "berries_farming_mastery": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "plenty": {
-          "default_xp": -0.5,
-          "extra_xp": 1.75
-        }
-      },
-      "harvesting_method": {
-        "wide_hand": {
-          "default_xp": -0.5,
-          "extra_xp": 1.75
-        },
-        "golden_finger": {
-          "default_xp": -0.5,
-          "extra_xp": 1.75
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -305,28 +195,6 @@
     "default_xp": 0.125,
     "extra_xp": 1.5,
     "mastery": "pumpkin_farming_mastery",
-    "skills": {
-      "farming": {
-        "pumpkin_farming_mastery": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "plenty": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      },
-      "harvesting_method": {
-        "wide_hand": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "golden_finger": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -365,28 +233,6 @@
     "default_xp": 0.125,
     "extra_xp": 1.5,
     "mastery": "melon_farming_mastery",
-    "skills": {
-      "farming": {
-        "melon_farming_mastery": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "plenty": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      },
-      "harvesting_method": {
-        "wide_hand": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        },
-        "golden_finger": {
-          "default_xp": -0.5,
-          "extra_xp": 2
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
