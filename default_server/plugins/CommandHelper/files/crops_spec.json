@@ -2,8 +2,14 @@
   "WHEAT": {
     "max_age": 7,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.125,
+      "extra": 1.5
+    },
+    "arcanelevel": {
+      "default": 0.125,
+      "extra": 1.5
+    },
     "mastery": "wheat_farming_mastery",
     "loot_table": [
       {
@@ -40,8 +46,14 @@
   "BEETROOTS": {
     "max_age": 3,
     "default_qty": 1,
-    "default_xp": -0.25,
-    "extra_xp": 1,
+    "tunalevel": {
+      "default": -0.25,
+      "extra": 1
+    },
+    "arcanelevel": {
+      "default": -0.25,
+      "extra": 1
+    },
     "mastery": "beetroot_farming_mastery",
     "loot_table": [
       {
@@ -78,8 +90,14 @@
   "POTATOES": {
     "max_age": 7,
     "default_qty": 3,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.125,
+      "extra": 1.5
+    },
+    "arcanelevel": {
+      "default": 0.125,
+      "extra": 1.5
+    },
     "mastery": "potato_farming_mastery",
     "loot_table": [
       {
@@ -116,8 +134,14 @@
   "CARROTS": {
     "max_age": 7,
     "default_qty": 3,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.125,
+      "extra": 1.5
+    },
+    "arcanelevel": {
+      "default": 0.125,
+      "extra": 1.5
+    },
     "mastery": "carrot_farming_mastery",
     "loot_table": [
       {
@@ -154,8 +178,14 @@
   "SWEET_BERRY_BUSH": {
     "max_age": 3,
     "default_qty": 2,
-    "default_xp": -0.25,
-    "extra_xp": 1,
+    "tunalevel": {
+      "default": -0.25,
+      "extra": 1
+    },
+    "arcanelevel": {
+      "default": -0.25,
+      "extra": 1
+    },
     "mastery": "berries_farming_mastery",
     "loot_table": [
       {
@@ -192,8 +222,14 @@
   "PUMPKIN": {
     "stem": "ATTACHED_PUMPKIN_STEM",
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.125,
+      "extra": 1.5
+    },
+    "arcanelevel": {
+      "default": 0.125,
+      "extra": 1.5
+    },
     "mastery": "pumpkin_farming_mastery",
     "loot_table": [
       {
@@ -230,8 +266,14 @@
   "MELON": {
     "stem": "ATTACHED_MELON_STEM",
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.125,
+      "extra": 1.5
+    },
+    "arcanelevel": {
+      "default": 0.125,
+      "extra": 1.5
+    },
     "mastery": "melon_farming_mastery",
     "loot_table": [
       {

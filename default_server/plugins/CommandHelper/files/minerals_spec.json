@@ -3,8 +3,14 @@
     "hp": 15,
     "hardness": 1,
     "default_qty": 1,
-    "default_xp": 1,
-    "extra_xp": 0,
+    "tunalevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
+    "arcanelevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
     "skills": {
       "mining": {
         "ore_selecting": {
@@ -27,8 +33,14 @@
     "hp": 15,
     "hardness": 1,
     "default_qty": 1,
-    "default_xp": 1,
-    "extra_xp": 0,
+    "tunalevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
+    "arcanelevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
     "skills": {
       "mining": {
         "ore_selecting": {
@@ -52,8 +64,14 @@
     "hp": 30,
     "hardness": 2,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.125,
+      "extra": 1.5
+    },
+    "arcanelevel": {
+      "default": 0.125,
+      "extra": 1.5
+    },
     "mastery": "copper_mining_mastery",
     "skills": {
       "mining": {
@@ -114,8 +132,14 @@
     "hp": 30,
     "hardness": 2,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.125,
+      "extra": 1.5
+    },
+    "arcanelevel": {
+      "default": 0.125,
+      "extra": 1.5
+    },
     "mastery": "copper_mining_mastery",
     "skills": {
       "mining": {
@@ -177,8 +201,14 @@
     "hp": 50,
     "hardness": 3,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.25,
+      "extra": 1.75
+    },
+    "arcanelevel": {
+      "default": 0.25,
+      "extra": 1.75
+    },
     "mastery": "iron_mining_mastery",
     "skills": {
       "mining": {
@@ -239,8 +269,14 @@
     "hp": 50,
     "hardness": 3,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.25,
+      "extra": 1.75
+    },
+    "arcanelevel": {
+      "default": 0.25,
+      "extra": 1.75
+    },
     "mastery": "iron_mining_mastery",
     "skills": {
       "mining": {
@@ -302,8 +338,14 @@
     "hp": 70,
     "hardness": 4,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.75,
+      "extra": 2.0
+    },
+    "arcanelevel": {
+      "default": 0.75,
+      "extra": 2.0
+    },
     "mastery": "gold_mining_mastery",
     "skills": {
       "mining": {
@@ -364,8 +406,14 @@
     "hp": 70,
     "hardness": 4,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.75,
+      "extra": 2.0
+    },
+    "arcanelevel": {
+      "default": 0.75,
+      "extra": 2.0
+    },
     "mastery": "gold_mining_mastery",
     "skills": {
       "mining": {
@@ -426,8 +474,14 @@
     "hp": 70,
     "hardness": 4,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.75,
+      "extra": 2.0
+    },
+    "arcanelevel": {
+      "default": 0.75,
+      "extra": 2.0
+    },
     "mastery": "gold_mining_mastery",
     "skills": {
       "mining": {
@@ -488,8 +542,14 @@
     "hp": 70,
     "hardness": 4,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.75,
+      "extra": 2.0
+    },
+    "arcanelevel": {
+      "default": 0.75,
+      "extra": 2.0
+    },
     "mastery": "gold_mining_mastery",
     "skills": {
       "mining": {
@@ -551,8 +611,14 @@
     "hp": 100,
     "hardness": 5,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 1.0,
+      "extra": 2.75
+    },
+    "arcanelevel": {
+      "default": 1.0,
+      "extra": 2.75
+    },
     "mastery": "diamond_mining_mastery",
     "skills": {
       "mining": {
@@ -613,8 +679,14 @@
     "hp": 100,
     "hardness": 5,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 1.0,
+      "extra": 2.75
+    },
+    "arcanelevel": {
+      "default": 1.0,
+      "extra": 2.75
+    },
     "mastery": "diamond_mining_mastery",
     "skills": {
       "mining": {
@@ -676,8 +748,14 @@
     "hp": 200,
     "hardness": 6,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 2.5,
+      "extra": 3.75
+    },
+    "arcanelevel": {
+      "default": 2.5,
+      "extra": 3.75
+    },
     "mastery": "ancient_debris_mining_mastery",
     "skills": {
       "mining": {
@@ -739,8 +817,14 @@
     "hp": 25,
     "hardness": 1,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
+    "arcanelevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
     "skills": {
       "mining": {
         "ore_selecting": {
@@ -764,8 +848,14 @@
     "hp": 50,
     "hardness": 3,
     "default_qty": 4,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
+    "arcanelevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
     "skills": {
       "mining": {
         "ore_selecting": {
@@ -788,8 +878,14 @@
     "hp": 50,
     "hardness": 3,
     "default_qty": 4,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
+    "arcanelevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
     "skills": {
       "mining": {
         "ore_selecting": {
@@ -813,8 +909,14 @@
     "hp": 70,
     "hardness": 4,
     "default_qty": 4,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
+    "arcanelevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
     "skills": {
       "mining": {
         "ore_selecting": {
@@ -837,8 +939,14 @@
     "hp": 70,
     "hardness": 4,
     "default_qty": 4,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
+    "arcanelevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
     "skills": {
       "mining": {
         "ore_selecting": {
@@ -862,8 +970,14 @@
     "hp": 100,
     "hardness": 4,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
+    "arcanelevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
     "skills": {
       "mining": {
         "ore_selecting": {
@@ -886,8 +1000,14 @@
     "hp": 100,
     "hardness": 4,
     "default_qty": 1,
-    "default_xp": 0.125,
-    "extra_xp": 1.5,
+    "tunalevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
+    "arcanelevel": {
+      "default": 0.1,
+      "extra": 0.5
+    },
     "skills": {
       "mining": {
         "ore_selecting": {

@@ -1736,15 +1736,16 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
         }
         # 경험치 드랍
         if(@player_data['item']['enchantments']['main_hand'] == '경험') {
-          @xp = integer(round((@mineral_spec['default_xp'] + rand() * @mineral_spec['extra_xp']) * 2))
+          @xp = integer(round((@mineral_spec['arcanelevel']['default'] + rand() * @mineral_spec['arcanelevel']['extra']) * 2))
         } else {
-          @xp = integer(round(@mineral_spec['default_xp'] + rand() * @mineral_spec['extra_xp']))
+          @xp = integer(round(@mineral_spec['arcanelevel']['default'] + rand() * @mineral_spec['arcanelevel']['extra']))
         }
         if(@xp > 0) {
           spawn_entity('EXPERIENCE_ORB', 1, @location, closure(@euuid) {
             set_entity_spec(@euuid, array('amount': @xp))
           })
         }
+        _add_tune_experience(@uuid, @player_data, @mineral_spec['tunalevel']['default'], @mineral_spec['tunalevel']['extra'])
         # 아이템, 경험치 수동으로 떨구기 때문에 모디피 이벤트로 이벤트 결과 수정
         modify_event('drops', array())
         modify_event('xp', 0)
@@ -1779,7 +1780,7 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
     modify_event('drops', array())
   }
 }
-  
+
 proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skills_spec, @text) {
   @player_data = @players_data[@uuid]
   @skill_manager = @player_data['skill_manager']
@@ -1865,15 +1866,16 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
             }
             # 경험치 드랍
             if(@player_data['item']['enchantments']['main_hand'] == '경험') {
-              @xp = integer(round((@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']) * 2))
+              @xp = integer(round((@crop_spec['arcanelevel']['default'] + rand() * @crop_spec['arcanelevel']['extra']) * 2))
             } else {
-              @xp = integer(round(@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']))
+              @xp = integer(round(@crop_spec['arcanelevel']['default'] + rand() * @crop_spec['arcanelevel']['extra']))
             }
             if(@xp > 0) {
               spawn_entity('EXPERIENCE_ORB', 1, @center_location, closure(@euuid) {
                 set_entity_spec(@euuid, array('amount': @xp))
               })
             }
+            _add_tune_experience(@uuid, @player_data, @crop_spec['tunalevel']['default'], @crop_spec['tunalevel']['extra'])
           }
         })
         # 아이템, 경험치 수동으로 떨구기 때문에 모디피 이벤트로 이벤트 결과 수정
@@ -1999,15 +2001,16 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
               }
               # 경험치 드랍
               if(@player_data['item']['enchantments']['main_hand'] == '경험') {
-                @xp = integer(round((@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']) * 2))
+                @xp = integer(round((@crop_spec['arcanelevel']['default'] + rand() * @crop_spec['arcanelevel']['extra']) * 2))
               } else {
-                @xp = integer(round(@crop_spec['default_xp'] + rand() * @crop_spec['extra_xp']))
+                @xp = integer(round(@crop_spec['arcanelevel']['default'] + rand() * @crop_spec['arcanelevel']['extra']))
               }
               if(@xp > 0) {
                 spawn_entity('EXPERIENCE_ORB', 1, @location, closure(@euuid) {
                   set_entity_spec(@euuid, array('amount': @xp))
                 })
               }
+              _add_tune_experience(@uuid, @player_data, @crop_spec['tunalevel']['default'], @crop_spec['tunalevel']['extra'])
             }
             # 내구도 깍기 및 다 부셔지면 아이템 없애기
             if(@max_durability > @damage) {
