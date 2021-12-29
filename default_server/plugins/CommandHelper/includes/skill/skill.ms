@@ -93,7 +93,7 @@ proc _set_tuna_level(@uuid, @player_data, @tuna_level_data) {
   _set_skill_manager(@uuid, @skill_manager)
 }
 # 튜나 레벨 경험치 추가
-proc _add_tune_experience(@uuid, @player_data, @adding_default_experience, @adding_extra_experience) {
+proc _add_tunalevel_experience(@uuid, @player_data, @adding_default_experience, @adding_extra_experience) {
   @tuna_level_data = _get_tuna_level_data(@player_data)
   @level = @tuna_level_data['level']
   # 레벨에 따른 맥스 경험치 구하기
@@ -124,6 +124,15 @@ proc _add_tune_experience(@uuid, @player_data, @adding_default_experience, @addi
     )
     update_bar(@tunalevel_id, @tunalevel_bossbar_data)
   }
+}
+# 바닐라 경험치 주기
+proc _add_arcanelevel_experience(@location, @adding_default_experience, @adding_extra_experience) {
+  @xp = integer(round(@adding_default_experience + rand() * @adding_extra_experience))
+    if(@xp > 0) {
+      spawn_entity('EXPERIENCE_ORB', 1, @location, closure(@euuid) {
+        set_entity_spec(@euuid, array('amount': @xp))
+      })
+    }
 }
 
 ## 스킬 데이터 (현재 포인트, 맥스 포인트)
@@ -1736,16 +1745,13 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
         }
         # 경험치 드랍
         if(@player_data['item']['enchantments']['main_hand'] == '경험') {
-          @xp = integer(round((@mineral_spec['arcanelevel']['default'] + rand() * @mineral_spec['arcanelevel']['extra']) * 2))
+          _add_arcanelevel_experience(@location, @mineral_spec['arcanelevel']['default'], @mineral_spec['arcanelevel']['extra'])
+          _add_arcanelevel_experience(@location, @mineral_spec['arcanelevel']['default'], @mineral_spec['arcanelevel']['extra'])
         } else {
-          @xp = integer(round(@mineral_spec['arcanelevel']['default'] + rand() * @mineral_spec['arcanelevel']['extra']))
+          _add_arcanelevel_experience(@location, @mineral_spec['arcanelevel']['default'], @mineral_spec['arcanelevel']['extra'])
         }
-        if(@xp > 0) {
-          spawn_entity('EXPERIENCE_ORB', 1, @location, closure(@euuid) {
-            set_entity_spec(@euuid, array('amount': @xp))
-          })
-        }
-        _add_tune_experience(@uuid, @player_data, @mineral_spec['tunalevel']['default'], @mineral_spec['tunalevel']['extra'])
+        # 튜나레벨
+        _add_tunalevel_experience(@uuid, @player_data, @mineral_spec['tunalevel']['default'], @mineral_spec['tunalevel']['extra'])
         # 아이템, 경험치 수동으로 떨구기 때문에 모디피 이벤트로 이벤트 결과 수정
         modify_event('drops', array())
         modify_event('xp', 0)
@@ -1866,16 +1872,13 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
             }
             # 경험치 드랍
             if(@player_data['item']['enchantments']['main_hand'] == '경험') {
-              @xp = integer(round((@crop_spec['arcanelevel']['default'] + rand() * @crop_spec['arcanelevel']['extra']) * 2))
+              _add_arcanelevel_experience(@center_location, @crop_spec['arcanelevel']['default'], @crop_spec['arcanelevel']['extra'])
+              _add_arcanelevel_experience(@center_location, @crop_spec['arcanelevel']['default'], @crop_spec['arcanelevel']['extra'])
             } else {
-              @xp = integer(round(@crop_spec['arcanelevel']['default'] + rand() * @crop_spec['arcanelevel']['extra']))
+              _add_arcanelevel_experience(@center_location, @crop_spec['arcanelevel']['default'], @crop_spec['arcanelevel']['extra'])
             }
-            if(@xp > 0) {
-              spawn_entity('EXPERIENCE_ORB', 1, @center_location, closure(@euuid) {
-                set_entity_spec(@euuid, array('amount': @xp))
-              })
-            }
-            _add_tune_experience(@uuid, @player_data, @crop_spec['tunalevel']['default'], @crop_spec['tunalevel']['extra'])
+            # 튜나레벨
+            _add_tunalevel_experience(@uuid, @player_data, @crop_spec['tunalevel']['default'], @crop_spec['tunalevel']['extra'])
           }
         })
         # 아이템, 경험치 수동으로 떨구기 때문에 모디피 이벤트로 이벤트 결과 수정
@@ -2001,16 +2004,13 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crops_spec, @skill
               }
               # 경험치 드랍
               if(@player_data['item']['enchantments']['main_hand'] == '경험') {
-                @xp = integer(round((@crop_spec['arcanelevel']['default'] + rand() * @crop_spec['arcanelevel']['extra']) * 2))
+                _add_arcanelevel_experience(@location, @crop_spec['arcanelevel']['default'], @crop_spec['arcanelevel']['extra'])
+                _add_arcanelevel_experience(@location, @crop_spec['arcanelevel']['default'], @crop_spec['arcanelevel']['extra'])
               } else {
-                @xp = integer(round(@crop_spec['arcanelevel']['default'] + rand() * @crop_spec['arcanelevel']['extra']))
+                _add_arcanelevel_experience(@location, @crop_spec['arcanelevel']['default'], @crop_spec['arcanelevel']['extra'])
               }
-              if(@xp > 0) {
-                spawn_entity('EXPERIENCE_ORB', 1, @location, closure(@euuid) {
-                  set_entity_spec(@euuid, array('amount': @xp))
-                })
-              }
-              _add_tune_experience(@uuid, @player_data, @crop_spec['tunalevel']['default'], @crop_spec['tunalevel']['extra'])
+              # 튜나레벨
+              _add_tunalevel_experience(@uuid, @player_data, @crop_spec['tunalevel']['default'], @crop_spec['tunalevel']['extra'])
             }
             # 내구도 깍기 및 다 부셔지면 아이템 없애기
             if(@max_durability > @damage) {
