@@ -1,7 +1,17 @@
+# 스킬, 인첸트 로우로 보내기
+# 업데이트 아이템 로우로 보네기
+# 이벤트들은 event.ms로 보내기 너무 긴것들 프로시저화 해도 됨
+
+
 ## Include
-include('crafting/crafting.ms')
 include('enchant/enchant.ms')
 include('skill/skill.ms')
+
+include('crafting/crafting.ms')
+# 모루
+# 레벨 변환
+# 데스패널티 (컨피그레이션)
+# 필드이펙트
 
 # PROC
 proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {

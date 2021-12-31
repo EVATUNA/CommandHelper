@@ -45,22 +45,12 @@ foreach(@scoreboard in get_scoreboards()) {
   }
 }
 
-# 광물 스펙
-@minerals_spec = array()
-async_read('files/minerals_spec.json', closure(@value) {
-  foreach(@mineral: @spec in json_decode(@value)) {
-    @minerals_spec[@mineral] = @spec
-  }
-})
-
-# 작물 스펙
-@crops_spec = array()
-async_read('files/crops_spec.json', closure(@value) {
-  foreach(@crop: @spec in json_decode(@value)) {
-    @crops_spec[@crop] = @spec
-  }
-})
-
+# 광물 보상
+@mineral_rewards = array()
+# 작물 보상
+@crop_rewards = array()
+# 낚시 보상
+@fish_rewards = array()
 # 몹 보상
 @mob_rewards = array()
 

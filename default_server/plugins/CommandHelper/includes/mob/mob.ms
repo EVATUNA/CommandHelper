@@ -34,15 +34,26 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards) {
       @mob_name = @splited_namespace[1]
 
       if(@mob_name == @target_name) {
+        //if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
+        //  modify_event('xp', @event['xp'] * 2) // 경험 인첸트 있을시 2배의 경험치 떨굼
+        //  # 파티시스템 만들어지면 경험치 나누어 받는 시스템 만들어야 함
+        //}
         # 마법레벨 주기
         if(array_index_exists(@mob_reward, 'arcanelevel')) {
           @location = entity_loc(@id)
-          _add_arcanelevel_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+          if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
+            _add_arcanelevel_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+            _add_arcanelevel_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+          } else {
+            _add_arcanelevel_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+          }
         }
+        
         # 튜나레벨 주기
         if(array_index_exists(@mob_reward, 'tunalevel')) {
           _add_tunalevel_experience(@uuid, @player_data, @mob_reward['tunalevel']['default'], @mob_reward['tunalevel']['extra'])
         }
+
         # 비법서 드랍
         if(array_index_exists(@mob_reward, 'scroll') && array_index_exists(@mob_reward['scroll'], 'chance') && rand() > @mob_reward['scroll']['chance']) { // chance 부분 수식 역으로 바꿔야 함
           @scroll_rank = 0 // 비법서 랭크
@@ -87,6 +98,7 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards) {
             }
           }
         }
+
         # 룬 드랍
         if(array_index_exists(@mob_reward, 'rune') && array_index_exists(@mob_reward['rune'], 'name') && array_index_exists(@mob_reward['rune'], 'chance') && rand() > @mob_reward['rune']['chance']) { // chance 부분 수식 역으로 바꿔야 함
           @rune_rank = 0 // 비법서 랭크
@@ -96,14 +108,12 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards) {
             #해당 name과 rank에 해당하는 룬 주기
           }
         }
+        
+        # 포리치 종료
         break()
       }
     }
 
-    //if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
-    //  modify_event('xp', @event['xp'] * 2) // 경험 인첸트 있을시 2배의 경험치 떨굼
-    //  # 파티시스템 만들어지면 경험치 나누어 받는 시스템 만들어야 함
-    //}
 
   }
   # 몹 죽고나서 사라질때 떨구는 경험치 제거
