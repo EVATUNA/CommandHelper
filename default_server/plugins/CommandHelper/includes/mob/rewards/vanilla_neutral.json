@@ -1,5 +1,14 @@
 {
   "AXOLOTL": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -10,6 +19,15 @@
     }
   },
   "BAT": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -20,6 +38,15 @@
     }
   },
   "BEE": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -30,6 +57,15 @@
     }
   },
   "CAT": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -40,6 +76,15 @@
     }
   },
   "CHICKEN": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -50,6 +95,15 @@
     }
   },
   "COD": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -60,6 +114,15 @@
     }
   },
   "COW": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -70,6 +133,15 @@
     }
   },
   "DOLPHIN": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -80,6 +152,15 @@
     }
   },
   "DONKEY": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -90,6 +171,15 @@
     }
   },
   "FOX": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -100,6 +190,15 @@
     }
   },
   "GLOW_SQUID": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -110,6 +209,15 @@
     }
   },
   "GOAT": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -120,6 +228,15 @@
     }
   },
   "HORSE": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -130,6 +247,15 @@
     }
   },
   "IRON_GOLEM": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -140,6 +266,15 @@
     }
   },
   "LLAMA": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -150,6 +285,15 @@
     }
   },
   "MULE": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -160,6 +304,15 @@
     }
   },
   "MUSHROOM_COW": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -170,6 +323,15 @@
     }
   },
   "OCELOT": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -180,6 +342,15 @@
     }
   },
   "PANDA": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -190,6 +361,15 @@
     }
   },
   "PARROT": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -200,6 +380,15 @@
     }
   },
   "PIG": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -210,6 +399,15 @@
     }
   },
   "POLAR_BEAR": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -220,6 +418,15 @@
     }
   },
   "PUFFERFISH": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -230,6 +437,15 @@
     }
   },
   "RABBIT": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -240,6 +456,15 @@
     }
   },
   "SALMON": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -250,6 +475,15 @@
     }
   },
   "SHEEP": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -260,6 +494,15 @@
     }
   },
   "SKELETON_HORSE": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -270,6 +513,15 @@
     }
   },
   "SNOWMAN": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -280,6 +532,15 @@
     }
   },
   "SQUID": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -290,6 +551,15 @@
     }
   },
   "TRADER_LLAMA": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -300,6 +570,15 @@
     }
   },
   "TROPICAL_FISH": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -310,6 +589,15 @@
     }
   },
   "TURTLE": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -320,6 +608,15 @@
     }
   },
   "VILLAGER": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -330,6 +627,15 @@
     }
   },
   "WANDERING_TRADER": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -340,6 +646,15 @@
     }
   },
   "WOLF": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
@@ -350,6 +665,15 @@
     }
   },
   "ZOMBIE_HORSE": {
+    "scroll": {
+      "rank": 4,
+      "chance": 0.01
+    },
+    "rune": {
+      "name": "test",
+      "rank": 1,
+      "chance": 0
+    },
     "tunalevel": {
       "default": 1,
       "extra": 0
