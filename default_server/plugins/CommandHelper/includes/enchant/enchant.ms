@@ -1,5 +1,3 @@
-console('EvaEnchant loaded')
-
 ## Essence Data Load
 @essences = array()
 foreach(@file in list_files('essence_tables')) {

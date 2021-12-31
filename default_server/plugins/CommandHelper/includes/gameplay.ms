@@ -1456,26 +1456,3 @@ bind('player_death', null, null, @event, @death_penalties_multiply, @players_dat
   @uuid = puuid(@player)
   _apply_death_penalty(@player, @uuid, @death_penalties_multiply, @players_data, @server)
 }
-
-bind('entity_death', null, null, @event, @players_data) {
-  if(array_index_exists(@event['cause'],'damager') && ponline(@event['cause']['damager'])) {
-    @player = @event['cause']['damager']
-    @uuid = puuid(@player)
-    if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
-      #broadcast(integer(@event['xp'] * 1.5))
-      modify_event('xp', @event['xp'] * 2)
-    }
-  }
-}
-
-bind('creature_spawn', null, null, @event) {
-  @uuid = @event['id']
-  set_equipment_droprates(@uuid, array(
-    'HELMET': 0,
-    'CHESTPLATE': 0,
-    'LEGGINGS': 0,
-    'BOOTS': 0,
-    'WEAPON': 0,
-    'OFF_HAND': 0
-  ))
-}

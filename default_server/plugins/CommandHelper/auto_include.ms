@@ -61,6 +61,9 @@ async_read('files/crops_spec.json', closure(@value) {
   }
 })
 
+# 몹 보상
+@mob_rewards = array()
+
 ## Item Management
 @effective_items = array(
   'armor': array(
@@ -654,6 +657,15 @@ proc _color(@color) {
   } else {
     return(color(@color))
   }
+}
+
+# 파일 이름과 파일 확장자를 나누어 구하기 (확장명이 있는 파일 이름만 넣을 것!)
+proc _get_file_name_and_extension(@file) {
+  @full_stop_qty = reg_count('\\.', @file) // . 의 갯수 구하기
+  @splited_file = split('.', @file, @full_stop_qty) // . 로 문자열 나누기
+  @file_name = array_implode(array_get(@splited_file, cslice(0, @full_stop_qty - 1)), '.') // 파일 이름부분
+  @file_extension = @splited_file[@full_stop_qty] // 파일 확장자 부분
+  return(array(@file_name, @file_extension))
 }
 
 # 참치 경험치 구하는 proc
