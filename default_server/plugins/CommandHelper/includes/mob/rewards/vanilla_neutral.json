@@ -1,0 +1,362 @@
+{
+  "AXOLOTL": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "BAT": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "BEE": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "CAT": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "CHICKEN": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "COD": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "COW": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "DOLPHIN": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "DONKEY": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "FOX": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "GLOW_SQUID": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "GOAT": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "HORSE": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "IRON_GOLEM": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "LLAMA": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "MULE": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "MUSHROOM_COW": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "OCELOT": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "PANDA": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "PARROT": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "PIG": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "POLAR_BEAR": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "PUFFERFISH": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "RABBIT": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "SALMON": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "SHEEP": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "SKELETON_HORSE": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "SNOWMAN": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "SQUID": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "TRADER_LLAMA": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "TROPICAL_FISH": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "TURTLE": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "VILLAGER": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "WANDERING_TRADER": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "WOLF": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "ZOMBIE_HORSE": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  }
+}

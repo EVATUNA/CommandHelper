@@ -1,0 +1,362 @@
+{
+  "BLAZE": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "CAVE_SPIDER": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "CREEPER": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "DROWNED": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "ELDER_GUARDIAN": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "ENDERMAN": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "ENDERMITE": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "ENDER_DRAGON": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "EVOKER": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "GHAST": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "GIANT": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "GUARDIAN": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "HOGLIN": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "HUSK": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "ILLUSIONER": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "MAGMA_CUBE": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "PHANTOM": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "PIGLIN": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "PIGLIN_BRUTE": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "PILLAGER": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "RAVAGER": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "SILVERFISH": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "SKELETON": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "SHULKER": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "SLIME": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "SPIDER": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "STRAY": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "VEX": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "VINDICATOR": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "WITCH": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "WITHER": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "WITHER_SKELETON": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "ZOGLIN": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "ZOMBIE": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "ZOMBIE_VILLAGER": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  },
+  "ZOMBIFIED_PIGLIN": {
+    "tunalevel": {
+      "default": 1,
+      "extra": 0
+    },
+    "arcanelevel": {
+      "default": 1,
+      "extra": 0
+    }
+  }
+}

@@ -49,6 +49,9 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards) {
 
         # 룬, 비법서 등 아이템 드랍
 
+
+
+
         break()
       }
     }
