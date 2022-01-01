@@ -1,0 +1,6 @@
+{
+  "default": {
+    "multiply": 0.6,
+    "deviation": 0.2
+  }
+}
