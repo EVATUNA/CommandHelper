@@ -57,6 +57,10 @@ foreach(@player in all_players()) {
           }
         }
       }
+
+      if(ploc(@player)['world'] == 'spawn_minecraft_residence') {
+        _generate_trace(@player)
+      }
     }
   }
 })

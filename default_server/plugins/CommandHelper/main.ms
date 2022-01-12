@@ -27,7 +27,7 @@ include('includes/mining/mining.ms')
 # 거주월드의 농사 시스템
 include('includes/farming/farming.ms')
 # 거주월드의 사냥 시스템
-#include('includes/hunting/hunting.ms')
+include('includes/hunting/hunting.ms')
 # 거주월드의 낚시 시스템
 #include('includes/fishing/fishing.ms')
 

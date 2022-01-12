@@ -2,6 +2,16 @@
   broadcast(_get_max_tuna_experience(integer($1)))
 <<<
 
+/gcp = >>>
+pgive_item(player(), array(
+  'name': 'COMPASS',
+  'meta': array(
+    'lodestone': false,
+    'target': ploc()
+  )
+))
+<<<
+
 /cir = >>>
   broadcast('')
   broadcast(simple_date('HH:mm:ss'))
