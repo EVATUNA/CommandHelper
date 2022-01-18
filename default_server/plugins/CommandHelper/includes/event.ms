@@ -59,7 +59,21 @@ foreach(@player in all_players()) {
       }
 
       if(ploc(@player)['world'] == 'spawn_minecraft_residence') {
-        _generate_trace(@player)
+        _generate_trace(@player, @traces)
+      }
+    }
+  }
+
+  if(@server == 'main') {
+    foreach(@loaded_chunk in get_loaded_chunks('spawn_minecraft_residence')) {
+      foreach(@id in all_entities(@loaded_chunk['world'], @loaded_chunk['x'], @loaded_chunk['z'])) {
+        if(entity_type(@id) == 'ITEM_FRAME' && get_mob_name(@id) == 'trace') {
+          @tag = _get_tag(@id)
+          broadcast(@tag)
+          if(is_array(@tag)) {
+            //entity_remove(@id)
+          }
+        }
       }
     }
   }

@@ -807,6 +807,108 @@ proc _replace_repair_percent(@percent) {
   return(@return)
 }
 
+# 엔티티 태그
+proc _update_tag(@id, @array) {
+  if(array_size(get_scoreboard_tags(@id)) == 0) {
+    add_scoreboard_tag(@id, json_encode(@array))
+  } else if(array_size(get_scoreboard_tags(@id)) == 1) {
+    remove_scoreboard_tag(@id, get_scoreboard_tags(@id)[0])
+    add_scoreboard_tag(@id, json_encode(@array))
+  }
+}
+proc _get_tag(@id) {
+  @tags = get_scoreboard_tags(@id)
+  if(array_size(@tags) == 1) {
+    return(json_decode(@tags[0]))
+  } else {
+    return(null)
+  }
+}
+
+proc _get_vanilla_world(@world) {
+  switch(@world) {
+  case 'spawn':
+    @return = 'overowrld'
+    break()
+  case 'world':
+    @return = 'overowrld'
+    break()
+  case 'spawn_minecraft_residence':
+    @return = 'residence'
+    break()
+  default:
+    @return = @world
+    break()
+  }
+  return(@return)
+}
+
+# 아이템 액자
+proc _summon_item_frame(@location, @frame_facing, @item_rotation, @name, @item, @tag) {
+  @vanilla_world = _get_vanilla_world(@location['world'])
+  @x = round(@location['x'], 1)
+  @y = round(@location['y'], 1)
+  @z = round(@location['z'], 1)
+  @facing = 0
+  # Facing
+  switch(@frame_facing) {
+  case 'UP':
+    @facing = 1
+    break()
+  case 'DOWN':
+    @facing = 0
+    break()
+  case 'SOUTH':
+    @facing = 3
+    break()
+  case 'WEST':
+    @facing = 4
+    break()
+  case 'NORTH':
+    @facing = 2
+    break()
+  case 'EAST':
+    @facing = 5
+    break()
+  }
+  @nbt_facing = "Facing: @facing"
+
+  @nbt_default = "Invisible: 1, Fixed: 1"
+  @nbt_rotation = "ItemRotation: @item_rotation"
+
+  # CustomName
+  if(is_null(@name)) {
+    @name = '\\\"\\\"'
+  } else {
+    @name = '\\\"'.@name.'\\\"'
+  }
+  @nbt_name = "CustomName:\"@name\""
+
+  # Tags
+  if(is_null(@tag)) {
+    @nbt_tag = "Tags: []"
+  } else {
+    @encoded_tag = replace(replace(json_encode(@tag), '\\', '\\\\'), '"', '\\\"')
+    @nbt_tag = "Tags: [\"@encoded_tag\"]"
+  }
+
+  # Item
+  if(is_null(@item)) {
+    @item = array('name': 'AIR')
+  }
+
+  @item_name = to_lower(@item['name'])
+  if(array_index_exists(@item, 'meta', 'model')) {
+    @item_model = @item['meta']['model']
+  } else {
+    @item_model = 0
+  }
+  @nbt_item = "Item: {id: \"minecraft:@item_name\", tags:{CustomModelData: @item_model}, Count: 1}"
+  
+  runas('~console', "/execute in @vanilla_world run summon item_frame @x @y @z {@nbt_default, @nbt_facing, @nbt_rotation, @nbt_name, @nbt_tag, @nbt_item}")
+  //broadcast('~console' "/execute in @vanilla_world run summon item_frame @x @y @z {@nbt_default, @nbt_facing, @nbt_rotation, @nbt_name, @nbt_tag, @nbt_item}")
+}
+
 # 상점 리코딩 후 제거 예정
 array proc _clone(array @arr) { return(array_deep_clone(@arr)) }
 boolean proc _existsGui(string @guiid) { return(array_contains(get_virtual_inventories(), @guiid)) }

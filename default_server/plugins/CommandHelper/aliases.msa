@@ -1,3 +1,13 @@
+/itf = >>>
+  @ploc = ploc()
+  @ploc['y'] += 1
+  @facing = 'UP'
+  @item = array('name': 'STONE')
+  @tag = array('test': array('a', 'b', 'c'))
+  _summon_item_frame(@ploc, @facing, 0, 'trace', @item, @tag)
+<<<
+
+
 /tule $1 = >>>
   broadcast(_get_max_tuna_experience(integer($1)))
 <<<

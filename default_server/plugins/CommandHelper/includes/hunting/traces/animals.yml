@@ -1,0 +1,184 @@
+sheep:
+  min_move: 15
+  max_move: 30
+  mob: sheep
+  count: 1
+  conditions:
+    chance_by_biomes:
+      #이곳에 포함되어 있지 않은 바이옴들은 0.0임
+      PLAINS: 1.0
+      WINDSWEPT_HILLS: 1.0
+
+      FOREST: 1.0
+      WINDSWEPT_FOREST: 1.0
+
+      SUNFLOWER_PLAINS: 1.0
+      FLOWER_FOREST: 1.0
+
+      BIRCH_FOREST: 1.0
+      OLD_GROWTH_BIRCH_FOREST: 1.0
+      
+      DARK_FOREST: 1.0
+
+      TAIGA: 1.0
+      OLD_GROWTH_PINE_TAIGA: 1.0
+      OLD_GROWTH_SPRUCE_TAIGA: 1.0
+
+      DESERT: 0.0
+      
+      SAVANNA: 0.75
+      SAVANNA_PLATEAU: 0.75
+      WINDSWEPT_SAVANNA: 0.75
+
+      BADLANDS: 0.0
+      WOODED_BADLANDS: 0.0
+      ERODED_BADLANDS: 0.0
+
+      SWAMP: 1.0
+
+      JUNGLE: 0.9
+      SPARSE_JUNGLE: 0.9
+      BAMBOO_JUNGLE: 0.9
+
+      SNOWY_PLAINS: 0.8
+      SNOWY_TAIGA: 0.8
+      ICE_SPIKES: 0.5
+
+      MEADOW: 1.0
+      WINDSWEPT_GRAVELLY_HILLS: 0.75
+      STONY_PEAKS: 0.5
+      JAGGED_PEAKS: 0.5
+      GROVE: 0.5
+      SNOWY_SLOPES: 0.5
+      FROZEN_PEAKS: 0.5
+
+      MUSHROOM_FIELDS: 0.0
+
+      RIVER: 0.5
+      FROZEN_RIVER: 0.25
+
+      BEACH: 0.0
+      STONY_SHORE: 0.0
+      SNOWY_BEACH: 0.0
+
+      OCEAN: 0.0
+      DEEP_OCEAN: 0.0
+      DEEP_COLD_OCEAN: 0.0
+      COLD_OCEAN: 0.0
+      FROZEN_OCEAN: 0.0
+      DEEP_FROZEN_OCEAN: 0.0
+      LUKEWARM_OCEAN: 0.0
+      DEEP_LUKEWARM_OCEAN: 0.0
+      WARM_OCEAN: 0.0
+
+      LUSH_CAVES: 0.0
+      DRIPSTONE_CAVES: 0.0
+
+    height_difference_for_chance: 40
+    min_y: 63
+    max_y: 320
+
+  trace_term: 3
+  traces:
+    type: normal # log: 나무 옆면에 흔적이 생김, effect_cloud, 광역 효과 구름이 생기며 파티클을 뿌림
+    facing: RANDOM # (type가 normal 이거나 log일시 사용 가능)
+    # PATHWAY: 움직인 방향을 향하여 각도 설정
+    # NONE, CLOCKWISE, CLOCKWISE_135, CLOCKWISE_45,
+    # COUNTER_CLOCKWISE, COUNTER_CLOCKWISE_45, FLIPPED, FLIPPED_45 로 특정 각도로 강제 설정 가능
+    item: # (type가 normal 이거나 log일시 사용 가능) 아이템 액자 내 아이템 속성 세팅
+      name: ''
+      meta:
+        model: 1
+    count: 1
+pig:
+  min_move: 30
+  max_move: 40
+  mob: pig
+  count: 1
+  conditions:
+    chance_by_biomes:
+      #이곳에 포함되어 있지 않은 바이옴들은 0.0임
+      PLAINS: 1.0
+      WINDSWEPT_HILLS: 1.0
+
+      FOREST: 1.0
+      WINDSWEPT_FOREST: 1.0
+
+      SUNFLOWER_PLAINS: 1.0
+      FLOWER_FOREST: 1.0
+
+      BIRCH_FOREST: 1.0
+      OLD_GROWTH_BIRCH_FOREST: 1.0
+      
+      DARK_FOREST: 1.0
+
+      TAIGA: 1.0
+      OLD_GROWTH_PINE_TAIGA: 1.0
+      OLD_GROWTH_SPRUCE_TAIGA: 1.0
+
+      DESERT: 0.0
+      
+      SAVANNA: 0.75
+      SAVANNA_PLATEAU: 0.75
+      WINDSWEPT_SAVANNA: 0.75
+
+      BADLANDS: 0.0
+      WOODED_BADLANDS: 0.0
+      ERODED_BADLANDS: 0.0
+
+      SWAMP: 1.0
+
+      JUNGLE: 0.9
+      SPARSE_JUNGLE: 0.9
+      BAMBOO_JUNGLE: 0.9
+
+      SNOWY_PLAINS: 0.8
+      SNOWY_TAIGA: 0.8
+      ICE_SPIKES: 0.5
+
+      MEADOW: 1.0
+      WINDSWEPT_GRAVELLY_HILLS: 0.75
+      STONY_PEAKS: 0.5
+      JAGGED_PEAKS: 0.5
+      GROVE: 0.5
+      SNOWY_SLOPES: 0.5
+      FROZEN_PEAKS: 0.5
+
+      MUSHROOM_FIELDS: 0.0
+
+      RIVER: 0.5
+      FROZEN_RIVER: 0.25
+
+      BEACH: 0.0
+      STONY_SHORE: 0.0
+      SNOWY_BEACH: 0.0
+
+      OCEAN: 0.0
+      DEEP_OCEAN: 0.0
+      DEEP_COLD_OCEAN: 0.0
+      COLD_OCEAN: 0.0
+      FROZEN_OCEAN: 0.0
+      DEEP_FROZEN_OCEAN: 0.0
+      LUKEWARM_OCEAN: 0.0
+      DEEP_LUKEWARM_OCEAN: 0.0
+      WARM_OCEAN: 0.0
+
+      LUSH_CAVES: 0.0
+      DRIPSTONE_CAVES: 0.0
+
+    height_difference_for_chance: 40
+    min_y: 63
+    max_y: 320
+
+  trace_term: 3
+  traces:
+    type: normal # log: 나무 옆면에 흔적이 생김, effect_cloud, 광역 효과 구름이 생기며 파티클을 뿌림
+    facing: RANDOM # (type가 normal 이거나 log일시 사용 가능)
+    # PATHWAY: 움직인 방향을 향하여 각도 설정
+    # NONE, CLOCKWISE, CLOCKWISE_135, CLOCKWISE_45,
+    # COUNTER_CLOCKWISE, COUNTER_CLOCKWISE_45, FLIPPED, FLIPPED_45 로 특정 각도로 강제 설정 가능
+    item: # (type가 normal 이거나 log일시 사용 가능) 아이템 액자 내 아이템 속성 세팅
+      name: ''
+      meta:
+        model: 1
+    count: 1
