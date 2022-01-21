@@ -75,8 +75,8 @@ sheep:
       DRIPSTONE_CAVES: 0.0
 
     height_difference_for_chance: 40
-    min_y: 63
-    max_y: 320
+    #min_y: 63
+    #max_y: 320
 
   trace_term: 3
   traces:
@@ -86,9 +86,9 @@ sheep:
     # NONE, CLOCKWISE, CLOCKWISE_135, CLOCKWISE_45,
     # COUNTER_CLOCKWISE, COUNTER_CLOCKWISE_45, FLIPPED, FLIPPED_45 로 특정 각도로 강제 설정 가능
     item: # (type가 normal 이거나 log일시 사용 가능) 아이템 액자 내 아이템 속성 세팅
-      name: ''
+      name: 'NAUTILUS_SHELL'
       meta:
-        model: 1
+        model: 101
     count: 1
 pig:
   min_move: 30
@@ -167,8 +167,8 @@ pig:
       DRIPSTONE_CAVES: 0.0
 
     height_difference_for_chance: 40
-    min_y: 63
-    max_y: 320
+    #min_y: 63
+    #max_y: 320
 
   trace_term: 3
   traces:
@@ -178,7 +178,7 @@ pig:
     # NONE, CLOCKWISE, CLOCKWISE_135, CLOCKWISE_45,
     # COUNTER_CLOCKWISE, COUNTER_CLOCKWISE_45, FLIPPED, FLIPPED_45 로 특정 각도로 강제 설정 가능
     item: # (type가 normal 이거나 log일시 사용 가능) 아이템 액자 내 아이템 속성 세팅
-      name: ''
+      name: 'NAUTILUS_SHELL'
       meta:
-        model: 1
+        model: 101
     count: 1

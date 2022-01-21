@@ -899,11 +899,13 @@ proc _summon_item_frame(@location, @frame_facing, @item_rotation, @name, @item, 
 
   @item_name = to_lower(@item['name'])
   if(array_index_exists(@item, 'meta', 'model')) {
+    broadcast(A)
     @item_model = @item['meta']['model']
   } else {
+    broadcast(B)
     @item_model = 0
   }
-  @nbt_item = "Item: {id: \"minecraft:@item_name\", tags:{CustomModelData: @item_model}, Count: 1}"
+  @nbt_item = "Item: {id: \"minecraft:@item_name\", tag:{CustomModelData: @item_model}, Count: 1}"
   
   runas('~console', "/execute in @vanilla_world run summon item_frame @x @y @z {@nbt_default, @nbt_facing, @nbt_rotation, @nbt_name, @nbt_tag, @nbt_item}")
   //broadcast('~console' "/execute in @vanilla_world run summon item_frame @x @y @z {@nbt_default, @nbt_facing, @nbt_rotation, @nbt_name, @nbt_tag, @nbt_item}")

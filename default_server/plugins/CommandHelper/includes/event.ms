@@ -63,20 +63,6 @@ foreach(@player in all_players()) {
       }
     }
   }
-
-  if(@server == 'main') {
-    foreach(@loaded_chunk in get_loaded_chunks('spawn_minecraft_residence')) {
-      foreach(@id in all_entities(@loaded_chunk['world'], @loaded_chunk['x'], @loaded_chunk['z'])) {
-        if(entity_type(@id) == 'ITEM_FRAME' && get_mob_name(@id) == 'trace') {
-          @tag = _get_tag(@id)
-          broadcast(@tag)
-          if(is_array(@tag)) {
-            //entity_remove(@id)
-          }
-        }
-      }
-    }
-  }
 })
 
 # 1분 반복
@@ -114,6 +100,19 @@ foreach(@player in all_players()) {
 
   }
 
+  if(@server == 'main') {
+    foreach(@loaded_chunk in get_loaded_chunks('spawn_minecraft_residence')) {
+      foreach(@id in all_entities(@loaded_chunk['world'], @loaded_chunk['x'], @loaded_chunk['z'])) {
+        if(entity_type(@id) == 'ITEM_FRAME' && get_mob_name(@id) == 'trace') {
+          @tag = _get_tag(@id)
+          broadcast(@tag)
+          if(is_array(@tag)) {
+            //entity_remove(@id)
+          }
+        }
+      }
+    }
+  }
 })
 
 # 플레이어 로그인

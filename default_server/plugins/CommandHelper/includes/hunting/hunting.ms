@@ -1,4 +1,3 @@
-
 proc _get_chunk_info(@x, @z) {
   @location = array(
     'x': @x * 16 + 8,
@@ -16,7 +15,6 @@ proc _get_chunk_info(@x, @z) {
 }
 
 proc _get_highest_block_at(@location) {
-  
   @bool = true
   @solid_blocks_to_ignore = array(
     "OAK_LOG",
@@ -37,7 +35,6 @@ proc _get_highest_block_at(@location) {
     @is_investing_solid_block = false
     @location['y'] -= 4
   }
-
 
   while(@bool) {
     @block = get_block(@location)
@@ -77,6 +74,34 @@ proc _get_highest_block_at(@location) {
     }
   }
   return(@location)
+}
+
+proc _get_random_surface_in_chunk(@x, @z) {
+  @location = array(
+    'x': @x * 16 + rand(16),
+    'y': 64,
+    'z': @z * 16 + rand(16),
+    'world': 'spawn_minecraft_residence'
+  )
+  @highest_location = _get_highest_block_at(@location)
+  @highest_location['y'] += 1
+  
+  @block = get_block(@highest_location)
+  @solid_blocks_to_ignore = array(
+    "OAK_LOG",
+    "SPRUCE_LOG",
+    "BIRCH_LOG",
+    "JUNGLE_LOG",
+    "ACACIA_LOG",
+    "DARK_OAK_LOG"
+  )
+
+  if(array_contains(@solid_blocks_to_ignore, @block)) {
+    @return = _get_random_surface_in_chunk(@x, @z)
+  } else {
+    @return = @highest_location
+  }
+  return(@return)
 }
 
 proc _update_chunks_info(@offset_x, @offset_z, @radius, @force_update, @clear_queue)  {
@@ -440,6 +465,9 @@ proc _try_moving(@moves, @failures, @traces, @trace_name) {
               if(array_index_exists(@trace_data, 'conditions')) {
                 @conditions = @trace_data['conditions']
 
+                // 디버깅용 변수
+                @m = array_size(@moves) + 1
+                @f = @failures + 1
                 // 바이옴 검사
                 if(@is_succeeded && array_index_exists(@conditions, 'chance_by_biomes')) {
                   @chance_by_biomes = @conditions['chance_by_biomes']
@@ -450,6 +478,7 @@ proc _try_moving(@moves, @failures, @traces, @trace_name) {
                   }
                   if(rand() > @chance) {
                     @is_succeeded = false
+                    broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (바이옴)")
                   }
                 }
 
@@ -457,6 +486,7 @@ proc _try_moving(@moves, @failures, @traces, @trace_name) {
                 if(@is_succeeded && array_index_exists(@conditions, 'min_y')) {
                   if(@conditions['min_y'] > @new_y) {
                     @is_succeeded = false
+                    broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (최소 y)")
                   }
                 }
 
@@ -464,6 +494,7 @@ proc _try_moving(@moves, @failures, @traces, @trace_name) {
                 if(@is_succeeded && array_index_exists(@conditions, 'max_y')) {
                   if(@conditions['max_y'] < @new_y) {
                     @is_succeeded = false
+                    broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (최대 y)")
                   }
                 }
 
@@ -472,9 +503,9 @@ proc _try_moving(@moves, @failures, @traces, @trace_name) {
                   @old_y = @last_move['y']
                   if(abs(@old_y - @new_y) > rand() * @conditions['height_difference_for_chance']) {
                     @is_succeeded = false
+                    broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (y편차)")
                   }
                 }
-
               }
 
               if(@is_succeeded) {
@@ -486,37 +517,112 @@ proc _try_moving(@moves, @failures, @traces, @trace_name) {
                   'facing': @new_facing
                 )
                 @moves[] = @move
-                //if(@failures == 0) {
-                  //broadcast(@trace_name array_size(@moves).'단계 성공 (방향:' @new_facing.')')
-                //} else {
-                //  broadcast(@trace_name array_size(@moves).'단계 성공 (트라이: '.@failures.')')
-                //}
+                broadcast(@trace_name array_size(@moves).' 번째 이동 성공 (방향:' @new_facing.')')
                 if(array_size(@moves) == @trace_data['min_move']) {
-                  //broadcast('경로 생성 가능')
+                  broadcast('경로 생성 가능')
                 }
                 @failures = 0
               } else {
                 @failures += 1
-                //broadcast('§7'.@trace_name array_size(@moves).'단계 실패 (트라이: '.@failures.')')
               }
               _try_moving(@moves, @failures, @traces, @trace_name)
             } else if(rand() < 0.666) { // 이동 경로에 튜랜 땅 있을 시
               @first_move = @moves[0]
-              //broadcast('경로 생성 재시도 (튜랜 땅이 경로에 걸림)')
+              broadcast('경로 생성 재시도 (튜랜 땅이 경로에 걸림)')
               _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces)
             } else {
-              //broadcast('경로 생성 실패')
+              broadcast('경로 생성 실패')
             }
           })
+        } else if(rand() < 0.333) { // 청크 파일 없을시
+          @first_move = @moves[0]
+          broadcast('경로 생성 재시도 (청크 파일 없음)')
+          _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces)
+        } else {
+          broadcast('경로 생성 실패 (청크 파일 없음)')
         }
       } else if(rand() < 0.666) { // 3번 실패했을시
         @first_move = @moves[0]
-        //broadcast('경로 생성 재시도 (3번 실패함)')
+        broadcast('경로 생성 재시도 (3번 실패함)')
         _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces)
       } else {
-        //broadcast('경로 생성 실패')
+        broadcast('경로 생성 실패 (3번 실패함)')
       }
 
+    } else {
+      if(!array_contains(array('RIVER', 'FROZEN_RIVER', 'BEACH', 'STONY_SHORE', 'SNOWY_BEACH', 'OCEAN', 'DEEP_OCEAN', 'DEEP_COLD_OCEAN', 'COLD_OCEAN', 'FROZEN_OCEAN', 'DEEP_FROZEN_OCEAN', 'LUKEWARM_OCEAN', 'DEEP_LUKEWARM_OCEAN', 'WARM_OCEAN'), @moves[-1]['biome'])) {
+        broadcast('흔적 생성')
+        array_remove(@trace_data, 'conditions')
+        array_remove(@trace_data, 'min_move')
+        array_remove(@trace_data, 'max_move')
+        @tag = array(
+          'trace_name': @trace_name,
+          'trace_data': @trace_data,
+          'moves': @moves,
+          'minute': 5
+        )
+        _place_trace(@tag, true)
+      } else if(rand() < 0.666) { // 마지막 청크바이옴이 바다나 강일시
+        @first_move = @moves[0]
+        broadcast('경로 생성 재시도 (마지막 청크 바다 or 강)')
+        _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces)
+      } else {
+        broadcast('경로 생성 실패 (마지막 청크 바다 or 강)')
+      }
+    }
+  } else {
+    if(!array_contains(array('RIVER', 'FROZEN_RIVER', 'BEACH', 'STONY_SHORE', 'SNOWY_BEACH', 'OCEAN', 'DEEP_OCEAN', 'DEEP_COLD_OCEAN', 'COLD_OCEAN', 'FROZEN_OCEAN', 'DEEP_FROZEN_OCEAN', 'LUKEWARM_OCEAN', 'DEEP_LUKEWARM_OCEAN', 'WARM_OCEAN'), @moves[-1]['biome'])) {
+      broadcast('흔적 생성')
+      array_remove(@trace_data, 'conditions')
+      array_remove(@trace_data, 'min_move')
+      array_remove(@trace_data, 'max_move')
+      @tag = array(
+        'trace_name': @trace_name,
+        'trace_data': @trace_data,
+        'moves': @moves,
+        'minute': 5
+      )
+      _place_trace(@tag, true)
+    } else if(rand() < 0.666) { // 마지막 청크바이옴이 바다나 강일시
+      @first_move = @moves[0]
+      broadcast('경로 생성 재시도 (마지막 청크 바다 or 강)')
+      _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces)
+    } else {
+      broadcast('경로 생성 실패 (마지막 청크 바다 or 강)')
     }
   }
+}
+
+proc _place_trace(@tag, @is_start) {
+
+  @moves = @tag['moves']
+  if(array_index_exists(@tag['trace_data'], 'trace_term') && @tag['trace_data']['trace_term'] > 1) {
+    @trace_term = @tag['trace_data']['trace_term']
+  } else {
+    @trace_term = 1
+  }
+  while(true) {
+    if(array_size(@moves) == 1) { break() }
+    if(!@is_start && @trace_term > 1) {
+      @trace_term--
+      array_remove(@moves, 0)
+    } else if(array_contains(array('RIVER', 'FROZEN_RIVER', 'BEACH', 'STONY_SHORE', 'SNOWY_BEACH', 'OCEAN', 'DEEP_OCEAN', 'DEEP_COLD_OCEAN', 'COLD_OCEAN', 'FROZEN_OCEAN', 'DEEP_FROZEN_OCEAN', 'LUKEWARM_OCEAN', 'DEEP_LUKEWARM_OCEAN', 'WARM_OCEAN'), @moves[0]['biome'])) {
+      array_remove(@moves, 0)
+    } else {
+      break()
+    }
+  }
+  if(array_size(@moves) > 1) {
+    @move = @moves[0]
+    # 발자국일시
+    @location = _get_random_surface_in_chunk(@move['x'], @move['z'])
+    broadcast(@location)
+    @rotation = @move['facing']
+    broadcast(@rotation)
+    @item = @tag['trace_data']['traces']['item']
+    _summon_item_frame(@location, 'UP', @rotation, 'trace', @item, @tag)
+  } else {
+    // 몹 소환
+  }
+  
 }
