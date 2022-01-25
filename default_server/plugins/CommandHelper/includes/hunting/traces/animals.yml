@@ -1,6 +1,6 @@
 sheep:
-  min_move: 15
-  max_move: 30
+  min_move: 10
+  max_move: 20
   mob: sheep
   count: 1
   conditions:

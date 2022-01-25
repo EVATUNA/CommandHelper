@@ -105,9 +105,13 @@ foreach(@player in all_players()) {
       foreach(@id in all_entities(@loaded_chunk['world'], @loaded_chunk['x'], @loaded_chunk['z'])) {
         if(entity_type(@id) == 'ITEM_FRAME' && get_mob_name(@id) == 'trace') {
           @tag = _get_tag(@id)
-          broadcast(@tag)
           if(is_array(@tag)) {
-            //entity_remove(@id)
+            @tag['minute']--
+            if(@tag['minute'] > 0) {
+              _update_tag(@id, @tag)
+            } else {
+              entity_remove(@id)
+            }
           }
         }
       }

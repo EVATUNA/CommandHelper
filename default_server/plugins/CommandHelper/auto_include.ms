@@ -899,16 +899,23 @@ proc _summon_item_frame(@location, @frame_facing, @item_rotation, @name, @item, 
 
   @item_name = to_lower(@item['name'])
   if(array_index_exists(@item, 'meta', 'model')) {
-    broadcast(A)
     @item_model = @item['meta']['model']
   } else {
-    broadcast(B)
     @item_model = 0
   }
   @nbt_item = "Item: {id: \"minecraft:@item_name\", tag:{CustomModelData: @item_model}, Count: 1}"
   
   runas('~console', "/execute in @vanilla_world run summon item_frame @x @y @z {@nbt_default, @nbt_facing, @nbt_rotation, @nbt_name, @nbt_tag, @nbt_item}")
   //broadcast('~console' "/execute in @vanilla_world run summon item_frame @x @y @z {@nbt_default, @nbt_facing, @nbt_rotation, @nbt_name, @nbt_tag, @nbt_item}")
+}
+
+# 미스틱 몹
+proc _summon_mythicmob(@name, @count, @location) {
+  @world = @location['world']
+  @x = round(@location['x'], 1)
+  @y = round(@location['y'], 1)
+  @z = round(@location['z'], 1)
+  runas('~console', "/mm mobs spawn @name @count @world,@x,@y,@z")
 }
 
 # 상점 리코딩 후 제거 예정

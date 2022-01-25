@@ -87,7 +87,7 @@ proc _get_random_surface_in_chunk(@x, @z) {
   @highest_location['y'] += 1
   
   @block = get_block(@highest_location)
-  @solid_blocks_to_ignore = array(
+  @ignore_blocks = array(
     "OAK_LOG",
     "SPRUCE_LOG",
     "BIRCH_LOG",
@@ -96,8 +96,12 @@ proc _get_random_surface_in_chunk(@x, @z) {
     "DARK_OAK_LOG"
   )
 
-  if(array_contains(@solid_blocks_to_ignore, @block)) {
-    @return = _get_random_surface_in_chunk(@x, @z)
+  if(array_contains(@ignore_blocks, @block) || @highest_location['y'] < 63) {
+    if(rand() > 0.005) {
+      @return = _get_random_surface_in_chunk(@x, @z)
+    } else {
+      @return = null
+    }
   } else {
     @return = @highest_location
   }
@@ -421,36 +425,36 @@ proc _try_moving(@moves, @failures, @traces, @trace_name) {
 
         switch(@new_facing) {
         case 0:
-          @new_x = @last_move['x'] + 1
-          @new_z = @last_move['z']
+          @new_x = @last_move['x']
+          @new_z = @last_move['z'] + 1
           break()
         case 1:
-          @new_x = @last_move['x'] + 1
+          @new_x = @last_move['x'] - 1
           @new_z = @last_move['z'] + 1
           break()
         case 2:
-          @new_x = @last_move['x']
-          @new_z = @last_move['z'] + 1
-          break()
-        case 3:
-          @new_x = @last_move['x'] - 1
-          @new_z = @last_move['z'] + 1
-          break()
-        case 4:
           @new_x = @last_move['x'] - 1
           @new_z = @last_move['z']
           break()
-        case 5:
+        case 3:
           @new_x = @last_move['x'] - 1
           @new_z = @last_move['z'] - 1
           break()
-        case 6:
+        case 4:
           @new_x = @last_move['x']
           @new_z = @last_move['z'] - 1
           break()
-        case 7:
+        case 5:
           @new_x = @last_move['x'] + 1
           @new_z = @last_move['z'] - 1
+          break()
+        case 6:
+          @new_x = @last_move['x'] + 1
+          @new_z = @last_move['z']
+          break()
+        case 7:
+          @new_x = @last_move['x'] + 1
+          @new_z = @last_move['z'] + 1
           break()
         }
 
@@ -478,7 +482,7 @@ proc _try_moving(@moves, @failures, @traces, @trace_name) {
                   }
                   if(rand() > @chance) {
                     @is_succeeded = false
-                    broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (바이옴)")
+                    //broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (바이옴)")
                   }
                 }
 
@@ -486,7 +490,7 @@ proc _try_moving(@moves, @failures, @traces, @trace_name) {
                 if(@is_succeeded && array_index_exists(@conditions, 'min_y')) {
                   if(@conditions['min_y'] > @new_y) {
                     @is_succeeded = false
-                    broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (최소 y)")
+                    //broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (최소 y)")
                   }
                 }
 
@@ -494,7 +498,7 @@ proc _try_moving(@moves, @failures, @traces, @trace_name) {
                 if(@is_succeeded && array_index_exists(@conditions, 'max_y')) {
                   if(@conditions['max_y'] < @new_y) {
                     @is_succeeded = false
-                    broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (최대 y)")
+                    //broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (최대 y)")
                   }
                 }
 
@@ -503,7 +507,7 @@ proc _try_moving(@moves, @failures, @traces, @trace_name) {
                   @old_y = @last_move['y']
                   if(abs(@old_y - @new_y) > rand() * @conditions['height_difference_for_chance']) {
                     @is_succeeded = false
-                    broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (y편차)")
+                    //broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (y편차)")
                   }
                 }
               }
@@ -517,9 +521,9 @@ proc _try_moving(@moves, @failures, @traces, @trace_name) {
                   'facing': @new_facing
                 )
                 @moves[] = @move
-                broadcast(@trace_name array_size(@moves).' 번째 이동 성공 (방향:' @new_facing.')')
+                //broadcast(@trace_name array_size(@moves).' 번째 이동 성공 (방향:' @new_facing.')')
                 if(array_size(@moves) == @trace_data['min_move']) {
-                  broadcast('경로 생성 가능')
+                  //broadcast('경로 생성 가능')
                 }
                 @failures = 0
               } else {
@@ -528,30 +532,30 @@ proc _try_moving(@moves, @failures, @traces, @trace_name) {
               _try_moving(@moves, @failures, @traces, @trace_name)
             } else if(rand() < 0.666) { // 이동 경로에 튜랜 땅 있을 시
               @first_move = @moves[0]
-              broadcast('경로 생성 재시도 (튜랜 땅이 경로에 걸림)')
+              //broadcast('경로 생성 재시도 (튜랜 땅이 경로에 걸림)')
               _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces)
             } else {
-              broadcast('경로 생성 실패')
+              //broadcast('경로 생성 실패')
             }
           })
         } else if(rand() < 0.333) { // 청크 파일 없을시
           @first_move = @moves[0]
-          broadcast('경로 생성 재시도 (청크 파일 없음)')
+          //broadcast('경로 생성 재시도 (청크 파일 없음)')
           _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces)
         } else {
-          broadcast('경로 생성 실패 (청크 파일 없음)')
+          //broadcast('경로 생성 실패 (청크 파일 없음)')
         }
       } else if(rand() < 0.666) { // 3번 실패했을시
         @first_move = @moves[0]
-        broadcast('경로 생성 재시도 (3번 실패함)')
+        //broadcast('경로 생성 재시도 (3번 실패함)')
         _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces)
       } else {
-        broadcast('경로 생성 실패 (3번 실패함)')
+        //broadcast('경로 생성 실패 (3번 실패함)')
       }
 
     } else {
       if(!array_contains(array('RIVER', 'FROZEN_RIVER', 'BEACH', 'STONY_SHORE', 'SNOWY_BEACH', 'OCEAN', 'DEEP_OCEAN', 'DEEP_COLD_OCEAN', 'COLD_OCEAN', 'FROZEN_OCEAN', 'DEEP_FROZEN_OCEAN', 'LUKEWARM_OCEAN', 'DEEP_LUKEWARM_OCEAN', 'WARM_OCEAN'), @moves[-1]['biome'])) {
-        broadcast('흔적 생성')
+        //broadcast('흔적 생성')
         array_remove(@trace_data, 'conditions')
         array_remove(@trace_data, 'min_move')
         array_remove(@trace_data, 'max_move')
@@ -564,15 +568,15 @@ proc _try_moving(@moves, @failures, @traces, @trace_name) {
         _place_trace(@tag, true)
       } else if(rand() < 0.666) { // 마지막 청크바이옴이 바다나 강일시
         @first_move = @moves[0]
-        broadcast('경로 생성 재시도 (마지막 청크 바다 or 강)')
+        //broadcast('경로 생성 재시도 (마지막 청크 바다 or 강)')
         _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces)
       } else {
-        broadcast('경로 생성 실패 (마지막 청크 바다 or 강)')
+        //broadcast('경로 생성 실패 (마지막 청크 바다 or 강)')
       }
     }
   } else {
     if(!array_contains(array('RIVER', 'FROZEN_RIVER', 'BEACH', 'STONY_SHORE', 'SNOWY_BEACH', 'OCEAN', 'DEEP_OCEAN', 'DEEP_COLD_OCEAN', 'COLD_OCEAN', 'FROZEN_OCEAN', 'DEEP_FROZEN_OCEAN', 'LUKEWARM_OCEAN', 'DEEP_LUKEWARM_OCEAN', 'WARM_OCEAN'), @moves[-1]['biome'])) {
-      broadcast('흔적 생성')
+      //broadcast('흔적 생성')
       array_remove(@trace_data, 'conditions')
       array_remove(@trace_data, 'min_move')
       array_remove(@trace_data, 'max_move')
@@ -585,16 +589,16 @@ proc _try_moving(@moves, @failures, @traces, @trace_name) {
       _place_trace(@tag, true)
     } else if(rand() < 0.666) { // 마지막 청크바이옴이 바다나 강일시
       @first_move = @moves[0]
-      broadcast('경로 생성 재시도 (마지막 청크 바다 or 강)')
+      //broadcast('경로 생성 재시도 (마지막 청크 바다 or 강)')
       _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces)
     } else {
-      broadcast('경로 생성 실패 (마지막 청크 바다 or 강)')
+      //broadcast('경로 생성 실패 (마지막 청크 바다 or 강)')
     }
   }
 }
 
 proc _place_trace(@tag, @is_start) {
-
+  @tag['minute'] = 5
   @moves = @tag['moves']
   if(array_index_exists(@tag['trace_data'], 'trace_term') && @tag['trace_data']['trace_term'] > 1) {
     @trace_term = @tag['trace_data']['trace_term']
@@ -616,13 +620,45 @@ proc _place_trace(@tag, @is_start) {
     @move = @moves[0]
     # 발자국일시
     @location = _get_random_surface_in_chunk(@move['x'], @move['z'])
-    broadcast(@location)
     @rotation = @move['facing']
-    broadcast(@rotation)
     @item = @tag['trace_data']['traces']['item']
-    _summon_item_frame(@location, 'UP', @rotation, 'trace', @item, @tag)
+
+    if(is_array(@location)) {
+      //break_block(@location)
+      set_block(@location, 'AIR')
+      _summon_item_frame(@location, 'UP', @rotation, 'trace', @item, @tag)
+    } else {
+      // 흔적이 사라짐
+    }
+    # 다른타입의 흔적일시
   } else {
+    @move = @moves[0]
+    @location = _get_random_surface_in_chunk(@move['x'], @move['z'])
+    if(is_array(@location)) {
+      _summon_mythicmob(@tag['trace_data']['mob'], @tag['trace_data']['count'], @location)
+    } else {
+      // 흔적이 사라짐
+    }
     // 몹 소환
   }
-  
+  //broadcast(@location)
+  return(@location)
+}
+
+bind('player_interact_entity', null, array('clicked': 'ITEM_FRAME'), @event) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+  @id = @event['id']
+  @tag = _get_tag(@id)
+  if(is_array(@tag)) {
+    @slot = pheld_slot(@player)
+    @item = get_inventory_item(@uuid, @slot)
+    if(is_array(@item) && array_index_exists(@item, 'meta', 'model') && !is_null(@item['meta']['model']) && @item['meta']['model'] > 0) {
+      @location = _place_trace(@tag, false)
+      entity_remove(@id)
+      @item['meta']['lodestone'] = false
+      @item['meta']['target'] = @location
+      set_inventory_item(@uuid, @slot, @item)
+    }
+  }
 }
