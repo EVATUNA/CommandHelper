@@ -610,7 +610,7 @@ proc _place_trace(@tag, @is_start) {
     if(!@is_start && @trace_term > 1) {
       @trace_term--
       array_remove(@moves, 0)
-    } else if(array_contains(array('RIVER', 'FROZEN_RIVER', 'BEACH', 'STONY_SHORE', 'SNOWY_BEACH', 'OCEAN', 'DEEP_OCEAN', 'DEEP_COLD_OCEAN', 'COLD_OCEAN', 'FROZEN_OCEAN', 'DEEP_FROZEN_OCEAN', 'LUKEWARM_OCEAN', 'DEEP_LUKEWARM_OCEAN', 'WARM_OCEAN'), @moves[0]['biome'])) {
+    } else if(array_contains(array(/*'RIVER', 'FROZEN_RIVER', 'BEACH', 'STONY_SHORE', 'SNOWY_BEACH',*/ 'OCEAN', 'DEEP_OCEAN', 'DEEP_COLD_OCEAN', 'COLD_OCEAN', 'FROZEN_OCEAN', 'DEEP_FROZEN_OCEAN', 'LUKEWARM_OCEAN', 'DEEP_LUKEWARM_OCEAN', 'WARM_OCEAN'), @moves[0]['biome'])) {
       array_remove(@moves, 0)
     } else {
       break()
@@ -621,14 +621,33 @@ proc _place_trace(@tag, @is_start) {
     # 발자국일시
     @location = _get_random_surface_in_chunk(@move['x'], @move['z'])
     @rotation = @move['facing']
-    @item = @tag['trace_data']['traces']['item']
+    broadcast(A @tag['trace_data']['traces']['item'])
+    @framed_item = array(
+      'name': @tag['trace_data']['traces']['item']['name'],
+      'meta': array(
+        'model': 0
+      )
+    )
+    broadcast(B @tag['trace_data']['traces']['item'])
 
+    @is_snow = false
+    if(array_index_exists(@tag['trace_data']['traces']['item'], 'normal_model')) {
+      @framed_item['meta']['model'] = @tag['trace_data']['traces']['item']['normal_model']
+    }
+    if(get_block(@location) == 'SNOW' && array_index_exists(@tag['trace_data']['traces']['item'], 'snow_model')) {
+      @framed_item['meta']['model'] = @tag['trace_data']['traces']['item']['snow_model']
+      @is_snow = true
+    }
     if(is_array(@location)) {
       //break_block(@location)
-      set_block(@location, 'AIR')
-      _summon_item_frame(@location, 'UP', @rotation, 'trace', @item, @tag)
+      if(!@is_snow) {
+        set_block(@location, 'AIR')
+      }
+      broadcast(@tag['trace_data']['traces']['item'])
+      _summon_item_frame(@location, 'UP', @rotation, 'trace', @framed_item, @tag)
     } else {
       // 흔적이 사라짐
+      @location = _place_trace(@tag, false)
     }
     # 다른타입의 흔적일시
   } else {
@@ -638,6 +657,7 @@ proc _place_trace(@tag, @is_start) {
       _summon_mythicmob(@tag['trace_data']['mob'], @tag['trace_data']['count'], @location)
     } else {
       // 흔적이 사라짐
+      broadcast(@tag['trace_data']['mob'] '스폰 불가능')
     }
     // 몹 소환
   }
@@ -655,6 +675,7 @@ bind('player_interact_entity', null, array('clicked': 'ITEM_FRAME'), @event) {
     @item = get_inventory_item(@uuid, @slot)
     if(is_array(@item) && array_index_exists(@item, 'meta', 'model') && !is_null(@item['meta']['model']) && @item['meta']['model'] > 0) {
       @location = _place_trace(@tag, false)
+      broadcast(@location)
       entity_remove(@id)
       @item['meta']['lodestone'] = false
       @item['meta']['target'] = @location

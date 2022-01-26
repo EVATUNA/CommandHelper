@@ -57,9 +57,9 @@ sheep:
       RIVER: 0.5
       FROZEN_RIVER: 0.25
 
-      BEACH: 0.0
-      STONY_SHORE: 0.0
-      SNOWY_BEACH: 0.0
+      BEACH: 0.75
+      STONY_SHORE: 0.5
+      SNOWY_BEACH: 0.75
 
       OCEAN: 0.0
       DEEP_OCEAN: 0.0
@@ -75,29 +75,47 @@ sheep:
       DRIPSTONE_CAVES: 0.0
 
     height_difference_for_chance: 40
-    #min_y: 63
+    #min_y: 63 // 강을 건너지 않도록 하는 용도로 주요 사용됨
     #max_y: 320
 
   trace_term: 3
   traces:
-    type: normal # log: 나무 옆면에 흔적이 생김, effect_cloud, 광역 효과 구름이 생기며 파티클을 뿌림
-    facing: RANDOM # (type가 normal 이거나 log일시 사용 가능)
-    # PATHWAY: 움직인 방향을 향하여 각도 설정
-    # NONE, CLOCKWISE, CLOCKWISE_135, CLOCKWISE_45,
-    # COUNTER_CLOCKWISE, COUNTER_CLOCKWISE_45, FLIPPED, FLIPPED_45 로 특정 각도로 강제 설정 가능
-    item: # (type가 normal 이거나 log일시 사용 가능) 아이템 액자 내 아이템 속성 세팅
+    # type: normal, log, effect_cloud
+    # 현재는 normal만 가능
+    #
+    # normal: 바닥에 아이템 액자를 소환하여 해당 액자에 아이템이 보여지도록 하는 방식
+    # log: normal과 비슷하나 나무 옆면에 아이템 액자를 소환하는 방식
+    # effect_cloud: 바닥에 파티클 구름 소환
+    type: normal
+
+    # facing: 0~7, RANDOM, PATHWAY
+    # 현재는 무조건 PATHWAY로 강제 적용됨
+    #
+    # 0~7: 특정 방향으로 설정
+    # RANDOM: 랜덤한 방향으로 설정
+    # PATHWAY: 움직인 경로에 맞도록 설정
+    facing: RANDOM
+
+    # item
+    #
+    # type이 normal log처럼 아이템 액자를 소환하는 경우에만 사용 가능
+    #
+    # normal_model, snow_model 로 커모델 설정 가능
+    # log는 무조건 normal_model만 적용됨
+    item: 
       name: 'NAUTILUS_SHELL'
-      meta:
-        model: 101
-    count: 1
+      normal_model: 101
+      snow_model: 151
+
+
+
 pig:
-  min_move: 30
-  max_move: 40
+  min_move: 10
+  max_move: 20
   mob: pig
   count: 1
   conditions:
     chance_by_biomes:
-      #이곳에 포함되어 있지 않은 바이옴들은 0.0임
       PLAINS: 1.0
       WINDSWEPT_HILLS: 1.0
 
@@ -149,9 +167,9 @@ pig:
       RIVER: 0.5
       FROZEN_RIVER: 0.25
 
-      BEACH: 0.0
-      STONY_SHORE: 0.0
-      SNOWY_BEACH: 0.0
+      BEACH: 0.75
+      STONY_SHORE: 0.5
+      SNOWY_BEACH: 0.75
 
       OCEAN: 0.0
       DEEP_OCEAN: 0.0
@@ -167,18 +185,13 @@ pig:
       DRIPSTONE_CAVES: 0.0
 
     height_difference_for_chance: 40
-    #min_y: 63
+    #min_y: 63 // 강을 건너지 않도록 하는 용도로 주요 사용됨
     #max_y: 320
-
   trace_term: 3
   traces:
-    type: normal # log: 나무 옆면에 흔적이 생김, effect_cloud, 광역 효과 구름이 생기며 파티클을 뿌림
-    facing: RANDOM # (type가 normal 이거나 log일시 사용 가능)
-    # PATHWAY: 움직인 방향을 향하여 각도 설정
-    # NONE, CLOCKWISE, CLOCKWISE_135, CLOCKWISE_45,
-    # COUNTER_CLOCKWISE, COUNTER_CLOCKWISE_45, FLIPPED, FLIPPED_45 로 특정 각도로 강제 설정 가능
-    item: # (type가 normal 이거나 log일시 사용 가능) 아이템 액자 내 아이템 속성 세팅
+    type: normal
+    facing: RANDOM
+    item: 
       name: 'NAUTILUS_SHELL'
-      meta:
-        model: 101
-    count: 1
+      normal_model: 101
+      snow_model: 151
