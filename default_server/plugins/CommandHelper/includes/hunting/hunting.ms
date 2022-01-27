@@ -620,39 +620,39 @@ proc _place_trace(@tag, @is_start) {
     @move = @moves[0]
     # 발자국일시
     @location = _get_random_surface_in_chunk(@move['x'], @move['z'])
-    @rotation = @move['facing']
-    broadcast(A @tag['trace_data']['traces']['item'])
-    @framed_item = array(
-      'name': @tag['trace_data']['traces']['item']['name'],
-      'meta': array(
-        'model': 0
-      )
-    )
-    broadcast(B @tag['trace_data']['traces']['item'])
 
-    @is_snow = false
-    if(array_index_exists(@tag['trace_data']['traces']['item'], 'normal_model')) {
-      @framed_item['meta']['model'] = @tag['trace_data']['traces']['item']['normal_model']
-    }
-    if(get_block(@location) == 'SNOW' && array_index_exists(@tag['trace_data']['traces']['item'], 'snow_model')) {
-      @framed_item['meta']['model'] = @tag['trace_data']['traces']['item']['snow_model']
-      @is_snow = true
-    }
     if(is_array(@location)) {
-      //break_block(@location)
+      @rotation = @move['facing']
+      @framed_item = array(
+        'name': @tag['trace_data']['traces']['item']['name'],
+        'meta': array(
+          'model': 0
+        )
+      )
+
+      @is_snow = false
+      if(array_index_exists(@tag['trace_data']['traces']['item'], 'normal_model')) {
+        @framed_item['meta']['model'] = @tag['trace_data']['traces']['item']['normal_model']
+      }
+      if(get_block(@location) == 'SNOW' && array_index_exists(@tag['trace_data']['traces']['item'], 'snow_model')) {
+        @framed_item['meta']['model'] = @tag['trace_data']['traces']['item']['snow_model']
+        @is_snow = true
+      }
+
       if(!@is_snow) {
         set_block(@location, 'AIR')
       }
-      broadcast(@tag['trace_data']['traces']['item'])
       _summon_item_frame(@location, 'UP', @rotation, 'trace', @framed_item, @tag)
     } else {
-      // 흔적이 사라짐
       @location = _place_trace(@tag, false)
     }
     # 다른타입의 흔적일시
   } else {
     @move = @moves[0]
     @location = _get_random_surface_in_chunk(@move['x'], @move['z'])
+    @location['x'] += 0.5
+    @location['y'] += 1
+    @location['z'] += 0.5
     if(is_array(@location)) {
       _summon_mythicmob(@tag['trace_data']['mob'], @tag['trace_data']['count'], @location)
     } else {
@@ -680,6 +680,33 @@ bind('player_interact_entity', null, array('clicked': 'ITEM_FRAME'), @event) {
       @item['meta']['lodestone'] = false
       @item['meta']['target'] = @location
       set_inventory_item(@uuid, @slot, @item)
+    }
+  }
+}
+
+bind('player_interact', null, array('block': 'SNOW', 'button': 'right', 'hand': 'main_hand'), @event) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+
+  @location = @event['location']
+  @location['x'] += 0.5
+  @location['z'] += 0.5
+
+  @item_frames = entities_in_radius(@location, 1, 'ITEM_FRAME')
+  foreach(@item_frame in @item_frames) {
+    @tag = _get_tag(@item_frame)
+    if(is_array(@tag)) {
+      @slot = pheld_slot(@player)
+      @item = get_inventory_item(@uuid, @slot)
+      if(is_array(@item) && array_index_exists(@item, 'meta', 'model') && !is_null(@item['meta']['model']) && @item['meta']['model'] > 0) {
+        @location = _place_trace(@tag, false)
+        broadcast(@location)
+        entity_remove(@item_frame)
+        @item['meta']['lodestone'] = false
+        @item['meta']['target'] = @location
+        set_inventory_item(@uuid, @slot, @item)
+      }
+      break()
     }
   }
 }
