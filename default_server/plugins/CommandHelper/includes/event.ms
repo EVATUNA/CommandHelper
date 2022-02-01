@@ -13,7 +13,7 @@ foreach(@player in all_players()) {
     @player = player(@uuid)
     if(ponline(@player)) {
       # action bar msg
-      _send_action_msg(@player, @player_data, @skills_spec, @text)
+      //_send_action_msg(@player, @player_data, @skills_spec, @text)
       # boss bar msg
       if(array_size(@player_data['cache']['tooltips']) > 0) {
         if(@player_data['cache']['tooltips'][0]['countdown'] > 0) {
@@ -2794,7 +2794,7 @@ bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_s
             call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skill_spec, @point)
             break()
           }
-          _send_action_msg(@player, @player_data, @skills_spec, @text) // 액션바 설정
+          //_send_action_msg(@player, @player_data, @skills_spec, @text) // 액션바 설정
         }
       }
     }

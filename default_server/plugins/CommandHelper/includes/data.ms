@@ -37,67 +37,67 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
   @scoreboard = "ch_scoreboard.@uuid"
   if(!array_contains(get_scoreboards(), @scoreboard)) { create_scoreboard(@scoreboard) }
   set_pscoreboard(@player, @scoreboard)
-  
-  # sidebar
   _load_sidebar(@player, @uuid, @player_data, @scoreboard, @text)
 
   # bossbar
-  @bossbars = get_bars()
-  ## 참치 레벨
-  ### 보스바 id 재생성
-  @tunalevel_id = "tunalevel.@uuid"
-  if(array_contains(@bossbars, @tunalevel_id)) {
-    remove_bar(@tunalevel_id)
-  }
-  ### 레벨
-  @tuna_level = @player_data['skill_manager'][0]
-  @tunalevel_text = _replace_tunalevel_text(@tuna_level)
-  ### 경험치
-  @tuna_experience = @player_data['skill_manager'][1]
-  @max_tuna_experience = _get_max_tuna_experience(@tuna_level)
-  @tuna_experience_persent = @tuna_experience / @max_tuna_experience
-  if(@tuna_experience_persent < 0) { @tuna_experience_persent = 0 }
-  if(@tuna_experience_persent > 1) { @tuna_experience_persent = 1 }
-  ### 보스바 데이터 설정
-  @tunalevel_bossbar_data = array(
-    'title': @tunalevel_text,
-    'percent': @tuna_experience_persent,
-    'color': 'BLUE'
-  )
-  ### 보스바 생성 및 보여주기
-  create_bar(@tunalevel_id, @tunalevel_bossbar_data)
-  bar_add_player(@tunalevel_id, @player)
-  // skill manager 바뀌는 카프카 cupset 인식하여 레벨 경험치 화면에 보여지게 해야함
-  
-  ## 더미 보스바
-  ### 보스바 id 재생성
-  @dummy_id = "dummy.@uuid"
-  if(array_contains(@bossbars, @dummy_id)) {
-    remove_bar(@dummy_id)
-  }
-  ### 보스바 데이터 설정
-  @dummy_bossbar_data = array(
-    'title': '',
-    'percent': 0
-  )
-  ### 보스바 생성 및 보여주기
-  create_bar(@dummy_id, @dummy_bossbar_data)
-  bar_add_player(@dummy_id, @player)
+  /*
+    @bossbars = get_bars()
+    ## 참치 레벨
+    ### 보스바 id 재생성
+    @tunalevel_id = "tunalevel.@uuid"
+    if(array_contains(@bossbars, @tunalevel_id)) {
+      remove_bar(@tunalevel_id)
+    }
+    ### 레벨
+    @tuna_level = @player_data['skill_manager'][0]
+    @tunalevel_text = _replace_tunalevel_text(@tuna_level)
+    ### 경험치
+    @tuna_experience = @player_data['skill_manager'][1]
+    @max_tuna_experience = _get_max_tuna_experience(@tuna_level)
+    @tuna_experience_persent = @tuna_experience / @max_tuna_experience
+    if(@tuna_experience_persent < 0) { @tuna_experience_persent = 0 }
+    if(@tuna_experience_persent > 1) { @tuna_experience_persent = 1 }
+    ### 보스바 데이터 설정
+    @tunalevel_bossbar_data = array(
+      'title': @tunalevel_text,
+      'percent': @tuna_experience_persent,
+      'color': 'BLUE'
+    )
+    ### 보스바 생성 및 보여주기
+    create_bar(@tunalevel_id, @tunalevel_bossbar_data)
+    bar_add_player(@tunalevel_id, @player)
+    // skill manager 바뀌는 카프카 cupset 인식하여 레벨 경험치 화면에 보여지게 해야함
+    
+    ## 더미 보스바
+    ### 보스바 id 재생성
+    @dummy_id = "dummy.@uuid"
+    if(array_contains(@bossbars, @dummy_id)) {
+      remove_bar(@dummy_id)
+    }
+    ### 보스바 데이터 설정
+    @dummy_bossbar_data = array(
+      'title': '',
+      'percent': 0
+    )
+    ### 보스바 생성 및 보여주기
+    create_bar(@dummy_id, @dummy_bossbar_data)
+    bar_add_player(@dummy_id, @player)
 
-  ## 인디케이터(and 툴팁) 보스바
-  ### 보스바 id 재생성
-  @indicator_id = 'tooltip.'.@uuid
-  if(array_contains(@bossbars, @indicator_id)) {
-    remove_bar(@indicator_id)
-  }
-  ### 보스바 데이터 설정
-  @indicator_bossbar_data = array(
-    'title': '',
-    'percent': 0
-  )
-  ### 보스바 생성 및 보여주기
-  create_bar(@indicator_id, @indicator_bossbar_data)
-  bar_add_player(@indicator_id, @player)
+    ## 인디케이터(and 툴팁) 보스바
+    ### 보스바 id 재생성
+    @indicator_id = 'tooltip.'.@uuid
+    if(array_contains(@bossbars, @indicator_id)) {
+      remove_bar(@indicator_id)
+    }
+    ### 보스바 데이터 설정
+    @indicator_bossbar_data = array(
+      'title': '',
+      'percent': 0
+    )
+    ### 보스바 생성 및 보여주기
+    create_bar(@indicator_id, @indicator_bossbar_data)
+    bar_add_player(@indicator_id, @player)
+  */
 
   # item
   @player_data['item'] = array(
@@ -176,22 +176,40 @@ proc _new_decoration(@uuid, @player_data) {
 }
 
 proc _load_sidebar(@player, @uuid, @player_data, @scoreboard, @text) {
-  @sidebar = 'sidebar'
-  @is_sidebar_exist = false
+  @is_objective_exists = false
   foreach(@objective in get_objectives(@scoreboard, 'DUMMY')) {
-    if(@objective['name'] == 'sidebar') {
-      @is_sidebar_exist = true
-      break() //나중에 해당 스코어 보드에 여러 오브젝티브 사용시 브레이크 제거 해야함
+    if(@objective['name'] == 'objective') {
+      @is_objective_exists = true
+      break()
     }
   }
-  if(!@is_sidebar_exist) { create_objective(@sidebar, 'DUMMY', @scoreboard) }
-  @psf = @text['space_fonts']['space.64']
-  @nsf = @text['space_fonts']['space.-82']
-  set_objective_display(@sidebar, array('slot': 'SIDEBAR', 'displayname': @nsf), @scoreboard)
-  set_pscore(@sidebar, @psf.'a'.@nsf, 1, @scoreboard)
-  set_pscore(@sidebar, @psf.'b'.@nsf, 1, @scoreboard)
-  set_pscore(@sidebar, @psf.'c'.@nsf, 1, @scoreboard)
-  set_pscore(@sidebar, @psf.'d'.@nsf, 1, @scoreboard)
+
+  @mnsf = @text['space_fonts']['space.-max']
+
+  if(!@is_objective_exists) {
+    create_objective('objective', 'DUMMY', @scoreboard)
+  }
+  set_objective_display('objective', array('slot': 'SIDEBAR', 'displayname': @text['space_fonts']['space.-5']), @scoreboard)
+
+  //@psf = @text['space_fonts']['space.64']
+  //@nsf = @text['space_fonts']['space.-82']
+
+  @teams = get_teams(@scoreboard)
+  for(@line = 0, @line < 15, @line ++) {
+    # 오브젝트 플레이어
+    set_pscore('objective', @line, 14 - @line, @scoreboard)
+    # 팀
+    if(!array_index_exists(@teams, @line)) {
+      create_team(@line, @scoreboard)
+    }
+    _set_sidebar(@uuid, @line, '', @text)
+    team_add_player(@line, @line, @scoreboard)
+  }
+  _set_sidebar(@uuid, 0, color('#feff00').'\ue3f9', @text) // default :color('#fe007f')
+  _set_sidebar(@uuid, 10, color('#fe7f7f').'TEST2', @text)
+
+
+  /*
   @channel_tags = array(
     'general_ko': '§1\ue3f9'.@nsf,
     'general_en': '§1\ue3fa'.@nsf,
@@ -206,20 +224,19 @@ proc _load_sidebar(@player, @uuid, @player_data, @scoreboard, @text) {
     'dummy_ko': '§1\ue403'.@nsf,
     'dummy_en': '§1\ue404'.@nsf,
   )
-  set_pscore(@sidebar, @channel_tags['general_ko'], 0, @scoreboard)
-  set_pscore(@sidebar, @channel_tags['general_en'], 0, @scoreboard)
-  set_pscore(@sidebar, @channel_tags['town_ko'], 0, @scoreboard)
-  set_pscore(@sidebar, @channel_tags['town_en'], 0, @scoreboard)
-  set_pscore(@sidebar, @channel_tags['local_ko'], 0, @scoreboard)
-  set_pscore(@sidebar, @channel_tags['local_en'], 0, @scoreboard)
-  set_pscore(@sidebar, @channel_tags['admin_ko'], 0, @scoreboard)
-  set_pscore(@sidebar, @channel_tags['admin_en'], 0, @scoreboard)
-  set_pscore(@sidebar, @channel_tags['party_ko'], 0, @scoreboard)
-  set_pscore(@sidebar, @channel_tags['party_en'], 0, @scoreboard)
-  set_pscore(@sidebar, @channel_tags['dummy_ko'], 0, @scoreboard)
-  set_pscore(@sidebar, @channel_tags['dummy_en'], 0, @scoreboard)
 
-  _update_channel_tag(@player, @uuid, @player_data, @text)
+
+  */
+  //_update_channel_tag(@player, @uuid, @player_data, @text)
+}
+
+proc _set_sidebar(@uuid, @line, @message, @text) {
+  @scoreboard = "ch_scoreboard.@uuid"
+  if(length(@message) <= 63) {
+    set_team_display(@line, array('prefix': @message.@text['space_fonts']['space.-max'] ), @scoreboard)
+  } else {
+    set_team_display(@line, array('prefix': @line.'번째 줄이 너무 깁니다. '.@text['space_fonts']['space.-max'] ), @scoreboard)
+  }
 }
 
 proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
@@ -958,7 +975,7 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
     @player_data['item']['enchantments'][@slot] = @enchantment
   }
   set_timeout(0, closure() {
-    _send_action_msg(@player, @player_data, @skills_spec, @text)
+    //_send_action_msg(@player, @player_data, @skills_spec, @text)
   })
 }
 

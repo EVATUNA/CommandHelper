@@ -32,6 +32,7 @@
 			{
 				"type": "rank",
         "model": 1,
+				"display": "추적기",
 				"weight": 1
 			}
 		]

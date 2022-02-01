@@ -113,6 +113,7 @@ foreach(@scoreboard in get_scoreboards()) {
 )
 
 # 사이드바 업데이트
+/*
 proc _update_channel_tag(@player, @uuid, @player_data, @text) {
   @scoreboard = "ch_scoreboard.@uuid"
   @sidebar = 'sidebar'
@@ -178,6 +179,7 @@ proc _update_channel_tag(@player, @uuid, @player_data, @text) {
   set_pscore(@sidebar, @channel_tags['dummy_en'], 0, @scoreboard)
   set_pscore(@sidebar, @channel_tags[@channel_tag], 2, @scoreboard)
 }
+*/
 
 ### Initial Including Procedure
 ## 화면 관련

@@ -675,7 +675,6 @@ bind('player_interact_entity', null, array('clicked': 'ITEM_FRAME'), @event) {
     @item = get_inventory_item(@uuid, @slot)
     if(is_array(@item) && array_index_exists(@item, 'meta', 'model') && !is_null(@item['meta']['model']) && @item['meta']['model'] > 0) {
       @location = _place_trace(@tag, false)
-      broadcast(@location)
       entity_remove(@id)
       @item['meta']['lodestone'] = false
       @item['meta']['target'] = @location
@@ -700,7 +699,6 @@ bind('player_interact', null, array('block': 'SNOW', 'button': 'right', 'hand': 
       @item = get_inventory_item(@uuid, @slot)
       if(is_array(@item) && array_index_exists(@item, 'meta', 'model') && !is_null(@item['meta']['model']) && @item['meta']['model'] > 0) {
         @location = _place_trace(@tag, false)
-        broadcast(@location)
         entity_remove(@item_frame)
         @item['meta']['lodestone'] = false
         @item['meta']['target'] = @location
