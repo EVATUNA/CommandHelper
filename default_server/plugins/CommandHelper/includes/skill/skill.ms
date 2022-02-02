@@ -1550,7 +1550,6 @@ proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
   _show_gui(@player, 'skillbook_combat', 54, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_info, @skills_spec, @text)
 }
 
-
 # 공격 반영
 proc _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skills_spec, @allowed_entity, @text, @server, @items, @weapons) {
   # 기본 변수 선언
@@ -1861,4 +1860,404 @@ proc _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skill
   @event['amount'] *= @nether_field_effect_multiply // 반영
   # 모디피 이벤트 (실제 반영)
   modify_event('amount', @event['amount'])
+}
+
+# 스킬 HUD 아이콘
+proc _update_skill_hud(@player, @uuid, @player_data, @skills_spec, @text) {
+  # 스킬 매니징
+  @skill_manager = @player_data['skill_manager']
+  @selected_methods = json_decode(@skill_manager[4])
+
+  # 변수들 선언
+  @icons = array(
+    'combat_method': array(
+      'sweeping': '\uee80',
+      'knockback': '\uee81',
+      'cleaving': '\uee82',
+      'blocking': '\uee83'
+    ),
+    'harvesting_method': array(
+      'wide_hands': '\uee90',
+      'golden_finger': '\uee91'
+    ),
+    'sowing_method': array(
+      'wet_hands': '\ueea0',
+      'fertile_touch': '\ueea1'
+    )
+  )
+  @cooldowns = array(
+    'combat_method': array('\uee20', '\uee21', '\uee22', '\uee23', '\uee24', '\uee25', '\uee26', '\uee27', '\uee28', '\uee29', '\uee2a', '\uee2b', '\uee2c', '\uee2d', '\uee2e', '\uee2f', @text['space_fonts']['space.17']),
+    'harvesting_method': array('\uee30', '\uee31', '\uee32', '\uee33', '\uee34', '\uee35', '\uee36', '\uee37', '\uee38', '\uee39', '\uee3a', '\uee3b', '\uee3c', '\uee3d', '\uee3e', '\uee3f', @text['space_fonts']['space.17']),
+    'sowing_method': array('\uee40', '\uee41', '\uee42', '\uee43', '\uee44', '\uee45', '\uee46', '\uee47', '\uee48', '\uee49', '\uee4a', '\uee4b', '\uee4c', '\uee4d', '\uee4e', '\uee4f', @text['space_fonts']['space.17']),
+    'line3': array('\uee50', '\uee51', '\uee52', '\uee53', '\uee54', '\uee55', '\uee56', '\uee57', '\uee58', '\uee59', '\uee5a', '\uee5b', '\uee5c', '\uee5d', '\uee5e', '\uee5f', @text['space_fonts']['space.17']),
+    'line4': array('\uee60', '\uee61', '\uee62', '\uee63', '\uee64', '\uee65', '\uee66', '\uee67', '\uee68', '\uee69', '\uee6a', '\uee6b', '\uee6c', '\uee6d', '\uee6e', '\uee6f', @text['space_fonts']['space.17']),
+    'line5': array('\uee70', '\uee71', '\uee72', '\uee73', '\uee74', '\uee75', '\uee76', '\uee77', '\uee78', '\uee79', '\uee7a', '\uee7b', '\uee7c', '\uee7d', '\uee7e', '\uee7f', @text['space_fonts']['space.17'])
+  )
+  @charges = array(
+    'combat_method': array('\uee10', '\uee11'),
+    'harvesting_method': array('\uee12', '\uee13'),
+    'sowing_method': array('\uee14', '\uee15'),
+    'line3': array('\uee16', '\uee17'),
+    'line4': array('\uee18', '\uee19'),
+    'line5': array('\uee1a', '\uee1b')
+  )
+  @huds = array(
+    'combat_method': '',
+    'harvesting_method': '',
+    'sowing_method': ''
+  )
+  //broadcast(@player @selected_methods)
+  foreach(@method_type: @selected_method in @selected_methods) {
+    @icon = @text['space_fonts']['space.17']
+    @cooldown = @text['space_fonts']['space.17']
+    @charge = ''
+    if(@selected_method != '' && array_index_exists(@player_data['active_skill'], @selected_method)) {
+      # 아이콘
+      @icon = @icons[@method_type][@selected_method]
+      # 쿨다운
+      @active_skill = @player_data['active_skill'][@selected_method]
+      @point = @player_data['skill_data'][@selected_method][0]
+      @skill_spec = @skills_spec[@selected_method]
+      if(@active_skill[1] > 0) { // 스킬 지속시간 있을시
+        @max_duration = @skill_spec['effect_by_point'][@point]['active']['duration']
+        @index = 16 - integer(@active_skill[1] / @max_duration * 16)
+      } else { // 쿨타임중일시
+        @max_cooldown = @skill_spec['effect_by_point'][@point]['active']['cooldown']
+        @remain_cooldown = @max_cooldown - @active_skill[0]
+        @index = 16 - integer(@remain_cooldown / @max_cooldown * 16)
+      }
+      if(@index == 16 && (@active_skill[2] == 0 || @skill_spec['effect_by_point'][@point]['active']['count'] > @active_skill[2])) {
+        @index = 15 // 지속시간 다 끝난후 or 충전 횟수 있을경우 쿨타임 16(쿨타임 다됨)될시 15(쿨타임 꽉참)로 변경
+      } else if(@index == 0 && @active_skill[2] == 1 && @active_skill[0] == 0) {
+        // 최대카운트 0인 스킬 쿨타임 다 됬을시
+        @index = 16
+      }
+      @cooldown = @cooldowns[@method_type][@index]
+      # 충전 갯수
+      if(@skill_spec['effect_by_point'][@point]['active']['count'] > 0) {
+        @slots = array()
+        @psfs = array()
+        for(@i = 0, @i < @skill_spec['effect_by_point'][@point]['active']['count'], @i++) {
+          if(@i < @active_skill[2]) {
+            @slots[] = @text['space_fonts']['space.-6'].@charges[@method_type][1]
+          } else {
+            @slots[] = @text['space_fonts']['space.-6'].@charges[@method_type][0]
+          }
+          @psfs[] = @text['space_fonts']['space.3']
+        }
+        @charge = array_implode(array_merge(@slots, @psfs), '')
+      }
+    }
+    @huds[@method_type] = @icon.@text['space_fonts']['space.-17'].@cooldown.@text['space_fonts']['space.2'].@charge.@text['space_fonts']['space.-2'].@text['space_fonts']['space.-17']
+  }
+
+  @skill_hud = color('#fe0080').@text['space_fonts']['space.-21'].@huds['combat_method'].@huds['harvesting_method'].@huds['sowing_method']
+  _set_sidebar(@uuid, 1, @skill_hud, @text)
+
+  /*
+
+  # 액티브 스킬을 쓸수 있을시
+  if(@skill != '' && array_index_exists(@player_data['active_skill'], @skill)) {
+    @active_skill = @player_data['active_skill'][@skill]
+    @point = @player_data['skill_data'][@skill][0]
+    @skill_spec = @skills_spec[@skill]
+    if(@skill_spec['effect_by_point'][@point]['active']['count'] == 0) {
+      if(@active_skill[1] > 0) {
+        @max_duration = @skill_spec['effect_by_point'][@point]['active']['duration']
+        @index = integer(@active_skill[1] / @max_duration * 10)
+        switch(@index) {
+        case 0:
+          @hotbar = '\ue406'
+          break()
+        case 1:
+          @hotbar = '\ue408'
+          break()
+        case 2:
+          @hotbar = '\ue409'
+          break()
+        case 3:
+          @hotbar = '\ue40a'
+          break()
+        case 4:
+          @hotbar = '\ue40b'
+          break()
+        case 5:
+          @hotbar = '\ue40c'
+          break()
+        case 6:
+          @hotbar = '\ue40d'
+          break()
+        case 7:
+          @hotbar = '\ue40e'
+          break()
+        case 8:
+          @hotbar = '\ue40f'
+          break()
+        case 9:
+          @hotbar = '\ue410'
+          break()
+        case 10:
+          @hotbar = '\ue411'
+          break()
+        }
+      } else {
+        @max_cooldown = @skill_spec['effect_by_point'][@point]['active']['cooldown']
+        @remain_cooldown = @max_cooldown - @active_skill[0]
+        @index = integer(@remain_cooldown / @max_cooldown * 10)
+        switch(@index) {
+        case 0:
+          @hotbar = '\ue406'
+          break()
+        case 1:
+          @hotbar = '\ue408'
+          break()
+        case 2:
+          @hotbar = '\ue409'
+          break()
+        case 3:
+          @hotbar = '\ue40a'
+          break()
+        case 4:
+          @hotbar = '\ue40b'
+          break()
+        case 5:
+          @hotbar = '\ue40c'
+          break()
+        case 6:
+          @hotbar = '\ue40d'
+          break()
+        case 7:
+          @hotbar = '\ue40e'
+          break()
+        case 8:
+          @hotbar = '\ue40f'
+          break()
+        case 9:
+          @hotbar = '\ue410'
+          break()
+        case 10:
+          @hotbar = '\ue411'
+          break()
+        }
+      }
+    } else {
+      @max_cooldown = @skill_spec['effect_by_point'][@point]['active']['cooldown']
+      @remain_cooldown = @max_cooldown - @active_skill[0]
+      @index = integer(@remain_cooldown / @max_cooldown * 10)
+      switch(@active_skill[2]) {
+      case 0:
+        switch(@index) {
+        case 0:
+          @hotbar = '\ue406'
+          break()
+        case 1:
+          @hotbar = '\ue412'
+          break()
+        case 2:
+          @hotbar = '\ue413'
+          break()
+        case 3:
+          @hotbar = '\ue414'
+          break()
+        case 4:
+          @hotbar = '\ue415'
+          break()
+        case 5:
+          @hotbar = '\ue416'
+          break()
+        case 6:
+          @hotbar = '\ue417'
+          break()
+        case 7:
+          @hotbar = '\ue418'
+          break()
+        case 8:
+          @hotbar = '\ue419'
+          break()
+        case 9:
+          @hotbar = '\ue41a'
+          break()
+        case 10:
+          @hotbar = '\ue41b'
+          break()
+        }
+        break()
+      case 1:
+        switch(@index) {
+        case 0:
+          @hotbar = '\ue41b'
+          break()
+        case 1:
+          @hotbar = '\ue41c'
+          break()
+        case 2:
+          @hotbar = '\ue41d'
+          break()
+        case 3:
+          @hotbar = '\ue41e'
+          break()
+        case 4:
+          @hotbar = '\ue41f'
+          break()
+        case 5:
+          @hotbar = '\ue420'
+          break()
+        case 6:
+          @hotbar = '\ue421'
+          break()
+        case 7:
+          @hotbar = '\ue422'
+          break()
+        case 8:
+          @hotbar = '\ue423'
+          break()
+        case 9:
+          @hotbar = '\ue424'
+          break()
+        case 10:
+          @hotbar = '\ue425'
+          break()
+        }
+        break()
+      case 2:
+        switch(@index) {
+        case 0:
+          @hotbar = '\ue425'
+          break()
+        case 1:
+          @hotbar = '\ue426'
+          break()
+        case 2:
+          @hotbar = '\ue427'
+          break()
+        case 3:
+          @hotbar = '\ue428'
+          break()
+        case 4:
+          @hotbar = '\ue429'
+          break()
+        case 5:
+          @hotbar = '\ue42a'
+          break()
+        case 6:
+          @hotbar = '\ue42b'
+          break()
+        case 7:
+          @hotbar = '\ue42c'
+          break()
+        case 8:
+          @hotbar = '\ue42d'
+          break()
+        case 9:
+          @hotbar = '\ue42e'
+          break()
+        case 10:
+          @hotbar = '\ue42f'
+          break()
+        }
+        break()
+      case 3:
+        @hotbar = '\ue42f'
+        break()
+      }
+    }
+    switch(@skill) {
+    case 'sweeping':
+      @icon = '\ue431'
+      break()
+    case 'knockback':
+      @icon = '\ue432'
+      break()
+    case 'cleaving':
+      @icon = '\ue433'
+      break()
+    case 'blocking':
+      @icon = '\ue434'
+      break()
+    case 'wide_hands':
+      @icon = '\ue435'
+      break()
+    case 'golden_finger':
+      @icon = '\ue436'
+      break()
+    case 'wet_hands':
+      @icon = '\ue437'
+      break()
+    case 'fertile_touch':
+      @icon = '\ue438'
+      break()
+    default:
+      @icon = '\ue430'
+      break()
+    }
+  } else {
+    @hotbar = @text['space_fonts']['space.23']
+    @icon = @text['space_fonts']['space.17']
+  }
+  if(@player_data['setting'][1]) {
+    @left_hotbar = @text['space_fonts']['space.23']
+    @left_icon = @text['space_fonts']['space.17']
+    @right_hotbar = @hotbar
+    @right_icon = @icon
+  } else {
+    @left_hotbar = @hotbar
+    @left_icon = @icon
+    @right_hotbar = @text['space_fonts']['space.23']
+    @right_icon = @text['space_fonts']['space.17']
+  }
+
+  //@skill_hud = @hotbar.@text['space_fonts']['space.-20'].@icon
+  //@skill_hud = @left_hotbar.@text['space_fonts']['space.-20'].@left_icon.@text['space_fonts']['space.198'].@right_hotbar.@text['space_fonts']['space.-20'].@right_icon
+  */
+
+}
+
+# 스킬 HUD 핫바 선택
+proc _update_selected_skill_hotbar(@player, @uuid, @player_data, @skills_spec, @text) {
+  # 스킬 매니징
+  @skill_manager = @player_data['skill_manager']
+  @selected_methods = json_decode(@skill_manager[4])
+  # 손에 든 아이템 구하기
+  @main_hand_item = @player_data['item']['main_hand']
+  @hoes = array(
+    'WOODEN_HOE',
+    'STONE_HOE',
+    'IRON_HOE',
+    'GOLDEN_HOE',
+    'DIAMOND_HOE',
+    'NETHERITE_HOE'
+  )
+  @seeds = array(
+    'WHEAT_SEEDS',
+    'BEETROOT_SEEDS',
+    'POTATO',
+    'CARROT',
+    'PUMPKIN_SEEDS',
+    'MELON_SEEDS',
+    'SWEET_BERRIES'
+  )
+  # 손에든 아이템, 사용중인 스킬에 따라 핫바 선택 조정
+  if(!is_null(@main_hand_item)) { // 무언가 들고 있을시
+    if(array_contains(@hoes, @main_hand_item['name'])) {
+      @selected_hotbar = @text['space_fonts']['space.-25'].'\uee02'
+      @skill = @selected_methods['harvesting_method']
+    } else if(array_contains(@seeds, @main_hand_item['name'])) {
+      @selected_hotbar = @text['space_fonts']['space.-25'].'\uee03'
+      @skill = @selected_methods['sowing_method']
+    } else {
+      @selected_hotbar = @text['space_fonts']['space.-25'].'\uee01'
+      @skill = @selected_methods['combat_method']
+    }
+    if(@skill == '') { // 파종, 수확 스킬 선택 안했을시
+      @selected_hotbar = @text['space_fonts']['space.-25'].'\uee01'
+      @skill = @selected_methods['combat_method']
+    }
+  } else { // 특별한 도구 든거 없을시
+    @selected_hotbar = @text['space_fonts']['space.-25'].'\uee01'
+    @skill = @selected_methods['combat_method']
+  }
+  if(@skill == '' || !array_index_exists(@player_data['active_skill'], @skill)) { // 전투스킬마저 없을시
+    @selected_hotbar = ''
+  }
+  _set_sidebar(@uuid, 2, color('#fe0080').@selected_hotbar, @text)
 }

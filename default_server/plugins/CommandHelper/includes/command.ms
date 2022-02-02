@@ -875,7 +875,7 @@ proc _screen_command(@command, @player, @args, @text, @uuid, @players_data, @ski
           @is_size_changed = true
         }
         if(@is_size_changed) {
-          _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
+          //_send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
           @message = 'HUD 표시 너비 설정 :: '.@players_data[@uuid]['setting'][0]
           _show_gui(@player, 'screen_setting', 27, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_spec, @text)
         }
@@ -893,32 +893,6 @@ register_command('screen', array(
   }
 ))
 
-# 화면 설정 (명령어)
-proc _hud_command(@command, @player, @args, @text, @uuid, @players_data, @skills_spec) {
-  switch(array_size(@args)) {
-  case 0:
-    msg(@text['prefix']['info']'§e/hud <너비>§7를 통해 HUD 표시 너비를 수정할 수 있습니다. (현재 너비:'.@players_data[@uuid]['setting'][0].')')
-    break()
-  case 1:
-    if(is_integral(@args[0]) && integer(@args[0]) >= 256 && integer(@args[0]) < 32768 ) {
-      @players_data[@uuid]['setting'][0] = integer(@args[0])
-      _send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
-      cup_set('SETTING', @uuid, @players_data[@uuid]['setting'])
-    } else {
-      msg(@text['prefix']['failure']'§7256이상 32768미만의 정수만 입력 가능합니다.')
-    }
-    break()
-  }
-}
-register_command('hud', array(
-  'description': '',
-  'usage': '/hud [width]',
-  'tabcompleter': closure(@command, @player, @args) { return(array()) },
-  'executor': closure(@command, @player, @args) {
-    @uuid = puuid(@player)
-    _hud_command(@command, @player, @args, @text, @uuid, @players_data, @skills_spec)
-  }
-))
 
 
 /*
@@ -1304,6 +1278,22 @@ register_command('broadcast', array(
   }
 ))
 
+
+proc _tunalevel_command(@command, @player, @args, @text, @players_data) {
+  @target_name = @args[0]
+  @target_uuid = puuid(@target_name)
+  @player_data = @players_data[@target_uuid]
+  @adding_default_experience = 0
+  @adding_default_experience = integer(@args[1])
+  _add_tunelevel_experience(@target_uuid, @player_data, @adding_default_experience, 0)
+}
+register_command('tunalevel', array(
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    _tunalevel_command(@command, @player, @args, @text, @players_data)
+  }
+))
+
 proc _chreload_command(@command, @player, @args, @text, @players_data) {
   foreach(@target_name in all_players()) {
     @target_uuid = puuid(@target_name)
@@ -1321,19 +1311,19 @@ proc _chreload_command(@command, @player, @args, @text, @players_data) {
       @selected_methods = json_decode(@skill_manager[4])
       
       @selected_combat_method = @selected_methods['combat_method']
-      if(@selected_combat_method != '') {
+      if(@selected_combat_method != '' && array_index_exists(@player_data['active_skill'], @selected_combat_method)) {
         @active_skill = @player_data['active_skill'][@selected_combat_method]
         _save_active_skill(@target_uuid, @selected_combat_method, @active_skill)
       }
 
       @selected_sowing_method = @selected_methods['sowing_method']
-      if(@selected_sowing_method != '') {
+      if(@selected_sowing_method != '' && array_index_exists(@player_data['active_skill'], @selected_sowing_method)) {
         @active_skill = @player_data['active_skill'][@selected_sowing_method]
         _save_active_skill(@target_uuid, @selected_sowing_method, @active_skill)
       }
 
       @selected_harvesting_method = @selected_methods['harvesting_method']
-      if(@selected_harvesting_method != '') {
+      if(@selected_harvesting_method != '' && array_index_exists(@player_data['active_skill'], @selected_harvesting_method)) {
         @active_skill = @player_data['active_skill'][@selected_harvesting_method]
         _save_active_skill(@target_uuid, @selected_harvesting_method, @active_skill)
       }
@@ -1351,21 +1341,5 @@ register_command('chreload', array(
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
     _chreload_command(@command, @player, @args, @text, @players_data)
-  }
-))
-
-
-#proc _tunalevel_command()
-
-register_command('tunalevel', array(
-  'tabcompleter': closure(@command, @player, @args) { return(array()) },
-  'executor': closure(@command, @player, @args) {
-    @target_name = @args[0]
-    @target_uuid = puuid(@target_name)
-    @player_data = @players_data[@target_uuid]
-    @adding_default_experience = 0
-    @adding_default_experience = integer(@args[1])
-    _add_tunelevel_experience(@target_uuid, @player_data, @adding_default_experience, 0)
-
   }
 ))

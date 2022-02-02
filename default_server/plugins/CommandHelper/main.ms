@@ -37,11 +37,12 @@ include('includes/chat.ms')
 #include('includes/decoration/decoration.ms')
 # 상점 시스템
 include('includes/shop/shop.ms')
-# 명령어 시스템
-include('includes/command.ms')
 
 
 ### High Include
 
 # 이벤트, 테스크 바인드
 include('includes/event.ms')
+
+# 명령어 시스템
+include('includes/command.ms')

@@ -171,18 +171,18 @@ proc _en_to_ko(@unconverted_message) {
 # Channel Tag
 proc _update_channel_tag(@uuid, @player_data, @text) {
   @channel_tags = array(
-    'general_ko': '\ue3f9',
-    'general_en': '\ue3fa',
-    'town_ko': '\ue3fb',
-    'town_en': '\ue3fc',
-    'local_ko': '\ue3fd',
-    'local_en': '\ue3fe',
-    'admin_ko': '\ue3ff',
-    'admin_en': '\ue400',
-    'party_ko': '\ue401',
-    'party_en': '\ue402',
-    'dummy_ko': '\ue403',
-    'dummy_en': '\ue404'
+    'general_en': '\ue3f9',
+    'general_ko': '\ue3fa',
+    'town_en': '\ue3fb',
+    'town_ko': '\ue3fc',
+    'local_en': '\ue3fd',
+    'local_ko': '\ue3fe',
+    'admin_en': '\ue3ff',
+    'admin_ko': '\ue400',
+    'party_en': '\ue401',
+    'party_ko': '\ue402',
+    'dummy_en': '\ue403',
+    'dummy_ko': '\ue404'
   )
   switch(@player_data['chat'][1]) {
   case true:

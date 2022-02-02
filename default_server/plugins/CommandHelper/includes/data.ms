@@ -34,6 +34,8 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
     _new_decoration(@uuid, @player_data)
   }
 
+  # 스킬 HUD 프리셋
+  _set_sidebar(@uuid, 3, color('#fe0080').@text['space_fonts']['space.-24'].'\uee00', @text)
   # skill
   _load_skills(@player_data, @player, @uuid, @skills_spec)
 
@@ -951,7 +953,7 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
     @player_data['item']['enchantments'][@slot] = @enchantment
   }
   set_timeout(0, closure() {
-    //_send_action_msg(@player, @player_data, @skills_spec, @text)
+    _update_selected_skill_hotbar(@player, @uuid, @player_data, @skills_spec, @text)
   })
 }
 
