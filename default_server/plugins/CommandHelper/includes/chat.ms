@@ -168,6 +168,57 @@ proc _en_to_ko(@unconverted_message) {
   return(@converted_message)
 }
 
+# Channel Tag
+proc _update_channel_tag(@uuid, @player_data, @text) {
+  @channel_tags = array(
+    'general_ko': '\ue3f9',
+    'general_en': '\ue3fa',
+    'town_ko': '\ue3fb',
+    'town_en': '\ue3fc',
+    'local_ko': '\ue3fd',
+    'local_en': '\ue3fe',
+    'admin_ko': '\ue3ff',
+    'admin_en': '\ue400',
+    'party_ko': '\ue401',
+    'party_en': '\ue402',
+    'dummy_ko': '\ue403',
+    'dummy_en': '\ue404'
+  )
+  switch(@player_data['chat'][1]) {
+  case true:
+    switch(@player_data['chat'][0]) {
+    case 'general':
+      @channel_tag = 'general_ko'
+    case 'town':
+      @channel_tag = 'town_ko'
+    case 'local':
+      @channel_tag = 'local_ko'
+    case 'admin':
+      @channel_tag = 'admin_ko'
+    case 'party':
+      @channel_tag = 'party_ko'
+    default:
+      @channel_tag = 'general_ko'
+    }
+  case false:
+  switch(@player_data['chat'][0]) {
+    case 'general':
+      @channel_tag = 'general_en'
+    case 'town':
+      @channel_tag = 'town_en'
+    case 'local':
+      @channel_tag = 'local_en'
+    case 'admin':
+      @channel_tag = 'admin_en'
+    case 'party':
+      @channel_tag = 'party_en'
+    default:
+      @channel_tag = 'general_en'
+    }
+  }
+  _set_sidebar(@uuid, 0, color('#feff00').@channel_tags[@channel_tag], @text)
+}
+
 # Default Chat
 proc _default_chat(@data, @players_data) {
   # 변수 선언

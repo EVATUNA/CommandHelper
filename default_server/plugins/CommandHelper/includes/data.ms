@@ -4,6 +4,9 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
   @players_data[@uuid] = array()
   @player_data = @players_data[@uuid]
 
+  # sidebar
+  _load_sidebar(@player, @uuid, @text)
+
   # cache
   @player_data['cache'] = array(
     'is_dash': false,
@@ -23,6 +26,7 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
   if(is_null(@player_data['chat'])) {
     _new_chat(@uuid, @player_data)
   }
+  _update_channel_tag(@uuid, @player_data, @text)
 
   # decoration
   @player_data['decoration'] = cup_get('DECORATION', @uuid)
@@ -32,12 +36,6 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
 
   # skill
   _load_skills(@player_data, @player, @uuid, @skills_spec)
-  
-  # scoreboard
-  @scoreboard = "ch_scoreboard.@uuid"
-  if(!array_contains(get_scoreboards(), @scoreboard)) { create_scoreboard(@scoreboard) }
-  set_pscoreboard(@player, @scoreboard)
-  _load_sidebar(@player, @uuid, @player_data, @scoreboard, @text)
 
   # bossbar
   /*
@@ -175,7 +173,11 @@ proc _new_decoration(@uuid, @player_data) {
   cup_set('DECORATION', @uuid, @player_data['decoration'])
 }
 
-proc _load_sidebar(@player, @uuid, @player_data, @scoreboard, @text) {
+proc _load_sidebar(@player, @uuid, @text) {
+  @scoreboard = "ch_scoreboard.@uuid"
+  if(!array_contains(get_scoreboards(), @scoreboard)) { create_scoreboard(@scoreboard) }
+  set_pscoreboard(@player, @scoreboard)
+
   @is_objective_exists = false
   foreach(@objective in get_objectives(@scoreboard, 'DUMMY')) {
     if(@objective['name'] == 'objective') {
@@ -191,9 +193,6 @@ proc _load_sidebar(@player, @uuid, @player_data, @scoreboard, @text) {
   }
   set_objective_display('objective', array('slot': 'SIDEBAR', 'displayname': @text['space_fonts']['space.-5']), @scoreboard)
 
-  //@psf = @text['space_fonts']['space.64']
-  //@nsf = @text['space_fonts']['space.-82']
-
   @teams = get_teams(@scoreboard)
   for(@line = 0, @line < 15, @line ++) {
     # 오브젝트 플레이어
@@ -205,29 +204,6 @@ proc _load_sidebar(@player, @uuid, @player_data, @scoreboard, @text) {
     _set_sidebar(@uuid, @line, '', @text)
     team_add_player(@line, @line, @scoreboard)
   }
-  _set_sidebar(@uuid, 0, color('#feff00').'\ue3f9', @text) // default :color('#fe007f')
-  _set_sidebar(@uuid, 10, color('#fe7f7f').'TEST2', @text)
-
-
-  /*
-  @channel_tags = array(
-    'general_ko': '§1\ue3f9'.@nsf,
-    'general_en': '§1\ue3fa'.@nsf,
-    'town_ko': '§1\ue3fb'.@nsf,
-    'town_en': '§1\ue3fc'.@nsf,
-    'local_ko': '§1\ue3fd'.@nsf,
-    'local_en': '§1\ue3fe'.@nsf,
-    'admin_ko': '§1\ue3ff'.@nsf,
-    'admin_en': '§1\ue400'.@nsf,
-    'party_ko': '§1\ue401'.@nsf,
-    'party_en': '§1\ue402'.@nsf,
-    'dummy_ko': '§1\ue403'.@nsf,
-    'dummy_en': '§1\ue404'.@nsf,
-  )
-
-
-  */
-  //_update_channel_tag(@player, @uuid, @player_data, @text)
 }
 
 proc _set_sidebar(@uuid, @line, @message, @text) {

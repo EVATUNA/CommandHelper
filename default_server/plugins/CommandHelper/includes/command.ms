@@ -296,7 +296,7 @@ register_command('enko', array(
         @players_data[@uuid]['chat'][1] = true
         cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
       }
-      _update_channel_tag(@player, @uuid, @players_data[@uuid], @text)
+      _update_channel_tag(@uuid, @players_data[@uuid], @text)
     }
   }
 ))
@@ -352,7 +352,7 @@ register_command('channel', array(
           cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
           break()
         }
-        _update_channel_tag(@player, @uuid, @players_data[@uuid], @text)
+        _update_channel_tag(@uuid, @players_data[@uuid], @text)
       } else if(array_size(@args) == 1) {
         switch(@args[0]) {
         case 'local':
@@ -376,7 +376,7 @@ register_command('channel', array(
           cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
           break()
         }
-        _update_channel_tag(@player, @uuid, @players_data[@uuid], @text)
+        _update_channel_tag(@uuid, @players_data[@uuid], @text)
       }
     }
   }
