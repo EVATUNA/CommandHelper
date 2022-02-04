@@ -1278,14 +1278,13 @@ register_command('broadcast', array(
   }
 ))
 
-
 proc _tunalevel_command(@command, @player, @args, @text, @players_data) {
   @target_name = @args[0]
   @target_uuid = puuid(@target_name)
   @player_data = @players_data[@target_uuid]
   @adding_default_experience = 0
   @adding_default_experience = integer(@args[1])
-  _add_tunelevel_experience(@target_uuid, @player_data, @adding_default_experience, 0)
+  _add_tunalevel_experience(@target_uuid, @player_data, @adding_default_experience, 0)
 }
 register_command('tunalevel', array(
   'tabcompleter': closure(@command, @player, @args) { return(array()) },

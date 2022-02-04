@@ -121,6 +121,8 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
           )
         )
       }
+      # old_hp 선언
+      @old_hp = @hp_blocks[@id]['hp']
       # 체력 깍기 (0이하로 내려거면 0으로 설정) 및 @hp_block 기타 데이터 갱신
       @hp_blocks[@id]['hp'] -= @mining_power
       if(@hp_blocks[@id]['hp'] < 0) {
@@ -168,7 +170,9 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
         @indicator_data  = array(
           'block': @mineral,
           'max_hp': @max_hp,
-          'hp': @hp,
+          'old_hp': @old_hp,
+          'new_hp': @hp,
+          'id': @id,
           'countdown': 7
         )
       } else { // 채굴 완료시
@@ -225,29 +229,34 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
         @indicator_data = array(
           'block': @mineral,
           'max_hp': @max_hp,
-          'hp': @hp,
+          'old_hp': @old_hp,
+          'new_hp': @hp,
+          'id': @id,
           'countdown': 1
         )
       }
     } else { # 곡괭이 강도가 부족할시
       # hp 변화 없어 보이도록 @hp 선언
       if(array_index_exists(@hp_blocks, @id)) {
+        @old_hp = @hp_blocks[@id]['hp']
         @hp = @hp_blocks[@id]['hp']
       } else {
+        @old_hp = @mineral_rewards[@mineral]['hp']
         @hp = @mineral_rewards[@mineral]['hp']
       }
       # 인디케이터 데이터 설정
       @indicator_data = array(
         'block': @mineral,
         'max_hp': @max_hp,
-        'hp': @hp,
-        'countdown': 7
+        'old_hp': @old_hp,
+        'new_hp': @hp,
+        'id': @id,
+        'countdown': 3
       )
       cancel()
     }
     #인디케이터 보여주기
-    _set_indicator(@player, @uuid, @player_data, @indicator_data, @text)
-    _set_tooltips(@player, @uuid, @player_data)
+    _show_indicator(@uuid, @player_data, @indicator_data, @text)
     #캔슬은 안됬는데 정상적으로 캔게 아닐떼 템 안떨구도록 해주는 코드
     modify_event('drops', array())
   }

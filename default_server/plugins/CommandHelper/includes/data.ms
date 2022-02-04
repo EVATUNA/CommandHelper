@@ -12,7 +12,9 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
     'is_dash': false,
     'last_weapon_effect': 0,
     'last_armor_effect': 0,
-    'tooltips': array()
+    'tooltips': array(),
+    'indicator_id': '',
+    'indicator_remove_task': 0
   )
 
   # setting
@@ -133,6 +135,7 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
   _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text)
 }
 
+# 설정 데이터 (현재 기능 없음) 
 proc _new_setting(@uuid, @player_data) {
   @player_data['setting'] = array(
     427,  // 해상도
@@ -147,6 +150,7 @@ proc _new_setting(@uuid, @player_data) {
   cup_set('SETTING', @uuid, @player_data['setting'])
 }
 
+# 채팅 데이터
 proc _new_chat(@uuid, @player_data) {
   @player_data['chat'] = array(
     'default', // 사용중인 채팅 채널
@@ -161,6 +165,7 @@ proc _new_chat(@uuid, @player_data) {
   cup_set('CHAT', @uuid, @player_data['chat'])
 }
 
+# 치장 데이터
 proc _new_decoration(@uuid, @player_data) {
   @player_data['decoration'] = array(
     array('\uf01e', '\uf01f', '\uf020', '\uf021')[rand(0, 4)], // 임시 뱃지
@@ -175,6 +180,7 @@ proc _new_decoration(@uuid, @player_data) {
   cup_set('DECORATION', @uuid, @player_data['decoration'])
 }
 
+# 스코어보드 기본값 생성
 proc _load_sidebar(@player, @uuid, @text) {
   @scoreboard = "ch_scoreboard.@uuid"
   if(!array_contains(get_scoreboards(), @scoreboard)) { create_scoreboard(@scoreboard) }
@@ -208,6 +214,7 @@ proc _load_sidebar(@player, @uuid, @text) {
   }
 }
 
+# 스코어보드 변경
 proc _set_sidebar(@uuid, @line, @message, @text) {
   @scoreboard = "ch_scoreboard.@uuid"
   if(length(@message) <= 63) {
@@ -217,6 +224,7 @@ proc _set_sidebar(@uuid, @line, @message, @text) {
   }
 }
 
+# 아이템 업데이트
 proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
   @seeds = array(
     'WHEAT_SEEDS',
@@ -957,6 +965,7 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
   })
 }
 
+# 리소스팩 보내기
 proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack) {
   @join_spec = array(
     'location': ploc(@player),
@@ -991,6 +1000,7 @@ proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_
   }
 }
 
+# 리소스팩 적용 후 세팅
 proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @effective_items, @text) {
   title(@player, '', '', 0, 1, 0)
   set_timeout(1000, closure() {
@@ -1011,6 +1021,7 @@ proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @
   })
 }
 
+# 플레이어 접속
 proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack) {
   runas('~console', '/recipe give '.@player.' *')
   if(!array_index_exists(@reconnectable_players, @uuid)) {
@@ -1023,6 +1034,7 @@ proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_
   }
 }
 
+# 플레이어 퇴장
 proc _quit_event(@uuid, @players_data) {
   kafka_send('ch.inform_player_quit', @uuid)
   if(array_index_exists(@players_data, @uuid)) {
@@ -1056,6 +1068,7 @@ proc _quit_event(@uuid, @players_data) {
   }
 }
 
+# 서버 이동시 카운트 다운 (카운트 다운이 다 되면 서버 나간것으로 간주)
 proc _countdown_reconnectable_players(@reconnectable_players) {
   foreach(@uuid: @remaining_second in @reconnectable_players) {
     if(@remaining_second > 0) {
@@ -1064,4 +1077,96 @@ proc _countdown_reconnectable_players(@reconnectable_players) {
       array_remove(@reconnectable_players, @uuid)
     }
   }
+}
+
+# 인디케이터
+proc _show_indicator(@uuid, @player_data, @indicator_data, @text) {
+
+  @queue_id = @indicator_data['id']'.'@indicator_data['block']
+  @queue = "@uuid.indicator"
+
+  @icons = array(
+    'COAL_ORE': '\ue4c7',
+    'COPPER_ORE': '\ue4c8',
+    'IRON_ORE': '\ue4c9',
+    'LAPIS_ORE': '\ue4ca',
+    'GOLD_ORE': '\ue4cb',
+    'NETHER_QUARTZ_ORE': '\ue4cc',
+    'REDSTONE_ORE': '\ue4cd',
+    'EMERALD_ORE': '\ue4ce',
+    'DIAMOND_ORE': '\ue4cf',
+    'ANCIENT_DEBRIS': '\ue4d0',
+    'DEEPSLATE_COAL_ORE': '\ue4d1',
+    'DEEPSLATE_COPPER_ORE': '\ue4d2',
+    'DEEPSLATE_IRON_ORE': '\ue4d3',
+    'DEEPSLATE_LAPIS_ORE': '\ue4d4',
+    'DEEPSLATE_GOLD_ORE': '\ue4d5',
+    'NETHER_GOLD_ORE': '\ue4d6',
+    'DEEPSLATE_REDSTONE_ORE': '\ue4d7',
+    'DEEPSLATE_EMERALD_ORE': '\ue4d8',
+    'DEEPSLATE_DIAMOND_ORE': '\ue4d9',
+    'FARMLAND': '\ue4da'
+
+  )
+  @backgrounds = array(
+    '\ue406',
+    '\ue408', '\ue409', '\ue40a', '\ue40b', '\ue40c', '\ue40d', '\ue40e', '\ue40f', '\ue410', '\ue411',
+    '\ue412', '\ue413', '\ue414', '\ue415', '\ue416', '\ue417', '\ue418', '\ue419', '\ue41a', '\ue41b',
+    '\ue41c', '\ue41d', '\ue41e', '\ue41f', '\ue420', '\ue421', '\ue422', '\ue423', '\ue424', '\ue425',
+    '\ue426', '\ue427', '\ue428', '\ue429', '\ue42a', '\ue42b', '\ue42c', '\ue42d', '\ue42e', '\ue42f',
+    '\ue430', '\ue431', '\ue432', '\ue433', '\ue434', '\ue435', '\ue436', '\ue437', '\ue438', '\ue439',
+    '\ue43a', '\ue43b', '\ue43c', '\ue43d', '\ue43e', '\ue43f', '\ue440', '\ue441', '\ue442', '\ue443',
+    '\ue444', '\ue445', '\ue446', '\ue447', '\ue448', '\ue449', '\ue44a', '\ue44b', '\ue44c', '\ue44d',
+    '\ue4b2', '\ue4b3', '\ue4b4', '\ue4b5', '\ue4b6', '\ue4b7', '\ue4b8', '\ue4b9', '\ue4ba', '\ue4bb',
+    '\ue4bc', '\ue4bd', '\ue4be', '\ue4bf'
+  )
+
+  @icon = @icons[@indicator_data['block']]
+
+  @old_background_index = integer((1- @indicator_data['old_hp'] / @indicator_data['max_hp']) * 84)
+  @new_background_index = integer((1- @indicator_data['new_hp'] / @indicator_data['max_hp']) * 84)
+
+  clear_task(@player_data['cache']['indicator_remove_task'])
+
+  // 큐 프리셋
+  if(queue_running(@queue)) {
+    if(@player_data['cache']['indicator_id'] == @queue_id) {
+      //같은 블럭 상호작용시 인디케이터 제거 큐 삭제
+      queue_remove(@queue)
+    } else{
+      //다른 블럭 상호작용시 큐 클리어
+      queue_clear(@queue)
+    }
+  }
+
+  // 인디케이터 메인 큐 푸시
+  if(@new_background_index != @old_background_index) {
+    // 체력 변화 있을시
+    for(@i = @old_background_index, @i <= @new_background_index, @i++) {
+      @chance = ((@i - @old_background_index) / (@new_background_index - @old_background_index)) ** 2
+      if(rand() < @chance) {
+        @background = @backgrounds[@i]
+        @closure = closure() {
+          _set_sidebar(@uuid, 4, color('#fe8080').@text['space_fonts']['space.4'].@background.@text['space_fonts']['space.-20'].@icon, @text)
+        }
+        queue_push(@closure, @queue)
+      }
+    }
+  } else {
+    // 체력 변화 없을시
+    @background = @backgrounds[@new_background_index]
+    _set_sidebar(@uuid, 4, color('#fe8080').@text['space_fonts']['space.4'].@background.@text['space_fonts']['space.-20'].@icon, @text)
+  }
+
+  // 인디케이터 제거 큐 푸시
+  @closure = closure() {
+    @task = set_timeout(integer(@indicator_data['countdown'] * 1000), closure() {
+      _set_sidebar(@uuid, 4, '', @text)
+    })
+    @player_data['cache']['indicator_remove_task'] = @task
+  }
+  queue_push(@closure, @queue)
+
+  // 인디케이터 id 저장
+  @player_data['cache']['indicator_id'] = @queue_id
 }

@@ -290,11 +290,11 @@ proc _farmland_cultivate_event(@event, @player, @uuid, @players_data, @hp_blocks
             set_pcooldown(@player, @hoe, integer(@hoes_cooldown[@item['name']] * @cooldown_multiply))
           }
         }
-        @sowing_power = 1
+        @cultivating_power = 1
         if(!is_null(@item['meta']) && !is_null(@item['meta']['modifiers']) && array_index_exists(@item['meta'], 'modifiers')) {
           foreach(@modifier in @item['meta']['modifiers']) {
             if(@modifier['attribute'] == 'GENERIC_FOLLOW_RANGE') {
-              @sowing_power = @modifier['amount']
+              @cultivating_power = @modifier['amount']
               break()
             }
           }
@@ -314,18 +314,20 @@ proc _farmland_cultivate_event(@event, @player, @uuid, @players_data, @hp_blocks
             'reset_countdown': 3
           )
         }
-        @hp_blocks[@id]['hp'] -= @sowing_power
+        @old_hp = @hp_blocks[@id]['hp']
+        @hp_blocks[@id]['hp'] -= @cultivating_power
         if(@hp_blocks[@id]['hp'] > 0) {
           @hp_blocks[@id]['reset_countdown'] = 3
           @hp = @hp_blocks[@id]['hp']
           @indicator_data = array(
             'block': 'FARMLAND',
             'max_hp': @max_hp,
-            'hp': @hp,
+            'old_hp': @old_hp,
+            'new_hp': @hp,
+            'id': @id,
             'countdown': 3
           )
-          _set_indicator(@player, @uuid, @player_data, @indicator_data, @text)
-          _set_tooltips(@player, @uuid, @player_data)
+          _show_indicator(@uuid, @player_data, @indicator_data, @text)
           set_block(@location, @block)
           if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
             @damage = 0
@@ -362,11 +364,12 @@ proc _farmland_cultivate_event(@event, @player, @uuid, @players_data, @hp_blocks
           @indicator_data = array(
             'block': 'FARMLAND',
             'max_hp': @max_hp,
-            'hp': @hp,
+            'old_hp': @old_hp,
+            'new_hp': @hp,
+            'id': @id,
             'countdown': 1
           )
-          _set_indicator(@player, @uuid, @player_data, @indicator_data, @text)
-          _set_tooltips(@player, @uuid, @player_data)
+          _show_indicator(@uuid, @player_data, @indicator_data, @text)
         }
       }
     }
