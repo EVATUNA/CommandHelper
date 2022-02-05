@@ -216,7 +216,7 @@ proc _update_channel_tag(@uuid, @player_data, @text) {
       @channel_tag = 'general_en'
     }
   }
-  _set_sidebar(@uuid, 0, color('#feff00').@channel_tags[@channel_tag], @text)
+  _set_sidebar(@uuid, 0, color('#fe0000').@text['space_fonts']['space.1'].@channel_tags[@channel_tag], @text)
 }
 
 # Default Chat

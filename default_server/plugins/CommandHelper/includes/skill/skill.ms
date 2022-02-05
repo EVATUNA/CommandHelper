@@ -1871,36 +1871,22 @@ proc _update_skill_hud(@player, @uuid, @player_data, @skills_spec, @text) {
   # 변수들 선언
   @icons = array(
     'combat_method': array(
-      'sweeping': '\uee80',
-      'knockback': '\uee81',
-      'cleaving': '\uee82',
-      'blocking': '\uee83'
+      'sweeping': '\uee20',
+      'knockback': '\uee21',
+      'cleaving': '\uee22',
+      'blocking': '\uee23'
     ),
     'harvesting_method': array(
-      'wide_hands': '\uee90',
-      'golden_finger': '\uee91'
+      'wide_hands': '\uee30',
+      'golden_finger': '\uee31'
     ),
     'sowing_method': array(
-      'wet_hands': '\ueea0',
-      'fertile_touch': '\ueea1'
+      'wet_hands': '\uee40',
+      'fertile_touch': '\uee41'
     )
   )
-  @cooldowns = array(
-    'combat_method': array('\uee20', '\uee21', '\uee22', '\uee23', '\uee24', '\uee25', '\uee26', '\uee27', '\uee28', '\uee29', '\uee2a', '\uee2b', '\uee2c', '\uee2d', '\uee2e', '\uee2f', @text['space_fonts']['space.17']),
-    'harvesting_method': array('\uee30', '\uee31', '\uee32', '\uee33', '\uee34', '\uee35', '\uee36', '\uee37', '\uee38', '\uee39', '\uee3a', '\uee3b', '\uee3c', '\uee3d', '\uee3e', '\uee3f', @text['space_fonts']['space.17']),
-    'sowing_method': array('\uee40', '\uee41', '\uee42', '\uee43', '\uee44', '\uee45', '\uee46', '\uee47', '\uee48', '\uee49', '\uee4a', '\uee4b', '\uee4c', '\uee4d', '\uee4e', '\uee4f', @text['space_fonts']['space.17']),
-    'line3': array('\uee50', '\uee51', '\uee52', '\uee53', '\uee54', '\uee55', '\uee56', '\uee57', '\uee58', '\uee59', '\uee5a', '\uee5b', '\uee5c', '\uee5d', '\uee5e', '\uee5f', @text['space_fonts']['space.17']),
-    'line4': array('\uee60', '\uee61', '\uee62', '\uee63', '\uee64', '\uee65', '\uee66', '\uee67', '\uee68', '\uee69', '\uee6a', '\uee6b', '\uee6c', '\uee6d', '\uee6e', '\uee6f', @text['space_fonts']['space.17']),
-    'line5': array('\uee70', '\uee71', '\uee72', '\uee73', '\uee74', '\uee75', '\uee76', '\uee77', '\uee78', '\uee79', '\uee7a', '\uee7b', '\uee7c', '\uee7d', '\uee7e', '\uee7f', @text['space_fonts']['space.17'])
-  )
-  @charges = array(
-    'combat_method': array('\uee10', '\uee11'),
-    'harvesting_method': array('\uee12', '\uee13'),
-    'sowing_method': array('\uee14', '\uee15'),
-    'line3': array('\uee16', '\uee17'),
-    'line4': array('\uee18', '\uee19'),
-    'line5': array('\uee1a', '\uee1b')
-  )
+  @cooldowns = array('\uee10', '\uee11', '\uee12', '\uee13', '\uee14', '\uee15', '\uee16', '\uee17', '\uee18', '\uee19', '\uee1a', '\uee1b', '\uee1c', '\uee1d', '\uee1e', '\uee1f', @text['space_fonts']['space.17'])
+  @charges = array('\uee02', '\uee03')
   @huds = array(
     'combat_method': '',
     'harvesting_method': '',
@@ -1932,26 +1918,26 @@ proc _update_skill_hud(@player, @uuid, @player_data, @skills_spec, @text) {
         // 최대카운트 0인 스킬 쿨타임 다 됬을시
         @index = 16
       }
-      @cooldown = @cooldowns[@method_type][@index]
+      @cooldown = @cooldowns[@index]
       # 충전 갯수
       if(@skill_spec['effect_by_point'][@point]['active']['count'] > 0) {
         @slots = array()
         @psfs = array()
         for(@i = 0, @i < @skill_spec['effect_by_point'][@point]['active']['count'], @i++) {
           if(@i < @active_skill[2]) {
-            @slots[] = @text['space_fonts']['space.-6'].@charges[@method_type][1]
+            @slots[] = @text['space_fonts']['space.-6'].@charges[1]
           } else {
-            @slots[] = @text['space_fonts']['space.-6'].@charges[@method_type][0]
+            @slots[] = @text['space_fonts']['space.-6'].@charges[0]
           }
           @psfs[] = @text['space_fonts']['space.3']
         }
         @charge = array_implode(array_merge(@slots, @psfs), '')
       }
     }
-    @huds[@method_type] = @icon.@text['space_fonts']['space.-17'].@cooldown.@text['space_fonts']['space.2'].@charge.@text['space_fonts']['space.-2'].@text['space_fonts']['space.-17']
+    @huds[@method_type] = @icon.@text['space_fonts']['space.-17'].@cooldown.@text['space_fonts']['space.2'].@charge.@text['space_fonts']['space.-2'].@text['space_fonts']['space.3']
   }
 
-  @skill_hud = color('#fe0080').@text['space_fonts']['space.-21'].@huds['combat_method'].@huds['harvesting_method'].@huds['sowing_method']
+  @skill_hud = color('#fd0080').@text['space_fonts']['space.31'].@huds['combat_method'].@huds['harvesting_method'].@huds['sowing_method']
   _set_sidebar(@uuid, 1, @skill_hud, @text)
 }
 
@@ -1982,25 +1968,29 @@ proc _update_selected_skill_hotbar(@player, @uuid, @player_data, @skills_spec, @
   # 손에든 아이템, 사용중인 스킬에 따라 핫바 선택 조정
   if(!is_null(@main_hand_item)) { // 무언가 들고 있을시
     if(array_contains(@hoes, @main_hand_item['name'])) {
-      @selected_hotbar = @text['space_fonts']['space.-25'].'\uee02'
+      @selected_hotbar = @text['space_fonts']['space.-44'].'\uee01'
       @skill = @selected_methods['harvesting_method']
     } else if(array_contains(@seeds, @main_hand_item['name'])) {
-      @selected_hotbar = @text['space_fonts']['space.-25'].'\uee03'
+      @selected_hotbar = @text['space_fonts']['space.-24'].'\uee01'
       @skill = @selected_methods['sowing_method']
     } else {
-      @selected_hotbar = @text['space_fonts']['space.-25'].'\uee01'
+      @selected_hotbar = @text['space_fonts']['space.-64'].'\uee01'
       @skill = @selected_methods['combat_method']
     }
     if(@skill == '') { // 파종, 수확 스킬 선택 안했을시
-      @selected_hotbar = @text['space_fonts']['space.-25'].'\uee01'
+      @selected_hotbar = @text['space_fonts']['space.-64'].'\uee01'
       @skill = @selected_methods['combat_method']
     }
   } else { // 특별한 도구 든거 없을시
-    @selected_hotbar = @text['space_fonts']['space.-25'].'\uee01'
+    @selected_hotbar = @text['space_fonts']['space.-64'].'\uee01'
     @skill = @selected_methods['combat_method']
   }
   if(@skill == '' || !array_index_exists(@player_data['active_skill'], @skill)) { // 전투스킬마저 없을시
     @selected_hotbar = ''
   }
-  _set_sidebar(@uuid, 2, color('#fe0080').@selected_hotbar, @text)
+  # 텍스트 생성
+  @hotbar_texts = array(color('#fd0080'), @text['space_fonts']['space.28'].'\uee00', @selected_hotbar)
+  @hotbar_text = array_implode(@hotbar_texts, '')
+
+  _set_sidebar(@uuid, 2, @hotbar_text, @text)
 }

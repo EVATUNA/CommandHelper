@@ -36,8 +36,6 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
     _new_decoration(@uuid, @player_data)
   }
 
-  # 스킬 HUD 프리셋
-  _set_sidebar(@uuid, 3, color('#fe0080').@text['space_fonts']['space.-24'].'\uee00', @text)
   # skill
   _load_skills(@player_data, @player, @uuid, @skills_spec)
 
@@ -199,7 +197,7 @@ proc _load_sidebar(@player, @uuid, @text) {
   if(!@is_objective_exists) {
     create_objective('objective', 'DUMMY', @scoreboard)
   }
-  set_objective_display('objective', array('slot': 'SIDEBAR', 'displayname': @text['space_fonts']['space.-5']), @scoreboard)
+  set_objective_display('objective', array('slot': 'SIDEBAR', 'displayname': @text['space_fonts']['space.-4']), @scoreboard)
 
   @teams = get_teams(@scoreboard)
   for(@line = 0, @line < 15, @line ++) {
@@ -1147,7 +1145,7 @@ proc _show_indicator(@uuid, @player_data, @indicator_data, @text) {
       if(rand() < @chance) {
         @background = @backgrounds[@i]
         @closure = closure() {
-          _set_sidebar(@uuid, 4, color('#fe8080').@text['space_fonts']['space.4'].@background.@text['space_fonts']['space.-20'].@icon, @text)
+          _set_sidebar(@uuid, 4, color('#fc8080').@text['space_fonts']['space.4'].@background.@text['space_fonts']['space.-20'].@icon, @text)
         }
         queue_push(@closure, @queue)
       }
@@ -1155,7 +1153,7 @@ proc _show_indicator(@uuid, @player_data, @indicator_data, @text) {
   } else {
     // 체력 변화 없을시
     @background = @backgrounds[@new_background_index]
-    _set_sidebar(@uuid, 4, color('#fe8080').@text['space_fonts']['space.4'].@background.@text['space_fonts']['space.-20'].@icon, @text)
+    _set_sidebar(@uuid, 4, color('#fc8080').@text['space_fonts']['space.4'].@background.@text['space_fonts']['space.-20'].@icon, @text)
   }
 
   // 인디케이터 제거 큐 푸시
