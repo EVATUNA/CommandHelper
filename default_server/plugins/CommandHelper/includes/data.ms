@@ -39,66 +39,6 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
   # skill
   _load_skills(@player_data, @player, @uuid, @skills_spec)
 
-  # bossbar
-  /*
-    @bossbars = get_bars()
-    ## 참치 레벨
-    ### 보스바 id 재생성
-    @tunalevel_id = "tunalevel.@uuid"
-    if(array_contains(@bossbars, @tunalevel_id)) {
-      remove_bar(@tunalevel_id)
-    }
-    ### 레벨
-    @tuna_level = @player_data['skill_manager'][0]
-    @tunalevel_text = _replace_tunalevel_text(@tuna_level)
-    ### 경험치
-    @tuna_experience = @player_data['skill_manager'][1]
-    @max_tuna_experience = _get_max_tuna_experience(@tuna_level)
-    @tuna_experience_persent = @tuna_experience / @max_tuna_experience
-    if(@tuna_experience_persent < 0) { @tuna_experience_persent = 0 }
-    if(@tuna_experience_persent > 1) { @tuna_experience_persent = 1 }
-    ### 보스바 데이터 설정
-    @tunalevel_bossbar_data = array(
-      'title': @tunalevel_text,
-      'percent': @tuna_experience_persent,
-      'color': 'BLUE'
-    )
-    ### 보스바 생성 및 보여주기
-    create_bar(@tunalevel_id, @tunalevel_bossbar_data)
-    bar_add_player(@tunalevel_id, @player)
-    // skill manager 바뀌는 카프카 cupset 인식하여 레벨 경험치 화면에 보여지게 해야함
-    
-    ## 더미 보스바
-    ### 보스바 id 재생성
-    @dummy_id = "dummy.@uuid"
-    if(array_contains(@bossbars, @dummy_id)) {
-      remove_bar(@dummy_id)
-    }
-    ### 보스바 데이터 설정
-    @dummy_bossbar_data = array(
-      'title': '',
-      'percent': 0
-    )
-    ### 보스바 생성 및 보여주기
-    create_bar(@dummy_id, @dummy_bossbar_data)
-    bar_add_player(@dummy_id, @player)
-
-    ## 인디케이터(and 툴팁) 보스바
-    ### 보스바 id 재생성
-    @indicator_id = 'tooltip.'.@uuid
-    if(array_contains(@bossbars, @indicator_id)) {
-      remove_bar(@indicator_id)
-    }
-    ### 보스바 데이터 설정
-    @indicator_bossbar_data = array(
-      'title': '',
-      'percent': 0
-    )
-    ### 보스바 생성 및 보여주기
-    create_bar(@indicator_id, @indicator_bossbar_data)
-    bar_add_player(@indicator_id, @player)
-  */
-
   # item
   @player_data['item'] = array(
     'is_inv_open': false,
@@ -131,6 +71,12 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
     @items['armor'] = null
   }
   _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text)
+
+  # tunalevel
+  _show_tunalevel(@uuid, @player_data, @text)
+
+  # arcanelevel
+  _show_arcanelevel(@player, @uuid, @text)
 }
 
 # 설정 데이터 (현재 기능 없음) 
@@ -1167,4 +1113,162 @@ proc _show_indicator(@uuid, @player_data, @indicator_data, @text) {
 
   // 인디케이터 id 저장
   @player_data['cache']['indicator_id'] = @queue_id
+}
+
+# 레벨 HUDs
+proc _replace_tunalevel_text(@tunalevel) {
+  @background = replace(
+    replace(
+      replace(
+        replace(
+          replace(
+            replace(
+              replace(
+                replace(
+                  replace(
+                    replace(
+                      @tunalevel, '0', '\uf802\uef10\uf801'
+                    ), '1', '\uf802\uef11\uf801'
+                  ), '2', '\uf802\uef12\uf801'
+                ), '3', '\uf802\uef13\uf801'
+              ), '4', '\uf802\uef14\uf801'
+            ), '5', '\uf802\uef15\uf801'
+          ), '6', '\uf802\uef16\uf801'
+        ), '7', '\uf802\uef17\uf801'
+      ), '8', '\uf802\uef18\uf801'
+    ), '9', '\uf802\uef19\uf801'
+  )
+  @text = replace(
+    replace(
+      replace(
+        replace(
+          replace(
+            replace(
+              replace(
+                replace(
+                  replace(
+                    replace(
+                      @tunalevel, '0', '\uef00\uf801'
+                    ), '1', '\uef01\uf801'
+                  ), '2', '\uef02\uf801'
+                ), '3', '\uef03\uf801'
+              ), '4', '\uef04\uf801'
+            ), '5', '\uef05\uf801'
+          ), '6', '\uef06\uf801'
+        ), '7', '\uef07\uf801'
+      ), '8', '\uef08\uf801'
+    ), '9', '09\uf801'
+  )
+  @chars = split('', @tunalevel)
+  @nsf = ''
+  foreach(@char in @chars) {
+    if(@char == 1) {
+      @nsf = @nsf.'\uF803'
+    } else {
+      @nsf = @nsf.'\uF804'
+    }
+  }
+  @tunalevel_text = '\uef1c\uf801'.@background.'\uf801'.@nsf.'\uf808\uf801'.'\uef1b\uf801'.@text
+  return(@tunalevel_text)
+}
+
+proc _replace_arcanelevel_text(@arcanelevel) {
+  @background = replace(
+    replace(
+      replace(
+        replace(
+          replace(
+            replace(
+              replace(
+                replace(
+                  replace(
+                    replace(
+                      @arcanelevel, '0', '\uf802\uef30\uf801'
+                    ), '1', '\uf802\uef31\uf801'
+                  ), '2', '\uf802\uef32\uf801'
+                ), '3', '\uf802\uef33\uf801'
+              ), '4', '\uf802\uef34\uf801'
+            ), '5', '\uf802\uef35\uf801'
+          ), '6', '\uf802\uef36\uf801'
+        ), '7', '\uf802\uef37\uf801'
+      ), '8', '\uf802\uef38\uf801'
+    ), '9', '\uf802\uef39\uf801'
+  )
+  @text = replace(
+    replace(
+      replace(
+        replace(
+          replace(
+            replace(
+              replace(
+                replace(
+                  replace(
+                    replace(
+                      @arcanelevel, '0', '\uef20\uf801'
+                    ), '1', '\uef21\uf801'
+                  ), '2', '\uef22\uf801'
+                ), '3', '\uef23\uf801'
+              ), '4', '\uef24\uf801'
+            ), '5', '\uef25\uf801'
+          ), '6', '\uef26\uf801'
+        ), '7', '\uef27\uf801'
+      ), '8', '\uef28\uf801'
+    ), '9', '\uef29\uf801'
+  )
+  @chars = split('', @arcanelevel)
+  @nsf = ''
+  foreach(@char in @chars) {
+    if(@char == 1) {
+      @nsf = @nsf.'\uF803'
+    } else {
+      @nsf = @nsf.'\uF804'
+    }
+  }
+  @arcanelevel_text = '\uef3c\uf801'.@background.'\uf801'.@nsf.'\uf808\uf801'.'\uef3b\uf801'.@text
+  return(@arcanelevel_text)
+}
+
+proc _show_arcanelevel(@player, @uuid, @text) {
+  # bar
+  @bars = array(
+    '\ueeb0', '\ueeb1', '\ueeb2', '\ueeb3', '\ueeb4', '\ueeb5', '\ueeb6', '\ueeb7', '\ueeb8', '\ueeb9', '\ueeba', '\ueebb', '\ueebc', '\ueebd', '\ueebe', '\ueebf',
+    '\ueec0', '\ueec1', '\ueec2', '\ueec3', '\ueec4', '\ueec5', '\ueec6', '\ueec7', '\ueec8', '\ueec9', '\ueeca', '\ueecb', '\ueecc', '\ueecd', '\ueece', '\ueecf',
+    '\ueed0', '\ueed1', '\ueed2', '\ueed3', '\ueed4', '\ueed5', '\ueed6', '\ueed7', '\ueed8', '\ueed9', '\ueeda', '\ueedb', '\ueedc', '\ueedd', '\ueede', '\ueedf',
+    '\ueee0', '\ueee1', '\ueee2', '\ueee3', '\ueee4', '\ueee5', '\ueee6', '\ueee7', '\ueee8', '\ueee9', '\ueeea', '\ueeeb', '\ueeec', '\ueeed', '\ueeee', '\ueeef',
+    '\ueef0', '\ueef1', '\ueef2', '\ueef3', '\ueef4', '\ueef5', '\ueef6', '\ueef7', '\ueef8', '\ueef9', '\ueefa', '\ueefb', '\ueefc', '\ueefd', '\ueefe', '\ueeff'
+  )
+  @bar_index = integer(pexp(@player) * 0.8)
+  @bar = @bars[@bar_index]
+  
+  # level
+  @arcanelevel_text = _replace_arcanelevel_text(plevel(@player))
+
+  _set_sidebar(@uuid, 6, color('#fd0000').@text['space_fonts']['space.9'].@bar.@text['space_fonts']['space.-83'].@arcanelevel_text, @text)
+}
+
+proc _show_tunalevel(@uuid, @player_data, @text) {
+  @tunalevel = @player_data['skill_manager'][0]
+  @experience = @player_data['skill_manager'][1]
+  @max_experience = _get_max_tuna_experience(@tunalevel)
+  # bar
+  @bars = array(
+    '\uee60', '\uee61', '\uee62', '\uee63', '\uee64', '\uee65', '\uee66', '\uee67', '\uee68', '\uee69', '\uee6a', '\uee6b', '\uee6c', '\uee6d', '\uee6e', '\uee6f',
+    '\uee70', '\uee71', '\uee72', '\uee73', '\uee74', '\uee75', '\uee76', '\uee77', '\uee78', '\uee79', '\uee7a', '\uee7b', '\uee7c', '\uee7d', '\uee7e', '\uee7f',
+    '\uee80', '\uee81', '\uee82', '\uee83', '\uee84', '\uee85', '\uee86', '\uee87', '\uee88', '\uee89', '\uee8a', '\uee8b', '\uee8c', '\uee8d', '\uee8e', '\uee8f',
+    '\uee90', '\uee91', '\uee92', '\uee93', '\uee94', '\uee95', '\uee96', '\uee97', '\uee98', '\uee99', '\uee9a', '\uee9b', '\uee9c', '\uee9d', '\uee9e', '\uee9f',
+    '\ueea0', '\ueea1', '\ueea2', '\ueea3', '\ueea4', '\ueea5', '\ueea6', '\ueea7', '\ueea8', '\ueea9', '\ueeaa', '\ueeab', '\ueeac', '\ueead', '\ueeae', '\ueeaf'
+  )
+  @bar_index = integer((@experience / @max_experience) * 80)
+  @bar = @bars[@bar_index]
+  # level
+  @tunalevel_text = _replace_tunalevel_text(@tunalevel)
+  _set_sidebar(@uuid, 5, color('#fd0000').@text['space_fonts']['space.-92'].@bar.@text['space_fonts']['space.-83'].@tunalevel_text, @text)
+}
+
+bind('exp_change', null, null, @event, @text) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+  set_timeout(0, closure() {
+    _show_arcanelevel(@player, @uuid, @text)
+  })
 }

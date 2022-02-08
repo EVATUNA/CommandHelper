@@ -116,6 +116,7 @@ foreach(@scoreboard in get_scoreboards()) {
 
 ### Initial Including Procedure
 
+/*
 # 팁 메시지 보여주기
 proc _set_tooltips(@player, @uuid, @player_data) {
   @tooltips = @player_data['cache']['tooltips']
@@ -185,6 +186,7 @@ proc _add_tooltip(@player, @uuid, @player_data, @tooltip_data) {
     break()
   }
 }
+*/
 
 ## 기타 proc
 # 배열 나누기
@@ -275,68 +277,6 @@ proc _get_max_tuna_experience(@level) {
 proc _get_total_skill_point(@skill_manager) {
   @point = @skill_manager[0] + integer(@skill_manager[0] / 5) + @skill_manager[2] // 1 레벨당 1 포인트, 5 레벨당 1 보너스 포안트, 그외 추가 포인트 의 총합
   return(@point)
-}
-
-
-# 참치 레벨 텍스트 생성
-proc _replace_tunalevel_text(@level) {
-  if(@level == 0) {
-    @tunalevel_text = ''
-  } else {
-    @text = replace(
-      replace(
-        replace(
-          replace(
-            replace(
-              replace(
-                replace(
-                  replace(
-                    replace(
-                      replace(
-                        @level, '0', '\uf136\uf801'
-                      ), '1', '\uf137\uf801'
-                    ), '2', '\uf138\uf801'
-                  ), '3', '\uf139\uf801'
-                ), '4', '\uf13a\uf801'
-              ), '5', '\uf13b\uf801'
-            ), '6', '\uf13c\uf801'
-          ), '7', '\uf13d\uf801'
-        ), '8', '\uf13e\uf801'
-      ), '9', '\uf13f\uf801'
-    )
-    @background = replace(
-      replace(
-        replace(
-          replace(
-            replace(
-              replace(
-                replace(
-                  replace(
-                    replace(
-                      replace(
-                        @level, '0', '\uf802\uf12c\uf801'
-                      ), '1', '\uf802\uf12d\uf801'
-                    ), '2', '\uf802\uf12e\uf801'
-                  ), '3', '\uf802\uf12f\uf801'
-                ), '4', '\uf802\uf130\uf801'
-              ), '5', '\uf802\uf131\uf801'
-            ), '6', '\uf802\uf132\uf801'
-          ), '7', '\uf802\uf133\uf801'
-        ), '8', '\uf802\uf134\uf801'
-      ), '9', '\uf802\uf135\uf801'
-    )
-    @chars = split('', @level)
-    @nsf = ''
-    foreach(@char in @chars) {
-      if(@char == 1) {
-        @nsf = @nsf.'\uF803'
-      } else {
-        @nsf = @nsf.'\uF804'
-      }
-    }
-    @tunalevel_text = '\uf801'.@background.'\uf801'.@nsf.@text
-  }
-  return(@tunalevel_text)
 }
 
 proc _replace_repair_percent(@percent) {

@@ -93,7 +93,7 @@ proc _set_tuna_level(@uuid, @player_data, @tuna_level_data) {
   _set_skill_manager(@uuid, @skill_manager)
 }
 # 튜나 레벨 경험치 추가
-proc _add_tunalevel_experience(@uuid, @player_data, @adding_default_experience, @adding_extra_experience) {
+proc _add_tunalevel_experience(@uuid, @player_data, @adding_default_experience, @adding_extra_experience, @text) {
   @tuna_level_data = _get_tuna_level_data(@player_data)
   @level = @tuna_level_data['level']
   # 레벨에 따른 맥스 경험치 구하기
@@ -112,17 +112,8 @@ proc _add_tunalevel_experience(@uuid, @player_data, @adding_default_experience, 
     @tuna_level_data['level'] = @level
     @tuna_level_data['experience'] = @new_experience
     _set_tuna_level(@uuid, @player_data, @tuna_level_data)
-    # 보스바 설정
-    //@tunalevel_id = "tunalevel.@uuid"
-    //@tunalevel_text = _replace_tunalevel_text(@level)
-    //@tuna_experience_persent = @new_experience / @max_experience
-    //if(@tuna_experience_persent < 0) { @tuna_experience_persent = 0 }
-    //if(@tuna_experience_persent > 1) { @tuna_experience_persent = 1 }
-    //@tunalevel_bossbar_data = array(
-    //  'title': @tunalevel_text,
-    //  'percent': @tuna_experience_persent
-    //)
-    //update_bar(@tunalevel_id, @tunalevel_bossbar_data)
+    # 튜나레벨바 설정
+    _show_tunalevel(@uuid, @player_data, @text)
   }
 }
 # 바닐라 경험치 주기
@@ -1937,7 +1928,7 @@ proc _update_skill_hud(@player, @uuid, @player_data, @skills_spec, @text) {
     @huds[@method_type] = @icon.@text['space_fonts']['space.-17'].@cooldown.@text['space_fonts']['space.2'].@charge.@text['space_fonts']['space.-2'].@text['space_fonts']['space.3']
   }
 
-  @skill_hud = color('#fd0080').@text['space_fonts']['space.31'].@huds['combat_method'].@huds['harvesting_method'].@huds['sowing_method']
+  @skill_hud = color('#fd0080').@text['space_fonts']['space.129'].@huds['combat_method'].@huds['harvesting_method'].@huds['sowing_method']
   _set_sidebar(@uuid, 1, @skill_hud, @text)
 }
 
@@ -1968,28 +1959,28 @@ proc _update_selected_skill_hotbar(@player, @uuid, @player_data, @skills_spec, @
   # 손에든 아이템, 사용중인 스킬에 따라 핫바 선택 조정
   if(!is_null(@main_hand_item)) { // 무언가 들고 있을시
     if(array_contains(@hoes, @main_hand_item['name'])) {
-      @selected_hotbar = @text['space_fonts']['space.-44'].'\uee01'
+      @selected_hotbar = @text['space_fonts']['space.-64'].'\uee01'
       @skill = @selected_methods['harvesting_method']
     } else if(array_contains(@seeds, @main_hand_item['name'])) {
-      @selected_hotbar = @text['space_fonts']['space.-24'].'\uee01'
+      @selected_hotbar = @text['space_fonts']['space.-44'].'\uee01'
       @skill = @selected_methods['sowing_method']
     } else {
-      @selected_hotbar = @text['space_fonts']['space.-64'].'\uee01'
+      @selected_hotbar = @text['space_fonts']['space.-84'].'\uee01'
       @skill = @selected_methods['combat_method']
     }
     if(@skill == '') { // 파종, 수확 스킬 선택 안했을시
-      @selected_hotbar = @text['space_fonts']['space.-64'].'\uee01'
+      @selected_hotbar = @text['space_fonts']['space.-84'].'\uee01'
       @skill = @selected_methods['combat_method']
     }
   } else { // 특별한 도구 든거 없을시
-    @selected_hotbar = @text['space_fonts']['space.-64'].'\uee01'
+    @selected_hotbar = @text['space_fonts']['space.-84'].'\uee01'
     @skill = @selected_methods['combat_method']
   }
   if(@skill == '' || !array_index_exists(@player_data['active_skill'], @skill)) { // 전투스킬마저 없을시
     @selected_hotbar = ''
   }
   # 텍스트 생성
-  @hotbar_texts = array(color('#fd0080'), @text['space_fonts']['space.28'].'\uee00', @selected_hotbar)
+  @hotbar_texts = array(color('#fd0000'), @text['space_fonts']['space.126'].'\uee00', @selected_hotbar)
   @hotbar_text = array_implode(@hotbar_texts, '')
 
   _set_sidebar(@uuid, 2, @hotbar_text, @text)

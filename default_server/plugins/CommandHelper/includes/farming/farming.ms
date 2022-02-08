@@ -107,7 +107,7 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
               _add_arcanelevel_experience(@center_location, @crop_reward['arcanelevel']['default'], @crop_reward['arcanelevel']['extra'])
             }
             # 튜나레벨
-            _add_tunalevel_experience(@uuid, @player_data, @crop_reward['tunalevel']['default'], @crop_reward['tunalevel']['extra'])
+            _add_tunalevel_experience(@uuid, @player_data, @crop_reward['tunalevel']['default'], @crop_reward['tunalevel']['extra'], @text)
           }
         })
         # 아이템, 경험치 수동으로 떨구기 때문에 모디피 이벤트로 이벤트 결과 수정
@@ -239,7 +239,7 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
                 _add_arcanelevel_experience(@location, @crop_reward['arcanelevel']['default'], @crop_reward['arcanelevel']['extra'])
               }
               # 튜나레벨
-              _add_tunalevel_experience(@uuid, @player_data, @crop_reward['tunalevel']['default'], @crop_reward['tunalevel']['extra'])
+              _add_tunalevel_experience(@uuid, @player_data, @crop_reward['tunalevel']['default'], @crop_reward['tunalevel']['extra'], @text)
             }
             # 내구도 깍기 및 다 부셔지면 아이템 없애기
             if(@max_durability > @damage) {

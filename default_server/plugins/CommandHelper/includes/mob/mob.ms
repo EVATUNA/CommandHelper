@@ -51,7 +51,7 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards) {
         
         # 튜나레벨 주기
         if(array_index_exists(@mob_reward, 'tunalevel')) {
-          _add_tunalevel_experience(@uuid, @player_data, @mob_reward['tunalevel']['default'], @mob_reward['tunalevel']['extra'])
+          _add_tunalevel_experience(@uuid, @player_data, @mob_reward['tunalevel']['default'], @mob_reward['tunalevel']['extra'], @text)
         }
 
         # 비법서 드랍
