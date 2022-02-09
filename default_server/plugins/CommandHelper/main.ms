@@ -31,6 +31,9 @@ include('includes/hunting/hunting.ms')
 # 거주월드의 낚시 시스템
 #include('includes/fishing/fishing.ms')
 
+# 음식 시스템
+include('includes/food/food.ms')
+
 # 채팅 시스템
 include('includes/chat.ms')
 # 치장 시스템
