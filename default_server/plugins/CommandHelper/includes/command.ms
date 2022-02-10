@@ -33,17 +33,17 @@ set_timeout(1000, closure() {
   proc _info_command(@command, @player, @args, @text) {
     @raw = array(
       array(
-        'text': '                              \ue008\n\n\n\n\n\n'
+        'text': @text['space_fonts']['space.128'].'\ue008\n\n\n\n\n\n'
       ),
       array(
-        'text': '     환영합니다! 에바참치는 색다른 경험을 제공해주는 성장형 야생 서버입니다.\n\n',
+        'text': @text['space_fonts']['space.21'].'환영합니다! 에바참치는 색다른 경험을 제공해주는 성장형 야생 서버입니다.\n\n',
         'color': '#80c8ff'
       ),
       array(
-        'text': '      기존의 마인크래프트 야생과 차별화되는 컨텐츠와 시스템들이 많으므로,\n'
+        'text': @text['space_fonts']['space.25'].'기존의 마인크래프트 야생과 차별화되는 컨텐츠와 시스템들이 많으므로,\n'
       ),
       array(
-        'text': '              지침서에서 제공되는 팁들을 꼭 확인하시길 바랍니다!'
+        'text': @text['space_fonts']['space.58'].'지침서에서 제공되는 팁들을 꼭 확인하시길 바랍니다!'
       )
     )
     _tellraw(@player, @raw)
@@ -60,7 +60,7 @@ set_timeout(1000, closure() {
     #msg(' §7서버오픈일: 2021년 06월 03일')
   }
   if(_is_command_registered('info')) { unregister_command('info') }
-  #if(_is_command_registered('version')) { unregister_command('version') }
+  //if(_is_command_registered('version')) { unregister_command('version') }
   register_command('info', array(
     'aliases': array('about', 'version', 'ver', '서버', '서버정보'),
     'tabcompleter': closure(@command, @player, @args) {
@@ -90,6 +90,50 @@ set_timeout(1000, closure() {
   ### 도움말 명령어
   ###
   if(_is_command_registered('help')) { unregister_command('help') }
+
+  proc _show_help_page_message(@player, @command, @page, @max_page, @text) {
+    @command_text = '/'.@command
+    @translate = string_multiply(' %s', @max_page)
+    @withs = array()
+    for(@i = 1, @i <= @max_page, @i ++) {
+      @with = array(
+        'text': '<'.@i.'>'
+      )
+      if(@i == @page) {
+        @with['color'] = 'aqua'
+      } else {
+        @with['clickEvent'] = array(
+          'action': 'run_command',
+          'value': '/'.@command @i
+        )
+        @with['hoverEvent'] = array(
+          'action': 'show_text',
+          'value': '좌클릭 시,'@i.'번째 페이지를 볼 수 있습니다.'
+        )
+      }
+      @withs[] = @with
+    }
+    @raw = array(
+      array(
+        'text': '',
+        'color': 'gray'
+      ),
+      array(
+        'text': @text['prefix']['info'].' ',
+        'color': 'white'
+      ),
+      array(
+        'text': @command_text,
+        'color': 'yellow'
+      ),
+      array(
+        'translate': @translate,
+        'with': @withs
+      )
+    )
+    _tellraw(@player, @raw)
+  }
+  
   proc _help_message(@player, @real_command, @sub_commands, @args, @description) {
     if(is_null(@args)) {
       @command_text = '/'.@real_command,
@@ -132,6 +176,7 @@ set_timeout(1000, closure() {
     }
     _tellraw(@player, @raw)
   }
+
   proc _help_commnad(@command, @player, @args, @text) {
     # 페이지 구하기
     switch(array_size(@args)) {
@@ -152,8 +197,10 @@ set_timeout(1000, closure() {
     # 페이지에 따른 메시지
     @max_page = 4
     if(!is_null(@page)) {
-      msg(@text['prefix']['info'].' §b/'.@command.' ['.@page.'/'.@max_page.'] §7< > = 필수 인자, [ ] = 선택 인자')
-      msg('§e 명령어 좌클릭 시, 채팅창에 명령어가 입력됩니다.')
+      msg('')
+      _show_help_page_message(@player, @command, @page, @max_page, @text)
+      msg('§7 위의 숫자 좌클릭하여 페이지 변경이 가능합니다.')
+      msg('§e 아래의 명령어를 좌클릭할 시, 채팅창에 명령어가 입력됩니다.')
       switch(@page) {
       case 1:
         msg(' §b# 도움말')
@@ -177,10 +224,10 @@ set_timeout(1000, closure() {
       case 3:
         msg(' §b# 스킬')
         _help_message(@player, 'skillbook', array('skill', 'abilitybook', 'ability', 'masterybook', 'mastery', '스킬북', '스킬', '어빌리티북', '어빌리티', '마스터리북', '마스터리'), null, '스킬북을 엽니다.')
-        msg(' §b# 설정')
-        _help_message(@player, 'setting', array('설정'), null, '설정 GUI를 엽니다.')
-        _help_message(@player, 'screen', array('graphics', '화면설정'), null, '화면 설정 GUI를 엽니다.')
-        _help_message(@player, 'hud', array(), '<너비>', 'HUD 표시 너비를 조정합니다.')
+        //msg(' §b# 설정')
+        //_help_message(@player, 'setting', array('설정'), null, '설정 GUI를 엽니다.')
+        //_help_message(@player, 'screen', array('graphics', '화면설정'), null, '화면 설정 GUI를 엽니다.')
+        //_help_message(@player, 'hud', array(), '<너비>', 'HUD 표시 너비를 조정합니다.')
         msg(' §b# 로그 조사')
         _help_message(@player, 'co i', array(), null, '로그조사 (토글)')
         break()
@@ -199,7 +246,7 @@ set_timeout(1000, closure() {
         break()
       }
     } else {
-      msg(@text['prefix']['warn'].' §e'.@command.' [페이지]')
+      msg(@text['prefix']['warn'].' §e/'.@command.' [페이지]')
     }
   }
 
@@ -1159,6 +1206,7 @@ register_command('skillbook', array(
 ))
 
 # 룬
+/*
 proc _rune_command(@command, @player, @args, @text, @players_data, @skills_info, @skills_spec) {
   @uuid = puuid(@player)
   if(array_size(@args) == 0) {
@@ -1177,6 +1225,8 @@ register_command('runebag', array(
     _rune_command(@command, @player, @args, @text, @players_data, @skills_info, @skills_spec)
   }
 ))
+*/
+
 ###
 ### 어드민 명령어
 ###
