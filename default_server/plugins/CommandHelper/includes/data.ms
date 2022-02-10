@@ -158,16 +158,6 @@ proc _load_sidebar(@player, @uuid, @text) {
   }
 }
 
-# 스코어보드 변경
-proc _set_sidebar(@uuid, @line, @message, @text) {
-  @scoreboard = "ch_scoreboard.@uuid"
-  if(length(@message) <= 63) {
-    set_team_display(@line, array('prefix': @message.@text['space_fonts']['space.-max'] ), @scoreboard)
-  } else {
-    set_team_display(@line, array('prefix': @line.'번째 줄이 너무 깁니다. '.@text['space_fonts']['space.-max'] ), @scoreboard)
-  }
-}
-
 # 아이템 업데이트
 proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
   @seeds = array(
@@ -1023,155 +1013,7 @@ proc _countdown_reconnectable_players(@reconnectable_players) {
   }
 }
 
-# 인디케이터
-proc _show_indicator(@uuid, @player_data, @indicator_data, @text) {
-
-  @queue_id = @indicator_data['id']'.'@indicator_data['block']
-  @queue = "@uuid.indicator"
-
-  @icons = array(
-    'COAL_ORE': '\ue4c7',
-    'COPPER_ORE': '\ue4c8',
-    'IRON_ORE': '\ue4c9',
-    'LAPIS_ORE': '\ue4ca',
-    'GOLD_ORE': '\ue4cb',
-    'NETHER_QUARTZ_ORE': '\ue4cc',
-    'REDSTONE_ORE': '\ue4cd',
-    'EMERALD_ORE': '\ue4ce',
-    'DIAMOND_ORE': '\ue4cf',
-    'ANCIENT_DEBRIS': '\ue4d0',
-    'DEEPSLATE_COAL_ORE': '\ue4d1',
-    'DEEPSLATE_COPPER_ORE': '\ue4d2',
-    'DEEPSLATE_IRON_ORE': '\ue4d3',
-    'DEEPSLATE_LAPIS_ORE': '\ue4d4',
-    'DEEPSLATE_GOLD_ORE': '\ue4d5',
-    'NETHER_GOLD_ORE': '\ue4d6',
-    'DEEPSLATE_REDSTONE_ORE': '\ue4d7',
-    'DEEPSLATE_EMERALD_ORE': '\ue4d8',
-    'DEEPSLATE_DIAMOND_ORE': '\ue4d9',
-    'FARMLAND': '\ue4da'
-
-  )
-  @backgrounds = array(
-    '\ue406',
-    '\ue408', '\ue409', '\ue40a', '\ue40b', '\ue40c', '\ue40d', '\ue40e', '\ue40f', '\ue410', '\ue411',
-    '\ue412', '\ue413', '\ue414', '\ue415', '\ue416', '\ue417', '\ue418', '\ue419', '\ue41a', '\ue41b',
-    '\ue41c', '\ue41d', '\ue41e', '\ue41f', '\ue420', '\ue421', '\ue422', '\ue423', '\ue424', '\ue425',
-    '\ue426', '\ue427', '\ue428', '\ue429', '\ue42a', '\ue42b', '\ue42c', '\ue42d', '\ue42e', '\ue42f',
-    '\ue430', '\ue431', '\ue432', '\ue433', '\ue434', '\ue435', '\ue436', '\ue437', '\ue438', '\ue439',
-    '\ue43a', '\ue43b', '\ue43c', '\ue43d', '\ue43e', '\ue43f', '\ue440', '\ue441', '\ue442', '\ue443',
-    '\ue444', '\ue445', '\ue446', '\ue447', '\ue448', '\ue449', '\ue44a', '\ue44b', '\ue44c', '\ue44d',
-    '\ue4b2', '\ue4b3', '\ue4b4', '\ue4b5', '\ue4b6', '\ue4b7', '\ue4b8', '\ue4b9', '\ue4ba', '\ue4bb',
-    '\ue4bc', '\ue4bd', '\ue4be', '\ue4bf'
-  )
-
-  @icon = @icons[@indicator_data['block']]
-
-  @old_background_index = integer((1- @indicator_data['old_hp'] / @indicator_data['max_hp']) * 84)
-  @new_background_index = integer((1- @indicator_data['new_hp'] / @indicator_data['max_hp']) * 84)
-
-  clear_task(@player_data['cache']['indicator_remove_task'])
-
-  // 큐 프리셋
-  if(queue_running(@queue)) {
-    if(@player_data['cache']['indicator_id'] == @queue_id) {
-      //같은 블럭 상호작용시 인디케이터 제거 큐 삭제
-      queue_remove(@queue)
-    } else{
-      //다른 블럭 상호작용시 큐 클리어
-      queue_clear(@queue)
-    }
-  }
-
-  // 인디케이터 메인 큐 푸시
-  if(@new_background_index != @old_background_index) {
-    // 체력 변화 있을시
-    for(@i = @old_background_index, @i <= @new_background_index, @i++) {
-      @chance = ((@i - @old_background_index) / (@new_background_index - @old_background_index)) ** 2
-      if(rand() < @chance) {
-        @background = @backgrounds[@i]
-        @closure = closure() {
-          _set_sidebar(@uuid, 4, color('#fc8080').@text['space_fonts']['space.4'].@background.@text['space_fonts']['space.-20'].@icon, @text)
-        }
-        queue_push(@closure, @queue)
-      }
-    }
-  } else {
-    // 체력 변화 없을시
-    @background = @backgrounds[@new_background_index]
-    _set_sidebar(@uuid, 4, color('#fc8080').@text['space_fonts']['space.4'].@background.@text['space_fonts']['space.-20'].@icon, @text)
-  }
-
-  // 인디케이터 제거 큐 푸시
-  @closure = closure() {
-    @task = set_timeout(integer(@indicator_data['countdown'] * 1000), closure() {
-      _set_sidebar(@uuid, 4, '', @text)
-    })
-    @player_data['cache']['indicator_remove_task'] = @task
-  }
-  queue_push(@closure, @queue)
-
-  // 인디케이터 id 저장
-  @player_data['cache']['indicator_id'] = @queue_id
-}
-
 # 레벨 HUDs
-proc _replace_tunalevel_text(@tunalevel) {
-  @background = replace(
-    replace(
-      replace(
-        replace(
-          replace(
-            replace(
-              replace(
-                replace(
-                  replace(
-                    replace(
-                      @tunalevel, '0', '\uf802\uef10\uf801'
-                    ), '1', '\uf802\uef11\uf801'
-                  ), '2', '\uf802\uef12\uf801'
-                ), '3', '\uf802\uef13\uf801'
-              ), '4', '\uf802\uef14\uf801'
-            ), '5', '\uf802\uef15\uf801'
-          ), '6', '\uf802\uef16\uf801'
-        ), '7', '\uf802\uef17\uf801'
-      ), '8', '\uf802\uef18\uf801'
-    ), '9', '\uf802\uef19\uf801'
-  )
-  @text = replace(
-    replace(
-      replace(
-        replace(
-          replace(
-            replace(
-              replace(
-                replace(
-                  replace(
-                    replace(
-                      @tunalevel, '0', '\uef00\uf801'
-                    ), '1', '\uef01\uf801'
-                  ), '2', '\uef02\uf801'
-                ), '3', '\uef03\uf801'
-              ), '4', '\uef04\uf801'
-            ), '5', '\uef05\uf801'
-          ), '6', '\uef06\uf801'
-        ), '7', '\uef07\uf801'
-      ), '8', '\uef08\uf801'
-    ), '9', '09\uf801'
-  )
-  @chars = split('', @tunalevel)
-  @nsf = ''
-  foreach(@char in @chars) {
-    if(@char == 1) {
-      @nsf = @nsf.'\uF803'
-    } else {
-      @nsf = @nsf.'\uF804'
-    }
-  }
-  @tunalevel_text = '\uef1c\uf801'.@background.'\uf801'.@nsf.'\uf808\uf801'.'\uef1b\uf801'.@text
-  return(@tunalevel_text)
-}
-
 proc _replace_arcanelevel_text(@arcanelevel) {
   @background = replace(
     replace(
@@ -1244,25 +1086,6 @@ proc _show_arcanelevel(@player, @uuid, @text) {
   @arcanelevel_text = _replace_arcanelevel_text(plevel(@player))
 
   _set_sidebar(@uuid, 6, color('#fd0000').@text['space_fonts']['space.9'].@bar.@text['space_fonts']['space.-83'].@arcanelevel_text, @text)
-}
-
-proc _show_tunalevel(@uuid, @player_data, @text) {
-  @tunalevel = @player_data['skill_manager'][0]
-  @experience = @player_data['skill_manager'][1]
-  @max_experience = _get_max_tuna_experience(@tunalevel)
-  # bar
-  @bars = array(
-    '\uee60', '\uee61', '\uee62', '\uee63', '\uee64', '\uee65', '\uee66', '\uee67', '\uee68', '\uee69', '\uee6a', '\uee6b', '\uee6c', '\uee6d', '\uee6e', '\uee6f',
-    '\uee70', '\uee71', '\uee72', '\uee73', '\uee74', '\uee75', '\uee76', '\uee77', '\uee78', '\uee79', '\uee7a', '\uee7b', '\uee7c', '\uee7d', '\uee7e', '\uee7f',
-    '\uee80', '\uee81', '\uee82', '\uee83', '\uee84', '\uee85', '\uee86', '\uee87', '\uee88', '\uee89', '\uee8a', '\uee8b', '\uee8c', '\uee8d', '\uee8e', '\uee8f',
-    '\uee90', '\uee91', '\uee92', '\uee93', '\uee94', '\uee95', '\uee96', '\uee97', '\uee98', '\uee99', '\uee9a', '\uee9b', '\uee9c', '\uee9d', '\uee9e', '\uee9f',
-    '\ueea0', '\ueea1', '\ueea2', '\ueea3', '\ueea4', '\ueea5', '\ueea6', '\ueea7', '\ueea8', '\ueea9', '\ueeaa', '\ueeab', '\ueeac', '\ueead', '\ueeae', '\ueeaf'
-  )
-  @bar_index = integer((@experience / @max_experience) * 80)
-  @bar = @bars[@bar_index]
-  # level
-  @tunalevel_text = _replace_tunalevel_text(@tunalevel)
-  _set_sidebar(@uuid, 5, color('#fd0000').@text['space_fonts']['space.-92'].@bar.@text['space_fonts']['space.-83'].@tunalevel_text, @text)
 }
 
 bind('exp_change', null, null, @event, @text) {

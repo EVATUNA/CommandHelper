@@ -75,57 +75,6 @@ proc _set_skill_manager(@uuid, @skill_manager) {
   cup_set('SKILL_MANAGER', @uuid, @skill_manager)
 }
 
-## 참치 레벨 데이터 관리
-# 레벨 데이터 get
-proc _get_tuna_level_data(@player_data) {
-  @skill_manager = @player_data['skill_manager']
-  @tuna_level_data = array(
-    'level': @skill_manager[0],
-    'experience': @skill_manager[1]
-  )
-  return(@tuna_level_data)
-}
-# 레벨 데이터 set
-proc _set_tuna_level(@uuid, @player_data, @tuna_level_data) {
-  @skill_manager = @player_data['skill_manager']
-  @skill_manager[0] = @tuna_level_data['level']
-  @skill_manager[1] = @tuna_level_data['experience']
-  _set_skill_manager(@uuid, @skill_manager)
-}
-# 튜나 레벨 경험치 추가
-proc _add_tunalevel_experience(@uuid, @player_data, @adding_default_experience, @adding_extra_experience, @text) {
-  @tuna_level_data = _get_tuna_level_data(@player_data)
-  @level = @tuna_level_data['level']
-  # 레벨에 따른 맥스 경험치 구하기
-  @max_experience = _get_max_tuna_experience(@level)
-  # 추가할 경험치 구하기 (@adding_default_experience, @adding_extra_experience에 따라 @adding_experience 구하기)
-  @adding_experience = integer(round(@adding_default_experience + rand() * @adding_extra_experience))
-  # 경험치가 오를시 데이터 설정, 보스바 설정
-  if(@adding_experience > 0) {
-    # 데이터 설정
-    @old_experience = @tuna_level_data['experience']
-    @new_experience = @old_experience + @adding_experience // 기존 경치 + 추가 경치
-    if(@new_experience >= @max_experience) { // 레벨업 했을 시
-      @level += 1
-      @new_experience = (@max_experience - @new_experience) * -1
-    }
-    @tuna_level_data['level'] = @level
-    @tuna_level_data['experience'] = @new_experience
-    _set_tuna_level(@uuid, @player_data, @tuna_level_data)
-    # 튜나레벨바 설정
-    _show_tunalevel(@uuid, @player_data, @text)
-  }
-}
-# 바닐라 경험치 주기
-proc _add_arcanelevel_experience(@location, @adding_default_experience, @adding_extra_experience) {
-  @xp = integer(round(@adding_default_experience + rand() * @adding_extra_experience))
-    if(@xp > 0) {
-      spawn_entity('EXPERIENCE_ORB', 1, @location, closure(@euuid) {
-        set_entity_spec(@euuid, array('amount': @xp))
-      })
-    }
-}
-
 ## 스킬 데이터 (현재 포인트, 맥스 포인트)
 # 스킬 데이터 get
 proc _get_skill_data(@uuid, @skill, @skill_spec) {
@@ -328,9 +277,7 @@ proc _reset_skills(@players_data, @player, @uuid, @skills_spec) {
   _set_skill_manager(@uuid, @skill_manager)
 
   ## invested_point 설정
-  #broadcast(A @player_data['invested_point'])
   @player_data['invested_point'] = 0
-  #broadcast(B @player_data['invested_point'])
 
   ## 스킬 데이터 초기화
   foreach(@skill: @skill_spec in @skills_spec) {

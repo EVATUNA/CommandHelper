@@ -1749,7 +1749,6 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
                   export(@gui_id, '')
                   set_mob_name(@item_armorstand, '')
                   set_mob_name(@essence_armorstand, '')
-                  #broadcast(초기화 완료)
                 }
                 #인첸트 할시
                 bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @id, @location, @item_armorstand, @essence_armorstand, @essences) {
@@ -2341,7 +2340,6 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
           switch(@event['item']['meta']['model']) {
           case 1: // 스킬 포인트 초기화 비법서
             _ask_using_skill_reset_scroll(@player, @uuid, @event['item'], @players_data, @skills_spec, @text)
-            #broadcast(A)
             #_reset_skills(@player_data, @player, @uuid, @skills_spec)
             break()
           }
