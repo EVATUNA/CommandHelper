@@ -374,7 +374,7 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
       case 'GLASS_BOTTLE':
         @magic_items['미약한 마법의 정수']['text'] = @text['space_fonts']['space.-1'].'\ue9ef'
         break()
-      case 'STRING':
+      case 'STRINGa':
         @magic_items['변환의 끈']['text'] = @text['space_fonts']['space.-1'].'\uea1f'
         break()
       }
@@ -384,7 +384,7 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
       case 'GLASS_BOTTLE':
         @magic_items['농축된 마법의 정수']['text'] = @text['space_fonts']['space.-1'].'\ue9ef'
         break()
-      case 'STRING':
+      case 'STRINGa':
         @magic_items['놀라운 변환의 끈']['text'] = @text['space_fonts']['space.-1'].'\uea1f'
         break()
       }
@@ -394,7 +394,7 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
       case 'GLASS_BOTTLE':
         @magic_items['강력한 마법의 정수']['text'] = @text['space_fonts']['space.-1'].'\ue9ef'
         break()
-      case 'STRING':
+      case 'STRINGa':
         @magic_items['강력한 변환의 끈']['text'] = @text['space_fonts']['space.-1'].'\uea1f'
         break()
       }
@@ -552,6 +552,7 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
               break()
             }
             if(@converting_level > 0 && @magic_item['text'] != @text['space_fonts']['space.18']) {
+              play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
               unbind('close'.@id)
               @item = @ingredient
               @item['qty'] -= 1
@@ -563,7 +564,7 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
               })
               close_pinv(@player)
               @location = array('x': @block_location['x'] + 0.5, 'y': @block_location['y'] + 1.01, 'z': @block_location['z'] + 0.5, 'world': @block_location['world'])
-              set_pcooldown(@player, 'CAVE_AIR', @converting_level)
+              set_pcooldown(@player, 'BEDROCK', @converting_level)
               @task = array('tick': integer(@converting_level / 3), 'id': null)
               @id = set_interval(100 , closure() {
                 if(ponline(@player) && ploc(@player)['world'] == @block_location['world']) {
@@ -1339,6 +1340,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
           case 37: // repair button
             cancel()
             if(@action == 'PICKUP_ALL' && @slot_item['meta']['model'] == 14) {
+              play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
               @inventory = get_inventory(@id)
               @repairing_item = @inventory[1]
               # copy
@@ -1377,55 +1379,57 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
               }
               if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
                 unbind('close'.@id)
-                for(@i = 5, @i > 0, @i --) {
-                  if(@i > 1) {
-                    queue_push(closure() {
-                      @particle_location = array('x': @block_location['x'] + 0.5, 'y': @block_location['y'] + 1, 'z': @block_location['z'] + 0.5, 'world': @block_location['world'])
-                      if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
-                        play_named_sound(@particle_location, array('sound': 'block.anvil.land', 'category': 'BLOCKS', 'volume': 2, 'pitch': 1.7))
-                        mom_playerparticle(@uuid, 'LAVA', @particle_location['x'], @particle_location['y'], @particle_location['z'], 5, 0.0, 0.0, 0.0, 0.0)
-                      } else {
-                        queue_clear('anvil.'.@player)
-                        @return_item = @repairing_item_copy
-                        if(!is_null(@return_item)) {
-                          drop_item(@particle_location, @return_item, false)
-                        }
-                        foreach(@return_item in @ingredients) {
-                          drop_item(@particle_location, @return_item, false)
-                        }
-                      }
-                    }, 'anvil.'.@player)
-                    queue_delay(1000, 'anvil.'.@player)
-                  } else {
-                    queue_push(closure() {
-                      @particle_location = array('x': @block_location['x'] + 0.5, 'y': @block_location['y'] + 1, 'z': @block_location['z'] + 0.5, 'world': @block_location['world'])
-                      if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
-                        play_named_sound(@particle_location, array('sound': 'block.anvil.land', 'category': 'BLOCKS', 'volume': 2, 'pitch': 1.7))
-                        mom_playerparticle(@uuid, 'LAVA', @particle_location['x'], @particle_location['y'], @particle_location['z'], 5, 0.0, 0.0, 0.0, 0.0)
-                        if(@is_success) {
-                          play_named_sound(@particle_location, array('sound': 'entity.experience_orb.pickup', 'category': 'BLOCKS', 'volume': 2, 'pitch': 1))
-                          mom_playerparticle(@uuid, 'FIREWORKS_SPARK', @particle_location['x'], @particle_location['y'], @particle_location['z'], 5, 0.1, 0.1, 0.1, 0.1)
+                set_timeout(1000, closure() {
+                  for(@i = 5, @i > 0, @i --) {
+                    if(@i > 1) {
+                      queue_push(closure() {
+                        @particle_location = array('x': @block_location['x'] + 0.5, 'y': @block_location['y'] + 1, 'z': @block_location['z'] + 0.5, 'world': @block_location['world'])
+                        if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
+                          play_named_sound(@particle_location, array('sound': 'block.anvil.land', 'category': 'BLOCKS', 'volume': 0.5, 'pitch': 1.7))
+                          mom_playerparticle(@uuid, 'LAVA', @particle_location['x'], @particle_location['y'], @particle_location['z'], 5, 0.0, 0.0, 0.0, 0.0)
                         } else {
-                          play_named_sound(@particle_location, array('sound': 'entity.item.break', 'category': 'BLOCKS', 'volume': 2, 'pitch': 1))
-                          mom_playerparticle(@uuid, 'CLOUD', @particle_location['x'], @particle_location['y'], @particle_location['z'], 5, 0.1, 0.1, 0.1, 0.1)
+                          queue_clear('anvil.'.@player)
+                          @return_item = @repairing_item_copy
+                          if(!is_null(@return_item)) {
+                            drop_item(@particle_location, @return_item, false)
+                          }
+                          foreach(@return_item in @ingredients) {
+                            drop_item(@particle_location, @return_item, false)
+                          }
                         }
-                        @return_item = @result
-                        if(!is_null(@return_item)) {
-                          drop_item(@particle_location, @return_item, false)
+                      }, 'anvil.'.@player)
+                      queue_delay(1000, 'anvil.'.@player)
+                    } else {
+                      queue_push(closure() {
+                        @particle_location = array('x': @block_location['x'] + 0.5, 'y': @block_location['y'] + 1, 'z': @block_location['z'] + 0.5, 'world': @block_location['world'])
+                        if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
+                          play_named_sound(@particle_location, array('sound': 'block.anvil.land', 'category': 'BLOCKS', 'volume': 0.5, 'pitch': 1.7))
+                          mom_playerparticle(@uuid, 'LAVA', @particle_location['x'], @particle_location['y'], @particle_location['z'], 5, 0.0, 0.0, 0.0, 0.0)
+                          if(@is_success) {
+                            play_named_sound(@particle_location, array('sound': 'entity.experience_orb.pickup', 'category': 'BLOCKS', 'volume': 0.5, 'pitch': 1))
+                            mom_playerparticle(@uuid, 'FIREWORKS_SPARK', @particle_location['x'], @particle_location['y'], @particle_location['z'], 5, 0.1, 0.1, 0.1, 0.1)
+                          } else {
+                            play_named_sound(@particle_location, array('sound': 'entity.item.break', 'category': 'BLOCKS', 'volume': 0.5, 'pitch': 1))
+                            mom_playerparticle(@uuid, 'CLOUD', @particle_location['x'], @particle_location['y'], @particle_location['z'], 5, 0.1, 0.1, 0.1, 0.1)
+                          }
+                          @return_item = @result
+                          if(!is_null(@return_item)) {
+                            drop_item(@particle_location, @return_item, false)
+                          }
+                        } else {
+                          queue_clear('anvil.'.@player)
+                          @return_item = @repairing_item_copy
+                          if(!is_null(@return_item)) {
+                            drop_item(@particle_location, @return_item, false)
+                          }
+                          foreach(@return_item in @ingredients) {
+                            drop_item(@particle_location, @return_item, false)
+                          }
                         }
-                      } else {
-                        queue_clear('anvil.'.@player)
-                        @return_item = @repairing_item_copy
-                        if(!is_null(@return_item)) {
-                          drop_item(@particle_location, @return_item, false)
-                        }
-                        foreach(@return_item in @ingredients) {
-                          drop_item(@particle_location, @return_item, false)
-                        }
-                      }
-                    }, 'anvil.'.@player)
+                      }, 'anvil.'.@player)
+                    }
                   }
-                }
+                })
               }
             }
             close_pinv(@player)
@@ -1433,6 +1437,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
           case 44: // refresh
             cancel()
             if(@action == 'PICKUP_ALL' && @slot_item['meta']['model'] == 8) {
+              play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
               @inventory = get_inventory(@id)
               @return = _get_repair_result(@inventory, @ingredient_name)
               if(!is_null(@return['failure_probability'])) {
@@ -1988,7 +1993,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         }
         if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
           cancel()
-          if(pcooldown(@player, 'CAVE_AIR') == 0) {
+          if(pcooldown(@player, 'BEDROCK') == 0) {
             @magic_items = array(
               '미약한 마법의 정수': array_deep_clone(@essences['미약한 마법의 정수']['item']),
               '농축된 마법의 정수': array_deep_clone(@essences['농축된 마법의 정수']['item']),
@@ -2094,7 +2099,8 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
             @inventory[12] = array_deep_clone(@magic_items['변환의 끈'])
             @inventory[12]['meta']['lore'][] = ''
             @inventory[12]['meta']['lore'][] = '§e- 재료'
-            @inventory[12]['meta']['lore'][] = '§f 실'
+            @inventory[12]['meta']['lore'][] = '§c 비활성화'
+            //@inventory[12]['meta']['lore'][] = '§f 실'
             @inventory[12]['meta']['lore'][] = '§f 30 경험 레벨'
             # 60
             @inventory[5] = array_deep_clone(@magic_items['농축된 마법의 정수'])
@@ -2105,7 +2111,8 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
             @inventory[14] = array_deep_clone(@magic_items['놀라운 변환의 끈'])
             @inventory[14]['meta']['lore'][] = ''
             @inventory[14]['meta']['lore'][] = '§e- 재료'
-            @inventory[14]['meta']['lore'][] = '§f 실'
+            @inventory[14]['meta']['lore'][] = '§c 비활성화'
+            //@inventory[14]['meta']['lore'][] = '§f 실'
             @inventory[14]['meta']['lore'][] = '§f 60 경험 레벨'
             # 90
             @inventory[7] = array_deep_clone(@magic_items['강력한 마법의 정수'])
@@ -2116,7 +2123,8 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
             @inventory[16] = array_deep_clone(@magic_items['강력한 변환의 끈'])
             @inventory[16]['meta']['lore'][] = ''
             @inventory[16]['meta']['lore'][] = '§e- 재료'
-            @inventory[16]['meta']['lore'][] = '§f 실'
+            @inventory[16]['meta']['lore'][] = '§c 비활성화'
+            //@inventory[16]['meta']['lore'][] = '§f 실'
             @inventory[16]['meta']['lore'][] = '§f 90 경험 레벨'
             # 120
             @inventory[30] = array_deep_clone(@magic_items['스킬 포인트 초기화 스크롤'])
