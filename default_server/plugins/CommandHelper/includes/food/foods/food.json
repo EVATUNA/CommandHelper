@@ -1,0 +1,8 @@
+{
+  "베이컨과 달걀": {
+    "health": 7,
+    "hunger": 8,
+    "saturation": 8,
+    "cooldown": 200
+  }
+}

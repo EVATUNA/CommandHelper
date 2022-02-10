@@ -1302,7 +1302,9 @@ proc _admin_chat(@data, @players_data) {
 }
 
 bind('async_player_chat', null , null, @event, @players_data, @text) {
-  cancel()
+  modify_event('format', '')
+  modify_event('recipients', array())
+  //cancel()
   @data = array(
     'sender_name': @event['player'],
     'sender_uuid': puuid(@event['player'])

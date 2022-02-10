@@ -8,8 +8,8 @@ foreach(@file in @files) {
   if(@file_extension == 'json') {
     async_read_file(@file_path, closure(@content) {
       foreach(@food_name: @food_data in json_decode(@content)) {
-        @namespace = "@file_name:@food_name"
-        @food_datas[@namespace] = @food_data
+        //@namespace = "@file_name:@food_name"
+        @food_datas[@food_name] = @food_data
       }
     })
   }
@@ -60,7 +60,7 @@ proc _natural_heal_per_sec(@player) {
   }
 }
 
-bind('player_interact', null, array('itemname': 'HONEY_BOTTLE', 'button': 'right'), @event) {
+bind('player_interact', null, array('itemname': 'HONEY_BOTTLE', 'button': 'right'), @event, @food_datas) {
   @player = @event['player']
   @uuid = puuid(@player)
   @is_item_available = true
@@ -80,13 +80,27 @@ bind('player_interact', null, array('itemname': 'HONEY_BOTTLE', 'button': 'right
       @slot = 40
     }
     unbind("eat.@uuid")
-    bind('player_consume', array('id': "eat.@uuid"), array('player': @player, 'itemname': 'HONEY_BOTTLE'), @event, @player, @uuid, @slot) {
+    bind('player_consume', array('id': "eat.@uuid"), array('player': @player, 'itemname': 'HONEY_BOTTLE'), @event, @player, @uuid, @slot, @food_datas) {
       @item = get_inventory_item(@uuid, @slot)
       cancel()
-      _add_health(@player, 4)
-      _add_hunger(@player, 4)
-      _add_saturation(@player, 4)
-      set_pcooldown(@player, 'HONEY_BOTTLE', 200)
+      if(array_index_exists(@item, 'meta', 'display')) {
+        @itemname = strip_colors(@item['meta']['display'])
+        if(array_index_exists(@food_datas, @itemname)) {
+          @food_data = @food_datas[@itemname]
+          if(array_index_exists(@food_data, 'health')) {
+            _add_health(@player, @food_data['health'])
+          }
+          if(array_index_exists(@food_data, 'hunger')) {
+            _add_hunger(@player, @food_data['hunger'])
+          }
+          if(array_index_exists(@food_data, 'saturation')) {
+            _add_saturation(@player, @food_data['saturation'])
+          }
+          if(array_index_exists(@food_data, 'cooldown')) {
+            set_pcooldown(@player, 'HONEY_BOTTLE', @food_data['cooldown'])
+          }
+        }
+      }
       if(pmode(@player) != 'CREATIVE') {
         @item['qty'] -= 1
         set_inventory_item(@uuid, @slot, @item)
