@@ -621,7 +621,8 @@ proc _util_command(@command, @player, @args, @text) {
   @inventory[14]['meta']['display'] = '§f치장'
   @inventory[14]['meta']['lore'] = array('§c준 비 중')
   @inventory[16]['meta']['display'] = '§f설정'
-  @inventory[16]['meta']['lore'] = array('§7좌클릭 시, 설정 GUI를 엽니다.')
+  @inventory[16]['meta']['lore'] = array('§c준 비 중')
+  //@inventory[16]['meta']['lore'] = array('§7좌클릭 시, 설정 GUI를 엽니다.')
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @text) {
     bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @id) {
       cancel()
@@ -629,14 +630,18 @@ proc _util_command(@command, @player, @args, @text) {
         switch(@event['rawslot']) {
         case 10:
           runas(@player, '/warp')
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           break()
         case 12:
           runas(@player, '/skill')
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           break()
         case 14:
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           break()
         case 16:
-          runas(@player, '/setting')
+          //runas(@player, '/setting')
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           break()
         }
       }
@@ -651,6 +656,7 @@ register_command('util', array(
     _util_command(@command, @player, @args, @text)
   }
 ))
+/*
 # 설정
 proc _setting_command(@command, @player, @args, @text) {
   @uuid = puuid(@player)
@@ -678,9 +684,11 @@ proc _setting_command(@command, @player, @args, @text) {
         switch(@event['rawslot']) {
         case 12:
           runas(@player, '/chat')
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           break()
         case 14:
           runas(@player, '/screen')
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           break()
         }
       }
@@ -939,7 +947,7 @@ register_command('screen', array(
     _screen_command(@command, @player, @args, @text, @uuid, @players_data, @skills_spec)
   }
 ))
-
+*/
 
 
 /*
@@ -1137,16 +1145,19 @@ proc _warp_command(@command, @player, @args, @text, @server) {
         case 0..2:
         case 9..11:
         case 18..20:
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           runas(@player, '/spawn')
           break()
         case 3..5:
         case 12..14:
         case 21..23:
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           runas(@player, '/home')
           break()
         case 6..8:
         case 15..17:
         case 24..26:
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           if(@server == 'main') {
             runas(@player, '/randomteleport')
           }

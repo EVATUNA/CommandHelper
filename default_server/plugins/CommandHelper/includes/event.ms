@@ -2375,6 +2375,7 @@ bind('inventory_click', null, null, @event) {
   if(ponline(@player) && pmode(@player) == 'SURVIVAL' && @event['leftclick'] && !@event['shiftclick'] && @event['inventorytype'] == 'CRAFTING' && @event['rawslot'] == 7 && is_null(@event['cursoritem'])) {
     set_timeout(1, closure() {
       runas(@player, '/util')
+      play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
     })
   }
 }

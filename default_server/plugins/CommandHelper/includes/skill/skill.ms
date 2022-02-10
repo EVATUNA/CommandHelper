@@ -791,9 +791,11 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
         switch(@slot) {
         case 45:
           runas(@player, '/skill farmingmethod')
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           break()
         case 53:
           runas(@player, '/skill mining')
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           break()
         default:
           if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
@@ -801,6 +803,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
             case 'combat_method':
               @new_skill = @inventory[@slot]['skill']
               if(@skills_data[@new_skill][0] > 0) {
+                play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
                 @category = 'combat_method'
                 @selected_combat_method = @selected_methods['combat_method']
                 @new_skill_proc_name = "_apply_loading_by_@new_skill"
@@ -837,6 +840,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
             case 'subcombat':
               break()
             case 'button':
+              play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
               @skill = @inventory[@slot]['skill']
               @selected_combat_method = @selected_methods['combat_method']
               @skills_data[@skill][0] += 1
@@ -1066,9 +1070,11 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
         switch(@slot) {
         case 45:
           runas(@player, '/skill farming')
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           break()
         case 53:
           runas(@player, '/skill combat')
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           break()
         default:
           if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
@@ -1076,6 +1082,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
             case 'sowing_method':
               @new_skill = @inventory[@slot]['skill']
               if(@skills_data[@new_skill][0] > 0) {
+                play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
                 @category = 'sowing_method'
                 @selected_sowing_method = @selected_methods['sowing_method']
                 @new_skill_proc_name = "_apply_loading_by_@new_skill"
@@ -1112,6 +1119,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
             case 'harvesting_method':
               @new_skill = @inventory[@slot]['skill']
               if(@skills_data[@new_skill][0] > 0) {
+                play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
                 @category = 'harvesting_method'
                 @selected_harvesting_method = @selected_methods['harvesting_method']
                 @new_skill_proc_name = "_apply_loading_by_@new_skill"
@@ -1146,6 +1154,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
               }
               break()
             case 'button':
+              play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
               @skill = @inventory[@slot]['skill']
               @selected_sowing_method = @selected_methods['sowing_method']
               @selected_harvesting_method = @selected_methods['harvesting_method']
@@ -1335,9 +1344,11 @@ proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_sp
         switch(@slot) {
         case 45:
           runas(@player, '/skill mining')
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           break()
         case 53:
           runas(@player, '/skill farmingmethod')
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           break()
         default:
           if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
@@ -1345,6 +1356,7 @@ proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_sp
             case 'farming':
               break()
             case 'button':
+              play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
               @skill = @inventory[@slot]['skill']
               @skills_data[@skill][0] += 1
               @player_data['invested_point'] += 1
@@ -1513,9 +1525,11 @@ proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
         switch(@slot) {
         case 45:
           runas(@player, '/skill combat')
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           break()
         case 53:
           runas(@player, '/skill farming')
+          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
           break()
         default:
           if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
@@ -1523,6 +1537,7 @@ proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
             case 'mining':
               break()
             case 'button':
+            play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
               @skill = @inventory[@slot]['skill']
               @skills_data[@skill][0] += 1
               @player_data['invested_point'] += 1
