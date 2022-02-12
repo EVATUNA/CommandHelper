@@ -36,8 +36,8 @@
 				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 2.5,
-						"max": 2.8
+						"min": 2.592,
+						"max": 2.592
 					},
 					"attack_speed": {
 						"min": 2.0,
@@ -56,8 +56,8 @@
 				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 2.6,
-						"max": 2.9
+						"min": 2.592,
+						"max": 2.689
 					},
 					"attack_speed": {
 						"min": 2.0,
@@ -76,8 +76,8 @@
 				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 2.7,
-						"max": 3.0
+						"min": 2.657,
+						"max": 2.851
 					},
 					"attack_speed": {
 						"min": 2.0,
@@ -96,8 +96,8 @@
 				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 2.8,
-						"max": 3.1
+						"min": 2.786,
+						"max": 3.078
 					},
 					"attack_speed": 2.5,
 					"mining_power": {
@@ -113,8 +113,8 @@
 				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.0,
-						"max": 3.3
+						"min": 2.981,
+						"max": 3.370
 					},
 					"attack_speed": 2.5,
 					"mining_power": {
@@ -131,8 +131,8 @@
 				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.2,
-						"max": 3.5
+						"min": 3.110,
+						"max": 3.499
 					},
 					"attack_speed": 2.5,
 					"mining_power": {
@@ -149,8 +149,8 @@
 				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.4,
-						"max": 3.7
+						"min": 3.402,
+						"max": 3.694
 					},
 					"attack_speed": 2.5,
 					"mining_power": {
@@ -166,8 +166,8 @@
 				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.6,
-						"max": 3.9
+						"min": 3.629,
+						"max": 3.823
 					},
 					"attack_speed": 2.5,
 					"mining_power": {
@@ -183,8 +183,8 @@
 				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.8,
-						"max": 4.1
+						"min": 3.791,
+						"max": 3.888
 					},
 					"attack_speed": 2.5,
 					"mining_power": {
@@ -200,7 +200,7 @@
 				"model": 8,
 				"broadcast": true,
 				"attributes": {
-					"attack_damage": 4.5,
+					"attack_damage": 3.888,
 					"attack_speed": 2.5,
 					"mining_power": 4
 				}

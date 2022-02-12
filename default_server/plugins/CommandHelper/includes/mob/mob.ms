@@ -1,3 +1,4 @@
+/*
 # 몹 보상 저장
 @files = list_files('rewards')
 foreach(@file in @files) {
@@ -119,6 +120,7 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards) {
   # 몹 죽고나서 사라질때 떨구는 경험치 제거
   modify_event('xp', 0)
 }
+*/
 
 # 스폰된 몹 들 입고있는 아이템 떨구지 안토록 수정
 bind('creature_spawn', null, null, @event) {

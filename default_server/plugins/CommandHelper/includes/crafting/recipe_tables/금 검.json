@@ -39,8 +39,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.0,
-						"max": 3.4
+						"min": 6.133,
+						"max": 6.133
 					},
 					"attack_speed": {
 						"min": 2.5,
@@ -55,8 +55,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.2,
-						"max": 3.6
+						"min": 6.133,
+						"max": 6.363
 					},
 					"attack_speed": {
 						"min": 2.5,
@@ -71,8 +71,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.4,
-						"max": 3.8
+						"min": 6.287,
+						"max": 6.747
 					},
 					"attack_speed": {
 						"min": 2.5,
@@ -87,8 +87,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.6,
-						"max": 4.0
+						"min": 6.593,
+						"max": 7.283
 					},
 					"attack_speed": 3
 				}
@@ -100,8 +100,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.9,
-						"max": 4.3
+						"min": 7.053,
+						"max": 7.973
 					},
 					"attack_speed": 3
 				}
@@ -114,8 +114,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 4.2,
-						"max": 4.6
+						"min": 7.360,
+						"max": 8.280
 					},
 					"attack_speed": 3
 				}
@@ -128,8 +128,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 4.5,
-						"max": 4.9
+						"min": 8.050,
+						"max": 8.740
 					},
 					"attack_speed": 3
 				}
@@ -141,8 +141,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 4.8,
-						"max": 5.2
+						"min": 8.587,
+						"max": 9.047
 					},
 					"attack_speed": 3
 				}
@@ -154,8 +154,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 5.1,
-						"max": 5.5
+						"min": 8.970,
+						"max": 9.200
 					},
 					"attack_speed": 3
 				}
@@ -167,7 +167,7 @@
 				"model": 0,
 				"broadcast": true,
 				"attributes": {
-					"attack_damage": 6,
+					"attack_damage": 9.200,
 					"attack_speed": 3
 				}
 			}

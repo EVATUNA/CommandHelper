@@ -40,6 +40,9 @@ include('includes/hunting/hunting.ms')
 # 음식 시스템
 include('includes/food/food.ms')
 
+# 몹 시스템
+include('includes/mob/mob.ms')
+
 # 채팅 시스템
 include('includes/chat.ms')
 # 치장 시스템

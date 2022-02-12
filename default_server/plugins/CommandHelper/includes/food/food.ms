@@ -80,32 +80,34 @@ bind('player_interact', null, array('itemname': 'HONEY_BOTTLE', 'button': 'right
       @slot = 40
     }
     unbind("eat.@uuid")
-    bind('player_consume', array('id': "eat.@uuid"), array('player': @player, 'itemname': 'HONEY_BOTTLE'), @event, @player, @uuid, @slot, @food_datas) {
-      @item = get_inventory_item(@uuid, @slot)
-      cancel()
-      if(array_index_exists(@item, 'meta', 'display')) {
-        @itemname = strip_colors(@item['meta']['display'])
-        if(array_index_exists(@food_datas, @itemname)) {
-          @food_data = @food_datas[@itemname]
-          if(array_index_exists(@food_data, 'health')) {
-            _add_health(@player, @food_data['health'])
-          }
-          if(array_index_exists(@food_data, 'hunger')) {
-            _add_hunger(@player, @food_data['hunger'])
-          }
-          if(array_index_exists(@food_data, 'saturation')) {
-            _add_saturation(@player, @food_data['saturation'])
-          }
-          if(array_index_exists(@food_data, 'cooldown')) {
-            set_pcooldown(@player, 'HONEY_BOTTLE', @food_data['cooldown'])
+    bind('player_consume', array('id': "eat.@uuid"), array('itemname': 'HONEY_BOTTLE'), @event, @player, @uuid, @slot, @food_datas) {
+      if(@player == @event['player']) {
+        @item = get_inventory_item(@uuid, @slot)
+        cancel()
+        if(array_index_exists(@item, 'meta', 'display')) {
+          @itemname = strip_colors(@item['meta']['display'])
+          if(array_index_exists(@food_datas, @itemname)) {
+            @food_data = @food_datas[@itemname]
+            if(array_index_exists(@food_data, 'health')) {
+              _add_health(@player, @food_data['health'])
+            }
+            if(array_index_exists(@food_data, 'hunger')) {
+              _add_hunger(@player, @food_data['hunger'])
+            }
+            if(array_index_exists(@food_data, 'saturation')) {
+              _add_saturation(@player, @food_data['saturation'])
+            }
+            if(array_index_exists(@food_data, 'cooldown')) {
+              set_pcooldown(@player, 'HONEY_BOTTLE', @food_data['cooldown'])
+            }
           }
         }
+        if(pmode(@player) != 'CREATIVE') {
+          @item['qty'] -= 1
+          set_inventory_item(@uuid, @slot, @item)
+        }
+        unbind()
       }
-      if(pmode(@player) != 'CREATIVE') {
-        @item['qty'] -= 1
-        set_inventory_item(@uuid, @slot, @item)
-      }
-      unbind()
     }
   }
 }

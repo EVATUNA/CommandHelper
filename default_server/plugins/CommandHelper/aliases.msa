@@ -8,8 +8,8 @@
 <<<
 
 
-/tule $1 = >>>
-  broadcast(_get_max_tuna_experience(integer($1)))
+/cole = >>>
+  broadcast(replace(color('#ffffff'), '§', '&'))
 <<<
 
 /gcp = >>>

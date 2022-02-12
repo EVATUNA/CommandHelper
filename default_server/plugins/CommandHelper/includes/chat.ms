@@ -142,17 +142,6 @@ proc _tellraw(@player, @raw) {
   }
 }
 
-# 채팅 로깅
-proc _chat_logging(@log) {
-  if(x_get_current_thread() == 'Server thread') {
-    # 로그 남기는 펑션
-  } else {
-    x_run_on_main_thread_now(closure() {
-      # 로그 남기는 펑션
-    })
-  }
-}
-
 # enko
 proc _en_to_ko(@unconverted_message) {
   @converted_message = _convert_eng_to_kor(@unconverted_message)
@@ -1301,30 +1290,35 @@ proc _admin_chat(@data, @players_data) {
   }
 }
 
-bind('async_player_chat', null , null, @event, @players_data, @text) {
+bind('async_player_chat', null , null, @event, @players_data, @text, @server) {
   modify_event('format', '')
   modify_event('recipients', array())
-  //cancel()
+  cancel()
+  //broadcast(is_cancelled)
+  @sender_name = @event['player']
   @data = array(
-    'sender_name': @event['player'],
-    'sender_uuid': puuid(@event['player'])
+    'sender_name': @sender_name,
+    'sender_uuid': puuid(@sender_name)
   )
   if(array_index_exists(@players_data, @data['sender_uuid'])) {
+    @data['sender_server'] = @server
     @data['sender_chat_data'] = @players_data[@data['sender_uuid']]['chat']
     @data['sender_badge'] = @players_data[@data['sender_uuid']]['decoration'][0]
     if(@data['sender_chat_data'][1]) {
-      @data['message'] = _en_to_ko(@event['message'])
+      @message = _en_to_ko(@event['message'])
     } else {
-      @data['message'] = @event['message']
+      @message = @event['message']
     }
-    switch(@players_data[@data['sender_uuid']]['chat'][0]) {
+    @data['message'] = @message
+    @channel = @players_data[@data['sender_uuid']]['chat'][0]
+    switch(@channel) {
     case 'default':
       # 카프카
-      kafka_send('send_defaultchat', json_encode(@data))
+      kafka_send('ch.send_defaultchat', json_encode(@data))
       # proc
       _default_chat(@data, @players_data)
       # logging
-      sys_out('[DefaultChat]'@data['sender_name'].':'@event['message'])
+      mom_log('INFO', "[@channel] @sender_name(@server): @message")
       break()
     case 'town':
       @town_members = tunalands_get_player_lands_member_list(@data['sender_uuid'])
@@ -1335,12 +1329,13 @@ bind('async_player_chat', null , null, @event, @players_data, @text) {
         # proc
         _town_chat(@data, @players_data)
         # logging
-        sys_out('[TownChat]'@data['sender_name'].':'@event['message'])
+        mom_log('INFO', "[@channel] @sender_name(@server): @message")
       } else {
         # 마을을 찾을수 없어서 채팅 채널 초기화
         @players_data[@sender_uuid]['chat'][0] = 'default'
         cup_set('CHAT', @sender_uuid, @players_data[@sender_uuid]['chat'])
         tmsg(@data['sender_name'], @text['prefix'] '§7가입된 마을이 없어 일반 채널로 변경됩니다.')
+        
       }
       break()
     case 'local':
@@ -1352,7 +1347,7 @@ bind('async_player_chat', null , null, @event, @players_data, @text) {
       @data['is_server_same'] = true
       _local_chat(@data, @players_data)
       # logging
-      sys_out('[LocalChat]'@data['sender_name'].':'@event['message'])
+      mom_log('INFO', "[@channel] @sender_name(@server): @message")
       break()
     case 'admin':
       # 카프카
@@ -1360,7 +1355,7 @@ bind('async_player_chat', null , null, @event, @players_data, @text) {
       # proc
       _admin_chat(@data, @players_data)
       # logging
-      sys_out('[AdminChat]'@data['sender_name'].':'@event['message'])
+      mom_log('INFO', "[@channel] @sender_name(@server): @message")
       break()
     }
   }
@@ -1530,3 +1525,40 @@ proc _whisper(@data, @log_data) {
     }
   }
 }
+
+//INFO, FINE, WARN, SEVERE
+
+
+register_command('broadcast', array(
+  'description': 'can broadcast',
+  'usage': '/broadcast <msg>',
+  'aliases': array('say'),
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    if(ponline(@player)) {
+      if(pisop(@player)) {
+        @sender_name = @player
+        @sender_uuid = puuid(@sender_name)
+        if(array_index_exists(@players_data, @sender_uuid) && array_size(@args) > 0) {
+          @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
+          @setting = @players_data[@sender_uuid]['setting']
+          _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting)
+        } else {
+          tmsg(@player, color('yellow')'/'.@command'<message>')
+        }
+      } else {
+        return(false)
+      }
+    } else {
+      @sender_name = 'console'
+      @sender_uuid = 'console'
+      if(array_size(@args) > 0) {
+        @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
+        @setting = array('broadcast', false)
+        _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting)
+      } else {
+        console(color('yellow')'/'.@command'<message>')
+      }
+    }
+  }
+))

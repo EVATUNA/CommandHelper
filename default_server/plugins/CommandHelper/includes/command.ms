@@ -9,7 +9,7 @@ register_command('resourceurl', array(
       if(array_size(@args) == 1) {
         store_value('resourcepack', @args[0])
         @resourcepack['url'] = @args[0]
-        kafka_send('ch_resourcepack_url_update', @args[0])
+        kafka_send('ch.resourcepack_url_update', @args[0])
         return(true)
       } else {
         return(false)
@@ -497,7 +497,7 @@ register_command('whisper', array( // last whisper 저장해서 /r 명령어 사
           } else {
             @data['message'] = array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' ')
           }
-          _bungeecord_foward(@sender_name, 'ch_whisper', @data)
+          //_bungeecord_foward(@sender_name, 'ch_whisper', @data)
           @modified_message = array(
             array('text': '')
           )
@@ -1302,40 +1302,6 @@ register_command('sendwarn', array(
     )
     _add_tooltip(@target_name, @target_uuid, @player_data, @tooltip_data)
     _set_tooltips(@target_name, @target_uuid, @player_data)
-  }
-))
-
-register_command('broadcast', array(
-  'description': 'can broadcast',
-  'usage': '/broadcast <msg>',
-  'aliases': array('say'),
-  'tabcompleter': closure(@command, @player, @args) { return(array()) },
-  'executor': closure(@command, @player, @args) {
-    if(ponline(@player)) {
-      if(pisop(@player)) {
-        @sender_name = @player
-        @sender_uuid = puuid(@sender_name)
-        if(array_index_exists(@players_data, @sender_uuid) && array_size(@args) > 0) {
-          @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
-          @setting = @players_data[@sender_uuid]['setting']
-          _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting)
-        } else {
-          tmsg(@player, color('yellow')'/'.@command'<message>')
-        }
-      } else {
-        return(false)
-      }
-    } else {
-      @sender_name = 'console'
-      @sender_uuid = 'console'
-      if(array_size(@args) > 0) {
-        @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
-        @setting = array('broadcast', false)
-        _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting)
-      } else {
-        console(color('yellow')'/'.@command'<message>')
-      }
-    }
   }
 ))
 

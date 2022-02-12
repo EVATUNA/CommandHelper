@@ -959,7 +959,8 @@ proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @
 proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack) {
   runas('~console', '/recipe give '.@player.' *')
   if(!array_index_exists(@reconnectable_players, @uuid)) {
-    _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack)
+    //_send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack)
+    broadcast('리팩보냄')
   } else {
     #set_timeout(500, closure() {
       _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text)
@@ -969,8 +970,14 @@ proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_
 }
 
 # 플레이어 퇴장
-proc _quit_event(@uuid, @players_data) {
-  kafka_send('ch.inform_player_quit', @uuid)
+proc _quit_event(@uuid, @players_data, @server) {
+  # 카프카
+  @quit_data = array(
+    'uuid': @uuid,
+    'server': @server
+  )
+  kafka_send('ch.inform_player_quit', json_encode(@quit_data))
+  # 컵
   if(array_index_exists(@players_data, @uuid)) {
     # 액티브 스킬 저장
     @player_data = @players_data[@uuid]

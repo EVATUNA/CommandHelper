@@ -39,8 +39,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.0,
-						"max": 3.4
+						"min": 3.703,
+						"max": 3.703
 					},
 					"attack_speed": {
 						"min": 2.5,
@@ -59,8 +59,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.2,
-						"max": 3.6
+						"min": 3.703,
+						"max": 3.842
 					},
 					"attack_speed": {
 						"min": 2.5,
@@ -79,8 +79,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.4,
-						"max": 3.8
+						"min": 3.795,
+						"max": 4.073
 					},
 					"attack_speed": {
 						"min": 2.5,
@@ -99,8 +99,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.6,
-						"max": 4.0
+						"min": 3.981,
+						"max": 4.397
 					},
 					"attack_speed": 3,
 					"farming_power": {
@@ -116,8 +116,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.9,
-						"max": 4.3
+						"min": 4.258,
+						"max": 4.814
 					},
 					"attack_speed": 3,
 					"farming_power": {
@@ -134,8 +134,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 4.2,
-						"max": 4.6
+						"min": 4.443,
+						"max": 4.999
 					},
 					"attack_speed": 3,
 					"farming_power": {
@@ -152,8 +152,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 4.5,
-						"max": 4.9
+						"min": 4.860,
+						"max": 5.277
 					},
 					"attack_speed": 3,
 					"farming_power": {
@@ -169,8 +169,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 4.8,
-						"max": 5.2
+						"min": 5.184,
+						"max": 5.462
 					},
 					"attack_speed": 3,
 					"farming_power": {
@@ -186,8 +186,8 @@
 				"model": 0,
 				"attributes": {
 					"attack_damage": {
-						"min": 5.1,
-						"max": 5.5
+						"min": 5.415,
+						"max": 5.554
 					},
 					"attack_speed": 3,
 					"farming_power": {
@@ -203,7 +203,7 @@
 				"model": 0,
 				"broadcast": true,
 				"attributes": {
-					"attack_damage": 6,
+					"attack_damage": 5.554,
 					"attack_speed": 3,
 					"farming_power": 6
 				}

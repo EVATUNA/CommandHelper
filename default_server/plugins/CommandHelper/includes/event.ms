@@ -129,16 +129,16 @@ bind('player_join', null, null, @event, @reconnectable_players, @players_data, @
   @uuid = puuid(@player)
   modify_event('join_message', null)
   set_timeout(100, closure() {
-    #_join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack)
+    _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack)
   })
 }
 
 # 플레이어 로그아웃
-bind('player_quit', null, null, @event, @players_data) {
+bind('player_quit', null, null, @event, @players_data, @server) {
   @player = @event['player']
   @uuid = puuid(@player)
   modify_event('message', null)
-  _quit_event(@uuid, @players_data)
+  _quit_event(@uuid, @players_data, @server)
 }
 
 # 웅크리기
@@ -155,12 +155,14 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
 }
 
 # 카프카
-bind('kafka_receive', null, null, @event, @reconnectable_players, @players_data, @resourcepack) {
-  //broadcast(@event['key'])
+bind('kafka_receive', null, null, @event, @reconnectable_players, @players_data, @resourcepack, @server) {
   switch(@event['key']) {
   case 'ch.inform_player_quit':
-    @uuid = @event['value']
-    @reconnectable_players[@uuid] = 5
+    @quit_data = json_decode(@event['value'])
+    @uuid = @quit_data['uuid']
+    if(@server != @quit_data) {
+      @reconnectable_players[@uuid] = 10
+    }
     break()
   case 'ch.update_resourcepack_url':
     @url = @event['value']
@@ -169,19 +171,52 @@ bind('kafka_receive', null, null, @event, @reconnectable_players, @players_data,
     break()
   case 'ch.send_defaultchat':
     @data = json_decode(@event['value'])
-    _default_chat(@data, @players_data)
+    @sender_server = @data['sender_server']
+    if(@sender_server != @server) {
+      _default_chat(@data, @players_data)
+      # logging
+      @sender_name = @data['sender_name']
+      @message = @data['message']
+      @channel = @data['sender_chat_data'][0]
+      mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
+    }
     break()
   case 'ch.send_townchat':
     @data = json_decode(@event['value'])
-    _town_chat(@data, @players_data)
+    @sender_server = @data['sender_server']
+    if(@sender_server != @server) {
+      _town_chat(@data, @players_data)
+      # logging
+      @sender_name = @data['sender_name']
+      @message = @data['message']
+      @channel = @data['sender_chat_data'][0]
+      mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
+    }
     break()
   case 'ch.send_localchat':
     @data = json_decode(@event['value'])
-    _local_chat(@data, @players_data)
+    # logging
+    @sender_server = @data['sender_server']
+    if(@sender_server != @server) {
+      _local_chat(@data, @players_data)
+      # logging
+      @sender_name = @data['sender_name']
+      @message = @data['message']
+      @channel = @data['sender_chat_data'][0]
+      mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
+    }
     break()
   case 'ch.send_adminchat':
     @data = json_decode(@event['value'])
-    _admin_chat(@data, @players_data)
+    @sender_server = @data['sender_server']
+    if(@sender_server != @server) {
+      _admin_chat(@data, @players_data)
+      # logging
+      @sender_name = @data['sender_name']
+      @message = @data['message']
+      @channel = @data['sender_chat_data'][0]
+      mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
+    }
     break()
   case 'ch.send_whisper':
     @data = json_decode(@event['value'])
