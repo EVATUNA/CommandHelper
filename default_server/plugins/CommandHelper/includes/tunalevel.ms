@@ -53,15 +53,7 @@ proc _replace_tunalevel_text(@tunalevel) {
       ), '8', '\uef08\uf801'
     ), '9', '09\uf801'
   )
-  @chars = split('', @tunalevel)
-  @nsf = ''
-  foreach(@char in @chars) {
-    if(@char == 1) {
-      @nsf = @nsf.'\uF803'
-    } else {
-      @nsf = @nsf.'\uF804'
-    }
-  }
+  @nsf = string_multiply('\uF804', length(@tunalevel))
   @tunalevel_text = '\uef1c\uf801'.@background.'\uf801'.@nsf.'\uf808\uf801'.'\uef1b\uf801'.@text
   return(@tunalevel_text)
 }

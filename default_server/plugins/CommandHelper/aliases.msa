@@ -1,3 +1,5 @@
+
+/*
 /itf = >>>
   @ploc = ploc()
   @ploc['y'] += 1
@@ -366,3 +368,4 @@ raw_set_pvanish($1, true, player())
 <<<
  
 
+*/

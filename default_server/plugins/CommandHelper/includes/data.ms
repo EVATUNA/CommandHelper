@@ -14,7 +14,10 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
     'last_armor_effect': 0,
     'tooltips': array(),
     'indicator_id': '',
-    'indicator_remove_task': 0
+    'indicator_remove_task': 0,
+    'last_sender': '',
+    'last_whisper_sender': '',
+    'whisper_target': '',
   )
 
   # setting
@@ -1064,15 +1067,7 @@ proc _replace_arcanelevel_text(@arcanelevel) {
       ), '8', '\uef28\uf801'
     ), '9', '\uef29\uf801'
   )
-  @chars = split('', @arcanelevel)
-  @nsf = ''
-  foreach(@char in @chars) {
-    if(@char == 1) {
-      @nsf = @nsf.'\uF803'
-    } else {
-      @nsf = @nsf.'\uF804'
-    }
-  }
+  @nsf = string_multiply('\uF804', length(@arcanelevel))
   @arcanelevel_text = '\uef3c\uf801'.@background.'\uf801'.@nsf.'\uf808\uf801'.'\uef3b\uf801'.@text
   return(@arcanelevel_text)
 }

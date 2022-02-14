@@ -385,7 +385,7 @@ proc _replace_repair_percent(@percent) {
                   replace(
                     replace(
                       @percent, '0', '\uf801\uec20'
-                    ), '1', '\uec21'
+                    ), '1', '\uf801\uec21'
                   ), '2', '\uf801\uec22'
                 ), '3', '\uf801\uec23'
               ), '4', '\uf801\uec24'

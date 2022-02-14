@@ -142,7 +142,7 @@ proc _tellraw(@player, @raw) {
   }
 }
 
-# enko
+# enko proc
 proc _en_to_ko(@unconverted_message) {
   @converted_message = _convert_eng_to_kor(@unconverted_message)
   if(@converted_message){
@@ -157,55 +157,992 @@ proc _en_to_ko(@unconverted_message) {
   return(@converted_message)
 }
 
-# Channel Tag
-proc _update_channel_tag(@uuid, @player_data, @text) {
-  @channel_tags = array(
-    'general_en': '\ue3f9',
-    'general_ko': '\ue3fa',
-    'town_en': '\ue3fb',
-    'town_ko': '\ue3fc',
-    'local_en': '\ue3fd',
-    'local_ko': '\ue3fe',
-    'admin_en': '\ue3ff',
-    'admin_ko': '\ue400',
-    'party_en': '\ue401',
-    'party_ko': '\ue402',
-    'dummy_en': '\ue403',
-    'dummy_ko': '\ue404'
-  )
-  switch(@player_data['chat'][1]) {
-  case true:
-    switch(@player_data['chat'][0]) {
-    case 'general':
-      @channel_tag = 'general_ko'
-    case 'town':
-      @channel_tag = 'town_ko'
-    case 'local':
-      @channel_tag = 'local_ko'
-    case 'admin':
-      @channel_tag = 'admin_ko'
-    case 'party':
-      @channel_tag = 'party_ko'
-    default:
-      @channel_tag = 'general_ko'
-    }
-  case false:
-  switch(@player_data['chat'][0]) {
-    case 'general':
-      @channel_tag = 'general_en'
-    case 'town':
-      @channel_tag = 'town_en'
-    case 'local':
-      @channel_tag = 'local_en'
-    case 'admin':
-      @channel_tag = 'admin_en'
-    case 'party':
-      @channel_tag = 'party_en'
-    default:
-      @channel_tag = 'general_en'
+# Channel ,EnKo Tag
+proc _get_whisper_tag_name(@name, @text) {
+  @chars = split('', @name)
+  @res = res_create_resource('STRING_BUILDER')
+  foreach(@char in @chars) {
+    @unicode = unicode_from_char(@char)
+    if(@unicode >= 48 && @unicode <= 57) { // 숫자
+      string_append(@res, char_from_unicode(@unicode + 61254), @text['space_fonts']['space.-1'])
+    } else if(@unicode >= 65 && @unicode <= 90) { // 대문자
+      string_append(@res, char_from_unicode(@unicode + 61183), @text['space_fonts']['space.-1'])
+    } else if(@unicode >= 97 && @unicode <= 122) { // 소문자
+      string_append(@res, char_from_unicode(@unicode + 61177), @text['space_fonts']['space.-1'])
+    } else if(@char == '_') { // 언더바
+      string_append(@res, '\uef75', @text['space_fonts']['space.-1'])
+    } else { // 그외
+      string_append(@res, '\uef74', @text['space_fonts']['space.-1'])
     }
   }
-  _set_sidebar(@uuid, 0, color('#fe0000').@text['space_fonts']['space.1'].@channel_tags[@channel_tag], @text)
+  @replaced_name = string(@res)
+  res_free_resource(@res)
+  return(@replaced_name)
+}
+
+proc _update_channel_tag(@uuid, @player_data, @text) {
+  @channel_tags = array(
+    'default': '\ue400',
+    'local': '\ue401',
+    'town': '\ue402',
+    'admin': '\ue403',
+    'dummy': '\ue404'
+  )
+  @channel = @player_data['chat'][0]
+  if(@channel == 'whisper') {
+    if(@player_data['cache']['whisper_target'] == '') { //귓말 채널일시 채널 초기화
+      @player_data['chat'][0] = 'default'
+      @channel = @player_data['chat'][0]
+      cup_set('CHAT', @uuid, @player_data['chat'])
+    }
+    @channel_tag = '\ue3fd'.@text['space_fonts']['space.-1']._get_whisper_tag_name(@player_data['cache']['whisper_target'], @text).'\ue3fe'
+  }
+  if(@channel != 'whisper') {
+    @channel_tag = @channel_tags[@channel]
+  }
+  @enko = @player_data['chat'][1]
+  if(@enko) {
+    @enko_tag = '\ue3ff'
+  } else {
+    @enko_tag = ''
+  }
+  _set_sidebar(@uuid, 0, color('#fe0000').@text['space_fonts']['space.1'].@channel_tag.@text['space_fonts']['space.1'].@enko_tag, @text)
+}
+
+# 한영 치환 입력 활성 여부 변경
+register_command('enko', array(
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    @uuid = puuid(@player)
+    if(array_index_exists(@players_data, @uuid)) {
+      if(@players_data[@uuid]['chat'][1]) {
+        @players_data[@uuid]['chat'][1] = false
+        cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
+      } else {
+        @players_data[@uuid]['chat'][1] = true
+        cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
+      }
+      _update_channel_tag(@uuid, @players_data[@uuid], @text)
+    }
+  }
+))
+
+# 채팅 채널 변경
+register_command('channel', array(
+  'aliases': array('ch', '채널'),
+  'tabcompleter': closure(@command, @player, @args) {
+    if(array_size(@args) == 1) {
+      @return = array('default', 'local')
+      @uuid = puuid(@player)
+      if(!is_null(tunalands_get_player_rank(@uuid))) {
+        @return[] = 'town'
+      }
+      if(pisop(@player)) {
+        @return[] = 'admin'
+      }
+    } else {
+      @return = array()
+    }
+    return(@return)
+  },
+  'executor': closure(@command, @player, @args) {
+    @uuid = puuid(@player)
+    if(array_index_exists(@players_data, @uuid)) {
+      if(array_size(@args) == 0) {
+        switch(@players_data[@uuid]['chat'][0]) {
+        case 'local':
+          if(!is_null(tunalands_get_player_rank(@uuid))) {
+            @players_data[@uuid]['chat'][0] = 'town'
+          } else {
+            if(pisop(@player)) {
+              @players_data[@uuid]['chat'][0] = 'admin'
+            } else {
+              @players_data[@uuid]['chat'][0] = 'default'
+            }
+          }
+          cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
+          break()
+        case 'town':
+          if(pisop(@player)) {
+            @players_data[@uuid]['chat'][0] = 'admin'
+          } else {
+            @players_data[@uuid]['chat'][0] = 'default'
+          }
+          cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
+          break()
+        case 'admin':
+          @players_data[@uuid]['chat'][0] = 'default'
+          cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
+          break()
+        case 'default':
+          @players_data[@uuid]['chat'][0] = 'local'
+          cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
+          break()
+        case 'whisper':
+        default:
+          @players_data[@uuid]['chat'][0] = 'default'
+          cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
+          break()
+        }
+        _update_channel_tag(@uuid, @players_data[@uuid], @text)
+      } else if(array_size(@args) == 1) {
+        switch(@args[0]) {
+        case 'local':
+          @players_data[@uuid]['chat'][0] = 'local'
+          cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
+          break()
+        case 'town':
+          if(!is_null(tunalands_get_player_rank(@uuid))) {
+            @players_data[@uuid]['chat'][0] = 'town'
+            cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
+          }
+          break()
+        case 'admin':
+          if(pisop(@player)) {
+            @players_data[@uuid]['chat'][0] = 'admin'
+            cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
+          }
+          break()
+        default:
+          @players_data[@uuid]['chat'][0] = 'default'
+          cup_set('CHAT', @uuid, @players_data[@uuid]['chat'])
+          break()
+        }
+        _update_channel_tag(@uuid, @players_data[@uuid], @text)
+      }
+    }
+  }
+))
+
+proc _get_name_raws(@channel, @sender_name, @sender_badge, @color, @target) {
+  switch(@channel) {
+  case 'Default':
+  case 'Town':
+  case 'Local':
+  case 'Admin':
+    @name_raws = array(
+      array(
+        'text': '',
+        'color': @color
+      ),
+      array(
+        'text': @sender_badge.' ',
+        'color': '#ffffff'
+      ),
+      array(
+        'text': @sender_name,
+        'insertion': '@'.@sender_name'',
+        'hoverEvent': array(
+          'action': 'show_text',
+          'value': array(
+            '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+            '좌클릭 시, 유저에게 귓속말을 보냅니다',
+          )
+        ),
+        'clickEvent': array(
+          'action': 'suggest_command',
+          'value': '/w'@sender_name''
+        )
+      ),
+      array(
+        'text': ' :: ',
+      )
+    )
+    break()
+  case 'Whisper':
+    switch(@sender_badge) {
+    case 'sender':
+      @name_raws = array(
+        array(
+          'text': '',
+          'color': @color
+        ),
+        array(
+          'text': 'To '
+        ),
+        array(
+          'text': @target,
+          'insertion': '@'.@target'',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': array(
+              '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+              '좌클릭 시, 유저에게 귓속말을 보냅니다',
+            )
+          ),
+          'clickEvent': array(
+            'action': 'suggest_command',
+            'value': '/w'@target''
+          )
+        ),
+        array(
+          'text': ' :: ',
+        )
+      )
+      break()
+    case 'target':
+      @name_raws = array(
+        array(
+          'text': '',
+          'color': @color
+        ),
+        array(
+          'text': 'From '
+        ),
+        array(
+          'text': @sender_name,
+          'insertion': '@'.@sender_name'',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': array(
+              '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+              '좌클릭 시, 유저에게 귓속말을 보냅니다',
+            )
+          ),
+          'clickEvent': array(
+            'action': 'suggest_command',
+            'value': '/w'@sender_name''
+          )
+        ),
+        array(
+          'text': ' :: ',
+        )
+      )
+      break()
+    case 'other':
+      @name_raws = array(
+        array(
+          'text': '',
+          'color': @color
+        ),
+        array(
+          'text': 'From '
+        ),
+        array(
+          'text': @sender_name,
+          'insertion': '@'.@sender_name'',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': array(
+              '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+              '좌클릭 시, 유저에게 귓속말을 보냅니다',
+            )
+          ),
+          'clickEvent': array(
+            'action': 'suggest_command',
+            'value': '/w'@sender_name''
+          )
+        ),
+        array(
+          'text': ' To '
+        ),
+        array(
+          'text': @target,
+          'insertion': '@'.@target'',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': array(
+              '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+              '좌클릭 시, 유저에게 귓속말을 보냅니다',
+            )
+          ),
+          'clickEvent': array(
+            'action': 'suggest_command',
+            'value': '/w'@target''
+          )
+        ),
+        array(
+          'text': ' :: ',
+        )
+      )
+      break()
+    }
+    break()
+  }
+  return(@name_raws)
+}
+
+proc _get_message_raws(@channel, @message, @receivers_data, @town_members) {
+  @mentioned_messages = array()
+  @message_raws = array(
+    array('text': '')
+  )
+  switch(@channel) {
+  case 'Default':
+    foreach(@key: @string in parse_args(@message)) {
+      @is_message_modified = false
+      if(string_starts_with(@string, '@')) {
+        @mentioned_message = substr(@string, 1) 
+        @eng_length = reg_count('[A-z0-9_]',@mentioned_message)
+        @kr_length = reg_count('[가-힣]', @mentioned_message)
+        @length = length(@mentioned_message)
+        if(@length != 0) {
+          if(@length == @eng_length) {
+            if(!array_contains(@mentioned_messages, @mentioned_message)) {
+              foreach(@receiver_uuid: @receiver_data in @receivers_data) {
+                if(@mentioned_message == @receiver_data['name']) {
+                  @receivers_data[@receiver_uuid]['is_mentioned'] = true
+                  @mentioned_messages[] = @mentioned_message
+                  @is_message_modified = true
+                  @message_raw = array(
+                    'text': @string,
+                    'color': 'red',
+                    'insertion': @string.' ',
+                    'hoverEvent': array(
+                      'action': 'show_text',
+                      'value': array(
+                        '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                        '좌클릭 시, 유저에게 귓속말을 보냅니다',
+                      )
+                    ),
+                    'clickEvent': array(
+                      'action': 'suggest_command',
+                      'value': '/w'@mentioned_message''
+                    )
+                  )
+                  break()
+                }
+              }
+            } else {
+              @is_message_modified = true
+              @message_raw = array(
+                'text': @string,
+                'color': 'red',
+                'insertion': @string.' ',
+                'hoverEvent': array(
+                  'action': 'show_text',
+                  'value': array(
+                    '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                    '좌클릭 시, 유저에게 귓속말을 보냅니다',
+                  )
+                ),
+                'clickEvent': array(
+                  'action': 'suggest_command',
+                  'value': '/w'@mentioned_message''
+                )
+              )
+            }
+          } else if(@length == @kr_length) {
+            @admin = array('스태프', '스탭', '스탭진', '스탭팀', '운영', '운영자', '운영진', '운영팀', '관리자', '어드민', '오피')
+            if(array_contains(@admin, @mentioned_message)) {
+              if(!array_contains(@mentioned_messages, '관리자')) {
+                @mentioned_messages[] = '관리자'
+                @is_message_modified = true
+                @message_raw = array(
+                  'text': @string,
+                  'color': 'red',
+                  'hoverEvent': array(
+                    'action': 'show_text',
+                    'value': array(
+                      '접속중인 관리자:'
+                    )
+                  )
+                )
+                foreach(@receiver_uuid: @receiver_data in @receivers_data) {
+                  if(@receiver_data['is_op']) {
+                    @receivers_data[@receiver_uuid]['is_mentioned'] = true
+                    @message_raw['hoverEvent']['value'][] = '\n'.@receiver_data['name']
+                  }
+                }
+                @op_list_message = @message_raw
+              } else {
+                @is_message_modified = true
+                @message_raw = @op_list_message
+                @message_raw['text'] = @string
+              }
+            }
+          }
+        }
+      } else if(string_starts_with(@string, './')) {
+        @string = replace(@string, './', '/')
+        @string = replace(@string, '_', ' ')
+        @is_message_modified = true
+        @message_raw = array(
+          'text': @string,
+          'color': 'yellow',
+          'clickEvent': array(
+            'action': 'suggest_command',
+            'value': @string
+          )
+        )
+      } else if(string_starts_with(@string, 'https://') || string_starts_with(@string, 'http://')) {
+        @is_message_modified = true
+        @message_raw = array(
+          'text': @string,
+          'color': 'blue',
+          'clickEvent': array(
+            'action': 'open_url',
+            'value': @string
+          )
+        )
+      }
+      if(@is_message_modified) {
+        @pre_message_raw = @message_raws[-1]
+        if(array_size(@message_raws) != 1) {
+          if(array_index_exists(@pre_message_raw, 'color')) {
+            @message_raws[] = array(
+              'text': ' '
+            )
+          } else {
+            @message_raws[-1]['text'] = @pre_message_raw['text'].' '
+          }
+        }
+        @message_raws[] = @message_raw
+      } else {
+        @pre_message_raw = @message_raws[-1]
+        if(array_size(@message_raws) == 1) {
+          @message_raws[] = array(
+            'text': @string
+          )
+        } else {
+          if(array_index_exists(@pre_message_raw, 'color')) {
+            @message_raws[] = array(
+              'text': ' '.@string
+            )
+          } else {
+            @message_raws[-1]['text'] = @pre_message_raw['text'].' '.@string
+          }
+        }
+      }
+    }
+    break()
+  case 'Town':
+    foreach(@key: @string in parse_args(@message)) {
+      @is_message_modified = false
+      if(string_starts_with(@string, '@')) {
+        @mentioned_message = substr(@string, 1) 
+        @eng_length = reg_count('[A-z0-9_]',@mentioned_message)
+        @kr_length = reg_count('[가-힣]', @mentioned_message)
+        @length = length(@mentioned_message)
+        if(@length != 0) {
+          if(@length == @eng_length) {
+            if(!array_contains(@mentioned_messages, @mentioned_message)) {
+              foreach(@receiver_uuid: @receiver_data in @receivers_data) {
+                if(@mentioned_message == @receiver_data['name'] && !is_null(@receiver_data['town_role'])) {
+                  @receivers_data[@receiver_uuid]['is_mentioned'] = true
+                  @mentioned_messages[] = @mentioned_message
+                  @is_message_modified = true
+                  @message_raw = array(
+                    'text': @string,
+                    'color': 'red',
+                    'insertion': @string.' ',
+                    'hoverEvent': array(
+                      'action': 'show_text',
+                      'value': array(
+                        '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                        '좌클릭 시, 유저에게 귓속말을 보냅니다',
+                      )
+                    ),
+                    'clickEvent': array(
+                      'action': 'suggest_command',
+                      'value': '/w'@mentioned_message''
+                    )
+                  )
+                  break()
+                }
+              }
+            } else {
+              @is_message_modified = true
+              @message_raw = array(
+                'text': @string,
+                'color': 'red',
+                'insertion': @string.' ',
+                'hoverEvent': array(
+                  'action': 'show_text',
+                  'value': array(
+                    '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                    '좌클릭 시, 유저에게 귓속말을 보냅니다',
+                  )
+                ),
+                'clickEvent': array(
+                  'action': 'suggest_command',
+                  'value': '/w'@mentioned_message''
+                )
+              )
+            }
+          } else if(@length == @kr_length) {
+            switch(@mentioned_message) {
+            case '알바':
+              if(!array_contains(@mentioned_messages, '알바')) {
+                @mentioned_messages[] = '알바'
+                @is_message_modified = true
+                @message_raw = array(
+                  'text': @string,
+                  'color': 'red',
+                  'hoverEvent': array(
+                    'action': 'show_text',
+                    'value': array(
+                      '접속중인 알바:'
+                    )
+                  )
+                )
+                foreach(@receiver_uuid: @receiver_data in @receivers_data) {
+                  if(@receiver_data['town_role'] == 'MEMBER') { //알바 로 설정
+                    @receivers_data[@receiver_uuid]['is_mentioned'] = true
+                    @message_raw['hoverEvent']['value'][] = '\n'.@receiver_data['name']
+                  }
+                }
+                @member_list_message = @message_raw
+              } else {
+                @is_message_modified = true
+                @message_raw = @member_list_message
+              }
+              break()
+            case '주민':
+              if(!array_contains(@mentioned_messages, '주민')) {
+                @mentioned_messages[] = '주민'
+                @is_message_modified = true
+                @message_raw = array(
+                  'text': @string,
+                  'color': 'red',
+                  'hoverEvent': array(
+                    'action': 'show_text',
+                    'value': array(
+                      '접속중인 주민:'
+                    )
+                  )
+                )
+                foreach(@receiver_uuid: @receiver_data in @receivers_data) {
+                  if(@receiver_data['town_role'] == 'MEMBER') {
+                    @receivers_data[@receiver_uuid]['is_mentioned'] = true
+                    @message_raw['hoverEvent']['value'][] = '\n'.@receiver_data['name']
+                  }
+                }
+                @member_list_message = @message_raw
+              } else {
+                @is_message_modified = true
+                @message_raw = @member_list_message
+              }
+              break()
+            case '부이장':
+              if(!array_contains(@mentioned_messages, '부이장')) {
+                @mentioned_messages[] = '부이장'
+                @is_message_modified = true
+                @message_raw = array(
+                  'text': @string,
+                  'color': 'red',
+                  'hoverEvent': array(
+                    'action': 'show_text',
+                    'value': array(
+                      '접속중인 부이장:'
+                    )
+                  )
+                )
+                foreach(@receiver_uuid: @receiver_data in @receivers_data) {
+                  if(@receiver_data['town_role'] == 'staff') {
+                    @receivers_data[@receiver_uuid]['is_mentioned'] = true
+                    @message_raw['hoverEvent']['value'][] = '\n'.@receiver_data['name']
+                  }
+                }
+                @staff_list_message = @message_raw
+              } else {
+                @is_message_modified = true
+                @message_raw = @staff_list_message
+              }
+              break()
+            case '이장':
+              if(!array_contains(@mentioned_messages, '이장')) {
+                @mentioned_messages[] = '이장'
+                @is_message_modified = true
+                foreach(@town_member in @town_members) {
+                  @town_member_uuid = bukkitlinked_get_player_uuid(@town_member)
+                  if(array_index_exists(@receivers_data,  @town_member_uuid) && @receivers_data[@town_member_uuid]['town_role'] == 'OWNER') {
+                    @town_owner = array(
+                      'name': @town_member,
+                      'uuid':@town_member_uuid
+                    )
+                    break()
+                  }
+                }
+                if(array_contains(bukkitlinked_get_all_players(), @town_owner['uuid'])) {
+                  @receivers_data[@town_owner['uuid']]['is_mentioned'] = true
+                  @message_raw = array(
+                    'text': @string,
+                    'color': 'red',
+                    'hoverEvent': array(
+                      'action': 'show_text',
+                      'value': array(
+                        '이장:'@town_owner['name']'(온라인)'
+                      )
+                    )
+                  )
+                } else {
+                  @message_raw = array(
+                    'text': @string,
+                    'color': 'red',
+                    'hoverEvent': array(
+                      'action': 'show_text',
+                      'value': array(
+                        '이장:'@town_owner['name']'(오프라인)'
+                      )
+                    )
+                  )
+                }
+                @member_list_message = @message_raw
+              } else {
+                @is_message_modified = true
+                @message_raw = @member_list_message
+              }
+              break()
+            }
+          }
+        }
+      } else if(string_starts_with(@string, './')) {
+        @string = replace(@string, './', '/')
+        @string = replace(@string, '_', ' ')
+        @is_message_modified = true
+        @message_raw = array(
+          'text': @string,
+          'color': 'yellow',
+          'clickEvent': array(
+            'action': 'suggest_command',
+            'value': @string
+          )
+        )
+      } else if(string_starts_with(@string, 'https://') || string_starts_with(@string, 'http://')) {
+        @is_message_modified = true
+        @message_raw = array(
+          'text': @string,
+          'color': 'blue',
+          'clickEvent': array(
+            'action': 'open_url',
+            'value': @string
+          )
+        )
+      }
+      if(@is_message_modified) {
+        @pre_message_raw = @message_raws[-1]
+        if(array_size(@message_raws) != 1) {
+          if(array_index_exists(@pre_message_raw, 'color')) {
+            @message_raws[] = array(
+              'text': ' '
+            )
+          } else {
+            @message_raws[-1]['text'] = @pre_message_raw['text'].' '
+          }
+        }
+        @message_raws[] = @message_raw
+      } else {
+        @pre_message_raw = @message_raws[-1]
+        if(array_size(@message_raws) == 1) {
+          @message_raws[] = array(
+            'text': @string
+          )
+        } else {
+          if(array_index_exists(@pre_message_raw, 'color')) {
+            @message_raws[] = array(
+              'text': ' '.@string
+            )
+          } else {
+            @message_raws[-1]['text'] = @pre_message_raw['text'].' '.@string
+          }
+        }
+      }
+    }
+    break()
+  case 'Local':
+    foreach(@key: @string in parse_args(@message)) {
+      @is_message_modified = false
+      if(string_starts_with(@string, '@')) {
+        @mentioned_message = substr(@string, 1) 
+        @eng_length = reg_count('[A-z0-9_]',@mentioned_message)
+        @kr_length = reg_count('[가-힣]', @mentioned_message)
+        @length = length(@mentioned_message)
+        if(@length != 0) {
+          if(@length == @eng_length) {
+            if(!array_contains(@mentioned_messages, @mentioned_message)) {
+              foreach(@receiver_uuid: @receiver_data in @receivers_data) {
+                if(@mentioned_message == @receiver_data['name'] && @receiver_data['is_near_player']) {
+                  @receivers_data[@receiver_uuid]['is_mentioned'] = true
+                  @mentioned_messages[] = @mentioned_message
+                  @is_message_modified = true
+                  @message_raw = array(
+                    'text': @string,
+                    'color': 'red',
+                    'insertion': @string.' ',
+                    'hoverEvent': array(
+                      'action': 'show_text',
+                      'value': array(
+                        '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                        '좌클릭 시, 유저에게 귓속말을 보냅니다',
+                      )
+                    ),
+                    'clickEvent': array(
+                      'action': 'suggest_command',
+                      'value': '/w'@mentioned_message''
+                    )
+                  )
+                  break()
+                }
+              }
+            } else {
+              @is_message_modified = true
+              @message_raw = array(
+                'text': @string,
+                'color': 'red',
+                'insertion': @string.' ',
+                'hoverEvent': array(
+                  'action': 'show_text',
+                  'value': array(
+                    '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                    '좌클릭 시, 유저에게 귓속말을 보냅니다',
+                  )
+                ),
+                'clickEvent': array(
+                  'action': 'suggest_command',
+                  'value': '/w'@mentioned_message''
+                )
+              )
+            }
+          }
+        }
+      } else if(string_starts_with(@string, './')) {
+        @string = replace(@string, './', '/')
+        @string = replace(@string, '_', ' ')
+        @is_message_modified = true
+        @message_raw = array(
+          'text': @string,
+          'color': 'yellow',
+          'clickEvent': array(
+            'action': 'suggest_command',
+            'value': @string
+          )
+        )
+      } else if(string_starts_with(@string, 'https://') || string_starts_with(@string, 'http://')) {
+        @is_message_modified = true
+        @message_raw = array(
+          'text': @string,
+          'color': 'blue',
+          'clickEvent': array(
+            'action': 'open_url',
+            'value': @string
+          )
+        )
+      }
+      if(@is_message_modified) {
+        @pre_message_raw = @message_raws[-1]
+        if(array_size(@message_raws) != 1) {
+          if(array_index_exists(@pre_message_raw, 'color')) {
+            @message_raws[] = array(
+              'text': ' '
+            )
+          } else {
+            @message_raws[-1]['text'] = @pre_message_raw['text'].' '
+          }
+        }
+        @message_raws[] = @message_raw
+      } else {
+        @pre_message_raw = @message_raws[-1]
+        if(array_size(@message_raws) == 1) {
+          @message_raws[] = array(
+            'text': @string
+          )
+        } else {
+          if(array_index_exists(@pre_message_raw, 'color')) {
+            @message_raws[] = array(
+              'text': ' '.@string
+            )
+          } else {
+            @message_raws[-1]['text'] = @pre_message_raw['text'].' '.@string
+          }
+        }
+      }
+    }
+    break()
+  case 'Admin':
+    foreach(@key: @string in parse_args(@message)) {
+      @is_message_modified = false
+      if(string_starts_with(@string, '@')) {
+        @mentioned_message = substr(@string, 1) 
+        @eng_length = reg_count('[A-z0-9_]',@mentioned_message)
+        @kr_length = reg_count('[가-힣]', @mentioned_message)
+        @length = length(@mentioned_message)
+        if(@length != 0) {
+          if(@length == @eng_length) {
+            if(!array_contains(@mentioned_messages, @mentioned_message)) {
+              foreach(@receiver_uuid: @receiver_data in @receivers_data) {
+                if(@mentioned_message == @receiver_data['name']) {
+                  @receivers_data[@receiver_uuid]['is_mentioned'] = true
+                  @mentioned_messages[] = @mentioned_message
+                  @is_message_modified = true
+                  @message_raw = array(
+                    'text': @string,
+                    'color': 'red',
+                    'insertion': @string.' ',
+                    'hoverEvent': array(
+                      'action': 'show_text',
+                      'value': array(
+                        '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                        '좌클릭 시, 유저에게 귓속말을 보냅니다',
+                      )
+                    ),
+                    'clickEvent': array(
+                      'action': 'suggest_command',
+                      'value': '/w'@mentioned_message''
+                    )
+                  )
+                  break()
+                }
+              }
+            } else {
+              @is_message_modified = true
+              @message_raw = array(
+                'text': @string,
+                'color': 'red',
+                'insertion': @string.' ',
+                'hoverEvent': array(
+                  'action': 'show_text',
+                  'value': array(
+                    '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                    '좌클릭 시, 유저에게 귓속말을 보냅니다',
+                  )
+                ),
+                'clickEvent': array(
+                  'action': 'suggest_command',
+                  'value': '/w'@mentioned_message''
+                )
+              )
+            }
+          } else if(@length == @kr_length) {
+            @admin = array('스태프', '스탭', '스탭진', '스탭팀', '운영', '운영자', '운영진', '운영팀', '관리자', '어드민', '오피')
+            if(array_contains(@admin, @mentioned_message)) {
+              if(!array_contains(@mentioned_messages, '관리자')) {
+                @mentioned_messages[] = '관리자'
+                @is_message_modified = true
+                @message_raw = array(
+                  'text': @string,
+                  'color': 'red',
+                  'hoverEvent': array(
+                    'action': 'show_text',
+                    'value': array(
+                      '접속중인 관리자:'
+                    )
+                  )
+                )
+                foreach(@receiver_uuid: @receiver_data in @receivers_data) {
+                  @receivers_data[@receiver_uuid]['is_mentioned'] = true
+                  @message_raw['hoverEvent']['value'][] = '\n'.@receiver_data['name']
+                }
+                @op_list_message = @message_raw
+              } else {
+                @is_message_modified = true
+                @message_raw = @op_list_message
+                @message_raw['text'] = @string
+              }
+            }
+          }
+        }
+      } else if(string_starts_with(@string, './')) {
+        @string = replace(@string, './', '/')
+        @string = replace(@string, '_', ' ')
+        @is_message_modified = true
+        @message_raw = array(
+          'text': @string,
+          'color': 'yellow',
+          'clickEvent': array(
+            'action': 'suggest_command',
+            'value': @string
+          )
+        )
+      } else if(string_starts_with(@string, 'https://') || string_starts_with(@string, 'http://')) {
+        @is_message_modified = true
+        @message_raw = array(
+          'text': @string,
+          'color': 'blue',
+          'clickEvent': array(
+            'action': 'open_url',
+            'value': @string
+          )
+        )
+      }
+      if(@is_message_modified) {
+        @pre_message_raw = @message_raws[-1]
+        if(array_size(@message_raws) != 1) {
+          if(array_index_exists(@pre_message_raw, 'color')) {
+            @message_raws[] = array(
+              'text': ' '
+            )
+          } else {
+            @message_raws[-1]['text'] = @pre_message_raw['text'].' '
+          }
+        }
+        @message_raws[] = @message_raw
+      } else {
+        @pre_message_raw = @message_raws[-1]
+        if(array_size(@message_raws) == 1) {
+          @message_raws[] = array(
+            'text': @string
+          )
+        } else {
+          if(array_index_exists(@pre_message_raw, 'color')) {
+            @message_raws[] = array(
+              'text': ' '.@string
+            )
+          } else {
+            @message_raws[-1]['text'] = @pre_message_raw['text'].' '.@string
+          }
+        }
+      }
+    }
+    break()
+  case 'Whisper':
+    foreach(@key: @string in parse_args(@message)) {
+      @is_message_modified = false
+      if(string_starts_with(@string, './')) {
+        @string = replace(@string, './', '/')
+        @string = replace(@string, '_', ' ')
+        @is_message_modified = true
+        @message_raw = array(
+          'text': @string,
+          'color': 'yellow',
+          'clickEvent': array(
+            'action': 'suggest_command',
+            'value': @string
+          )
+        )
+      } else if(string_starts_with(@string, 'https://') || string_starts_with(@string, 'http://')) {
+        @is_message_modified = true
+        @message_raw = array(
+          'text': @string,
+          'color': 'blue',
+          'clickEvent': array(
+            'action': 'open_url',
+            'value': @string
+          )
+        )
+      }
+      if(@is_message_modified) {
+        @pre_message_raw = @message_raws[-1]
+        if(array_size(@message_raws) != 1) {
+          if(array_index_exists(@pre_message_raw, 'color')) {
+            @message_raws[] = array(
+              'text': ' '
+            )
+          } else {
+            @message_raws[-1]['text'] = @pre_message_raw['text'].' '
+          }
+        }
+        @message_raws[] = @message_raw
+      } else {
+        @pre_message_raw = @message_raws[-1]
+        if(array_size(@message_raws) == 1) {
+          @message_raws[] = array(
+            'text': @string
+          )
+        } else {
+          if(array_index_exists(@pre_message_raw, 'color')) {
+            @message_raws[] = array(
+              'text': ' '.@string
+            )
+          } else {
+            @message_raws[-1]['text'] = @pre_message_raw['text'].' '.@string
+          }
+        }
+      }
+    }
+    break()
+  }
+  return(@message_raws)
 }
 
 # Default Chat
@@ -213,11 +1150,13 @@ proc _default_chat(@data, @players_data) {
   # 변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
-  @sender_chat_data = @data['sender_chat_data']
+  @sender_server = @data['sender_server']
   @sender_badge = @data['sender_badge']
-  @unmodified_message = @data['message']
+  @sender_chat_data = @data['sender_chat_data']
+  @message = @data['message']
+  @channel = 'Default'
   # 리시버 데이터 세팅
-  @receivers = array()
+  @receivers_data = array()
   foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
     @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
     if(ponline(@receiver_name)) {
@@ -233,7 +1172,7 @@ proc _default_chat(@data, @players_data) {
           @is_listening = false
         }
         # Receiver Setting
-        @receivers[@receiver_uuid] = array(
+        @receivers_data[@receiver_uuid] = array(
           'name': @receiver_name,
           'is_online': true,
           'is_op': pisop(@receiver_name),
@@ -255,7 +1194,7 @@ proc _default_chat(@data, @players_data) {
           @is_listening = false
         }
         # Receiver Setting
-        @receivers[@receiver_uuid] = array(
+        @receivers_data[@receiver_uuid] = array(
           'name': @receiver_name,
           'is_online': false,
           'is_op': bukkitlinked_is_player_op(@receiver_uuid),
@@ -267,177 +1206,17 @@ proc _default_chat(@data, @players_data) {
       }
     }
   }
-  #이름 부분
-  @name = array(
-    array(
-      'text': @sender_badge.' ',
-      'color': '#ffffff',
-    ),
-    array(
-      'text': @sender_name,
-      'insertion': '@'.@sender_name'',
-      'hoverEvent': array(
-        'action': 'show_text',
-        'value': array(
-          '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-          '좌클릭 시, 유저에게 귓속말을 보냅니다',
-        )
-      ),
-      'clickEvent': array(
-        'action': 'suggest_command',
-        'value': '/w'@sender_name''
-      )
-    ),
-    array(
-      'text': ' :: ',
-    )
-  )
-  #메시지 생성 부분
-  @mentioned_messages = array()
-  @modified_message = array(
-    array('text': '')
-  )
-  foreach(@key: @string in parse_args(@unmodified_message)) {
-    @is_modified_message = false
-    if(string_starts_with(@string, '@')) {
-      @mentioned_message = substr(@string, 1) 
-      @eng_length = reg_count('[A-z0-9_]',@mentioned_message)
-      @kr_length = reg_count('[가-힣]', @mentioned_message)
-      @length = length(@mentioned_message)
-      if(@length != 0) {
-        if(@length == @eng_length) {
-          if(!array_contains(@mentioned_messages, @mentioned_message)) {
-            foreach(@receiver_uuid: @receiver_data in @receivers) {
-              if(@mentioned_message == @receiver_data['name']) {
-                @receivers[@receiver_uuid]['is_mentioned'] = true
-                @mentioned_messages[] = @mentioned_message
-                @is_modified_message = true
-                @message = array(
-                  'text': @string,
-                  'color': 'red',
-                  'insertion': @string.' ',
-                  'hoverEvent': array(
-                    'action': 'show_text',
-                    'value': array(
-                      '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-                      '좌클릭 시, 유저에게 귓속말을 보냅니다',
-                    )
-                  ),
-                  'clickEvent': array(
-                    'action': 'suggest_command',
-                    'value': '/w'@mentioned_message''
-                  )
-                )
-                break()
-              }
-            }
-          } else {
-            @is_modified_message = true
-            @message = array(
-              'text': @string,
-              'color': 'red',
-              'insertion': @string.' ',
-              'hoverEvent': array(
-                'action': 'show_text',
-                'value': array(
-                  '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-                  '좌클릭 시, 유저에게 귓속말을 보냅니다',
-                )
-              ),
-              'clickEvent': array(
-                'action': 'suggest_command',
-                'value': '/w'@mentioned_message''
-              )
-            )
-          }
-        } else if(@length == @kr_length) {
-          @admin = array('스태프', '스탭', '스탭진', '스탭팀', '운영', '운영자', '운영진', '운영팀', '관리자', '어드민', '오피')
-          if(array_contains(@admin, @mentioned_message)) {
-            if(!array_contains(@mentioned_messages, '관리자')) {
-              @mentioned_messages[] = '관리자'
-              @is_modified_message = true
-              @message = array(
-                'text': @string,
-                'color': 'red',
-                'hoverEvent': array(
-                  'action': 'show_text',
-                  'value': array(
-                    '접속중인 관리자:'
-                  )
-                )
-              )
-              foreach(@receiver_uuid: @receiver_data in @receivers) {
-                if(@receiver_data['is_op']) {
-                  @receivers[@receiver_uuid]['is_mentioned'] = true
-                  @message['hoverEvent']['value'][] = '\n'.@receiver_data['name']
-                }
-              }
-              @op_list_message = @message
-            } else {
-              @is_modified_message = true
-              @message = @op_list_message
-            }
-          }
-        }
-      }
-    } else if(string_starts_with(@string, './')) {
-      @string = replace(@string, './', '/')
-      @string = replace(@string, '_', ' ')
-      @is_modified_message = true
-      @message = array(
-        'text': @string,
-        'color': 'yellow',
-        'clickEvent': array(
-          'action': 'suggest_command',
-          'value': @string
-        )
-      )
-    } else if(string_starts_with(@string, 'https://') || string_starts_with(@string, 'http://')) {
-      @is_modified_message = true
-      @message = array(
-        'text': @string,
-        'color': 'blue',
-        'clickEvent': array(
-          'action': 'open_url',
-          'value': @string
-        )
-      )
-    }
-    if(@is_modified_message) {
-      @pre_message = @modified_message[array_size(@modified_message) -1]
-      if(array_size(@modified_message) != 1) {
-        if(array_index_exists(@pre_message, 'color')) {
-          @modified_message[] = array(
-            'text': ' '
-          )
-        } else {
-          @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '
-        }
-      }
-      @modified_message[] = @message
-    } else {
-      @pre_message = @modified_message[array_size(@modified_message) -1]
-      if(array_size(@modified_message) == 1) {
-        @modified_message[] = array(
-          'text': @string
-        )
-      } else {
-        if(array_index_exists(@pre_message, 'color')) {
-          @modified_message[] = array(
-            'text': ' '.@string
-          )
-        } else {
-          @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '.@string
-        }
-      }
-    }
-  }
+  # 이름 부분 raw
+  @name_raws = _get_name_raws(@channel, @sender_name, @sender_badge, '#ffffff')
+  # 메시지 부분 raw (해당 함수에서 @receivers_data를 수정할 수 있음)
+  @message_raws = _get_message_raws(@channel, @message, @receivers_data)
   # 메시지 보내기
-  foreach(@receiver_uuid: @receiver_data in @receivers) {
+  foreach(@receiver_uuid: @receiver_data in @receivers_data) {
     if(@receiver_data['is_online']) {
       if(@receiver_data['channel'] == 'default' || @receiver_data['is_listening'] || @receiver_data['is_observer'] || @receiver_data['is_mentioned']) {
         @receiver_name = @receiver_data['name']
-        _tellraw(@receiver_name, array_merge(@name, @modified_message))
+        _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
+        // 라스트 센더 세팅
         if(@sender_name == @receiver_name) {
           if(ponline(@sender_name)) {
             play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
@@ -456,18 +1235,22 @@ proc _default_chat(@data, @players_data) {
       }
     }
   }
+  # 로깅
+  mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
 }
 
 proc _town_chat(@data, @players_data) {
   # 변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
-  @sender_chat_data = @data['sender_chat_data']
+  @sender_server = @data['sender_server']
   @sender_badge = @data['sender_badge']
-  @unmodified_message = @data['message']
+  @sender_chat_data = @data['sender_chat_data']
+  @message = @data['message']
+  @channel = 'Town'
   @town_members = @data['town_members']
   # 리시버 설정
-  @receivers = array()
+  @receivers_data = array()
   foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
     @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
     if(array_contains(@town_members, @receiver_name)) { // 마을원일시
@@ -489,7 +1272,7 @@ proc _town_chat(@data, @players_data) {
         }
         # Receiver Setting
         if(!is_null(@receiver_role) || @chat_data[3]) {
-          @receivers[@receiver_uuid] = array(
+          @receivers_data[@receiver_uuid] = array(
             'name': @receiver_name,
             'is_online': true,
             'channel': @chat_data[0],
@@ -513,7 +1296,7 @@ proc _town_chat(@data, @players_data) {
         }
         if(!is_null(@receiver_role) || @chat_data[3]) {
           # Receiver Setting
-          @receivers[@receiver_uuid] = array(
+          @receivers_data[@receiver_uuid] = array(
             'name': @receiver_name,
             'is_online': false,
             'channel': @chat_data[0],
@@ -526,278 +1309,17 @@ proc _town_chat(@data, @players_data) {
       }
     }
   }
-  # 이름 부분
-  @name = array(
-    array(
-      'text': '',
-      'color': '#16A085'
-    ),
-    array(
-      'text': @sender_badge.' ',  // 길드 뱃지로 대체할 것
-      'color': '#ffffff',
-    ),
-    array(
-      'text': @sender_name,
-      'insertion': '@'.@sender_name'',
-      'hoverEvent': array(
-        'action': 'show_text',
-        'value': array(
-          '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-          '좌클릭 시, 유저에게 귓속말을 보냅니다',
-        )
-      ),
-      'clickEvent': array(
-        'action': 'suggest_command',
-        'value': '/w'@sender_name''
-      )
-    ),
-    array(
-      'text': ' :: ',
-    )
-  )
-  #메시지 생성 부분
-  @mentioned_messages = array()
-  @modified_message = array(
-    array('text': '')
-  )
-  foreach(@key: @string in parse_args(@unmodified_message)) {
-    @is_modified_message = false
-    if(string_starts_with(@string, '@')) {
-      @mentioned_message = substr(@string, 1) 
-      @eng_length = reg_count('[A-z0-9_]',@mentioned_message)
-      @kr_length = reg_count('[가-힣]', @mentioned_message)
-      @length = length(@mentioned_message)
-      if(@length != 0) {
-        if(@length == @eng_length) {
-          if(!array_contains(@mentioned_messages, @mentioned_message)) {
-            foreach(@receiver_uuid: @receiver_data in @receivers) {
-              if(@mentioned_message == @receiver_data['name'] && !is_null(@receiver_data['town_role'])) {
-                @receivers[@receiver_uuid]['is_mentioned'] = true
-                @mentioned_messages[] = @mentioned_message
-                @is_modified_message = true
-                @message = array(
-                  'text': @string,
-                  'color': 'red',
-                  'insertion': @string.' ',
-                  'hoverEvent': array(
-                    'action': 'show_text',
-                    'value': array(
-                      '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-                      '좌클릭 시, 유저에게 귓속말을 보냅니다',
-                    )
-                  ),
-                  'clickEvent': array(
-                    'action': 'suggest_command',
-                    'value': '/w'@mentioned_message''
-                  )
-                )
-                break()
-              }
-            }
-          } else {
-            @is_modified_message = true
-            @message = array(
-              'text': @string,
-              'color': 'red',
-              'insertion': @string.' ',
-              'hoverEvent': array(
-                'action': 'show_text',
-                'value': array(
-                  '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-                  '좌클릭 시, 유저에게 귓속말을 보냅니다',
-                )
-              ),
-              'clickEvent': array(
-                'action': 'suggest_command',
-                'value': '/w'@mentioned_message''
-              )
-            )
-          }
-        } else if(@length == @kr_length) {
-          switch(@mentioned_message) {
-          case '알바':
-            if(!array_contains(@mentioned_messages, '알바')) {
-              @mentioned_messages[] = '알바'
-              @is_modified_message = true
-              @message = array(
-                'text': @string,
-                'color': 'red',
-                'hoverEvent': array(
-                  'action': 'show_text',
-                  'value': array(
-                    '접속중인 알바:'
-                  )
-                )
-              )
-              foreach(@receiver_uuid: @receiver_data in @receivers) {
-                if(@receiver_data['town_role'] == 'MEMBER') { //알바 로 설정
-                  @receivers[@receiver_uuid]['is_mentioned'] = true
-                  @message['hoverEvent']['value'][] = '\n'.@receiver_data['name']
-                }
-              }
-              @member_list_message = @message
-            } else {
-              @is_modified_message = true
-              @message = @member_list_message
-            }
-            break()
-          case '주민':
-            if(!array_contains(@mentioned_messages, '주민')) {
-              @mentioned_messages[] = '주민'
-              @is_modified_message = true
-              @message = array(
-                'text': @string,
-                'color': 'red',
-                'hoverEvent': array(
-                  'action': 'show_text',
-                  'value': array(
-                    '접속중인 주민:'
-                  )
-                )
-              )
-              foreach(@receiver_uuid: @receiver_data in @receivers) {
-                if(@receiver_data['town_role'] == 'MEMBER') {
-                  @receivers[@receiver_uuid]['is_mentioned'] = true
-                  @message['hoverEvent']['value'][] = '\n'.@receiver_data['name']
-                }
-              }
-              @member_list_message = @message
-            } else {
-              @is_modified_message = true
-              @message = @member_list_message
-            }
-            break()
-          case '부이장':
-            if(!array_contains(@mentioned_messages, '부이장')) {
-              @mentioned_messages[] = '부이장'
-              @is_modified_message = true
-              @message = array(
-                'text': @string,
-                'color': 'red',
-                'hoverEvent': array(
-                  'action': 'show_text',
-                  'value': array(
-                    '접속중인 부이장:'
-                  )
-                )
-              )
-              foreach(@receiver_uuid: @receiver_data in @receivers) {
-                if(@receiver_data['town_role'] == 'staff') {
-                  @receivers[@receiver_uuid]['is_mentioned'] = true
-                  @message['hoverEvent']['value'][] = '\n'.@receiver_data['name']
-                }
-              }
-              @staff_list_message = @message
-            } else {
-              @is_modified_message = true
-              @message = @staff_list_message
-            }
-            break()
-          case '이장':
-            if(!array_contains(@mentioned_messages, '이장')) {
-              @mentioned_messages[] = '이장'
-              @is_modified_message = true
-              foreach(@town_member in @town_members) {
-                @town_member_uuid = bukkitlinked_get_player_uuid(@town_member)
-                if(array_index_exists(@receivers,  @town_member_uuid) && @receivers[@town_member_uuid]['town_role'] == 'OWNER') {
-                  @town_owner = array(
-                    'name': @town_member,
-                    'uuid':@town_member_uuid
-                  )
-                  break()
-                }
-              }
-              if(array_contains(bukkitlinked_get_all_players(), @town_owner['uuid'])) {
-                @receivers[@town_owner['uuid']]['is_mentioned'] = true
-                @message = array(
-                  'text': @string,
-                  'color': 'red',
-                  'hoverEvent': array(
-                    'action': 'show_text',
-                    'value': array(
-                      '이장:'@town_owner['name']'(온라인)'
-                    )
-                  )
-                )
-              } else {
-                @message = array(
-                  'text': @string,
-                  'color': 'red',
-                  'hoverEvent': array(
-                    'action': 'show_text',
-                    'value': array(
-                      '이장:'@town_owner['name']'(오프라인)'
-                    )
-                  )
-                )
-              }
-              @member_list_message = @message
-            } else {
-              @is_modified_message = true
-              @message = @member_list_message
-            }
-            break()
-          }
-        }
-      }
-    } else if(string_starts_with(@string, './')) {
-      @string = replace(@string, './', '/')
-      @string = replace(@string, '_', ' ')
-      @is_modified_message = true
-      @message = array(
-        'text': @string,
-        'color': 'yellow',
-        'clickEvent': array(
-          'action': 'suggest_command',
-          'value': @string
-        )
-      )
-    } else if(string_starts_with(@string, 'https://') || string_starts_with(@string, 'http://')) {
-      @is_modified_message = true
-      @message = array(
-        'text': @string,
-        'color': 'blue',
-        'clickEvent': array(
-          'action': 'open_url',
-          'value': @string
-        )
-      )
-    }
-    if(@is_modified_message) {
-      @pre_message = @modified_message[array_size(@modified_message) -1]
-      if(array_size(@modified_message) != 1) {
-        if(array_index_exists(@pre_message, 'color')) {
-          @modified_message[] = array(
-            'text': ' '
-          )
-        } else {
-          @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '
-        }
-      }
-      @modified_message[] = @message
-    } else {
-      @pre_message = @modified_message[array_size(@modified_message) -1]
-      if(array_size(@modified_message) == 1) {
-        @modified_message[] = array(
-          'text': @string
-        )
-      } else {
-        if(array_index_exists(@pre_message, 'color')) {
-          @modified_message[] = array(
-            'text': ' '.@string
-          )
-        } else {
-          @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '.@string
-        }
-      }
-    }
-  }
+  # 이름 부분 raw
+  @name_raws = _get_name_raws(@channel, @sender_name, @sender_badge, '#16A085')
+  # 메시지 부분 raw (해당 함수에서 @receivers_data를 수정할 수 있음)
+  @message_raws = _get_message_raws(@channel, @message, @receivers_data, @town_members)
   # 메시지 보내기
-  foreach(@receiver_uuid: @receiver_data in @receivers) {
+  foreach(@receiver_uuid: @receiver_data in @receivers_data) {
     if(@receiver_data['is_online']) {
       if(@receiver_data['channel'] == 'town' || @receiver_data['is_listening'] || @receiver_data['is_observer'] || @receiver_data['is_mentioned']) {
         @receiver_name = @receiver_data['name']
-        _tellraw(@receiver_name, array_merge(@name, @modified_message))
+        _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
+        // 라스트 센더 세팅
         if(@sender_name == @receiver_name) {
           if(ponline(@sender_name)) {
             play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
@@ -816,19 +1338,22 @@ proc _town_chat(@data, @players_data) {
       }
     }
   }
+  # 로깅
+  mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
 }
 
 proc _local_chat(@data, @players_data) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
-  @sender_chat_data = @data['sender_chat_data']
+  @sender_server = @data['sender_server']
   @sender_badge = @data['sender_badge']
-  @is_server_same = @data['is_server_same']
+  @sender_chat_data = @data['sender_chat_data']
+  @message = @data['message']
+  @channel = 'Local'
   @near_players = @data['near_players']
-  @unmodified_message = @data['message']
   #리시버 설정
-  @receivers = array()
+  @receivers_data = array()
   foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
     @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
     if(array_contains(@near_players, @receiver_name) && array_index_exists(@players_data, @receiver_uuid)) {
@@ -843,7 +1368,7 @@ proc _local_chat(@data, @players_data) {
         @is_listening = false
       }
       # Receiver Setting
-      @receivers[@receiver_uuid] = array(
+      @receivers_data[@receiver_uuid] = array(
         'name': @receiver_name,
         'channel': @chat_data[0],
         'is_near_player': true,
@@ -851,7 +1376,7 @@ proc _local_chat(@data, @players_data) {
         'is_observer': @chat_data[3],
         'is_mentioned': false
       )
-    } else {
+    } else { // 오프라인이나 근처 플레이어 아닐시
       # Data
       @chat_data = cup_get('CHAT', @receiver_uuid)
       if(!is_null(@chat_data) && @chat_data[3]) {
@@ -863,7 +1388,7 @@ proc _local_chat(@data, @players_data) {
           @is_listening = false
         }
         # Receiver Setting
-        @receivers[@receiver_uuid] = array(
+        @receivers_data[@receiver_uuid] = array(
           'name': @receiver_name,
           'channel': @chat_data[0],
           'is_near_player': false,
@@ -874,153 +1399,17 @@ proc _local_chat(@data, @players_data) {
       }
     }
   }
-  #이름 부분
-  @name = array(
-    array(
-      'text': '',
-      'color': '#D35400'
-    ),
-    array(
-      'text': @sender_badge.' ',
-      'color': '#ffffff',
-    ),
-    array(
-      'text': @sender_name,
-      'insertion': '@'.@sender_name'',
-      'hoverEvent': array(
-        'action': 'show_text',
-        'value': array(
-          '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-          '좌클릭 시, 유저에게 귓속말을 보냅니다',
-        )
-      ),
-      'clickEvent': array(
-        'action': 'suggest_command',
-        'value': '/w'@sender_name''
-      )
-    ),
-    array(
-      'text': ' :: ',
-    )
-  )
-  #메시지 생성 부분
-  @mentioned_messages = array()
-  @modified_message = array(
-    array('text': '')
-  )
-  foreach(@key: @string in parse_args(@unmodified_message)) {
-    @is_modified_message = false
-    if(string_starts_with(@string, '@')) {
-      @mentioned_message = substr(@string, 1) 
-      @eng_length = reg_count('[A-z0-9_]',@mentioned_message)
-      @kr_length = reg_count('[가-힣]', @mentioned_message)
-      @length = length(@mentioned_message)
-      if(@length != 0) {
-        if(@length == @eng_length) {
-          if(!array_contains(@mentioned_messages, @mentioned_message)) {
-            foreach(@receiver_uuid: @receiver_data in @receivers) {
-              if(@mentioned_message == @receiver_data['name'] && @receiver_data['is_near_player']) {
-                @receivers[@receiver_uuid]['is_mentioned'] = true
-                @mentioned_messages[] = @mentioned_message
-                @is_modified_message = true
-                @message = array(
-                  'text': @string,
-                  'color': 'red',
-                  'insertion': @string.' ',
-                  'hoverEvent': array(
-                    'action': 'show_text',
-                    'value': array(
-                      '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-                      '좌클릭 시, 유저에게 귓속말을 보냅니다',
-                    )
-                  ),
-                  'clickEvent': array(
-                    'action': 'suggest_command',
-                    'value': '/w'@mentioned_message''
-                  )
-                )
-                break()
-              }
-            }
-          } else {
-            @is_modified_message = true
-            @message = array(
-              'text': @string,
-              'color': 'red',
-              'insertion': @string.' ',
-              'hoverEvent': array(
-                'action': 'show_text',
-                'value': array(
-                  '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-                  '좌클릭 시, 유저에게 귓속말을 보냅니다',
-                )
-              ),
-              'clickEvent': array(
-                'action': 'suggest_command',
-                'value': '/w'@mentioned_message''
-              )
-            )
-          }
-        }
-      }
-    } else if(string_starts_with(@string, './')) {
-      @string = replace(@string, './', '/')
-      @string = replace(@string, '_', ' ')
-      @is_modified_message = true
-      @message = array(
-        'text': @string,
-        'color': 'yellow',
-        'clickEvent': array(
-          'action': 'suggest_command',
-          'value': @string
-        )
-      )
-    } else if(string_starts_with(@string, 'https://') || string_starts_with(@string, 'http://')) {
-      @is_modified_message = true
-      @message = array(
-        'text': @string,
-        'color': 'blue',
-        'clickEvent': array(
-          'action': 'open_url',
-          'value': @string
-        )
-      )
-    }
-    if(@is_modified_message) {
-      @pre_message = @modified_message[array_size(@modified_message) -1]
-      if(array_size(@modified_message) != 1) {
-        if(array_index_exists(@pre_message, 'color')) {
-          @modified_message[] = array(
-            'text': ' '
-          )
-        } else {
-          @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '
-        }
-      }
-      @modified_message[] = @message
-    } else {
-      @pre_message = @modified_message[array_size(@modified_message) -1]
-      if(array_size(@modified_message) == 1) {
-        @modified_message[] = array(
-          'text': @string
-        )
-      } else {
-        if(array_index_exists(@pre_message, 'color')) {
-          @modified_message[] = array(
-            'text': ' '.@string
-          )
-        } else {
-          @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '.@string
-        }
-      }
-    }
-  }
+  # 이름 부분 raw
+  @name_raws = _get_name_raws(@channel, @sender_name, @sender_badge, '#D35400')
+  # 메시지 부분 raw (해당 함수에서 @receivers_data를 수정할 수 있음)
+  @message_raws = _get_message_raws(@channel, @message, @receivers_data)
   # 메시지 보내기
-  foreach(@receiver_uuid: @receiver_data in @receivers) {
+  foreach(@receiver_uuid: @receiver_data in @receivers_data) {
     if(ponline(@receiver_data['name'])) {
       if(@receiver_data['channel'] == 'local' || @receiver_data['is_listening'] || @receiver_data['is_observer'] || @receiver_data['is_mentioned']) {
         @receiver_name = @receiver_data['name']
-        _tellraw(@receiver_name, array_merge(@name, @modified_message))
+        _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
+        // 라스트 센더 세팅
         if(@sender_name == @receiver_name) {
           if(ponline(@sender_name)) {
             play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
@@ -1039,17 +1428,21 @@ proc _local_chat(@data, @players_data) {
       }
     }
   }
+  # 로깅
+  mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
 }
 
 proc _admin_chat(@data, @players_data) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
-  @sender_chat_data = @data['sender_chat_data']
+  @sender_server = @data['sender_server']
   @sender_badge = @data['sender_badge']
-  @unmodified_message = @data['message']
+  @sender_chat_data = @data['sender_chat_data']
+  @message = @data['message']
+  @channel = 'Admin'
   #리시버 설정
-  @receivers = array()
+  @receivers_data = array()
   foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
     @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
     if(ponline(@receiver_name)) {
@@ -1065,7 +1458,7 @@ proc _admin_chat(@data, @players_data) {
           @is_listening = false
         }
         # Receiver Setting
-        @receivers[@receiver_uuid] = array(
+        @receivers_data[@receiver_uuid] = array(
           'name': @receiver_name,
           'is_online': true,
           'channel': @chat_data[0],
@@ -1086,7 +1479,7 @@ proc _admin_chat(@data, @players_data) {
           @is_listening = false
         }
         # Receiver Setting
-        @receivers[@receiver_uuid] = array(
+        @receivers_data[@receiver_uuid] = array(
           'name': @receiver_name,
           'is_online': false,
           'channel': @chat_data[0],
@@ -1097,179 +1490,17 @@ proc _admin_chat(@data, @players_data) {
       }
     }
   }
-  #이름 부분
-  @name = array(
-    array(
-      'text': '',
-      'color': '#C0392B',
-    ),
-    array(
-      'text': @sender_badge.' ',
-      'color': '#ffffff',
-    ),
-    array(
-      'text': @sender_name,
-      'insertion': '@'.@sender_name'',
-      'hoverEvent': array(
-        'action': 'show_text',
-        'value': array(
-          '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-          '좌클릭 시, 유저에게 귓속말을 보냅니다',
-        )
-      ),
-      'clickEvent': array(
-        'action': 'suggest_command',
-        'value': '/w'@sender_name''
-      )
-    ),
-    array(
-      'text': ' :: ',
-    )
-  )
-  #메시지 생성 부분
-  @mentioned_messages = array()
-  @modified_message = array(
-    array('text': '')
-  )
-  foreach(@key: @string in parse_args(@unmodified_message)) {
-    @is_modified_message = false
-    if(string_starts_with(@string, '@')) {
-      @mentioned_message = substr(@string, 1) 
-      @eng_length = reg_count('[A-z0-9_]',@mentioned_message)
-      @kr_length = reg_count('[가-힣]', @mentioned_message)
-      @length = length(@mentioned_message)
-      if(@length != 0) {
-        if(@length == @eng_length) {
-          if(!array_contains(@mentioned_messages, @mentioned_message)) {
-            foreach(@receiver_uuid: @receiver_data in @receivers) {
-              if(@mentioned_message == @receiver_data['name']) {
-                @receivers[@receiver_uuid]['is_mentioned'] = true
-                @mentioned_messages[] = @mentioned_message
-                @is_modified_message = true
-                @message = array(
-                  'text': @string,
-                  'color': 'red',
-                  'insertion': @string.' ',
-                  'hoverEvent': array(
-                    'action': 'show_text',
-                    'value': array(
-                      '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-                      '좌클릭 시, 유저에게 귓속말을 보냅니다',
-                    )
-                  ),
-                  'clickEvent': array(
-                    'action': 'suggest_command',
-                    'value': '/w'@mentioned_message''
-                  )
-                )
-                break()
-              }
-            }
-          } else {
-            @is_modified_message = true
-            @message = array(
-              'text': @string,
-              'color': 'red',
-              'insertion': @string.' ',
-              'hoverEvent': array(
-                'action': 'show_text',
-                'value': array(
-                  '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-                  '좌클릭 시, 유저에게 귓속말을 보냅니다',
-                )
-              ),
-              'clickEvent': array(
-                'action': 'suggest_command',
-                'value': '/w'@mentioned_message''
-              )
-            )
-          }
-        } else if(@length == @kr_length) {
-          @admin = array('스태프', '스탭', '스탭진', '스탭팀', '운영', '운영자', '운영진', '운영팀', '관리자', '어드민', '오피')
-          if(array_contains(@admin, @mentioned_message)) {
-            if(!array_contains(@mentioned_messages, '관리자')) {
-              @mentioned_messages[] = '관리자'
-              @is_modified_message = true
-              @message = array(
-                'text': @string,
-                'color': 'red',
-                'hoverEvent': array(
-                  'action': 'show_text',
-                  'value': array(
-                    '접속중인 관리자:'
-                  )
-                )
-              )
-              foreach(@receiver_uuid: @receiver_data in @receivers) {
-                @receivers[@receiver_uuid]['is_mentioned'] = true
-                @message['hoverEvent']['value'][] = '\n'.@receiver_data['name']
-              }
-              @op_list_message = @message
-            } else {
-              @is_modified_message = true
-              @message = @op_list_message
-            }
-          }
-        }
-      }
-    } else if(string_starts_with(@string, './')) {
-      @string = replace(@string, './', '/')
-      @string = replace(@string, '_', ' ')
-      @is_modified_message = true
-      @message = array(
-        'text': @string,
-        'color': 'yellow',
-        'clickEvent': array(
-          'action': 'suggest_command',
-          'value': @string
-        )
-      )
-    } else if(string_starts_with(@string, 'https://') || string_starts_with(@string, 'http://')) {
-      @is_modified_message = true
-      @message = array(
-        'text': @string,
-        'color': 'blue',
-        'clickEvent': array(
-          'action': 'open_url',
-          'value': @string
-        )
-      )
-    }
-    if(@is_modified_message) {
-      @pre_message = @modified_message[array_size(@modified_message) -1]
-      if(array_size(@modified_message) != 1) {
-        if(array_index_exists(@pre_message, 'color')) {
-          @modified_message[] = array(
-            'text': ' '
-          )
-        } else {
-          @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '
-        }
-      }
-      @modified_message[] = @message
-    } else {
-      @pre_message = @modified_message[array_size(@modified_message) -1]
-      if(array_size(@modified_message) == 1) {
-        @modified_message[] = array(
-          'text': @string
-        )
-      } else {
-        if(array_index_exists(@pre_message, 'color')) {
-          @modified_message[] = array(
-            'text': ' '.@string
-          )
-        } else {
-          @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '.@string
-        }
-      }
-    }
-  }
+  # 이름 부분 raw
+  @name_raws = _get_name_raws(@channel, @sender_name, @sender_badge, '#C0392B')
+  # 메시지 부분 raw (해당 함수에서 @receivers_data를 수정할 수 있음)
+  @message_raws = _get_message_raws(@channel, @message, @receivers_data)
   # 메시지 보내기
-  foreach(@receiver_uuid: @receiver_data in @receivers) {
+  foreach(@receiver_uuid: @receiver_data in @receivers_data) {
     if(@receiver_data['is_online']) {
       if(@receiver_data['channel'] == 'admin' || @receiver_data['is_listening'] || @receiver_data['is_observer'] || @receiver_data['is_mentioned']) {
         @receiver_name = @receiver_data['name']
-        _tellraw(@receiver_name, array_merge(@name, @modified_message))
+        _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
+        // 라스트 센더 세팅
         if(@sender_name == @receiver_name) {
           if(ponline(@sender_name)) {
             play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
@@ -1288,74 +1519,167 @@ proc _admin_chat(@data, @players_data) {
       }
     }
   }
+  # 로깅
+  mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
+}
+
+proc _whisper_chat(@data, @players_data, @server) {
+  #변수 선언
+  @sender_name = @data['sender_name']
+  @sender_uuid = @data['sender_uuid']
+  @sender_server = @data['sender_server']
+  @sender_badge = @data['sender_badge']
+  @sender_chat_data = @data['sender_chat_data']
+  @message = @data['message']
+  @channel = 'Whisper'
+  @target_name = @data['target_name']
+  @target_uuid = @data['target_uuid']
+  @target_server = 'other'
+  #리시버 설정 (내부에서 이름 부분 raw 세팅)
+  @receivers_data = array()
+  foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
+    @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
+    if(@sender_name == @receiver_name) {
+      # Data
+      @receiver_data = @players_data[@receiver_uuid]
+      @chat_data = @receiver_data['chat']
+      # Receiver Setting
+      @receivers_data[@receiver_uuid] = array(
+        'name': @receiver_name,
+        'channel': @chat_data[0],
+        'type': 'sender',
+        'is_observer': @chat_data[3],
+        'is_mentioned': false
+      )
+      # 이름 부분 raw
+      @name_raws = _get_name_raws(@channel, @sender_name, 'sender', '#7F8C8D', @target_name)
+    } else if(@target_name == @receiver_name) {
+      # Data
+      @receiver_data = @players_data[@receiver_uuid]
+      @chat_data = @receiver_data['chat']
+      # Receiver Setting
+      @receivers_data[@receiver_uuid] = array(
+        'name': @receiver_name,
+        'channel': @chat_data[0],
+        'type': 'target',
+        'is_observer': @chat_data[3],
+        'is_mentioned': false
+      )
+      @target_server = @server
+      # 이름 부분 raw
+      @name_raws = _get_name_raws(@channel, @sender_name, 'target', '#7F8C8D', @target_name)
+      # 라스트 휘스퍼 타겟 세팅
+    } else { // 오프라인이거나 타켓 플레이어 아닐시
+      # Data
+      @chat_data = cup_get('CHAT', @receiver_uuid)
+      if(!is_null(@chat_data) && @chat_data[3]) {
+        # Receiver Setting
+        @receivers_data[@receiver_uuid] = array(
+          'name': @receiver_name,
+          'channel': @chat_data[0],
+          'type': 'other',
+          'is_observer': true,
+          'is_mentioned': false
+        )
+        # 이름 부분 raw
+        @name_raws = _get_name_raws(@channel, @sender_name, 'other', '#7F8C8D', @target_name)
+      }
+    }
+  }
+  # 메시지 부분 raw (해당 함수에서 @receivers_data를 수정할 수 있음)
+  @message_raws = _get_message_raws(@channel, @message, @receivers_data)
+  # 메시지 보내기
+  foreach(@receiver_uuid: @receiver_data in @receivers_data) {
+    if(ponline(@receiver_data['name'])) {
+      if(@receiver_data['type'] == 'sender' || @receiver_data['type'] == 'target' || (@receiver_data['type'] == 'other' && @receiver_data['is_observer'])) {
+        @receiver_name = @receiver_data['name']
+        _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
+        // 라스트 센더 세팅
+        if(@sender_name == @receiver_name) {
+          if(ponline(@sender_name)) {
+            play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+          }
+        } else {
+          if(@receiver_data['is_mentioned']) {
+            if(ponline(@receiver_name)) {
+              play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
+            }
+          } else {
+            if(ponline(@receiver_name)) {
+              play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+            }
+          }
+        }
+      }
+    }
+  }
+  # 로깅
+  mom_log('INFO', "[@channel] @sender_name(@sender_server) → @target_name(@target_server) @message")
 }
 
 bind('async_player_chat', null , null, @event, @players_data, @text, @server) {
-  modify_event('format', '')
-  modify_event('recipients', array())
   cancel()
-  //broadcast(is_cancelled)
   @sender_name = @event['player']
-  @data = array(
-    'sender_name': @sender_name,
-    'sender_uuid': puuid(@sender_name)
-  )
-  if(array_index_exists(@players_data, @data['sender_uuid'])) {
-    @data['sender_server'] = @server
-    @data['sender_chat_data'] = @players_data[@data['sender_uuid']]['chat']
-    @data['sender_badge'] = @players_data[@data['sender_uuid']]['decoration'][0]
+  @sender_uuid = puuid(@sender_name)
+  if(array_index_exists(@players_data, @sender_uuid)) {
+    # 플레이어 데이터
+    @player_data = @players_data[@sender_uuid]
+    # 카프카 데이터 세팅
+    @data = array(
+      'sender_name': @sender_name,
+      'sender_uuid': @sender_uuid,
+      'sender_server': @server,
+      'sender_chat_data': @player_data['chat'],
+      'sender_badge': @player_data['decoration'][0]
+    )
+    # enko여부에 따라 채팅 내용 수정
     if(@data['sender_chat_data'][1]) {
       @message = _en_to_ko(@event['message'])
     } else {
       @message = @event['message']
     }
     @data['message'] = @message
-    @channel = @players_data[@data['sender_uuid']]['chat'][0]
-    switch(@channel) {
+    # 카프카 보내기 (마을 채팅 입력시 마을 없으면 기본으로, 귓말 보낼시 타겟 없으면 기본으로, 이상한 채널이면 기본 채널로 설정)
+    switch(@player_data['chat'][0]) {
     case 'default':
-      # 카프카
-      kafka_send('ch.send_defaultchat', json_encode(@data))
-      # proc
-      _default_chat(@data, @players_data)
-      # logging
-      mom_log('INFO', "[@channel] @sender_name(@server): @message")
-      break()
-    case 'town':
-      @town_members = tunalands_get_player_lands_member_list(@data['sender_uuid'])
-      if(!is_null(@town_members)) {
-        @data['town_members'] = @town_members
-        # 카프카
-        kafka_send('send_townchat', json_encode(@data))
-        # proc
-        _town_chat(@data, @players_data)
-        # logging
-        mom_log('INFO', "[@channel] @sender_name(@server): @message")
-      } else {
-        # 마을을 찾을수 없어서 채팅 채널 초기화
-        @players_data[@sender_uuid]['chat'][0] = 'default'
-        cup_set('CHAT', @sender_uuid, @players_data[@sender_uuid]['chat'])
-        tmsg(@data['sender_name'], @text['prefix'] '§7가입된 마을이 없어 일반 채널로 변경됩니다.')
-        
-      }
+    case 'admin':
+      kafka_send('ch.send_chat', json_encode(@data))
       break()
     case 'local':
       @data['near_players'] = players_in_radius(ploc(@data['sender_name']), 64)
-      # 카프카
-      @data['is_server_same'] = false
-      kafka_send('send_localchat', json_encode(@data))
-      # proc
-      @data['is_server_same'] = true
-      _local_chat(@data, @players_data)
-      # logging
-      mom_log('INFO', "[@channel] @sender_name(@server): @message")
+      kafka_send('ch.send_chat', json_encode(@data))
       break()
-    case 'admin':
-      # 카프카
-      kafka_send('send_adminchat', json_encode(@data))
-      # proc
-      _admin_chat(@data, @players_data)
-      # logging
-      mom_log('INFO', "[@channel] @sender_name(@server): @message")
+    case 'town':
+      @town_members = tunalands_get_player_lands_member_list(@sender_uuid)
+      if(!is_null(@town_members)) {
+        @data['town_members'] = @town_members
+        kafka_send('ch.send_chat', json_encode(@data))
+      } else {
+        @player_data['chat'][0] = 'default'
+        cup_set('CHAT', @sender_uuid, @player_data['chat'])
+        tmsg(@sender_name, @text['prefix']['warn'] '§7가입된 마을을 찾을 수 없어 일반 채널로 이동됩니다.')
+        _update_channel_tag(@sender_uuid, @player_data, @text)
+      }
+      break()
+    case 'whisper':
+      @target_name = @player_data['cache']['whisper_target']
+      @target_uuid = bukkitlinked_get_player_uuid(@target_name)
+      if(array_contains(bukkitlinked_get_all_players(), @target_uuid)) {
+        @data['target_name'] = @target_name
+        @data['target_uuid'] = @target_uuid
+        kafka_send('ch.send_chat', json_encode(@data))
+      } else {
+        @player_data['chat'][0] = 'default'
+        cup_set('CHAT', @sender_uuid, @player_data['chat'])
+        tmsg(@sender_name, @text['prefix']['warn'] '§7해당 플레이어를 찾을 수 없어 일반 채널로 이동됩니다.')
+        _update_channel_tag(@sender_uuid, @player_data, @text)
+      }
+      break()
+    default:
+      @player_data['chat'][0] = 'default'
+      cup_set('CHAT', @sender_uuid, @player_data['chat'])
+      tmsg(@sender_name, @text['prefix']['warn'] '§7알 수 없는 채널에서 채팅을 입력하여 일반 채널로 이동됩니다.')
+      _update_channel_tag(@sender_uuid, @player_data, @text)
       break()
     }
   }
@@ -1405,130 +1729,6 @@ proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting) {
   kafka_send('send_broadcast', json_encode(@data))
 }
 
-proc _whisper(@data, @log_data) {
-  #변수 선언
-  @sender_name = @data['sender_name']
-  @sender_uuid = @data['sender_uuid']
-  @sender_chat_data = @data['sender_chat_data']
-  @target_name = @data['target_name']
-  @target_uuid = @data['target_uuid']
-  @unmodified_message = @data['message']
-  #리시버 설정
-  @receivers = @data['receivers']
-  #메시지 생성 부분
-  @modified_message = array(
-    array('text': '')
-  )
-  foreach(@key: @string in parse_args(@unmodified_message)) {
-    @is_modified_message = false
-    if(string_starts_with(@string, './')) {
-      @string = replace(@string, './', '/')
-      @string = replace(@string, '_', ' ')
-      @is_modified_message = true
-      @message = array(
-        'text': @string,
-        'color': 'yellow',
-        'clickEvent': array(
-          'action': 'suggest_command',
-          'value': @string
-        )
-      )
-    } else if(string_starts_with(@string, 'https://') || string_starts_with(@string, 'http://')) {
-      @is_modified_message = true
-      @message = array(
-        'text': @string,
-        'color': 'blue',
-        'clickEvent': array(
-          'action': 'open_url',
-          'value': @string
-        )
-      )
-    }
-    if(@is_modified_message) {
-      @pre_message = @modified_message[array_size(@modified_message) -1]
-      if(array_size(@modified_message) != 1) {
-        if(array_index_exists(@pre_message, 'color')) {
-          @modified_message[] = array(
-            'text': ' '
-          )
-        } else {
-          @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '
-        }
-      }
-      @modified_message[] = @message
-    } else {
-      @pre_message = @modified_message[array_size(@modified_message) -1]
-      if(array_size(@modified_message) == 1) {
-        @modified_message[] = array(
-          'text': @string
-        )
-      } else {
-        if(array_index_exists(@pre_message, 'color')) {
-          @modified_message[] = array(
-            'text': ' '.@string
-          )
-        } else {
-          @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '.@string
-        }
-      }
-    }
-  }
-  #이름 부분
-  @target_raw = array(
-    array(
-      'text': 'From ',
-      'color': '#7F8C8D',
-    ),
-    array(
-      'text': @sender_name,
-      'hoverEvent': array(
-        'action': 'show_text',
-        'value': array(
-          '좌클릭 시, 유저에게 귓속말을 보냅니다'
-        )
-      ),
-      'clickEvent': array(
-        'action': 'suggest_command',
-        'value': '/w'@sender_name''
-      )
-    ),
-    array(
-      'text': ' :: ',
-    ),
-    @modified_message
-  )
-  @observer_raw = array(
-    array(
-      'text': @sender_name.' To '.@target_name,
-      'color': '#7F8C8D',
-    ),
-    array(
-      'text': ' :: ',
-    ),
-    @modified_message
-  )
-  # 메시지 보내기
-  foreach(@receiver_uuid: @receiver_data in @receivers) {
-    @receiver_name = @receiver_data['name']
-    if(ponline(@receiver_name)) {
-      if(@receiver_data['is_target']) {
-        _tellraw(@receiver_name, @target_raw)
-        if(ponline(@receiver_name)) {
-          play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
-        }
-      } else {
-        _tellraw(@receiver_name, @observer_raw)
-        if(ponline(@receiver_name)) {
-          play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
-        }
-      }
-    }
-  }
-}
-
-//INFO, FINE, WARN, SEVERE
-
-
 register_command('broadcast', array(
   'description': 'can broadcast',
   'usage': '/broadcast <msg>',
@@ -1558,6 +1758,222 @@ register_command('broadcast', array(
         _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting)
       } else {
         console(color('yellow')'/'.@command'<message>')
+      }
+    }
+  }
+))
+
+register_command('whisper', array( // last whisper 저장해서 /r 명령어 사용 가능하도록 만들기
+  'aliases': array('w', 'm', 'msg', 'tell', '귓속말', '귓'),
+  'tabcompleter': closure(@command, @player, @args) {
+    if(array_size(@args) == 1) {
+      @online_players = array()
+      foreach(@target_uuid in bukkitlinked_get_all_players()) {
+        @online_players[] = bukkitlinked_get_player_name(@target_uuid)
+      }
+      array_remove_values(@online_players, @player)
+      @input = @args[-1]
+      return(array_filter(@online_players, closure(@key, @value) {
+        return(length(@input) <= length(@value) && equals_ic(@input, substr(@value, 0, length(@input))))
+      }))
+    } else {
+      return(array())
+    }
+  },
+  'executor': closure(@command, @player, @args) {
+    @sender_name = @player
+    @sender_uuid = puuid(@sender_name)
+    if(array_index_exists(@players_data, @sender_uuid)) {
+      switch(array_size(@args)) {
+      case 0:
+        tmsg(@player, '\ue4dd'color('yellow').'/'.@command'<플레이어> <할 말>'.color('gray').'을 통해 귓속말을 보낼 수 있습니다.\n 또는,'color('yellow').'/'.@command'<플레이어>'.color('gray').'를 통해 귓속말을 채팅으로 보낼 수 있습니다.')
+        break();
+      case 1:
+        @online_players = array()
+        foreach(@target_uuid in bukkitlinked_get_all_players()) {
+          @online_players[] = bukkitlinked_get_player_name(@target_uuid)
+        }
+        array_remove_values(@online_players, @player) // 본인 제외
+        if(array_contains(@online_players, @args[0])) {
+          @player_data = @players_data[@sender_uuid]
+          @player_data['cache']['whisper_target'] = @args[0]
+          @player_data['chat'][0] = 'whisper'
+          cup_set('CHAT', @sender_uuid, @player_data['chat'])
+          _update_channel_tag(@sender_uuid, @players_data[@sender_uuid], @text)
+          tmsg(@player, @text['prefix']['info'] color('gray').'채팅 채널이 귓속말로 전환되었습니다.')
+        } else {
+          tmsg(@player, @text['prefix']['failure'] color('gray').'플레이어를 찾을 수 없습니다.')
+        }
+        break();
+      default:
+        @is_target_exists = false
+        @all_players_uuid = bukkitlinked_get_all_players()
+        array_remove_values(@all_players_uuid, @sender_uuid)
+        foreach(@target_uuid in @all_players_uuid) {
+          @target_name = bukkitlinked_get_player_name(@target_uuid)
+          if(@target_name == @args[0]) {
+            @is_target_exists = true
+            break()
+          }
+        }
+        if(@is_target_exists) {
+          # 카프카 데이터 세팅
+          @data = array(
+            'sender_name': @sender_name,
+            'sender_uuid': @sender_uuid,
+            'sender_server': @server,
+            'sender_chat_data': @players_data[@sender_uuid]['chat'],
+            'sender_badge': @players_data[@sender_uuid]['decoration'][0],
+            'target_name': @target_name,
+            'target_uuid': @target_uuid,
+          )
+          if(@data['sender_chat_data'][1]) {
+            @message = _en_to_ko(array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' '))
+          } else {
+            @message = array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' ')
+          }
+          @data['message'] = @message
+          # 카프카 보내기
+          kafka_send('ch.send_chat', json_encode(@data))
+        } else {
+          tmsg(@player, @text['prefix']['failure'] color('gray').'플레이어를 찾을 수 없습니다.')
+        }
+        /*
+        break();
+
+
+        @is_target_exists = false
+        @all_players_uuid = bukkitlinked_get_all_players()
+        array_remove_values(@all_players_uuid, @sender_uuid)
+        @receivers = array()
+        foreach(@receiver_uuid in @all_players_uuid) {
+          @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
+          if(@receiver_name == @args[0]) {
+            @is_target_exists = true
+            @receivers[@receiver_uuid] = array(
+              'name': @receiver_name,
+              'is_target': true
+            )
+            @data['target_name'] = @receiver_name
+            @data['target_uuid'] = @receiver_uuid
+          } else { // 관리자들 감시 모드 켜있을시
+            if(ponline(@receiver_name) && array_index_exists(@players_data, @receiver_uuid)) {
+              @receiver_setting = @players_data[@receiver_uuid]['setting']
+              if(@receiver_setting[8]) {
+                @receivers[@receiver_uuid] = array(
+                  'name': @receiver_name,
+                  'is_target': false
+                )
+              }
+            } else {
+              @receiver_setting = cup_get('SETTING', @receiver_uuid)
+              if(!is_null(@receiver_setting) && @receiver_setting[8]) {
+                @receivers[@receiver_uuid] = array(
+                  'name': @receiver_name,
+                  'is_target': false
+                )
+              }
+            }
+          }
+        }
+        @data['receivers'] = @receivers
+        if(@is_target_exists) {
+          if(@data['sender_setting'][1]) {
+            @data['message'] = _en_to_ko(array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' '))
+          } else {
+            @data['message'] = array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' ')
+          }
+          //_bungeecord_foward(@sender_name, 'ch_whisper', @data)
+          @modified_message = array(
+            array('text': '')
+          )
+          foreach(@key: @string in parse_args(@data['message'])) {
+            @is_message_modified = false
+            if(string_starts_with(@string, './')) {
+              @string = replace(@string, './', '/')
+              @string = replace(@string, '_', ' ')
+              @is_message_modified = true
+              @message = array(
+                'text': @string,
+                'color': 'yellow',
+                'clickEvent': array(
+                  'action': 'suggest_command',
+                  'value': @string
+                )
+              )
+            } else if(string_starts_with(@string, 'https://') || string_starts_with(@string, 'http://')) {
+              @is_message_modified = true
+              @message = array(
+                'text': @string,
+                'color': 'blue',
+                'clickEvent': array(
+                  'action': 'open_url',
+                  'value': @string
+                )
+              )
+            }
+            if(@is_message_modified) {
+              @pre_message = @modified_message[array_size(@modified_message) -1]
+              if(array_size(@modified_message) != 1) {
+                if(array_index_exists(@pre_message, 'color')) {
+                  @modified_message[] = array(
+                    'text': ' '
+                  )
+                } else {
+                  @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '
+                }
+              }
+              @modified_message[] = @message
+            } else {
+              @pre_message = @modified_message[array_size(@modified_message) -1]
+              if(array_size(@modified_message) == 1) {
+                @modified_message[] = array(
+                  'text': @string
+                )
+              } else {
+                if(array_index_exists(@pre_message, 'color')) {
+                  @modified_message[] = array(
+                    'text': ' '.@string
+                  )
+                } else {
+                  @modified_message[array_size(@modified_message) -1]['text'] = @pre_message['text'].' '.@string
+                }
+              }
+            }
+          }
+          #이름 부분
+          @sender_raw = array(
+            array(
+              'text': 'To ',
+              'color': '#7F8C8D',
+            ),
+            array(
+              'text': @data['target_name'],
+              'hoverEvent': array(
+                'action': 'show_text',
+                'value': array(
+                  '좌클릭 시, 유저에게 귓속말을 보냅니다'
+                )
+              ),
+              'clickEvent': array(
+                'action': 'suggest_command',
+                'value': '/w'@data['target_name']''
+              )
+            ),
+            array(
+              'text': ' :: ',
+            ),
+            @modified_message
+          )
+          #센더에게 tellraw
+          _tellraw(@sender_name, @sender_raw)
+          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+          _whisper(@data, @log_data)
+        } else {
+          tmsg(@player, '\ue4de'color('gray').'플레이어를 찾을 수 없습니다.')
+        }
+        break();
+        */
       }
     }
   }

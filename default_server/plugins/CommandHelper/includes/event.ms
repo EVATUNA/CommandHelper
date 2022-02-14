@@ -157,6 +157,7 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
 # 카프카
 bind('kafka_receive', null, null, @event, @reconnectable_players, @players_data, @resourcepack, @server) {
   switch(@event['key']) {
+
   case 'ch.inform_player_quit':
     @quit_data = json_decode(@event['value'])
     @uuid = @quit_data['uuid']
@@ -164,64 +165,34 @@ bind('kafka_receive', null, null, @event, @reconnectable_players, @players_data,
       @reconnectable_players[@uuid] = 10
     }
     break()
+
   case 'ch.update_resourcepack_url':
     @url = @event['value']
     @resourcepack['url'] = @url
     store_value('resourcepack', @url)
     break()
-  case 'ch.send_defaultchat':
+
+  case 'ch.send_chat':
     @data = json_decode(@event['value'])
-    @sender_server = @data['sender_server']
-    if(@sender_server != @server) {
+    @channel = @data['sender_chat_data'][0]
+    switch(@channel) {
+    case 'default':
       _default_chat(@data, @players_data)
-      # logging
-      @sender_name = @data['sender_name']
-      @message = @data['message']
-      @channel = @data['sender_chat_data'][0]
-      mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
-    }
-    break()
-  case 'ch.send_townchat':
-    @data = json_decode(@event['value'])
-    @sender_server = @data['sender_server']
-    if(@sender_server != @server) {
+      break()
+    case 'town':
       _town_chat(@data, @players_data)
-      # logging
-      @sender_name = @data['sender_name']
-      @message = @data['message']
-      @channel = @data['sender_chat_data'][0]
-      mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
-    }
-    break()
-  case 'ch.send_localchat':
-    @data = json_decode(@event['value'])
-    # logging
-    @sender_server = @data['sender_server']
-    if(@sender_server != @server) {
+      break()
+    case 'local':
       _local_chat(@data, @players_data)
-      # logging
-      @sender_name = @data['sender_name']
-      @message = @data['message']
-      @channel = @data['sender_chat_data'][0]
-      mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
-    }
-    break()
-  case 'ch.send_adminchat':
-    @data = json_decode(@event['value'])
-    @sender_server = @data['sender_server']
-    if(@sender_server != @server) {
+      break()
+    case 'admin':
       _admin_chat(@data, @players_data)
-      # logging
-      @sender_name = @data['sender_name']
-      @message = @data['message']
-      @channel = @data['sender_chat_data'][0]
-      mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
+      break()
+    case 'whisper':
+      _whisper_chat(@data, @players_data)
+      break()
     }
-    break()
-  case 'ch.send_whisper':
-    @data = json_decode(@event['value'])
-    _whisper(@data)
-    break()
+  break()
   case 'ch.send_broadcast':
     @data = json_decode(@event['value'])
     foreach(@receiver_name in all_players()) {
@@ -285,7 +256,7 @@ bind('block_break', null, null, @event, @players_data, @hp_blocks, @mineral_rewa
     if(@server == 'main' && pworld(@player) == 'spawn_minecraft_residence') {
       _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @skills_spec, @text)
     }
-    if(@server != 'main') {
+    if(@server != 'main' || true) {
       _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @mineral_rewards, @skills_spec, @text)
 
       # 일반 블럭들 튜나 레벨 주기?
