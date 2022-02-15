@@ -189,10 +189,11 @@ bind('kafka_receive', null, null, @event, @reconnectable_players, @players_data,
       _admin_chat(@data, @players_data)
       break()
     case 'whisper':
-      _whisper_chat(@data, @players_data)
+      _whisper_chat(@data, @players_data, @server)
       break()
     }
-  break()
+    break()
+  
   case 'ch.send_broadcast':
     @data = json_decode(@event['value'])
     foreach(@receiver_name in all_players()) {
@@ -200,6 +201,7 @@ bind('kafka_receive', null, null, @event, @reconnectable_players, @players_data,
       play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
     }
     break()
+    
   }
 }
 
