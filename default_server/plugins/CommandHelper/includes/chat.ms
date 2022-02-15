@@ -314,148 +314,307 @@ register_command('channel', array(
   }
 ))
 
-proc _get_name_raws(@channel, @sender_name, @sender_badge, @color, @target) {
+proc _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, @sender_badge, @color, @target) {
   switch(@channel) {
   case 'Default':
   case 'Town':
   case 'Local':
   case 'Admin':
-    @name_raws = array(
-      array(
-        'text': '',
-        'color': @color
-      ),
-      array(
-        'text': @sender_badge.' ',
-        'color': '#ffffff'
-      ),
-      array(
-        'text': @sender_name,
-        'insertion': '@'.@sender_name'',
-        'hoverEvent': array(
-          'action': 'show_text',
-          'value': array(
-            '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-            '좌클릭 시, 유저에게 귓속말을 보냅니다',
+    if(@is_type_messenger) {
+      if(@is_sender_same) {
+        @name_raws = array(
+          array(
+            'text': ' > ',
+            'color': @color
+          )
+        )
+      } else {
+        @name_raws = array(
+          array(
+            'text': '',
+            'color': @color
+          ),
+          array(
+            'text': @sender_badge.' ',
+            'color': '#ffffff'
+          ),
+          array(
+            'text': @sender_name,
+            'insertion': '@'.@sender_name'',
+            'hoverEvent': array(
+              'action': 'show_text',
+              'value': array(
+                '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                '좌클릭 시, 유저에게 귓속말을 보냅니다',
+              )
+            ),
+            'clickEvent': array(
+              'action': 'suggest_command',
+              'value': '/w'@sender_name''
+            )
+          ),
+          array(
+            'text': '\n > ',
+          )
+        )
+      }
+    } else {
+      @name_raws = array(
+        array(
+          'text': '',
+          'color': @color
+        ),
+        array(
+          'text': @sender_badge.' ',
+          'color': '#ffffff'
+        ),
+        array(
+          'text': @sender_name,
+          'insertion': '@'.@sender_name'',
+          'hoverEvent': array(
+            'action': 'show_text',
+            'value': array(
+              '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+              '좌클릭 시, 유저에게 귓속말을 보냅니다',
+            )
+          ),
+          'clickEvent': array(
+            'action': 'suggest_command',
+            'value': '/w'@sender_name''
           )
         ),
-        'clickEvent': array(
-          'action': 'suggest_command',
-          'value': '/w'@sender_name''
+        array(
+          'text': ' :: ',
         )
-      ),
-      array(
-        'text': ' :: ',
       )
-    )
+    }
     break()
   case 'Whisper':
-    switch(@sender_badge) {
-    case 'sender':
-      @name_raws = array(
-        array(
-          'text': '',
-          'color': @color
-        ),
-        array(
-          'text': 'To '
-        ),
-        array(
-          'text': @target,
-          'insertion': '@'.@target'',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': array(
-              '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-              '좌클릭 시, 유저에게 귓속말을 보냅니다',
-            )
-          ),
-          'clickEvent': array(
-            'action': 'suggest_command',
-            'value': '/w'@target''
+    if(!@is_type_messenger) {
+      if(@is_sender_same) {
+        @name_raws = array(
+          array(
+            'text': ' > ',
+            'color': @color
           )
-        ),
-        array(
-          'text': ' :: ',
         )
-      )
-      break()
-    case 'target':
-      @name_raws = array(
-        array(
-          'text': '',
-          'color': @color
-        ),
-        array(
-          'text': 'From '
-        ),
-        array(
-          'text': @sender_name,
-          'insertion': '@'.@sender_name'',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': array(
-              '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-              '좌클릭 시, 유저에게 귓속말을 보냅니다',
+      } else {
+        switch(@sender_badge) {
+        case 'sender':
+          @name_raws = array(
+            array(
+              'text': '',
+              'color': @color
+            ),
+            array(
+              'text': 'To '
+            ),
+            array(
+              'text': @target,
+              'insertion': '@'.@target'',
+              'hoverEvent': array(
+                'action': 'show_text',
+                'value': array(
+                  '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                  '좌클릭 시, 유저에게 귓속말을 보냅니다',
+                )
+              ),
+              'clickEvent': array(
+                'action': 'suggest_command',
+                'value': '/w'@target''
+              )
+            ),
+            array(
+              'text': '\n > ',
+            )
+          )
+          break()
+        case 'target':
+          @name_raws = array(
+            array(
+              'text': '',
+              'color': @color
+            ),
+            array(
+              'text': 'From '
+            ),
+            array(
+              'text': @sender_name,
+              'insertion': '@'.@sender_name'',
+              'hoverEvent': array(
+                'action': 'show_text',
+                'value': array(
+                  '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                  '좌클릭 시, 유저에게 귓속말을 보냅니다',
+                )
+              ),
+              'clickEvent': array(
+                'action': 'suggest_command',
+                'value': '/w'@sender_name''
+              )
+            ),
+            array(
+              'text': '\n > ',
+            )
+          )
+          break()
+        case 'other':
+          @name_raws = array(
+            array(
+              'text': '',
+              'color': @color
+            ),
+            array(
+              'text': 'From '
+            ),
+            array(
+              'text': @sender_name,
+              'insertion': '@'.@sender_name'',
+              'hoverEvent': array(
+                'action': 'show_text',
+                'value': array(
+                  '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                  '좌클릭 시, 유저에게 귓속말을 보냅니다',
+                )
+              ),
+              'clickEvent': array(
+                'action': 'suggest_command',
+                'value': '/w'@sender_name''
+              )
+            ),
+            array(
+              'text': ' To '
+            ),
+            array(
+              'text': @target,
+              'insertion': '@'.@target'',
+              'hoverEvent': array(
+                'action': 'show_text',
+                'value': array(
+                  '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                  '좌클릭 시, 유저에게 귓속말을 보냅니다',
+                )
+              ),
+              'clickEvent': array(
+                'action': 'suggest_command',
+                'value': '/w'@target''
+              )
+            ),
+            array(
+              'text': '\n > ',
+            )
+          )
+          break()
+        }
+      }
+    } else {
+      switch(@sender_badge) {
+      case 'sender':
+        @name_raws = array(
+          array(
+            'text': '',
+            'color': @color
+          ),
+          array(
+            'text': 'To '
+          ),
+          array(
+            'text': @target,
+            'insertion': '@'.@target'',
+            'hoverEvent': array(
+              'action': 'show_text',
+              'value': array(
+                '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                '좌클릭 시, 유저에게 귓속말을 보냅니다',
+              )
+            ),
+            'clickEvent': array(
+              'action': 'suggest_command',
+              'value': '/w'@target''
             )
           ),
-          'clickEvent': array(
-            'action': 'suggest_command',
-            'value': '/w'@sender_name''
+          array(
+            'text': ' :: ',
           )
-        ),
-        array(
-          'text': ' :: ',
         )
-      )
-      break()
-    case 'other':
-      @name_raws = array(
-        array(
-          'text': '',
-          'color': @color
-        ),
-        array(
-          'text': 'From '
-        ),
-        array(
-          'text': @sender_name,
-          'insertion': '@'.@sender_name'',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': array(
-              '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-              '좌클릭 시, 유저에게 귓속말을 보냅니다',
+        break()
+      case 'target':
+        @name_raws = array(
+          array(
+            'text': '',
+            'color': @color
+          ),
+          array(
+            'text': 'From '
+          ),
+          array(
+            'text': @sender_name,
+            'insertion': '@'.@sender_name'',
+            'hoverEvent': array(
+              'action': 'show_text',
+              'value': array(
+                '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                '좌클릭 시, 유저에게 귓속말을 보냅니다',
+              )
+            ),
+            'clickEvent': array(
+              'action': 'suggest_command',
+              'value': '/w'@sender_name''
             )
           ),
-          'clickEvent': array(
-            'action': 'suggest_command',
-            'value': '/w'@sender_name''
+          array(
+            'text': ' :: ',
           )
-        ),
-        array(
-          'text': ' To '
-        ),
-        array(
-          'text': @target,
-          'insertion': '@'.@target'',
-          'hoverEvent': array(
-            'action': 'show_text',
-            'value': array(
-              '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
-              '좌클릭 시, 유저에게 귓속말을 보냅니다',
-            )
-          ),
-          'clickEvent': array(
-            'action': 'suggest_command',
-            'value': '/w'@target''
-          )
-        ),
-        array(
-          'text': ' :: ',
         )
-      )
-      break()
+        break()
+      case 'other':
+        @name_raws = array(
+          array(
+            'text': '',
+            'color': @color
+          ),
+          array(
+            'text': 'From '
+          ),
+          array(
+            'text': @sender_name,
+            'insertion': '@'.@sender_name'',
+            'hoverEvent': array(
+              'action': 'show_text',
+              'value': array(
+                '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                '좌클릭 시, 유저에게 귓속말을 보냅니다',
+              )
+            ),
+            'clickEvent': array(
+              'action': 'suggest_command',
+              'value': '/w'@sender_name''
+            )
+          ),
+          array(
+            'text': ' To '
+          ),
+          array(
+            'text': @target,
+            'insertion': '@'.@target'',
+            'hoverEvent': array(
+              'action': 'show_text',
+              'value': array(
+                '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                '좌클릭 시, 유저에게 귓속말을 보냅니다',
+              )
+            ),
+            'clickEvent': array(
+              'action': 'suggest_command',
+              'value': '/w'@target''
+            )
+          ),
+          array(
+            'text': ' :: ',
+          )
+        )
+        break()
+      }
     }
     break()
   }
@@ -1206,8 +1365,6 @@ proc _default_chat(@data, @players_data) {
       }
     }
   }
-  # 이름 부분 raw
-  @name_raws = _get_name_raws(@channel, @sender_name, @sender_badge, '#ffffff')
   # 메시지 부분 raw (해당 함수에서 @receivers를 수정할 수 있음)
   @message_raws = _get_message_raws(@channel, @message, @receivers)
   # 메시지 보내기
@@ -1215,21 +1372,22 @@ proc _default_chat(@data, @players_data) {
     if(@receiver_data['is_online']) {
       if(@receiver_data['channel'] == 'default' || @receiver_data['is_listening'] || @receiver_data['is_observer'] || @receiver_data['is_mentioned']) {
         @receiver_name = @receiver_data['name']
+        # 이름 부분 raw
+        @is_sender_same = @players_data[@receiver_uuid]['cache']['last_sender'] == "default.@sender_name"
+        @is_type_messenger = @players_data[@receiver_uuid]['chat'][6]
+        @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, @sender_badge, '#ffffff')
+        # 메시지 보내기
         _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
-        // 라스트 센더 세팅
+        # ls 세팅
+        @players_data[@receiver_uuid]['cache']['last_sender'] = "default.@sender_name"
+        # 사운드
         if(@sender_name == @receiver_name) {
-          if(ponline(@sender_name)) {
-            play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
-          }
+          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
         } else {
           if(@receiver_data['is_mentioned']) {
-            if(ponline(@receiver_name)) {
-              play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
-            }
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
           } else {
-            if(ponline(@receiver_name)) {
-              play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
-            }
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
           }
         }
       }
@@ -1309,8 +1467,6 @@ proc _town_chat(@data, @players_data) {
       }
     }
   }
-  # 이름 부분 raw
-  @name_raws = _get_name_raws(@channel, @sender_name, @sender_badge, '#c3f2a2')
   # 메시지 부분 raw (해당 함수에서 @receivers를 수정할 수 있음)
   @message_raws = _get_message_raws(@channel, @message, @receivers, @town_members)
   # 메시지 보내기
@@ -1318,21 +1474,22 @@ proc _town_chat(@data, @players_data) {
     if(@receiver_data['is_online']) {
       if(@receiver_data['channel'] == 'town' || @receiver_data['is_listening'] || @receiver_data['is_observer'] || @receiver_data['is_mentioned']) {
         @receiver_name = @receiver_data['name']
+        # 이름 부분 raw
+        @is_sender_same = @players_data[@receiver_uuid]['cache']['last_sender'] == "town.@sender_name"
+        @is_type_messenger = @players_data[@receiver_uuid]['chat'][6]
+        @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, @sender_badge, '#c3f2a2')
+        # 메시지 보내기
         _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
-        // 라스트 센더 세팅
+        # ls 세팅
+        @players_data[@receiver_uuid]['cache']['last_sender'] = "town.@sender_name"
+        # 사운드
         if(@sender_name == @receiver_name) {
-          if(ponline(@sender_name)) {
-            play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
-          }
+          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
         } else {
           if(@receiver_data['is_mentioned']) {
-            if(ponline(@receiver_name)) {
-              play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
-            }
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
           } else {
-            if(ponline(@receiver_name)) {
-              play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
-            }
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
           }
         }
       }
@@ -1399,17 +1556,22 @@ proc _local_chat(@data, @players_data) {
       }
     }
   }
-  # 이름 부분 raw
-  @name_raws = _get_name_raws(@channel, @sender_name, @sender_badge, '#f7f9c4')
   # 메시지 부분 raw (해당 함수에서 @receivers를 수정할 수 있음)
   @message_raws = _get_message_raws(@channel, @message, @receivers)
   # 메시지 보내기
   foreach(@receiver_uuid: @receiver_data in @receivers) {
-    if(ponline(@receiver_data['name'])) {
+    if(ponline(@receiver_data['name']) && array_index_exists(@players_data, @receiver_uuid)) {
       if(@receiver_data['channel'] == 'local' || @receiver_data['is_listening'] || @receiver_data['is_observer'] || @receiver_data['is_mentioned']) {
         @receiver_name = @receiver_data['name']
+        # 이름 부분 raw
+        @is_sender_same = @players_data[@receiver_uuid]['cache']['last_sender'] == "local.@sender_name"
+        @is_type_messenger = @players_data[@receiver_uuid]['chat'][6]
+        @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, @sender_badge, '#f7f9c4')
+        # 메시지 보내기
         _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
-        // 라스트 센더 세팅
+        # ls 세팅
+        @players_data[@receiver_uuid]['cache']['last_sender'] = "local.@sender_name"
+        # 사운드
         if(@sender_name == @receiver_name) {
           if(ponline(@sender_name)) {
             play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
@@ -1490,8 +1652,6 @@ proc _admin_chat(@data, @players_data) {
       }
     }
   }
-  # 이름 부분 raw
-  @name_raws = _get_name_raws(@channel, @sender_name, @sender_badge, '#fbc8c8')
   # 메시지 부분 raw (해당 함수에서 @receivers를 수정할 수 있음)
   @message_raws = _get_message_raws(@channel, @message, @receivers)
   # 메시지 보내기
@@ -1499,21 +1659,22 @@ proc _admin_chat(@data, @players_data) {
     if(@receiver_data['is_online']) {
       if(@receiver_data['channel'] == 'admin' || @receiver_data['is_listening'] || @receiver_data['is_observer'] || @receiver_data['is_mentioned']) {
         @receiver_name = @receiver_data['name']
+        # 이름 부분 raw
+        @is_sender_same = @players_data[@receiver_uuid]['cache']['last_sender'] == "admin.@sender_name"
+        @is_type_messenger = @players_data[@receiver_uuid]['chat'][6]
+        @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, @sender_badge, '#fbc8c8')
+        # 메시지 보내기
         _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
-        // 라스트 센더 세팅
+        # ls 세팅
+        @players_data[@receiver_uuid]['cache']['last_sender'] = "admin.@sender_name"
+        # 사운드
         if(@sender_name == @receiver_name) {
-          if(ponline(@sender_name)) {
-            play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
-          }
+          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
         } else {
           if(@receiver_data['is_mentioned']) {
-            if(ponline(@receiver_name)) {
-              play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
-            }
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
           } else {
-            if(ponline(@receiver_name)) {
-              play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
-            }
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
           }
         }
       }
@@ -1550,6 +1711,7 @@ proc _whisper_chat(@data, @players_data, @server) {
       # Receiver Setting
       @receivers[@receiver_uuid] = array(
         'name': @receiver_name,
+        'is_online': true,
         'channel': @chat_data[0],
         'type': 'sender',
         'is_observer': @chat_data[3],
@@ -1567,6 +1729,7 @@ proc _whisper_chat(@data, @players_data, @server) {
       # Receiver Setting
       @receivers[@receiver_uuid] = array(
         'name': @receiver_name,
+        'is_online': false,
         'channel': @chat_data[0],
         'type': 'target',
         'is_observer': @chat_data[3],
@@ -1597,29 +1760,35 @@ proc _whisper_chat(@data, @players_data, @server) {
   # 메시지 보내기
   foreach(@receiver_uuid: @receiver_data in @receivers) {
     @receiver_name = @receiver_data['name']
-    if(ponline(@receiver_name)) {
+    if(@receiver_data['is_online']) {
+      @is_sender_same = @players_data[@receiver_uuid]['cache']['last_sender'] == "whisper.@sender_name.to.@target_name"
+      @is_type_messenger = @players_data[@receiver_uuid]['chat'][6]
       switch(@receiver_data['type']) {
       case 'sender':
-        @name_raws = _get_name_raws(@channel, @sender_name, 'sender', '#fbc8f5', @target_name)
+        # 이름 부분 raw
+        @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, 'sender', '#fbc8f5', @target_name)
+        # 사운드
         play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
-        _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
-        // 라스트 센더 세팅
         break()
       case 'target':
-        @name_raws = _get_name_raws(@channel, @sender_name, 'target', '#fbc8f5', @target_name)
+        # 이름 부분 raw
+        @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, 'target', '#fbc8f5', @target_name)
+        # 사운드
         play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
-        _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
-        // 라스트 센더 세팅
+        # lws 세팅
+        @players_data[@receiver_uuid]['cache']['last_whisper_sender'] = @sender_name
         break()
       case 'other':
-        if(@receiver_data['is_observer']) {
-          @name_raws = _get_name_raws(@channel, @sender_name, 'other', '#fbc8f5', @target_name)
-          play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
-          _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
-          // 라스트 센더 세팅
-        }
+        # 이름 부분 raw
+        @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, 'other', '#fbc8f5', @target_name)
+        # 사운드
+        play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
         break()
       }
+      # 메시지 보내기
+      _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
+      # ls 세팅
+      @players_data[@receiver_uuid]['cache']['last_sender'] = "whisper.@sender_name.to.@target_name"
     }
   }
   # 로깅
@@ -1772,7 +1941,7 @@ register_command('broadcast', array(
   }
 ))
 
-register_command('whisper', array( // last whisper 저장해서 /r 명령어 사용 가능하도록 만들기
+register_command('whisper', array(
   'aliases': array('w', 'm', 'msg', 'tell', '귓속말', '귓'),
   'tabcompleter': closure(@command, @player, @args) {
     if(array_size(@args) == 1) {
@@ -1849,6 +2018,77 @@ register_command('whisper', array( // last whisper 저장해서 /r 명령어 사
           @data['sender_chat_data'][0] = @channel
         } else {
           tmsg(@player, @text['prefix']['failure'] color('gray').'플레이어를 찾을 수 없습니다.')
+        }
+      }
+    }
+  }
+))
+
+register_command('reply', array(
+  'aliases': array('r', '답장'),
+  'tabcompleter': closure(@command, @player, @args) {
+    if(array_size(@args) == 1) {
+      @online_players = array()
+      foreach(@target_uuid in bukkitlinked_get_all_players()) {
+        @online_players[] = bukkitlinked_get_player_name(@target_uuid)
+      }
+      array_remove_values(@online_players, @player)
+      @input = @args[-1]
+      return(array_filter(@online_players, closure(@key, @value) {
+        return(length(@input) <= length(@value) && equals_ic(@input, substr(@value, 0, length(@input))))
+      }))
+    } else {
+      return(array())
+    }
+  },
+  'executor': closure(@command, @player, @args) {
+    @sender_name = @player
+    @sender_uuid = puuid(@sender_name)
+    if(array_index_exists(@players_data, @sender_uuid)) {
+      //tmsg(@player, '\ue4dd'color('yellow').'/'.@command'<할 말>'.color('gray').'을 통해 답장을 보낼 수 있습니다.\n 또는,'color('yellow').'/'.@command.color('gray').'를 통해 답장을 채팅으로 보낼 수 있습니다.')
+      @online_players = array()
+      foreach(@target_uuid in bukkitlinked_get_all_players()) {
+        @online_players[] = bukkitlinked_get_player_name(@target_uuid)
+      }
+      @player_data = @players_data[@sender_uuid]
+      @last_whisper_sender = @player_data['cache']['last_whisper_sender']
+      if(array_size(@args) == 0) {
+        if(@last_whisper_sender != '' && array_contains(@online_players, @last_whisper_sender)) {
+          @player_data['cache']['whisper_target'] = @last_whisper_sender
+          @player_data['chat'][0] = 'whisper'
+          cup_set('CHAT', @sender_uuid, @player_data['chat'])
+          _update_channel_tag(@sender_uuid, @players_data[@sender_uuid], @text)
+          tmsg(@player, @text['prefix']['info'] color('gray').'채팅 채널이 귓속말로 전환되었습니다.')
+        } else {
+          tmsg(@player, @text['prefix']['failure'] color('gray').'답장할 플레이어를 찾을 수 없습니다.')
+        }
+      } else {
+        if(@last_whisper_sender != '' && array_contains(@online_players, @last_whisper_sender)) {
+          @target_name = @last_whisper_sender
+          @target_uuid = bukkitlinked_get_player_uuid(@target_name)
+          # 카프카 데이터 세팅
+          @data = array(
+            'sender_name': @sender_name,
+            'sender_uuid': @sender_uuid,
+            'sender_server': @server,
+            'sender_chat_data': @player_data['chat'],
+            'sender_badge': @player_data['decoration'][0],
+            'target_name': @target_name,
+            'target_uuid': @target_uuid,
+          )
+          if(@data['sender_chat_data'][1]) {
+            @message = _en_to_ko(array_implode(@args, ' '))
+          } else {
+            @message = array_implode(@args, ' ')
+          }
+          @data['message'] = @message
+          @channel = @data['sender_chat_data'][0]
+          @data['sender_chat_data'][0] = 'whisper'
+          # 카프카 보내기
+          kafka_send('ch.send_chat', json_encode(@data))
+          @data['sender_chat_data'][0] = @channel
+        } else {
+          tmsg(@player, @text['prefix']['failure'] color('gray').'답장할 플레이어를 찾을 수 없습니다.')
         }
       }
     }

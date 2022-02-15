@@ -12,19 +12,10 @@ foreach(@player in all_players()) {
   foreach(@uuid: @player_data in @players_data) {
     @player = player(@uuid)
     if(ponline(@player)) {
+
+      //broadcast(@player_data['cache']['last_sender'])
       # Update Skill Hud
       _update_skill_hud(@player, @uuid, @player_data, @skills_spec, @text)
-      /*
-      # boss bar msg
-      if(array_size(@player_data['cache']['tooltips']) > 0) {
-        if(@player_data['cache']['tooltips'][0]['countdown'] > 0) {
-          @player_data['cache']['tooltips'][0]['countdown'] -= 1
-        } else {
-          array_remove(@player_data['cache']['tooltips'], 0)
-        }
-        _set_tooltips(@player, @uuid, @player_data)
-      }
-       */
 
       # 액티브 스킬 카운드다운
       foreach(@skill: @active_skill in @player_data['active_skill']) { // 활성화된 액티브 스킬 포리치
