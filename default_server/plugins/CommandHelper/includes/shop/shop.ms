@@ -17,7 +17,7 @@ if(@server == 'main') {
   })
 
   proc _shop_logging(@shop_log_data, @player, @uuid, @type, @item, @qty, @price) {
-    if(array_index_exists(@item['meta'], 'display') && @item['meta']['display'] != '') {
+    if(array_index_exists(@item, 'meta', 'display') && @item['meta']['display'] != '') {
       @item_name = strip_colors(@item['meta']['display'])
     } else {
       @item_name = @item['name']

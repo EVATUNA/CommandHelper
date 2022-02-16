@@ -16,7 +16,41 @@ foreach(@file in @files) {
   }
 }
 
-proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @skills_spec, @text) {
+# 수확 로깅
+@harvesting_log_data = array()
+if(@server == 'main') {
+  @date = simple_date('yyyy-MM-dd')
+  @harvesting_log_data = array(
+    'date': @date,
+    'path': 'logs/'.@date.'.log'
+  )
+
+  if(!file_exists(@harvesting_log_data['path'])) {
+    create_file(@harvesting_log_data['path'])
+  }
+
+  @cron_task = set_cron('0 0 * * *', closure() {
+    @date = simple_date('yyyy-MM-dd')
+    @harvesting_log_data['date'] = @date
+    @harvesting_log_data['path'] = 'logs/'.@date.'.log'
+  })
+
+  proc _harvesting_logging(@harvesting_log_data, @player, @uuid, @item, @location) {
+    if(array_index_exists(@item, 'meta', 'display') && @item['meta']['display'] != '') {
+      @item_name = strip_colors(@item['meta']['display'])
+    } else {
+      @item_name = @item['name']
+    }
+    @x = integer(@location['x']) 
+    @y = integer(@location['y'])
+    @z = integer(@location['z'])
+    @message = "@player(@uuid) harvest @item_name in x: @x y: @y z: @z"
+    @log = string('['.simple_date('HH:mm:ss').'] '.@message.'\n')
+    write_file(@harvesting_log_data['path'], @log, 'APPEND')
+  }
+}
+
+proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @skills_spec, @text, @harvesting_log_data) {
   @player_data = @players_data[@uuid]
   @skill_manager = @player_data['skill_manager']
   # 부순 블럭 선언
@@ -93,6 +127,7 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
                 @max_weight = @min_weight + @entry['weight']
                 if(@max_weight > @result_weight) {
                   drop_item(@center_location, @entry['item'], false)
+                  _harvesting_logging(@harvesting_log_data, @player, @uuid, @entry['item'], @center_location)
                   break()
                 } else {
                   @min_weight = @max_weight
@@ -225,6 +260,7 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
                   @max_weight = @min_weight + @entry['weight']
                   if(@max_weight > @result_weight) {
                     drop_item(@location, @entry['item'], false)
+                    _harvesting_logging(@harvesting_log_data, @player, @uuid, @entry['item'], @center_location)
                     break()
                   } else {
                     @min_weight = @max_weight

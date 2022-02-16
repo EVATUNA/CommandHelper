@@ -242,15 +242,15 @@ bind('block_place', null, null, @event, @players_data, @skills_spec) {
 }
 
 # 블럭 파괴
-bind('block_break', null, null, @event, @players_data, @hp_blocks, @mineral_rewards, @crop_rewards, @skills_spec, @text, @server) {
+bind('block_break', null, null, @event, @players_data, @hp_blocks, @mineral_rewards, @mining_log_data, @crop_rewards, @harvesting_log_data, @skills_spec, @text, @server) {
   @player = @event['player']
   @uuid = puuid(@player)
   if(pmode(@player) == 'SURVIVAL') {
     if(@server == 'main' && pworld(@player) == 'spawn_minecraft_residence') {
-      _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @skills_spec, @text)
+      _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @skills_spec, @text, @harvesting_log_data)
     }
-    if(@server != 'main' || true) {
-      _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @mineral_rewards, @skills_spec, @text)
+    if(@server != 'main' || true) { // true 지우기
+      _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @mineral_rewards, @skills_spec, @text, @mining_log_data)
 
       # 일반 블럭들 튜나 레벨 주기?
       @stones = array(
