@@ -390,7 +390,7 @@ proc _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name,
     }
     break()
   case 'Whisper':
-    if(!@is_type_messenger) {
+    if(@is_type_messenger) {
       if(@is_sender_same) {
         @name_raws = array(
           array(
@@ -1499,7 +1499,7 @@ proc _town_chat(@data, @players_data) {
   mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
 }
 
-proc _local_chat(@data, @players_data) {
+proc _local_chat(@data, @players_data, @server) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1513,78 +1513,63 @@ proc _local_chat(@data, @players_data) {
   @receivers = array()
   foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
     @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
-    if(array_contains(@near_players, @receiver_name) && array_index_exists(@players_data, @receiver_uuid)) {
-      # Data
+    if(ponline(@receiver_name) && array_index_exists(@players_data, @receiver_uuid)) {
       @receiver_data = @players_data[@receiver_uuid]
       @chat_data = @receiver_data['chat']
-      # Listening Chanel
       @listening_chanels = json_decode(@chat_data[2])
       if(array_contains(@listening_chanels, 'local')) {
         @is_listening = true
       } else {
         @is_listening = false
       }
-      # Receiver Setting
-      @receivers[@receiver_uuid] = array(
-        'name': @receiver_name,
-        'channel': @chat_data[0],
-        'is_near_player': true,
-        'is_listening': @is_listening,
-        'is_observer': @chat_data[3],
-        'is_mentioned': false
-      )
-    } else { // 오프라인이나 근처 플레이어 아닐시
-      # Data
-      @chat_data = cup_get('CHAT', @receiver_uuid)
-      if(!is_null(@chat_data) && @chat_data[3]) {
-        # Listening Chanel
-        @listening_chanels = json_decode(@chat_data[2])
-        if(array_contains(@listening_chanels, 'local')) {
-          @is_listening = true
-        } else {
-          @is_listening = false
-        }
-        # Receiver Setting
+      if(@sender_server == @server && array_contains(@near_players, @receiver_name)) {
+        @receivers[@receiver_uuid] = array(
+          'name': @receiver_name,
+          'channel': @chat_data[0],
+          'is_near_player': true,
+          'is_listening': @is_listening,
+          'is_observer': @chat_data[3],
+          'is_mentioned': false
+        )
+      } else if(!is_null(@chat_data) && @chat_data[3]) {
         @receivers[@receiver_uuid] = array(
           'name': @receiver_name,
           'channel': @chat_data[0],
           'is_near_player': false,
           'is_listening': @is_listening,
-          'is_observer': true,
+          'is_observer': @chat_data[3],
           'is_mentioned': false
         )
       }
     }
   }
-  # 메시지 부분 raw (해당 함수에서 @receivers를 수정할 수 있음)
+  # 메시지 raw
   @message_raws = _get_message_raws(@channel, @message, @receivers)
   # 메시지 보내기
   foreach(@receiver_uuid: @receiver_data in @receivers) {
-    if(ponline(@receiver_data['name']) && array_index_exists(@players_data, @receiver_uuid)) {
-      if(@receiver_data['channel'] == 'local' || @receiver_data['is_listening'] || @receiver_data['is_observer'] || @receiver_data['is_mentioned']) {
-        @receiver_name = @receiver_data['name']
-        # 이름 부분 raw
-        @is_sender_same = @players_data[@receiver_uuid]['cache']['last_sender'] == "local.@sender_name"
-        @is_type_messenger = @players_data[@receiver_uuid]['chat'][6]
-        @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, @sender_badge, '#f7f9c4')
-        # 메시지 보내기
-        _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
-        # ls 세팅
-        @players_data[@receiver_uuid]['cache']['last_sender'] = "local.@sender_name"
-        # 사운드
-        if(@sender_name == @receiver_name) {
-          if(ponline(@sender_name)) {
-            play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+    if(@receiver_data['channel'] == 'local' || @receiver_data['is_listening'] || @receiver_data['is_observer'] || @receiver_data['is_mentioned']) {
+      @receiver_name = @receiver_data['name']
+      # 이름 raw
+      @is_sender_same = @players_data[@receiver_uuid]['cache']['last_sender'] == "local.@sender_name"
+      @is_type_messenger = @players_data[@receiver_uuid]['chat'][6]
+      @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, @sender_badge, '#f7f9c4')
+      # 메시지 보내기
+      _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
+      # ls 세팅
+      @players_data[@receiver_uuid]['cache']['last_sender'] = "local.@sender_name"
+      # 사운드
+      if(@sender_name == @receiver_name) {
+        if(ponline(@sender_name)) {
+          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+        }
+      } else {
+        if(@receiver_data['is_mentioned']) {
+          if(ponline(@receiver_name)) {
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
           }
         } else {
-          if(@receiver_data['is_mentioned']) {
-            if(ponline(@receiver_name)) {
-              play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
-            }
-          } else {
-            if(ponline(@receiver_name)) {
-              play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
-            }
+          if(ponline(@receiver_name)) {
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
           }
         }
       }
@@ -1608,18 +1593,15 @@ proc _admin_chat(@data, @players_data) {
   foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
     @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
     if(ponline(@receiver_name)) {
-      if(array_index_exists(@players_data, @receiver_uuid) && pisop(@receiver_name)) {
-        # Data
+      if(pisop(@receiver_name) && array_index_exists(@players_data, @receiver_uuid)) { // pisop를 퍼미션 있는지 여부로 수정해야 할수도 있음
         @receiver_data = @players_data[@receiver_uuid]
         @chat_data = @receiver_data['chat']
-        # Listening Chanel
         @listening_chanels = json_decode(@chat_data[2])
         if(array_contains(@listening_chanels, 'admin')) {
           @is_listening = true
         } else {
           @is_listening = false
         }
-        # Receiver Setting
         @receivers[@receiver_uuid] = array(
           'name': @receiver_name,
           'is_online': true,
@@ -1630,17 +1612,14 @@ proc _admin_chat(@data, @players_data) {
         )
       }
     } else {
-      # Data
       @chat_data = cup_get('CHAT', @receiver_uuid)
       if(!is_null(@chat_data) && bukkitlinked_is_player_op(@receiver_uuid)) {
-        # Listening Chanel
         @listening_chanels = json_decode(@chat_data[2])
         if(array_contains(@listening_chanels, 'admin')) {
           @is_listening = true
         } else {
           @is_listening = false
         }
-        # Receiver Setting
         @receivers[@receiver_uuid] = array(
           'name': @receiver_name,
           'is_online': false,
@@ -1652,14 +1631,14 @@ proc _admin_chat(@data, @players_data) {
       }
     }
   }
-  # 메시지 부분 raw (해당 함수에서 @receivers를 수정할 수 있음)
+  # 메시지 raw
   @message_raws = _get_message_raws(@channel, @message, @receivers)
   # 메시지 보내기
   foreach(@receiver_uuid: @receiver_data in @receivers) {
     if(@receiver_data['is_online']) {
       if(@receiver_data['channel'] == 'admin' || @receiver_data['is_listening'] || @receiver_data['is_observer'] || @receiver_data['is_mentioned']) {
         @receiver_name = @receiver_data['name']
-        # 이름 부분 raw
+        # 이름 raw
         @is_sender_same = @players_data[@receiver_uuid]['cache']['last_sender'] == "admin.@sender_name"
         @is_type_messenger = @players_data[@receiver_uuid]['chat'][6]
         @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, @sender_badge, '#fbc8c8')
@@ -1698,98 +1677,61 @@ proc _whisper_chat(@data, @players_data, @server) {
   @target_server = 'other'
   # 리시버 설정
   @receivers = array()
-  foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
-    @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
-    if(@sender_name == @receiver_name) {
-      # Data
-      if(ponline(@receiver_name) && array_index_exists(@players_data, @receiver_uuid)) {
-        @receiver_data = @players_data[@receiver_uuid]
-        @chat_data = @receiver_data['chat']
-      } else {
-        @chat_data = cup_get('CHAT', @receiver_uuid)
-      }
-      # Receiver Setting
+  foreach(@receiver_name in all_players()) {
+    @receiver_uuid = puuid(@receiver_name)
+    if(array_index_exists(@players_data, @receiver_uuid)) {
+      @receiver_data = @players_data[@receiver_uuid]
+      @chat_data = @receiver_data['chat']
       @receivers[@receiver_uuid] = array(
         'name': @receiver_name,
-        'is_online': true,
         'channel': @chat_data[0],
-        'type': 'sender',
         'is_observer': @chat_data[3],
         'is_mentioned': false
       )
-    } else if(@target_name == @receiver_name) {
-      # Data
-      if(ponline(@receiver_name) && array_index_exists(@players_data, @receiver_uuid)) {
-        @receiver_data = @players_data[@receiver_uuid]
-        @chat_data = @receiver_data['chat']
+      if(@receiver_name == @sender_name) {
+        @receivers[@receiver_uuid]['type'] = 'sender'
+      } else if(@receiver_name == @target_name) {
+        @receivers[@receiver_uuid]['type'] = 'target'
+        @receivers[@receiver_uuid]['is_mentioned'] = true
         @target_server = @server
-      } else {
-        @chat_data = cup_get('CHAT', @receiver_uuid)
-      }
-      # Receiver Setting
-      @receivers[@receiver_uuid] = array(
-        'name': @receiver_name,
-        'is_online': false,
-        'channel': @chat_data[0],
-        'type': 'target',
-        'is_observer': @chat_data[3],
-        'is_mentioned': false
-      )
-    } else { // 오프라인이거나 타켓 플레이어 아닐시
-      # Data
-      if(ponline(@receiver_name) && array_index_exists(@players_data, @receiver_uuid)) {
-        @receiver_data = @players_data[@receiver_uuid]
-        @chat_data = @receiver_data['chat']
-      } else {
-        @chat_data = cup_get('CHAT', @receiver_uuid)
-      }
-      if(!is_null(@chat_data) && @chat_data[3]) {
-        # Receiver Setting
-        @receivers[@receiver_uuid] = array(
-          'name': @receiver_name,
-          'channel': @chat_data[0],
-          'type': 'other',
-          'is_observer': true,
-          'is_mentioned': false
-        )
+      } else if(!is_null(@chat_data) && @chat_data[3]) {
+        @receivers[@receiver_uuid]['type'] = 'observer'
       }
     }
   }
-  # 메시지 부분 raw (해당 함수에서 @receivers를 수정할 수 있음)
+  # 메시지 raw
   @message_raws = _get_message_raws(@channel, @message, @receivers)
   # 메시지 보내기
   foreach(@receiver_uuid: @receiver_data in @receivers) {
     @receiver_name = @receiver_data['name']
-    if(@receiver_data['is_online']) {
-      @is_sender_same = @players_data[@receiver_uuid]['cache']['last_sender'] == "whisper.@sender_name.to.@target_name"
-      @is_type_messenger = @players_data[@receiver_uuid]['chat'][6]
-      switch(@receiver_data['type']) {
-      case 'sender':
-        # 이름 부분 raw
-        @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, 'sender', '#fbc8f5', @target_name)
-        # 사운드
-        play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
-        break()
-      case 'target':
-        # 이름 부분 raw
-        @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, 'target', '#fbc8f5', @target_name)
-        # 사운드
-        play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
-        # lws 세팅
-        @players_data[@receiver_uuid]['cache']['last_whisper_sender'] = @sender_name
-        break()
-      case 'other':
-        # 이름 부분 raw
-        @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, 'other', '#fbc8f5', @target_name)
-        # 사운드
-        play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
-        break()
-      }
-      # 메시지 보내기
-      _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
-      # ls 세팅
-      @players_data[@receiver_uuid]['cache']['last_sender'] = "whisper.@sender_name.to.@target_name"
+    @is_sender_same = @players_data[@receiver_uuid]['cache']['last_sender'] == "whisper.@sender_name.to.@target_name"
+    @is_type_messenger = @players_data[@receiver_uuid]['chat'][6]
+    switch(@receiver_data['type']) {
+    case 'sender':
+      # 이름 raw
+      @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, 'sender', '#fbc8f5', @target_name)
+      # 사운드
+      play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+      break()
+    case 'target':
+      # 이름 raw
+      @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, 'target', '#fbc8f5', @target_name)
+      # 사운드
+      play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+      # lws 세팅
+      @players_data[@receiver_uuid]['cache']['last_whisper_sender'] = @sender_name
+      break()
+    case 'other':
+      # 이름 raw
+      @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, 'other', '#fbc8f5', @target_name)
+      # 사운드
+      play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+      break()
     }
+    # 메시지 보내기
+    _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
+    # ls 세팅
+    @players_data[@receiver_uuid]['cache']['last_sender'] = "whisper.@sender_name.to.@target_name"
   }
   # 로깅
   mom_log('INFO', "[@channel] @sender_name(@sender_server) → @target_name(@target_server) @message")
@@ -2027,19 +1969,7 @@ register_command('whisper', array(
 register_command('reply', array(
   'aliases': array('r', '답장'),
   'tabcompleter': closure(@command, @player, @args) {
-    if(array_size(@args) == 1) {
-      @online_players = array()
-      foreach(@target_uuid in bukkitlinked_get_all_players()) {
-        @online_players[] = bukkitlinked_get_player_name(@target_uuid)
-      }
-      array_remove_values(@online_players, @player)
-      @input = @args[-1]
-      return(array_filter(@online_players, closure(@key, @value) {
-        return(length(@input) <= length(@value) && equals_ic(@input, substr(@value, 0, length(@input))))
-      }))
-    } else {
-      return(array())
-    }
+    return(array())
   },
   'executor': closure(@command, @player, @args) {
     @sender_name = @player

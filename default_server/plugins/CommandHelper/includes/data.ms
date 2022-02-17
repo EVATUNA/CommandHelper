@@ -102,7 +102,7 @@ proc _new_chat(@uuid, @player_data) {
   @player_data['chat'] = array(
     'default', // 사용중인 채팅 채널
     false, // enko여부
-    json_encode(array('default', 'local', 'town')), // 듣기 활성화 할 채널들
+    json_encode(array('default', 'local', 'town', 'admin')), // 듣기 활성화 할 채널들
     false, // 채팅 옵저버모드
     '',    // 마지막 귓말한사람
     '',    // 마지막 채팅친사람

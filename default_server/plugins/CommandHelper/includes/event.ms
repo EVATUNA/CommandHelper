@@ -174,7 +174,7 @@ bind('kafka_receive', null, null, @event, @reconnectable_players, @players_data,
       _town_chat(@data, @players_data)
       break()
     case 'local':
-      _local_chat(@data, @players_data)
+      _local_chat(@data, @players_data, @server)
       break()
     case 'admin':
       _admin_chat(@data, @players_data)
@@ -249,7 +249,7 @@ bind('block_break', null, null, @event, @players_data, @hp_blocks, @mineral_rewa
     if(@server == 'main' && pworld(@player) == 'spawn_minecraft_residence') {
       _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @skills_spec, @text, @harvesting_log_data)
     }
-    if(@server != 'main' || true) { // true 지우기
+    if(@server != 'main') {
       _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @mineral_rewards, @skills_spec, @text, @mining_log_data)
 
       # 일반 블럭들 튜나 레벨 주기?
