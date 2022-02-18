@@ -3,6 +3,9 @@ foreach(@player in all_players()) {
   @uuid = puuid(@player)
   set_timeout(1, closure() {
     _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text)
+    if(pworld(@player) == 'spawn') {
+      _play_spawn_music(@player, @uuid, @musics_data)
+    }
   })
 }
 
@@ -115,12 +118,12 @@ foreach(@player in all_players()) {
 })
 
 # 플레이어 로그인
-bind('player_join', null, null, @event, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack) {
+bind('player_join', null, null, @event, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data) {
   @player = @event['player']
   @uuid = puuid(@player)
   modify_event('join_message', null)
   set_timeout(100, closure() {
-    _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack)
+    _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
   })
 }
 
@@ -2382,6 +2385,13 @@ bind('inventory_click', null, null, @event) {
       runas(@player, '/util')
       play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
     })
+  }
+}
+
+# 주민, 떠상 상호 작용
+bind('player_interact_entity', null, null, @event) {
+  if(@event['clicked'] == 'VILLAGER' || @event['clicked'] == 'WANDERING_TRADER') {
+    cancel()
   }
 }
 

@@ -44,7 +44,11 @@ register_command('moveserver', array(
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
     if(array_size(@args) == 0) {
-      kafka_send('ch.inform_player_quit', puuid(@player))
+      @quit_data = array(
+        'uuid': @uuid,
+        'server': @server
+      )
+      kafka_send('ch.inform_player_quit', json_encode(@quit_data))
       return(true)
     } else {
       return(false)

@@ -1,6 +1,6 @@
 {
 	"recipe": {
-		"key": "spruce_pickaxe",
+		"key": "oak_pickaxe",
 		"type": "SHAPED",
 		"group": "wooden_pickaxes",
 		"result": {
@@ -20,7 +20,7 @@
 			" S "
 		],
 		"ingredients": {
-			"P": "SPRUCE_PLANKS",
+			"P": "OAK_PLANKS",
 			"S": "STICK"
 		},
 		"ingredients_weight": {

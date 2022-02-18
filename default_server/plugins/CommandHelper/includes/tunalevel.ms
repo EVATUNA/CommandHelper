@@ -92,6 +92,7 @@ proc _get_max_experience(@level) {
   } else {
     @max_experience = integer(round(4770 * 1.25 ** (@level + 1 - 21)))
   }
+  @max_experience = integer(@max_experience * 1.5)
   return(@max_experience)
 }
 
@@ -187,7 +188,6 @@ proc _tunalevel_command(@command, @player, @args, @text, @players_data) {
   }
 }
 register_command('tunalevel', array(
-  'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'tabcompleter': closure(@command, @player, @args) {
     switch(array_size(@args)) {
     case 1:
@@ -220,9 +220,27 @@ register_command('tunalevel', array(
 
 # 튜나레벨 경험치 랜덤 추가
 proc _add_randed_tunalevel_experience(@uuid, @player_data, @adding_default_experience, @adding_extra_experience, @text) {
+  @points = integer(round(@adding_default_experience + rand() * @adding_extra_experience))
+  if(@points < 0) { @points = 0 }
   @adding_tunalevel_data = array(
     'levels': 0,
-    'points': integer(round(@adding_default_experience + rand() * @adding_extra_experience))
+    'points': @points
   )
   _add_tunalevel(@uuid, @player_data, @adding_tunalevel_data, @text)
+  return(@points)
 }
+
+register_command('tunalevelrand', array(
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    if(array_size(@args) == 3) {
+      @target_name = @args[0]
+      @target_uuid = puuid(@target_name)
+      @player_data = @players_data[@target_uuid]
+      @adding_default_experience = double(@args[1])
+      @adding_extra_experience = double(@args[2])
+      @points = _add_randed_tunalevel_experience(@target_uuid, @player_data, @adding_default_experience, @adding_extra_experience, @text)
+      tmsg(@target_name, @text['prefix']['success'] @points.'의 튜나 레벨 경험치를 받았습니다.')
+    }
+  }
+))

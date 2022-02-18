@@ -449,6 +449,7 @@ bind('mom_moisture_change', null, null, @event) {
   @crop_location['y'] += 1
   @is_drying = true
   if(@new_moisture == 7) {
+    //broadcast( has_storm(@location['world'])  has_thunder(@location['world']) @location['world'])
     if((has_storm(@location['world']) || has_thunder(@location['world'])) && get_highest_block_at(@location)['y'] <= @crop_location['y']) {
       @is_drying = false
     }

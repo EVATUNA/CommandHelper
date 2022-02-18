@@ -1,158 +1,146 @@
 {
   "포르케타": {
-    "health": 8,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
+  "health": 8,
+  "hunger": 10,
+  "saturation": 20,
+  "cooldown": 200
+},
   "소고기 꼬치": {
-    "health": 4,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "치킨 꼬치": {
-    "health": 4,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "과일 샐러드": {
-    "health": 3,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "대구 초밥": {
-    "health": 5,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "연어 초밥": {
-    "health": 5,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "애플 파이": {
-    "health": 7,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "돼지갈비": {
-    "health": 7,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "사과맛 사탕": {
-    "health": 2,
-    "hunger": 5,
-    "saturation": 5,
-    "cooldown": 200
-  },
-    "브라우니": {
-    "health": 3,
-    "hunger": 5,
-    "saturation": 10,
-    "cooldown": 200
-  },
-    "대구 샌드위치": {
-    "health": 6,
-    "hunger": 15,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "연어 샌드위치": {
-    "health": 6,
-    "hunger": 15,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "소고기 버거": {
-    "health": 5,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "치킨 버거": {
-    "health": 5,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "달걀 바구니": {
-    "health": 7,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "햄 샌드위치": {
-    "health": 6,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "도넛": {
-    "health": 4,
-    "hunger": 5,
-    "saturation": 12,
-    "cooldown": 200
-  },
-    "팬케이크": {
-    "health": 6,
-    "hunger": 6,
-    "saturation": 12,
-    "cooldown": 200
-  },
-    "초콜릿 바": {
-    "health": 6,
-    "hunger": 4,
-    "saturation": 7,
-    "cooldown": 200
-  },
-    "초코우유": {
-    "health": 5,
-    "hunger": 7,
-    "saturation": 8,
-    "cooldown": 200
-  },
-    "피쉬 & 칩스": {
-    "health": 8,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "우유 스테이크": {
-    "health": 6,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "스테이크와 달걀": {
-    "health": 8,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "막대 사탕": {
-    "health": 3,
-    "hunger": 3,
-    "saturation": 5,
-    "cooldown": 200
-  },
-    "베이컨과 달걀": {
-    "health": 6,
-    "hunger": 10,
-    "saturation": 20,
-    "cooldown": 200
-  },
-    "딸기우유": {
-    "health": 5,
-    "hunger": 6,
-    "saturation": 10,
-    "cooldown": 200
-  }
+  "health": 4,
+  "hunger": 10,
+  "saturation": 20,
+  "cooldown": 200
+},
+  "치킨 꼬치": {
+  "health": 4,
+  "hunger": 10,
+  "saturation": 20,
+  "cooldown": 200
+},
+  "과일 샐러드": {
+  "health": 3,
+  "hunger": 10,
+  "saturation": 20,
+  "cooldown": 200
+},
+  "초밥": {
+  "health": 5,
+  "hunger": 10,
+  "saturation": 20,
+  "cooldown": 200
+},
+  "애플 파이": {
+  "health": 7,
+  "hunger": 10,
+  "saturation": 20,
+  "cooldown": 200
+},
+  "돼지갈비": {
+  "health": 7,
+  "hunger": 10,
+  "saturation": 20,
+  "cooldown": 200
+},
+  "사과맛 사탕": {
+  "health": 2,
+  "hunger": 5,
+  "saturation": 5,
+  "cooldown": 200
+},
+  "브라우니": {
+  "health": 3,
+  "hunger": 5,
+  "saturation": 10,
+  "cooldown": 200
+},
+  "생선 샌드위치": {
+  "health": 6,
+  "hunger": 15,
+  "saturation": 20,
+  "cooldown": 200
+},
+  "소고기 버거": {
+  "health": 5,
+  "hunger": 10,
+  "saturation": 20,
+  "cooldown": 200
+},
+  "치킨 버거": {
+  "health": 5,
+  "hunger": 10,
+  "saturation": 20,
+  "cooldown": 200
+},
+  "달걀 바구니": {
+  "health": 7,
+  "hunger": 10,
+  "saturation": 20,
+  "cooldown": 200
+},
+  "햄 샌드위치": {
+  "health": 6,
+  "hunger": 10,
+  "saturation": 20,
+  "cooldown": 200
+},
+  "도넛": {
+  "health": 4,
+  "hunger": 5,
+  "saturation": 12,
+  "cooldown": 200
+},
+  "팬케이크": {
+  "health": 6,
+  "hunger": 6,
+  "saturation": 12,
+  "cooldown": 200
+},
+  "초콜릿 바": {
+  "health": 6,
+  "hunger": 4,
+  "saturation": 7,
+  "cooldown": 200
+},
+  "초코우유": {
+  "health": 5,
+  "hunger": 7,
+  "saturation": 8,
+  "cooldown": 200
+},
+  "피쉬 & 칩스": {
+  "health": 8,
+  "hunger": 10,
+  "saturation": 20,
+  "cooldown": 200
+},
+  "우유 스테이크": {
+  "health": 6,
+  "hunger": 10,
+  "saturation": 20,
+  "cooldown": 200
+},
+  "스테이크와 달걀": {
+  "health": 8,
+  "hunger": 10,
+  "saturation": 20,
+  "cooldown": 200
+},
+  "막대 사탕": {
+  "health": 3,
+  "hunger": 3,
+  "saturation": 5,
+  "cooldown": 200
+},
+  "베이컨과 달걀": {
+  "health": 6,
+  "hunger": 10,
+  "saturation": 20,
+  "cooldown": 200
+},
+  "딸기우유": {
+  "health": 5,
+  "hunger": 6,
+  "saturation": 10,
+  "cooldown": 200
+}
 }

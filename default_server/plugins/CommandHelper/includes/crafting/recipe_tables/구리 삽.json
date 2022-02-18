@@ -22,11 +22,11 @@
 			"S"
 		],
 		"ingredients": {
-			"P": "GOLD_NUGGET",
+			"P": "COPPER_INGOT",
 			"S": "STICK"
 		},
 		"ingredients_weight": {
-			"GOLD_NUGGET": 1
+			"COPPER_INGOT": 1
 		}
 	},
 	"pool": {

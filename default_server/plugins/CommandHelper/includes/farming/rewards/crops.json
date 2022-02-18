@@ -3,11 +3,11 @@
     "max_age": 7,
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.125,
+      "default": -0.25,
       "extra": 1.5
     },
     "arcanelevel": {
-      "default": 0.125,
+      "default": -0.25,
       "extra": 1.5
     },
     "mastery": "wheat_farming_mastery",
@@ -47,12 +47,12 @@
     "max_age": 3,
     "default_qty": 1,
     "tunalevel": {
-      "default": -0.25,
-      "extra": 1
+      "default": -1,
+      "extra": 2.25
     },
     "arcanelevel": {
-      "default": -0.25,
-      "extra": 1
+      "default": -1,
+      "extra": 2.25
     },
     "mastery": "beetroot_farming_mastery",
     "loot_table": [
@@ -91,11 +91,11 @@
     "max_age": 7,
     "default_qty": 3,
     "tunalevel": {
-      "default": 0.125,
+      "default": -0.25,
       "extra": 1.5
     },
     "arcanelevel": {
-      "default": 0.125,
+      "default": -0.25,
       "extra": 1.5
     },
     "mastery": "potato_farming_mastery",
@@ -135,11 +135,11 @@
     "max_age": 7,
     "default_qty": 3,
     "tunalevel": {
-      "default": 0.125,
+      "default": -0.25,
       "extra": 1.5
     },
     "arcanelevel": {
-      "default": 0.125,
+      "default": -0.25,
       "extra": 1.5
     },
     "mastery": "carrot_farming_mastery",
@@ -179,12 +179,12 @@
     "max_age": 3,
     "default_qty": 2,
     "tunalevel": {
-      "default": -0.25,
-      "extra": 1
+      "default": -1,
+      "extra": 2.25
     },
     "arcanelevel": {
-      "default": -0.25,
-      "extra": 1
+      "default": -1,
+      "extra": 2.25
     },
     "mastery": "berries_farming_mastery",
     "loot_table": [
@@ -223,12 +223,12 @@
     "stem": "ATTACHED_PUMPKIN_STEM",
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.125,
-      "extra": 1.5
+      "default": 0.25,
+      "extra": 1
     },
     "arcanelevel": {
-      "default": 0.125,
-      "extra": 1.5
+      "default": 0.25,
+      "extra": 1
     },
     "mastery": "pumpkin_farming_mastery",
     "loot_table": [
@@ -267,12 +267,12 @@
     "stem": "ATTACHED_MELON_STEM",
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.125,
-      "extra": 1.5
+      "default": 0.25,
+      "extra": 1
     },
     "arcanelevel": {
-      "default": 0.125,
-      "extra": 1.5
+      "default": 0.25,
+      "extra": 1
     },
     "mastery": "melon_farming_mastery",
     "loot_table": [

@@ -903,7 +903,7 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
 }
 
 # 리소스팩 보내기
-proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack) {
+proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data) {
   @join_spec = array(
     'location': ploc(@player),
     'effects': get_peffect(@player),
@@ -932,6 +932,9 @@ proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_
     case 'SUCCESSFULLY_LOADED':
       _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @effective_items, @text)
       unbind()
+      if(pworld(@player) == 'spawn') {
+        _play_spawn_music(@player, @uuid, @musics_data)
+      }
       break()
     }
   }
@@ -959,15 +962,19 @@ proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @
 }
 
 # 플레이어 접속
-proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack) {
+proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data) {
   runas('~console', '/recipe give '.@player.' *')
   if(!array_index_exists(@reconnectable_players, @uuid)) {
-    //_send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack)
+    //_send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
     broadcast('리팩보냄')
   } else {
     #set_timeout(500, closure() {
       _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text)
       array_remove(@reconnectable_players, @uuid)
+      
+      if(pworld(@player) == 'spawn') {
+        _play_spawn_music(@player, @uuid, @musics_data)
+      }
     #})
   }
 }

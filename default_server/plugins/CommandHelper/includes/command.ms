@@ -1035,8 +1035,8 @@ register_command('sendwarn', array(
       'message': array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' '),
       'countdown': 3
     )
-    _add_tooltip(@target_name, @target_uuid, @player_data, @tooltip_data)
-    _set_tooltips(@target_name, @target_uuid, @player_data)
+    //_add_tooltip(@target_name, @target_uuid, @player_data, @tooltip_data)
+    //_set_tooltips(@target_name, @target_uuid, @player_data)
   }
 ))
 

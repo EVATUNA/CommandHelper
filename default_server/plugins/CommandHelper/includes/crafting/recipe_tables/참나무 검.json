@@ -1,6 +1,6 @@
 {
 	"recipe": {
-		"key": "spruce_sword",
+		"key": "oak_sword",
 		"type": "SHAPED",
 		"group": "wooden_swords",
 		"result": {
@@ -20,7 +20,7 @@
 			"S"
 		],
 		"ingredients": {
-			"P": "SPRUCE_PLANKS",
+			"P": "OAK_PLANKS",
 			"S": "STICK"
 		},
 		"ingredients_weight": {

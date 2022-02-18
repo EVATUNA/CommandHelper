@@ -18,10 +18,10 @@
 			" I "
 		],
 		"ingredients": {
-			"I": "GOLD_NUGGET"
+			"I": "COPPER_INGOT"
 		},
 		"ingredients_weight": {
-			"GOLD_NUGGET": 1
+			"COPPER_INGOT": 1
 		}
 	},
 	"pool": {

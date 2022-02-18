@@ -40,6 +40,9 @@ include('includes/hunting/hunting.ms')
 # 음식 시스템
 include('includes/food/food.ms')
 
+# 음악 시스템
+include('includes/music/music.ms')
+
 # 몹 시스템
 include('includes/mob/mob.ms')
 
