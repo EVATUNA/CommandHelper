@@ -1682,20 +1682,31 @@ proc _whisper_chat(@data, @players_data, @server) {
     if(array_index_exists(@players_data, @receiver_uuid)) {
       @receiver_data = @players_data[@receiver_uuid]
       @chat_data = @receiver_data['chat']
-      @receivers[@receiver_uuid] = array(
-        'name': @receiver_name,
-        'channel': @chat_data[0],
-        'is_observer': @chat_data[3],
-        'is_mentioned': false
-      )
       if(@receiver_name == @sender_name) {
-        @receivers[@receiver_uuid]['type'] = 'sender'
+        @receivers[@receiver_uuid] = array(
+          'name': @receiver_name,
+          'type': 'sender',
+          'channel': @chat_data[0],
+          'is_observer': @chat_data[3],
+          'is_mentioned': false
+        )
       } else if(@receiver_name == @target_name) {
-        @receivers[@receiver_uuid]['type'] = 'target'
-        @receivers[@receiver_uuid]['is_mentioned'] = true
+        @receivers[@receiver_uuid] = array(
+          'name': @receiver_name,
+          'type': 'target',
+          'channel': @chat_data[0],
+          'is_observer': @chat_data[3],
+          'is_mentioned': true
+        )
         @target_server = @server
       } else if(!is_null(@chat_data) && @chat_data[3]) {
-        @receivers[@receiver_uuid]['type'] = 'observer'
+        @receivers[@receiver_uuid] = array(
+          'name': @receiver_name,
+          'type': 'observer',
+          'channel': @chat_data[0],
+          'is_observer': @chat_data[3],
+          'is_mentioned': false
+        )
       }
     }
   }
@@ -1721,7 +1732,7 @@ proc _whisper_chat(@data, @players_data, @server) {
       # lws 세팅
       @players_data[@receiver_uuid]['cache']['last_whisper_sender'] = @sender_name
       break()
-    case 'other':
+    case 'observer':
       # 이름 raw
       @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, 'other', '#fbc8f5', @target_name)
       # 사운드
