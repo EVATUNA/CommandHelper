@@ -4,7 +4,7 @@
 include('includes/skill/skill.ms')
 
 # 튜나레벨 시스템
-include('includes/tunalevel.ms')
+include('includes/level.ms')
 
 # 인첸트 시스템
 include('includes/enchant/enchant.ms')

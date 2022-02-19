@@ -44,11 +44,16 @@ register_command('moveserver', array(
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
     if(array_size(@args) == 0) {
-      @quit_data = array(
+      @uuid = puuid(@player)
+      @reconnecting_data = array(
         'uuid': @uuid,
-        'server': @server
+        'countdown': 10,
+        'server': @server,
+        'last_sender': '',
+        'last_whisper_sender': '',
+        'whisper_target': ''
       )
-      kafka_send('ch.inform_player_quit', json_encode(@quit_data))
+      kafka_send('ch.inform_player_quit', json_encode(@reconnecting_data))
       return(true)
     } else {
       return(false)

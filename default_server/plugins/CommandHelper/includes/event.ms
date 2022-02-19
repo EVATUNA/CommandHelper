@@ -2,7 +2,7 @@
 foreach(@player in all_players()) {
   @uuid = puuid(@player)
   set_timeout(1, closure() {
-    _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text)
+    _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, null)
     if(pworld(@player) == 'spawn') {
       _play_spawn_music(@player, @uuid, @musics_data)
     }
@@ -11,7 +11,7 @@ foreach(@player in all_players()) {
 
 # 1초 반복
 @interval_task = set_interval(1000, closure() {
-  _countdown_reconnectable_players(@reconnectable_players)
+  _countdown_reconnectable_players(@reconnecting_datas)
   foreach(@uuid: @player_data in @players_data) {
     @player = player(@uuid)
     if(ponline(@player)) {
@@ -118,12 +118,12 @@ foreach(@player in all_players()) {
 })
 
 # 플레이어 로그인
-bind('player_join', null, null, @event, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data) {
+bind('player_join', null, null, @event, @reconnecting_datas, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data) {
   @player = @event['player']
   @uuid = puuid(@player)
   modify_event('join_message', null)
   set_timeout(100, closure() {
-    _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
+    _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
   })
 }
 
@@ -149,14 +149,13 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
 }
 
 # 카프카
-bind('kafka_receive', null, null, @event, @reconnectable_players, @players_data, @resourcepack, @server) {
+bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @resourcepack, @server) {
   switch(@event['key']) {
 
   case 'ch.inform_player_quit':
-    @quit_data = json_decode(@event['value'])
-    @uuid = @quit_data['uuid']
-    if(@server != @quit_data) {
-      @reconnectable_players[@uuid] = 10
+    @reconnecting_data = json_decode(@event['value'])
+    if(@server != @reconnecting_data['server']) {
+      @reconnecting_datas[@reconnecting_data['uuid']] = @reconnecting_data
     }
     break()
 

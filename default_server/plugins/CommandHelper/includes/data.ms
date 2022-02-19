@@ -1,11 +1,12 @@
 ## Data Procedure
-proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text) {
+proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @reconnecting_data) {
   # 배열로 선언
   @players_data[@uuid] = array()
   @player_data = @players_data[@uuid]
 
   # sidebar
   _load_sidebar(@player, @uuid, @text)
+
 
   # cache
   @player_data['cache'] = array(
@@ -19,6 +20,13 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
     'last_whisper_sender': '',
     'whisper_target': '',
   )
+
+  # cache edit
+  if(is_array(@reconnecting_data)) {
+    @player_data['cache']['last_sender'] = @reconnecting_data['last_sender']
+    @player_data['cache']['last_whisper_sender'] = @reconnecting_data['last_whisper_sender']
+    @player_data['cache']['whisper_target'] = @reconnecting_data['whisper_target']
+  }
 
   # setting
   @player_data['setting'] = cup_get('SETTING', @uuid)
@@ -957,20 +965,42 @@ proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @
     if(@join_spec['onfire'] > 0) {
       set_entity_onfire(@uuid, @join_spec['onfire'])
     }
-    _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text)
+    _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, null)
   })
 }
 
 # 플레이어 접속
-proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data) {
+proc _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data) {
   runas('~console', '/recipe give '.@player.' *')
-  if(!array_index_exists(@reconnectable_players, @uuid)) {
+  if(!array_index_exists(@reconnecting_datas, @uuid)) {
     //_send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
     broadcast('리팩보냄')
   } else {
     #set_timeout(500, closure() {
-      _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text)
-      array_remove(@reconnectable_players, @uuid)
+      @reconnecting_data = @reconnecting_datas[@uuid]
+      # 플레이어 데이터 로드
+      _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @reconnecting_data)
+      # 첫접속시 가이드 안내 메시지
+      if(@reconnecting_data['server'] == 'guest') {
+        @raw = array(
+          array(
+            'text': @text['space_fonts']['space.128'].'\ue008\n\n\n\n\n\n'
+          ),
+          array(
+            'text': @text['space_fonts']['space.8'].'환영합니다! 에바참치는 기존 마인크래프트 야생의 장점을 살려 재해석한 서버입니다.\n\n',
+            'color': '#80c8ff'
+          ),
+          array(
+            'text': '서버에 적응하는 것을 도와드리기 위해 가이드를 준비하였으니 꼭 확인해보시기 바랍니다.\n'
+          ),
+          array(
+            'text': @text['space_fonts']['space.112'].'( ESC > 에바참치 가이드 )',
+            'color': 'gray'
+          )
+        )
+        _tellraw(@player, @raw)
+      }
+      array_remove(@reconnecting_datas, @uuid)
       
       if(pworld(@player) == 'spawn') {
         _play_spawn_music(@player, @uuid, @musics_data)
@@ -981,14 +1011,19 @@ proc _join_event(@player, @uuid, @reconnectable_players, @players_data, @skills_
 
 # 플레이어 퇴장
 proc _quit_event(@uuid, @players_data, @server) {
-  # 카프카
-  @quit_data = array(
-    'uuid': @uuid,
-    'server': @server
-  )
-  kafka_send('ch.inform_player_quit', json_encode(@quit_data))
-  # 컵
   if(array_index_exists(@players_data, @uuid)) {
+    # 카프카
+    @reconnecting_data = array(
+      'uuid': @uuid,
+      'countdown': 10,
+      'server': @server,
+      'last_sender': @players_data[@uuid]['cache']['last_sender'],
+      'last_whisper_sender': @players_data[@uuid]['cache']['last_whisper_sender'],
+      'whisper_target': @players_data[@uuid]['cache']['whisper_target']
+    )
+
+    kafka_send('ch.inform_player_quit', json_encode(@reconnecting_data))
+    # 컵
     # 액티브 스킬 저장
     @player_data = @players_data[@uuid]
     @skill_manager = @player_data['skill_manager']
@@ -1020,12 +1055,12 @@ proc _quit_event(@uuid, @players_data, @server) {
 }
 
 # 서버 이동시 카운트 다운 (카운트 다운이 다 되면 서버 나간것으로 간주)
-proc _countdown_reconnectable_players(@reconnectable_players) {
-  foreach(@uuid: @remaining_second in @reconnectable_players) {
-    if(@remaining_second > 0) {
-      @reconnectable_players[@uuid] -= 1
+proc _countdown_reconnectable_players(@reconnecting_datas) {
+  foreach(@uuid: @reconnecting_data in @reconnecting_datas) {
+    if(@reconnecting_data['countdown'] > 0) {
+      @reconnecting_data['countdown'] -= 1
     } else {
-      array_remove(@reconnectable_players, @uuid)
+      array_remove(@reconnecting_datas, @uuid)
     }
   }
 }

@@ -36,15 +36,22 @@ set_timeout(1000, closure() {
         'text': @text['space_fonts']['space.128'].'\ue008\n\n\n\n\n\n'
       ),
       array(
-        'text': @text['space_fonts']['space.21'].'환영합니다! 에바참치는 색다른 경험을 제공해주는 성장형 야생 서버입니다.\n\n',
+        'text': @text['space_fonts']['space.8'].'환영합니다! 에바참치는 기존 마인크래프트 야생의 장점을 살려 재해석한 서버입니다.\n\n',
         'color': '#80c8ff'
       ),
       array(
-        'text': @text['space_fonts']['space.25'].'기존의 마인크래프트 야생과 차별화되는 컨텐츠와 시스템들이 많으므로,\n'
+        'text': '서버에 적응하는 것을 도와드리기 위해 가이드를 준비하였으니 꼭 확인해보시기 바랍니다.\n'
       ),
       array(
-        'text': @text['space_fonts']['space.58'].'지침서에서 제공되는 팁들을 꼭 확인하시길 바랍니다!'
-      )
+        'text': @text['space_fonts']['space.112'].'( ESC > 에바참치 가이드 )',
+        'color': 'gray'
+      )/*,
+      array(
+        'keybind': 'key.advancements'
+      ),
+      array(
+        'text': ''
+      ),*/
     )
     _tellraw(@player, @raw)
 

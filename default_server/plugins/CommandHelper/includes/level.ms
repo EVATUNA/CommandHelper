@@ -217,8 +217,7 @@ register_command('tunalevel', array(
   }
 ))
 
-
-# 튜나레벨 경험치 랜덤 추가
+# 튜나레벨 랜덤 커맨드
 proc _add_randed_tunalevel_experience(@uuid, @player_data, @adding_default_experience, @adding_extra_experience, @text) {
   @points = integer(round(@adding_default_experience + rand() * @adding_extra_experience))
   if(@points < 0) { @points = 0 }

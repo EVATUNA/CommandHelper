@@ -23,7 +23,6 @@ proc _play_spawn_music(@player, @uuid, @musics_data) {
       queue_push(@recurse_closure, @queue_name)
     })
 
-
   }
 }
 

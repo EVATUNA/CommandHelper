@@ -31,7 +31,7 @@ async_read('files/general_emoji.json', closure(@value) {
 })
 
 # 서버 이동중으로 인식할 플레이어 목록
-@reconnectable_players = array()
+@reconnecting_datas = array()
 
 # 플레이어 개인 데이터
 @players_data = array()
