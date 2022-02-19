@@ -43,10 +43,10 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards) {
         if(array_index_exists(@mob_reward, 'arcanelevel')) {
           @location = entity_loc(@id)
           if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
-            _add_arcanelevel_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
-            _add_arcanelevel_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+            _drop_randed_arcanelevel_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+            _drop_randed_arcanelevel_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
           } else {
-            _add_arcanelevel_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+            _drop_randed_arcanelevel_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
           }
         }
         

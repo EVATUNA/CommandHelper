@@ -243,3 +243,111 @@ register_command('tunalevelrand', array(
     }
   }
 ))
+
+
+# 레벨 HUDs
+proc _replace_arcanelevel_text(@arcanelevel) {
+  @background = replace(
+    replace(
+      replace(
+        replace(
+          replace(
+            replace(
+              replace(
+                replace(
+                  replace(
+                    replace(
+                      @arcanelevel, '0', '\uf802\uef30\uf801'
+                    ), '1', '\uf802\uef31\uf801'
+                  ), '2', '\uf802\uef32\uf801'
+                ), '3', '\uf802\uef33\uf801'
+              ), '4', '\uf802\uef34\uf801'
+            ), '5', '\uf802\uef35\uf801'
+          ), '6', '\uf802\uef36\uf801'
+        ), '7', '\uf802\uef37\uf801'
+      ), '8', '\uf802\uef38\uf801'
+    ), '9', '\uf802\uef39\uf801'
+  )
+  @text = replace(
+    replace(
+      replace(
+        replace(
+          replace(
+            replace(
+              replace(
+                replace(
+                  replace(
+                    replace(
+                      @arcanelevel, '0', '\uef20\uf801'
+                    ), '1', '\uef21\uf801'
+                  ), '2', '\uef22\uf801'
+                ), '3', '\uef23\uf801'
+              ), '4', '\uef24\uf801'
+            ), '5', '\uef25\uf801'
+          ), '6', '\uef26\uf801'
+        ), '7', '\uef27\uf801'
+      ), '8', '\uef28\uf801'
+    ), '9', '\uef29\uf801'
+  )
+  @nsf = string_multiply('\uF804', length(@arcanelevel))
+  @arcanelevel_text = '\uef3c\uf801'.@background.'\uf801'.@nsf.'\uf808\uf801'.'\uef3b\uf801'.@text
+  return(@arcanelevel_text)
+}
+
+## 아케인 경험치
+proc _show_arcanelevel(@player, @uuid, @text) {
+  # bar
+  @bars = array(
+    '\ueeb0', '\ueeb1', '\ueeb2', '\ueeb3', '\ueeb4', '\ueeb5', '\ueeb6', '\ueeb7', '\ueeb8', '\ueeb9', '\ueeba', '\ueebb', '\ueebc', '\ueebd', '\ueebe', '\ueebf',
+    '\ueec0', '\ueec1', '\ueec2', '\ueec3', '\ueec4', '\ueec5', '\ueec6', '\ueec7', '\ueec8', '\ueec9', '\ueeca', '\ueecb', '\ueecc', '\ueecd', '\ueece', '\ueecf',
+    '\ueed0', '\ueed1', '\ueed2', '\ueed3', '\ueed4', '\ueed5', '\ueed6', '\ueed7', '\ueed8', '\ueed9', '\ueeda', '\ueedb', '\ueedc', '\ueedd', '\ueede', '\ueedf',
+    '\ueee0', '\ueee1', '\ueee2', '\ueee3', '\ueee4', '\ueee5', '\ueee6', '\ueee7', '\ueee8', '\ueee9', '\ueeea', '\ueeeb', '\ueeec', '\ueeed', '\ueeee', '\ueeef',
+    '\ueef0', '\ueef1', '\ueef2', '\ueef3', '\ueef4', '\ueef5', '\ueef6', '\ueef7', '\ueef8', '\ueef9', '\ueefa', '\ueefb', '\ueefc', '\ueefd', '\ueefe', '\ueeff'
+  )
+  @bar_index = integer(pexp(@player) * 0.8)
+  @bar = @bars[@bar_index]
+  
+  # level
+  @arcanelevel_text = _replace_arcanelevel_text(plevel(@player))
+
+  _set_sidebar(@uuid, 6, color('#fd0000').@text['space_fonts']['space.9'].@bar.@text['space_fonts']['space.-83'].@arcanelevel_text, @text)
+}
+
+proc _drop_randed_arcanelevel_experience(@location, @adding_default_experience, @adding_extra_experience) {
+  @points = integer(round(@adding_default_experience + rand() * @adding_extra_experience))
+  if(@points > 0) {
+    spawn_entity('EXPERIENCE_ORB', 1, @location, closure(@euuid) {
+      set_entity_spec(@euuid, array('amount': @points))
+    })
+  }
+}
+
+bind('exp_change', null, null, @event, @text) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+  set_timeout(0, closure() {
+    _show_arcanelevel(@player, @uuid, @text)
+  })
+}
+
+proc _add_randed_arcanelevel_experience(@player, @uuid, @adding_default_experience, @adding_extra_experience, @text) {
+  @points = integer(round(@adding_default_experience + rand() * @adding_extra_experience))
+  if(@points < 0) { @points = 0 }
+  give_pexp(@player, @points)
+  _show_arcanelevel(@player, @uuid, @text)
+  return(@points)
+}
+
+register_command('arcanelevelrand', array(
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    if(array_size(@args) == 3) {
+      @target_name = @args[0]
+      @target_uuid = puuid(@target_name)
+      @adding_default_experience = double(@args[1])
+      @adding_extra_experience = double(@args[2])
+      @points = _add_randed_arcanelevel_experience(@target_name, @target_uuid, @adding_default_experience, @adding_extra_experience, @text)
+      tmsg(@target_name, @text['prefix']['success'] @points.'의 아케인 레벨 경험치를 받았습니다.')
+    }
+  }
+))

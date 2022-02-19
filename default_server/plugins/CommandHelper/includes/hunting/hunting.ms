@@ -237,7 +237,8 @@ if(@server == 'main') {
   }
 
   // 월드 초기화 해서 청크 로딩 해야할시 청크 마스터로 반지금 7500블럭 미리 로드 한 후에 청크 불러와야함 
-  // _update_chunks_info(0, 0, 450, true, true)
+  //_update_chunks_info(0, 0, 450, true, true)
+  //queue_clear('update_chunk')
 
   # 바이옴별 청크 저장
   @biomes = array()

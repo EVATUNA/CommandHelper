@@ -250,10 +250,10 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
         }
         # 경험치 드랍
         if(@player_data['item']['enchantments']['main_hand'] == '경험') {
-          _add_arcanelevel_experience(@location, @mineral_reward['arcanelevel']['default'], @mineral_reward['arcanelevel']['extra'])
-          _add_arcanelevel_experience(@location, @mineral_reward['arcanelevel']['default'], @mineral_reward['arcanelevel']['extra'])
+          _drop_randed_arcanelevel_experience(@location, @mineral_reward['arcanelevel']['default'], @mineral_reward['arcanelevel']['extra'])
+          _drop_randed_arcanelevel_experience(@location, @mineral_reward['arcanelevel']['default'], @mineral_reward['arcanelevel']['extra'])
         } else {
-          _add_arcanelevel_experience(@location, @mineral_reward['arcanelevel']['default'], @mineral_reward['arcanelevel']['extra'])
+          _drop_randed_arcanelevel_experience(@location, @mineral_reward['arcanelevel']['default'], @mineral_reward['arcanelevel']['extra'])
         }
         # 튜나레벨
         _add_randed_tunalevel_experience(@uuid, @player_data, @mineral_reward['tunalevel']['default'], @mineral_reward['tunalevel']['extra'], @text)

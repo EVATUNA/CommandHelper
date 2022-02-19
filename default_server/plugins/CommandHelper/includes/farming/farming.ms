@@ -136,10 +136,10 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
             }
             # 경험치 드랍
             if(@player_data['item']['enchantments']['main_hand'] == '경험') {
-              _add_arcanelevel_experience(@center_location, @crop_reward['arcanelevel']['default'], @crop_reward['arcanelevel']['extra'])
-              _add_arcanelevel_experience(@center_location, @crop_reward['arcanelevel']['default'], @crop_reward['arcanelevel']['extra'])
+              _drop_randed_arcanelevel_experience(@center_location, @crop_reward['arcanelevel']['default'], @crop_reward['arcanelevel']['extra'])
+              _drop_randed_arcanelevel_experience(@center_location, @crop_reward['arcanelevel']['default'], @crop_reward['arcanelevel']['extra'])
             } else {
-              _add_arcanelevel_experience(@center_location, @crop_reward['arcanelevel']['default'], @crop_reward['arcanelevel']['extra'])
+              _drop_randed_arcanelevel_experience(@center_location, @crop_reward['arcanelevel']['default'], @crop_reward['arcanelevel']['extra'])
             }
             # 튜나레벨
             _add_randed_tunalevel_experience(@uuid, @player_data, @crop_reward['tunalevel']['default'], @crop_reward['tunalevel']['extra'], @text)
@@ -269,10 +269,10 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
               }
               # 경험치 드랍
               if(@player_data['item']['enchantments']['main_hand'] == '경험') {
-                _add_arcanelevel_experience(@location, @crop_reward['arcanelevel']['default'], @crop_reward['arcanelevel']['extra'])
-                _add_arcanelevel_experience(@location, @crop_reward['arcanelevel']['default'], @crop_reward['arcanelevel']['extra'])
+                _drop_randed_arcanelevel_experience(@location, @crop_reward['arcanelevel']['default'], @crop_reward['arcanelevel']['extra'])
+                _drop_randed_arcanelevel_experience(@location, @crop_reward['arcanelevel']['default'], @crop_reward['arcanelevel']['extra'])
               } else {
-                _add_arcanelevel_experience(@location, @crop_reward['arcanelevel']['default'], @crop_reward['arcanelevel']['extra'])
+                _drop_randed_arcanelevel_experience(@location, @crop_reward['arcanelevel']['default'], @crop_reward['arcanelevel']['extra'])
               }
               # 튜나레벨
               _add_randed_tunalevel_experience(@uuid, @player_data, @crop_reward['tunalevel']['default'], @crop_reward['tunalevel']['extra'], @text)

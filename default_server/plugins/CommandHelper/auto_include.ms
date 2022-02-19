@@ -518,17 +518,6 @@ proc _summon_mythicmob(@name, @count, @location) {
   runas('~console', "/mm mobs spawn @name @count @world,@x,@y,@z")
 }
 
-
-# 바닐라 경험치 주기
-proc _add_arcanelevel_experience(@location, @adding_default_experience, @adding_extra_experience) {
-  @xp = integer(round(@adding_default_experience + rand() * @adding_extra_experience))
-    if(@xp > 0) {
-      spawn_entity('EXPERIENCE_ORB', 1, @location, closure(@euuid) {
-        set_entity_spec(@euuid, array('amount': @xp))
-      })
-    }
-}
-
 # 상점 리코딩 후 제거 예정
 array proc _clone(array @arr) { return(array_deep_clone(@arr)) }
 boolean proc _existsGui(string @guiid) { return(array_contains(get_virtual_inventories(), @guiid)) }
