@@ -1,5 +1,8 @@
 ### Includes
 
+# 아이템 관리 시스템
+include('includes/item/item.ms')
+
 # 스킬 시스템
 include('includes/skill/skill.ms')
 

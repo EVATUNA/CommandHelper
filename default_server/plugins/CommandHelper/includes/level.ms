@@ -218,7 +218,7 @@ register_command('tunalevel', array(
 ))
 
 # 튜나레벨 랜덤 커맨드
-proc _add_randed_tunalevel_experience(@uuid, @player_data, @adding_default_experience, @adding_extra_experience, @text) {
+proc _give_tunalevel_random_experience(@uuid, @player_data, @adding_default_experience, @adding_extra_experience, @text) {
   @points = integer(round(@adding_default_experience + rand() * @adding_extra_experience))
   if(@points < 0) { @points = 0 }
   @adding_tunalevel_data = array(
@@ -238,7 +238,7 @@ register_command('tunalevelrand', array(
       @player_data = @players_data[@target_uuid]
       @adding_default_experience = double(@args[1])
       @adding_extra_experience = double(@args[2])
-      @points = _add_randed_tunalevel_experience(@target_uuid, @player_data, @adding_default_experience, @adding_extra_experience, @text)
+      @points = _give_tunalevel_random_experience(@target_uuid, @player_data, @adding_default_experience, @adding_extra_experience, @text)
       tmsg(@target_name, @text['prefix']['success'] @points.'의 튜나 레벨 경험치를 받았습니다.')
     }
   }
@@ -313,7 +313,7 @@ proc _show_arcanelevel(@player, @uuid, @text) {
   _set_sidebar(@uuid, 6, color('#fd0000').@text['space_fonts']['space.9'].@bar.@text['space_fonts']['space.-83'].@arcanelevel_text, @text)
 }
 
-proc _drop_randed_arcanelevel_experience(@location, @adding_default_experience, @adding_extra_experience) {
+proc _drop_arcanelevel_random_experience(@location, @adding_default_experience, @adding_extra_experience) {
   @points = integer(round(@adding_default_experience + rand() * @adding_extra_experience))
   if(@points > 0) {
     spawn_entity('EXPERIENCE_ORB', 1, @location, closure(@euuid) {
@@ -330,7 +330,7 @@ bind('exp_change', null, null, @event, @text) {
   })
 }
 
-proc _add_randed_arcanelevel_experience(@player, @uuid, @adding_default_experience, @adding_extra_experience, @text) {
+proc _give_arcanelevel_random_experience(@player, @uuid, @adding_default_experience, @adding_extra_experience, @text) {
   @points = integer(round(@adding_default_experience + rand() * @adding_extra_experience))
   if(@points < 0) { @points = 0 }
   give_pexp(@player, @points)
@@ -346,7 +346,7 @@ register_command('arcanelevelrand', array(
       @target_uuid = puuid(@target_name)
       @adding_default_experience = double(@args[1])
       @adding_extra_experience = double(@args[2])
-      @points = _add_randed_arcanelevel_experience(@target_name, @target_uuid, @adding_default_experience, @adding_extra_experience, @text)
+      @points = _give_arcanelevel_random_experience(@target_name, @target_uuid, @adding_default_experience, @adding_extra_experience, @text)
       tmsg(@target_name, @text['prefix']['success'] @points.'의 아케인 레벨 경험치를 받았습니다.')
     }
   }

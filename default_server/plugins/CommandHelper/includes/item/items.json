@@ -1,0 +1,87 @@
+{
+  "arcane_essence": {
+    "arcane_essence_1": {
+      "name": "EXPERIENCE_BOTTLE",
+      "meta": {
+        "model": 1,
+        "display": "§b희미한 마법의 정수",
+        "lore": [
+          "§7그냥 물약처럼 보일 정도로,",
+          "§7집중해야 그 마법을 느낄수 있습니다.",
+          "",
+          "§7마법 작업대를 사용하여",
+          "§7마법을 부여할 수 있습니다."
+        ]
+      }
+    },
+    "arcane_essence_2": {
+      "name": "EXPERIENCE_BOTTLE",
+      "meta": {
+        "model": 2,
+        "display": "§b미약한 마법의 정수",
+        "lore": [
+          "§7미약하지만 흘러나오는 마법은",
+          "§7충분히 느낄 수 있습니다.",
+          "",
+          "§7마법 작업대를 사용하여",
+          "§7마법을 부여할 수 있습니다."
+        ]
+      }
+    },
+    "arcane_essence_3": {
+      "name": "EXPERIENCE_BOTTLE",
+      "meta": {
+        "model": 3,
+        "display": "§b농축된 마법의 정수",
+        "lore": [
+          "§7잘 만들어진 마법의 정수입니다.",
+          "",
+          "§7마법 작업대를 사용하여",
+          "§7마법을 부여할 수 있습니다."
+        ]
+      }
+    },
+    "arcane_essence_4": {
+      "name": "EXPERIENCE_BOTTLE",
+      "meta": {
+        "model": 4,
+        "display": "§b강력한 마법의 정수",
+        "lore": [
+          "§7강대한 마법이 흘러나오고 있습니다.",
+          "",
+          "§7마법 작업대를 사용하여",
+          "§7마법을 부여할 수 있습니다."
+        ]
+      }
+    },
+    "arcane_essence_5": {
+      "name": "EXPERIENCE_BOTTLE",
+      "meta": {
+        "model": 5,
+        "display": "§b찬란한 마법의 정수",
+        "lore": [
+          "§7폭발할듯한 마력이 흘러나오고 있습니다,",
+          "",
+          "§7마법 작업대를 사용하여",
+          "§7마법을 부여할 수 있습니다."
+        ]
+      }
+    },
+    "arcane_essence_6": {
+      "name": "EXPERIENCE_BOTTLE",
+      "meta": {
+        "model": 6,
+        "display": "§b빛나는 마법의 정수",
+        "lore": [
+          "§7빛나는 마력이 흘러나오고 있습니다,",
+          "",
+          "§7마법 작업대를 사용하여",
+          "§7마법을 부여할 수 있습니다."
+        ]
+      }
+    }
+  },
+  "crafting": {},
+  "scroll": {},
+  "rune": {}
+}

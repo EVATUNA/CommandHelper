@@ -220,7 +220,6 @@ proc _ask_using_skill_reset_scroll(@player, @uuid, @item, @players_data, @skills
   @inventory[1] = @item
   @inventory[5]['meta']['display'] = '§a네'
   @inventory[7]['meta']['display'] = '§c아니요'
-  _reset_skills(@players_data, @player, @uuid, @skills_spec)
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @item, @players_data, @skills_spec, @text) {
     bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @item, @players_data, @skills_spec, @text) {
       cancel()

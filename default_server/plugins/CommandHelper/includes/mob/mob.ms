@@ -43,16 +43,16 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards) {
         if(array_index_exists(@mob_reward, 'arcanelevel')) {
           @location = entity_loc(@id)
           if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
-            _drop_randed_arcanelevel_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
-            _drop_randed_arcanelevel_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+            _drop_arcanelevel_random_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+            _drop_arcanelevel_random_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
           } else {
-            _drop_randed_arcanelevel_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+            _drop_arcanelevel_random_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
           }
         }
         
         # 튜나레벨 주기
         if(array_index_exists(@mob_reward, 'tunalevel')) {
-          _add_randed_tunalevel_experience(@uuid, @player_data, @mob_reward['tunalevel']['default'], @mob_reward['tunalevel']['extra'], @text)
+          _give_tunalevel_random_experience(@uuid, @player_data, @mob_reward['tunalevel']['default'], @mob_reward['tunalevel']['extra'], @text)
         }
 
         # 비법서 드랍

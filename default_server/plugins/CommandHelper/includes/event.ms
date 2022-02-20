@@ -2149,7 +2149,19 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       #case 'CARTOGRAPHY_TABLE':
       #case 'CHEST':
       #case 'COMPARATOR':
-      #case 'COMPOSTER': // 조건적 반응 (꽉 차있어서 뺫가루 얻어낼 수 있을시)
+      case 'BEE_NEST':
+      case 'BEEHIVE':
+      case 'CAULDRON':
+      case 'WATER_CAULDRON':
+      case 'LAVA_CAULDRON':
+      case 'POWER_SNOW_CAULDRON':
+      case 'COMPOSTER': // 조건적 반응 (꽉 차있어서 뺫가루 얻어낼 수 있을시)
+      case 'CAMPFIRE':
+      case 'SOUL_CAMPFIRE':
+      case 'REDSTONE_WIRE': // 조건적 ()
+      case 'PUMPKIN':
+        // 아이템 사용시 위의 블럭들은 상호작용이 없음으로 간주함
+        break()
       #case 'CRAFTING_TABLE':
       #case 'DAYLIGHT_DETECTOR':
       #case 'DISPENSER':
@@ -2168,7 +2180,9 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       #case 'STONECUTTER':
       #case 'TRAPPED_CHEST':
       default:
-        if(material_info(@event['block'], 'isInteractable')) {
+        if(string_ends_with(@event['block'], '_BED')) {
+          //cancel()
+        } else if(material_info(@event['block'], 'isInteractable') && !string_ends_with(@event['block'], '_STAIRS') && !string_ends_with(@event['block'], '_FENCE') && !string_ends_with(@event['block'], '_CANDLE')) {
           if(!psneaking(@player)) {
             if(@is_item_available) {
               @is_item_available = false
