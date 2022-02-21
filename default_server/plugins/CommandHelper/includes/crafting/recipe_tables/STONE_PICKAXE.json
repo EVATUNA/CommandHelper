@@ -1,28 +1,6 @@
 {
 	"recipe": {
-		"key": "blackstone_pickaxe",
-		"type": "SHAPED",
-		"group": "stone_pickaxes",
-		"result": {
-			"name": "WOODEN_PICKAXE",
-			"meta": {
-				"display": "§f흑암 곡괭이",
-				"model": 9,
-				"lore": [
-					"§7쉬프트 클릭으로 조합할 수 없습니다."
-				],
-				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
-			}
-		},
-		"shape": [
-			"PPP",
-			" S ",
-			" S "
-		],
-		"ingredients": {
-			"P": "BLACKSTONE",
-			"S": "STICK"
-		},
+		"result": "STONE_PICKAXE",
 		"ingredients_weight": {
 		}
 	},
@@ -31,18 +9,97 @@
 		"entries": [
 			{
 				"type": "rank",
+				"alt_name": "WOODEN_PICKAXE",
 				"weight": 5,
-				"display": "부서질듯한 흑암 곡괭이",
-				"model": 9,
+				"display": "부서질듯한 돌 곡괭이",
+				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 9.504,
-						"max": 9.504
+						"min": 2.592,
+						"max": 2.592
 					},
 					"attack_speed": {
 						"min": 2.0,
 						"max": 2.5
 					},
+					"mining_power": {
+						"min": 2.0,
+						"max": 2.3
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"alt_name": "WOODEN_PICKAXE",
+				"weight": 10,
+				"display": "의미를 알 수 없는 돌 곡괭이",
+				"model": 8,
+				"attributes": {
+					"attack_damage": {
+						"min": 2.592,
+						"max": 2.689
+					},
+					"attack_speed": {
+						"min": 2.0,
+						"max": 2.5
+					},
+					"mining_power": {
+						"min": 2.1,
+						"max": 2.4
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"alt_name": "WOODEN_PICKAXE",
+				"weight": 10,
+				"display": "제 기능을 하기 힘든 돌 곡괭이",
+				"model": 8,
+				"attributes": {
+					"attack_damage": {
+						"min": 2.657,
+						"max": 2.851
+					},
+					"attack_speed": {
+						"min": 2.0,
+						"max": 2.5
+					},
+					"mining_power": {
+						"min": 2.2,
+						"max": 2.5
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"alt_name": "WOODEN_PICKAXE",
+				"weight": 25,
+				"display": "무딘 돌 곡괭이",
+				"model": 8,
+				"attributes": {
+					"attack_damage": {
+						"min": 2.786,
+						"max": 3.078
+					},
+					"attack_speed": 2.5,
+					"mining_power": {
+						"min": 2.3,
+						"max": 2.6
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"alt_name": "WOODEN_PICKAXE",
+				"weight": 35,
+				"display": "무난한 돌 곡괭이",
+				"model": 8,
+				"attributes": {
+					"attack_damage": {
+						"min": 2.981,
+						"max": 3.370
+					},
+					"attack_speed": 2.5,
 					"mining_power": {
 						"min": 2.5,
 						"max": 2.8
@@ -51,38 +108,17 @@
 			},
 			{
 				"type": "rank",
-				"weight": 10,
-				"display": "의미를 알 수 없는 흑암 곡괭이",
-				"model": 9,
+				"alt_name": "WOODEN_PICKAXE",
+				"weight": 30,
+				"quality": 0,
+				"display": "평범한 돌 곡괭이",
+				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 9.504,
-						"max": 9.860
+						"min": 3.110,
+						"max": 3.499
 					},
-					"attack_speed": {
-						"min": 2.0,
-						"max": 2.5
-					},
-					"mining_power": {
-						"min": 2.6,
-						"max": 2.9
-					}
-				}
-			},
-			{
-				"type": "rank",
-				"weight": 10,
-				"display": "제 기능을 하기 힘든 흑암 곡괭이",
-				"model": 9,
-				"attributes": {
-					"attack_damage": {
-						"min": 9.742,
-						"max": 10.454
-					},
-					"attack_speed": {
-						"min": 2.0,
-						"max": 2.5
-					},
+					"attack_speed": 2.5,
 					"mining_power": {
 						"min": 2.7,
 						"max": 3.0
@@ -91,118 +127,70 @@
 			},
 			{
 				"type": "rank",
-				"weight": 25,
-				"display": "무딘 흑암 곡괭이",
-				"model": 9,
-				"attributes": {
-					"attack_damage": {
-						"min": 10.217,
-						"max": 11.286
-					},
-					"attack_speed": 2.5,
-					"mining_power": {
-						"min": 2.8,
-						"max": 3.1
-					}
-				}
-			},
-			{
-				"type": "rank",
-				"weight": 35,
-				"display": "무난한 흑암 곡괭이",
-				"model": 9,
-				"attributes": {
-					"attack_damage": {
-						"min": 10.930,
-						"max": 12.355
-					},
-					"attack_speed": 2.5,
-					"mining_power": {
-						"min": 3.0,
-						"max": 3.3
-					}
-				}
-			},
-			{
-				"type": "rank",
+				"alt_name": "WOODEN_PICKAXE",
 				"weight": 30,
 				"quality": 0,
-				"display": "평범한 흑암 곡괭이",
-				"model": 9,
+				"display": "쓸만한 돌 곡괭이",
+				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 11.405,
-						"max": 12.830
+						"min": 3.402,
+						"max": 3.694
 					},
 					"attack_speed": 2.5,
 					"mining_power": {
-						"min": 3.2,
-						"max": 3.5
+						"min": 2.9,
+						"max": 3.2
 					}
 				}
 			},
 			{
 				"type": "rank",
+				"alt_name": "WOODEN_PICKAXE",
 				"weight": 30,
-				"quality": 0,
-				"display": "쓸만한 흑암 곡괭이",
-				"model": 9,
+				"display": "잘 만들어진 돌 곡괭이",
+				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 12.474,
-						"max": 13.543
+						"min": 3.629,
+						"max": 3.823
 					},
 					"attack_speed": 2.5,
 					"mining_power": {
-						"min": 3.4,
-						"max": 3.7
+						"min": 3.1,
+						"max": 3.4
 					}
 				}
 			},
 			{
 				"type": "rank",
-				"weight": 30,
-				"display": "잘 만들어진 흑암 곡괭이",
-				"model": 9,
-				"attributes": {
-					"attack_damage": {
-						"min": 13.306,
-						"max": 14.018
-					},
-					"attack_speed": 2.5,
-					"mining_power": {
-						"min": 3.6,
-						"max": 3.9
-					}
-				}
-			},
-			{
-				"type": "rank",
+				"alt_name": "WOODEN_PICKAXE",
 				"weight": 20,
-				"display": "예사롭지 않은 흑암 곡괭이",
-				"model": 9,
+				"display": "예사롭지 않은 돌 곡괭이",
+				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 13.900,
-						"max": 14.256
+						"min": 3.791,
+						"max": 3.888
 					},
 					"attack_speed": 2.5,
 					"mining_power": {
-						"min": 3.8,
-						"max": 4.1
+						"min": 3.3,
+						"max": 3.6
 					}
 				}
 			},
 			{
 				"type": "rank",
+				"alt_name": "WOODEN_PICKAXE",
 				"weight": 1,
-				"display": "전설적인 흑암 곡괭이",
-				"model": 9,
+				"display": "전설적인 돌 곡괭이",
+				"model": 8,
 				"broadcast": true,
 				"attributes": {
-					"attack_damage": 14.256,
+					"attack_damage": 3.888,
 					"attack_speed": 2.5,
-					"mining_power": 4.5
+					"mining_power": 4
 				}
 			}
 		]

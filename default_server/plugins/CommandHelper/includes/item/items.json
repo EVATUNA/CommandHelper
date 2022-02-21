@@ -81,7 +81,637 @@
       }
     }
   },
-  "crafting": {},
+  "crafting": {
+    "가죽 조끼": {
+			"name": "LEATHER_BOOTS",
+			"meta": {
+				"display": "§f가죽 조끼",
+				"model": 0,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "구리 검": {
+			"name": "STONE_SWORD",
+			"meta": {
+				"display": "§f구리 검",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "구리 곡괭이": {
+			"name": "STONE_PICKAXE",
+			"meta": {
+				"display": "§f구리 곡괭이",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "구리 괭이": {
+			"name": "STONE_HOE",
+			"meta": {
+				"display": "§f구리 괭이",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "구리 도끼": {
+			"name": "STONE_AXE",
+			"meta": {
+				"display": "§f구리 도끼",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "구리 물뿌리개": {
+			"name": "BUCKET",
+			"meta": {
+				"display": "§f구리 물뿌리개",
+				"model": 0,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "구리 삽": {
+			"name": "STONE_SHOVEL",
+			"meta": {
+				"display": "§f구리 삽",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "구리 흉갑": {
+			"name": "CHAINMAIL_BOOTS",
+			"meta": {
+				"display": "§f구리 흉갑",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "금 검": {
+			"name": "GOLDEN_SWORD",
+			"meta": {
+				"display": "§f금 검",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "금 곡괭이": {
+			"name": "GOLDEN_PICKAXE",
+			"meta": {
+				"display": "§f금 곡괭이",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "금 괭이": {
+			"name": "GOLDEN_HOE",
+			"meta": {
+				"display": "§f금 괭이",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "금 도끼": {
+			"name": "GOLDEN_AXE",
+			"meta": {
+				"display": "§f금 도끼",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "금 물뿌리개": {
+			"name": "BUCKET",
+			"meta": {
+				"display": "§f금 물뿌리개",
+				"model": 2,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "금 삽": {
+			"name": "GOLDEN_SHOVEL",
+			"meta": {
+				"display": "§f금 삽",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "금 흉갑": {
+			"name": "GOLDEN_BOOTS",
+			"meta": {
+				"display": "§f금 흉갑",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "WOODEN_SWORD": {
+			"name": "WOODEN_SWORD",
+			"meta": {
+				"display": "§f나무 검",
+				"model": 0,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "WOODEN_PICKAXE": {
+			"name": "WOODEN_PICKAXE",
+			"meta": {
+				"display": "§f나무 곡괭이",
+				"model": 0,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "WOODEN_HOE": {
+			"name": "WOODEN_HOE",
+			"meta": {
+				"display": "§f나무 괭이",
+				"model": 0,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "WOODEN_AXE": {
+			"name": "WOODEN_AXE",
+			"meta": {
+				"display": "§f나무 도끼",
+				"model": 0,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "WOODEN_SHOVEL": {
+			"name": "WOODEN_SHOVEL",
+			"meta": {
+				"display": "§f나무 삽",
+				"model": 0,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "네더라이트 검": {
+			"name": "NETHERITE_SWORD",
+			"meta": {
+				"display": "§f네더라이트 검",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "네더라이트 곡괭이": {
+			"name": "NETHERITE_PICKAXE",
+			"meta": {
+				"display": "§f네더라이트 곡괭이",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "네더라이트 괭이": {
+			"name": "NETHERITE_HOE",
+			"meta": {
+				"display": "§f네더라이트 괭이",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "네더라이트 도끼": {
+			"name": "NETHERITE_AXE",
+			"meta": {
+				"display": "§f네더라이트 도끼",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "네더라이트 물뿌리개": {
+			"name": "BUCKET",
+			"meta": {
+				"display": "§f네더라이트 물뿌리개",
+				"model": 4,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "네더라이트 삽": {
+			"name": "NETHERITE_SHOVEL",
+			"meta": {
+				"display": "§f네더라이트 삽",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "네더라이트 주괴": {
+			"name": "NETHERITE_INGOT",
+			"meta": {
+				"display": "§f네더라이트 주괴",
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "네더라이트 흉갑": {
+			"name": "NETHERITE_BOOTS",
+			"meta": {
+				"display": "§f네더라이트 흉갑",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "다이아몬드 검": {
+			"name": "DIAMOND_SWORD",
+			"meta": {
+				"display": "§f다이아몬드 검",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "다이아몬드 곡괭이": {
+			"name": "DIAMOND_PICKAXE",
+			"meta": {
+				"display": "§f다이아몬드 곡괭이",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "다이아몬드 괭이": {
+			"name": "DIAMOND_HOE",
+			"meta": {
+				"display": "§f다이아몬드 괭이",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "다이아몬드 도끼": {
+			"name": "DIAMOND_AXE",
+			"meta": {
+				"display": "§f다이아몬드 도끼",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "다이아몬드 물뿌리개": {
+			"name": "BUCKET",
+			"meta": {
+				"display": "§f다이아몬드 물뿌리개",
+				"model": 3,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "다이아몬드 삽": {
+			"name": "DIAMOND_SHOVEL",
+			"meta": {
+				"display": "§f다이아몬드 삽",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "다이아몬드 흉갑": {
+			"name": "DIAMOND_BOOTS",
+			"meta": {
+				"display": "§f다이아몬드 흉갑",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "STONE_SWORD": {
+			"name": "WOODEN_SWORD",
+			"meta": {
+				"display": "§f돌 검",
+				"model": 1,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "STONE_PICKAXE": {
+			"name": "WOODEN_PICKAXE",
+			"meta": {
+				"display": "§f돌 곡괭이",
+				"model": 1,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "STONE_HOE": {
+			"name": "WOODEN_HOE",
+			"meta": {
+				"display": "§f돌 괭이",
+				"model": 1,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "STONE_AXE": {
+			"name": "WOODEN_AXE",
+			"meta": {
+				"display": "§f돌 도끼",
+				"model": 1,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "STONE_SHOVEL": {
+			"name": "WOODEN_SHOVEL",
+			"meta": {
+				"display": "§f돌 삽",
+				"model": 1,
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "삼지창": {
+			"name": "TRIDENT",
+			"meta": {
+				"display": "§f삼지창",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"],
+				"enchants": {
+					"loyalty": {
+						"elevel": 5,
+						"etype": "LOYALTY"
+					}
+				}
+			}
+		},
+    "철 검": {
+			"name": "IRON_SWORD",
+			"meta": {
+				"display": "§f철 검",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "철 곡괭이": {
+			"name": "IRON_PICKAXE",
+			"meta": {
+				"display": "§f철 곡괭이",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "철 괭이": {
+			"name": "IRON_HOE",
+			"meta": {
+				"display": "§f철 괭이",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "철 도끼": {
+			"name": "IRON_AXE",
+			"meta": {
+				"display": "§f철 도끼",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "철 삽": {
+			"name": "IRON_SHOVEL",
+			"meta": {
+				"display": "§f철 삽",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "철 흉갑": {
+			"name": "IRON_BOOTS",
+			"meta": {
+				"display": "§f철 흉갑",
+				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "쉬프트 클릭으로 조합할 수 없습니다.": {
+			"name": "COMPASS",
+			"meta": {
+        "model": 1,
+				"display": "§f추적기",
+				"lore": [
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		}
+  },
   "scroll": {},
   "rune": {}
 }

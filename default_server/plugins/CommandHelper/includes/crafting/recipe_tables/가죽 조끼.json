@@ -2,17 +2,7 @@
 	"recipe": {
 		"key": "leather_boots",
 		"type": "SHAPED",
-		"result": {
-			"name": "LEATHER_BOOTS",
-			"meta": {
-				"display": "§f가죽 조끼",
-				"model": 0,
-				"lore": [
-					"§7쉬프트 클릭으로 조합할 수 없습니다."
-				],
-				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
-			}
-		},
+		"result": "가죽 조끼",
 		"shape": [
 			"O O",
 			"OOO",

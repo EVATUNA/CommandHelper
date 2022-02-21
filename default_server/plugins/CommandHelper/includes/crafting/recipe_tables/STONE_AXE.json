@@ -1,28 +1,6 @@
 {
 	"recipe": {
-		"key": "spruce_shovel",
-		"type": "SHAPED",
-		"group": "wooden_shovels",
-		"result": {
-			"name": "WOODEN_SHOVEL",
-			"meta": {
-				"display": "§f짙은 참나무 삽",
-				"model": 1,
-				"lore": [
-					"§7쉬프트 클릭으로 조합할 수 없습니다."
-				],
-				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
-			}
-		},
-		"shape": [
-			"P",
-			"S",
-			"S"
-		],
-		"ingredients": {
-			"P": "SPRUCE_PLANKS",
-			"S": "STICK"
-		},
+		"result": "STONE_AXE",
 		"ingredients_weight": {
 		}
 	},
@@ -31,13 +9,14 @@
 		"entries": [
 			{
 				"type": "rank",
+				"alt_name": "WOODEN_AXE",
 				"weight": 5,
-				"display": "부서질듯한 짙은 참나무 삽",
-				"model": 1,
+				"display": "부서질듯한 돌 도끼",
+				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 2.240,
-						"max": 2.240
+						"min": 3.600,
+						"max": 3.600
 					},
 					"attack_speed": {
 						"min": 1.5,
@@ -47,13 +26,14 @@
 			},
 			{
 				"type": "rank",
+				"alt_name": "WOODEN_AXE",
 				"weight": 10,
-				"display": "의미를 알 수 없는 짙은 참나무 삽",
-				"model": 1,
+				"display": "의미를 알 수 없는 돌 도끼",
+				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 2.240,
-						"max": 2.324
+						"min": 3.600,
+						"max": 3.735
 					},
 					"attack_speed": {
 						"min": 1.5,
@@ -63,13 +43,14 @@
 			},
 			{
 				"type": "rank",
+				"alt_name": "WOODEN_AXE",
 				"weight": 10,
-				"display": "제 기능을 하기 힘든 짙은 참나무 삽",
-				"model": 1,
+				"display": "제 기능을 하기 힘든 돌 도끼",
+				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 2.296,
-						"max": 2.464
+						"min": 3.690,
+						"max": 3.960
 					},
 					"attack_speed": {
 						"min": 1.5,
@@ -79,92 +60,99 @@
 			},
 			{
 				"type": "rank",
+				"alt_name": "WOODEN_AXE",
 				"weight": 25,
-				"display": "무딘 짙은 참나무 삽",
-				"model": 1,
+				"display": "무딘 돌 도끼",
+				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 2.408,
-						"max": 2.660
+						"min": 3.870,
+						"max": 4.275
 					},
 					"attack_speed": 2
 				}
 			},
 			{
 				"type": "rank",
+				"alt_name": "WOODEN_AXE",
 				"weight": 35,
-				"display": "무난한 짙은 참나무 삽",
-				"model": 1,
+				"display": "무난한 돌 도끼",
+				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 2.576,
-						"max": 2.912
+						"min": 4.140,
+						"max": 4.680
 					},
 					"attack_speed": 2
 				}
 			},
 			{
 				"type": "rank",
+				"alt_name": "WOODEN_AXE",
 				"weight": 30,
 				"quality": 0,
-				"display": "평범한 짙은 참나무 삽",
-				"model": 1,
+				"display": "평범한 돌 도끼",
+				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 2.688,
-						"max": 3.024
+						"min": 4.320,
+						"max": 4.860
 					},
 					"attack_speed": 2
 				}
 			},
 			{
 				"type": "rank",
+				"alt_name": "WOODEN_AXE",
 				"weight": 30,
 				"quality": 0,
-				"display": "쓸만한 짙은 참나무 삽",
-				"model": 1,
+				"display": "쓸만한 돌 도끼",
+				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 2.940,
-						"max": 3.192
+						"min": 4.725,
+						"max": 5.130
 					},
 					"attack_speed": 2
 				}
 			},
 			{
 				"type": "rank",
+				"alt_name": "WOODEN_AXE",
 				"weight": 30,
-				"display": "잘 만들어진 짙은 참나무 삽",
-				"model": 1,
+				"display": "잘 만들어진 돌 도끼",
+				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.136,
-						"max": 3.304
+						"min": 5.040,
+						"max": 5.310
 					},
 					"attack_speed": 2
 				}
 			},
 			{
 				"type": "rank",
+				"alt_name": "WOODEN_AXE",
 				"weight": 20,
-				"display": "예사롭지 않은 짙은 참나무 삽",
-				"model": 1,
+				"display": "예사롭지 않은 돌 도끼",
+				"model": 8,
 				"attributes": {
 					"attack_damage": {
-						"min": 3.276,
-						"max": 3.360
+						"min": 5.265,
+						"max": 5.400
 					},
 					"attack_speed": 2
 				}
 			},
 			{
 				"type": "rank",
+				"alt_name": "WOODEN_AXE",
 				"weight": 1,
-				"display": "전설적인 짙은 참나무 삽",
-				"model": 1,
+				"display": "전설적인 돌 도끼",
+				"model": 8,
 				"broadcast": true,
 				"attributes": {
-					"attack_damage": 3.360,
+					"attack_damage": 5.400,
 					"attack_speed": 2
 				}
 			}

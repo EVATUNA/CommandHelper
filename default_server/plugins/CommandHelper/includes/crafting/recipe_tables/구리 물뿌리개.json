@@ -2,17 +2,7 @@
 	"recipe": {
 		"key": "copper_watering_can",
 		"type": "SHAPED",
-		"result": {
-			"name": "BUCKET",
-			"meta": {
-				"display": "§f구리 물뿌리개",
-				"model": 1,
-				"lore": [
-					"§7쉬프트 클릭으로 조합할 수 없습니다."
-				],
-				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
-			}
-		},
+		"result": "구리 물뿌리개",
 		"shape": [
 			"I I",
 			" I "

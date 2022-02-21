@@ -2,17 +2,7 @@
 	"recipe": {
 		"key": "normal_tracker",
 		"type": "SHAPED",
-		"result": {
-			"name": "COMPASS",
-			"meta": {
-        "model": 1,
-				"display": "§f추적기",
-				"lore": [
-					"§7쉬프트 클릭으로 조합할 수 없습니다."
-				],
-				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
-			}
-		},
+		"result": "추적기",
 		"shape": [
 			" A ",
 			"CWC",

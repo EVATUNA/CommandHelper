@@ -42,3 +42,38 @@ register_command('giveitemrand', array(
     }
   }
 ))
+
+register_command('giveitemone', array(
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    if(array_size(@args) > 2) {
+      @target_name = @args[0]
+      @target_uuid = puuid(@target_name)
+      @category = @args[1]
+      @ch_item_name = array_implode(array_get(@args, cslice(2, array_size(@args) - 1)), ' ')
+      broadcast(@ch_item_name)
+      if(array_index_exists(@ch_items, @category, @ch_item_name)) {
+        pgive_item(@target_name, @ch_items[@category][@ch_item_name])
+      }
+      /*
+      @default_qty = double(@args[3])
+      @extra_qty = double(@args[4])
+      @qty = _give_item_random_qty(@target_name, @category, @ch_item_name, @default_qty, @extra_qty, @ch_items)
+      if(@qty > 0) {
+        @item = @ch_items[@category][@ch_item_name]
+        if(array_index_exists(@item, 'meta', 'display') && @item['meta']['display'] != '') {
+          @item_name = @item['meta']['display']
+        } else {
+          @item_name = @item['name']
+        }
+        @prefix = @text['prefix']['success']
+        if(@qty == 1) {
+          tmsg(@target_name, "@prefix @item_name§f를 받았습니다")
+        } else {
+          tmsg(@target_name, "@prefix @item_name§7(x@qty)§f를 받았습니다")
+        }
+      }
+       */
+    }
+  }
+))

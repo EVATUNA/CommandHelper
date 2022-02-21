@@ -2180,9 +2180,10 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       #case 'STONECUTTER':
       #case 'TRAPPED_CHEST':
       default:
-        if(string_ends_with(@event['block'], '_BED')) {
-          //cancel()
-        } else if(material_info(@event['block'], 'isInteractable') && !string_ends_with(@event['block'], '_STAIRS') && !string_ends_with(@event['block'], '_FENCE') && !string_ends_with(@event['block'], '_CANDLE')) {
+        //if(string_ends_with(@event['block'], '_BED')) {
+        //  //cancel()
+        //} else 
+        if(material_info(@event['block'], 'isInteractable') && !string_ends_with(@event['block'], '_STAIRS') && !string_ends_with(@event['block'], '_FENCE') && !string_ends_with(@event['block'], '_CANDLE')) {
           if(!psneaking(@player)) {
             if(@is_item_available) {
               @is_item_available = false
@@ -3064,6 +3065,7 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text, @s
   }
   # 방어
   if(@event['type'] == 'PLAYER') {
+    //broadcast(entity_type(@event['damager']) @event['amount'] @event['finalamount'])
     @player = @event['player']
     @puuid = @event['id']
     if(array_index_exists(@players_data, @puuid)) {

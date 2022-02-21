@@ -4,7 +4,12 @@ foreach(@file in list_files('recipe_tables')) {
   @item = replace(@file, '.json', '')
   async_read('recipe_tables/'.@file, closure(@data) {
     @craftings[@item] = json_decode(@data)
-    add_recipe(@craftings[@item]['recipe'])
+    @recipe = @craftings[@item]['recipe']
+    @converted_result = @ch_items['crafting'][@recipe['result']]
+    @recipe['result'] = @converted_result
+    if(array_index_exists(@recipe, 'key')) {
+      add_recipe(@recipe)
+    }
   })
 }
 
@@ -42,7 +47,7 @@ proc _get_result_item_rank(@ingredients_weight, @ingredient_items) { #등급있�
   }
 }
 
-proc _get_final_entry_from_first_entry(@entry, @result_item_rank, @luck) {
+proc _get_final_entry_from_entries(@entry, @result_item_rank, @luck) {
   #broadcast(@result_item_rank @luck)
   @type = @entry['type']
   switch(@type) {
@@ -63,7 +68,7 @@ proc _get_final_entry_from_first_entry(@entry, @result_item_rank, @luck) {
         if(@entry['type'] == 'rank') {
           @return = @entry
         } else {
-          @return = _get_final_entry_from_first_entry(@entry, @result_item_rank, @luck)
+          @return = _get_final_entry_from_entries(@entry, @result_item_rank, @luck)
         }
         break()
       } else {
@@ -98,7 +103,7 @@ proc _get_final_entry_from_first_entry(@entry, @result_item_rank, @luck) {
         if(@entry['type'] == 'rank') {
           @return = @entry
         } else {
-          @return = _get_final_entry_from_first_entry(@entry, @result_item_rank, @luck)
+          @return = _get_final_entry_from_entries(@entry, @result_item_rank, @luck)
         }
         break()
       } else {
@@ -166,6 +171,10 @@ proc _get_modified_item(@entry, @item) {
   }
   
   @modified_item = array('name': @item['name'], 'qty': @item['qty'], 'meta': array('flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES')))
+  
+  if(array_index_exists(@entry, 'alt_name')) {
+    @modified_item['name'] = @entry['alt_name']
+  }
   if(array_index_exists(@entry, 'display')) {
     @modified_item['meta']['display'] = '§f'.@entry['display']
   }
@@ -323,25 +332,35 @@ proc _get_modified_item(@entry, @item) {
 }
 
 ## Bind
-bind('inventory_click', array('id': 'crafting'), array('slottype': 'RESULT'), @event, @craftings) {
+bind('inventory_click', array('priority': 'LOWEST', 'id': 'crafting'), array('slottype': 'RESULT'), @event, @craftings) {
   if(@event['inventorytype'] == 'WORKBENCH') {
     @player = @event['player']
     @uuid = puuid(@player)
+
     @inventory = get_inventory(@uuid)
     array_remove(@inventory, 36)
     array_remove(@inventory, 37)
     array_remove(@inventory, 38)
     array_remove(@inventory, 39)
     array_remove(@inventory, 40)
-    @result_item = @event['slotitem'] #조합결과 템
-    if(!is_null(@result_item) && !is_null(@result_item['meta']) && array_index_exists(@result_item['meta'], 'display')) {
-      @item_display = strip_colors(@result_item['meta']['display'])
-      if(array_index_exists(@craftings, @item_display)) {
-        @crafting = @craftings[@item_display]
+
+    @result_item = @event['slotitem']
+
+    if(is_array(@result_item)) {
+      if(array_index_exists(@result_item, 'meta', 'display')) {
+        @result_item_name = strip_colors(@result_item['meta']['display'])
+      } else {
+        @result_item_name = @result_item['name']
+      }
+      if(array_index_exists(@craftings, @result_item_name)) {
+        @crafting = @craftings[@result_item_name]
+
         @recipe = @crafting['recipe']
         @ranking_craftable = false
+
         if(!is_null(@event['cursoritem'])) {
           if(array_contains(array('SHIFT_LEFT', 'SHIFT_RIGHT'), @event['clicktype']) && array_contains(@inventory, null)) {
+            
             cancel()
           } else if(array_contains(array('DROP', 'CONTROL_DROP'), @event['clicktype'])) {
             @ranking_craftable = false
@@ -365,6 +384,7 @@ bind('inventory_click', array('id': 'crafting'), array('slottype': 'RESULT'), @e
             }
           }
         }
+        
         if(@ranking_craftable) {
           @ingredient_items = array()
           foreach(@key: @ingredient_item in @event['inventory']) {
@@ -374,10 +394,11 @@ bind('inventory_click', array('id': 'crafting'), array('slottype': 'RESULT'), @e
           }
           @result_item_rank = _get_result_item_rank(@recipe['ingredients_weight'], @ingredient_items) //레시피에 포함된 재료템들 등급에 따라 결과물 등급"수치" 결정
           @luck = entity_attribute_value(puuid(@player), 'GENERIC_LUCK') //제작 스킬 생길시 제작 스킬에 따른 럭 보너스 더하기
-          @first_entry = @crafting['pool']
-          if(array_index_exists(@first_entry, 'type')) {
-            @final_entry = _get_final_entry_from_first_entry(@first_entry, @result_item_rank, @luck)
+          @entries = @crafting['pool']
+          if(array_index_exists(@entries, 'type')) {
+            @final_entry = _get_final_entry_from_entries(@entries, @result_item_rank, @luck)
             @modified_item = _get_modified_item(@final_entry, @result_item)
+            broadcast(@modified_item)
             modify_event('slotitem', @modified_item)
           } else {
             broadcast('잘못된 json!', '*') #타입을 작성하지 않음
@@ -385,6 +406,80 @@ bind('inventory_click', array('id': 'crafting'), array('slottype': 'RESULT'), @e
         }
       }
     }
+
+    /*
+    if(!is_null(@result_item) && array_index_exists(@result_item, 'meta', 'display')) {
+      @item_display = strip_colors(@result_item['meta']['display'])
+      if(array_index_exists(@craftings, @item_display)) {
+        @max_stack_size = max_stack_size(@result_item)
+        # 재료 배열 만들기, 쉬프트 조합, 컨트롤 버리기 조합시 최대 갯수 지정
+        @max_craftable_qty = 64
+        @ingredient_items = array()
+        foreach(@key: @ingredient_item in @event['inventory']) {
+          if(@key != 0) {
+            @ingredient_items[] = @ingredient_item
+            if(is_array(@ingredient_item) && @ingredient_item['qty'] < @max_craftable_qty) {
+              @max_craftable_qty = @ingredient_item['qty']
+            }
+          }
+        }
+
+        //broadcast(@ingredient_items @max_craftable_qty)
+          //broadcast(@event['inventory'])
+        if(is_null(@event['cursoritem'])) {
+          @result_item['meta']['lore'][] = 'asdf'
+          modify_event('slotitem', @result_item)
+          cancel()
+
+          //broadcast(@result_item)
+          //modify_event('cursoritem', array(
+          //  'name': 'STONE'
+          //))
+        } else {
+          if(array_contains(array('SHIFT_LEFT', 'SHIFT_RIGHT'), @event['clicktype'])) {
+            //modify_event('slotitem', array(name: STONE))
+            //@crafted_qty = 0
+            //for(@i = 0, @i < @max_craftable_qty, @i++) {
+            //  @is_space_left = !pgive_item(@player, array(name: 'AIR'))
+            //  if(@is_space_left) {
+            //    pgive_item(@player, array(name: 'STONE_SWORD')) // 조합아이템 주는걸로 바꾸기
+            //  } else {
+            //    break()
+            //  }
+            //  @crafted_qty++
+            //}
+            //foreach(@index: @ingredient_item in @ingredient_items) {
+            //  if(is_array(@ingredient_items[@index])) {
+            //    @ingredient_items[@index]['qty'] -= @crafted_qty
+            //    if(@ingredient_items[@index]['qty'] <= 0) {
+            //      @ingredient_items[@index] = null
+            //    }
+            //  }
+            //}
+            //broadcast(@ingredient_items)
+            //broadcast(@inventory)
+            @inventory = get_inventory(pinventory_holder(@player))
+            array_remove(@inventory, 36)
+            array_remove(@inventory, 37)
+            array_remove(@inventory, 38)
+            array_remove(@inventory, 39)
+            array_remove(@inventory, 40)
+            broadcast(@inventory)
+            //broadcast(A)
+          } else if(array_contains(array('DROP', 'CONTROL_DROP'), @event['clicktype'])) {
+            @ranking_craftable = false
+            cancel()
+            broadcast(B)
+          } else {
+            @ranking_craftable = false
+            cancel()
+          }
+        }
+      }
+    }
+
+
+    */
   }
 }
 

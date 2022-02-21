@@ -2,17 +2,7 @@
 	"recipe": {
 		"key": "golden_watering_can",
 		"type": "SHAPED",
-		"result": {
-			"name": "BUCKET",
-			"meta": {
-				"display": "§f금 물뿌리개",
-				"model": 2,
-				"lore": [
-					"§7쉬프트 클릭으로 조합할 수 없습니다."
-				],
-				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
-			}
-		},
+		"result": "금 물뿌리개",
 		"shape": [
 			"I I",
 			" I "

@@ -5,7 +5,7 @@ PRODUCTS:
       display: §f구리 주괴
       model: 2
       price:
-        sell: 0.703125
+        sell: 5
       detail: NONE
   12:
     name: IRON_INGOT
@@ -13,7 +13,7 @@ PRODUCTS:
       display: §f철괴
       model: 2
       price:
-        sell: 0.859375
+        sell: 7.5
       detail: NONE
   13:
     name: GOLD_INGOT
@@ -21,7 +21,7 @@ PRODUCTS:
       display: §f금괴
       model: 2
       price:
-        sell: 0.9375
+        sell: 10
       detail: NONE
   14:
     name: DIAMOND
@@ -29,7 +29,7 @@ PRODUCTS:
       display: §f다이아몬드
       model: 2
       price:
-        sell: 1.875
+        sell: 20
       detail: NONE
   15:
     name: NETHERITE_INGOT
@@ -37,7 +37,7 @@ PRODUCTS:
       display: §f네더라이트 주괴
       model: 2
       price:
-        sell: 4.6875
+        sell: 50
       detail: NONE
   29:
     name: COAL

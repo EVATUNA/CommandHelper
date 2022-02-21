@@ -2,26 +2,7 @@
 	"recipe": {
 		"key": "trident",
 		"type": "SHAPED",
-		"result": {
-			"name": "TRIDENT",
-			"meta": {
-				"display": "§f삼지창",
-				"model": 0,
-				"lore": [
-					"§7재료 아이템의 등급이 높을수록,",
-					"§7더 좋은 아이템을 조합할 수 있습니다.",
-					"",
-					"§7쉬프트 클릭으로 조합할 수 없습니다."
-				],
-				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"],
-				"enchants": {
-					"loyalty": {
-						"elevel": 5,
-						"etype": "LOYALTY"
-					}
-				}
-			}
-		},
+		"result": "삼지창",
 		"shape": [
 			" PP",
 			" SP",

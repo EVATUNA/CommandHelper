@@ -1,28 +1,6 @@
 {
 	"recipe": {
-		"key": "spruce_sword",
-		"type": "SHAPED",
-		"group": "wooden_swords",
-		"result": {
-			"name": "WOODEN_SWORD",
-			"meta": {
-				"display": "§f뒤틀린 균사 검",
-				"model": 1,
-				"lore": [
-					"§7쉬프트 클릭으로 조합할 수 없습니다."
-				],
-				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
-			}
-		},
-		"shape": [
-			"P",
-			"P",
-			"S"
-		],
-		"ingredients": {
-			"P": "SPRUCE_PLANKS",
-			"S": "STICK"
-		},
+		"result": "WOODEN_SWORD",
 		"ingredients_weight": {
 		}
 	},
@@ -32,8 +10,8 @@
 			{
 				"type": "rank",
 				"weight": 5,
-				"display": "부서질듯한 뒤틀린 균사 검",
-				"model": 1,
+				"display": "부서질듯한 나무 검",
+				"model": 0,
 				"attributes": {
 					"attack_damage": {
 						"min": 1.867,
@@ -48,8 +26,8 @@
 			{
 				"type": "rank",
 				"weight": 10,
-				"display": "의미를 알 수 없는 뒤틀린 균사 검",
-				"model": 1,
+				"display": "의미를 알 수 없는 나무 검",
+				"model": 0,
 				"attributes": {
 					"attack_damage": {
 						"min": 1.867,
@@ -64,8 +42,8 @@
 			{
 				"type": "rank",
 				"weight": 10,
-				"display": "제 기능을 하기 힘든 뒤틀린 균사 검",
-				"model": 1,
+				"display": "제 기능을 하기 힘든 나무 검",
+				"model": 0,
 				"attributes": {
 					"attack_damage": {
 						"min": 1.913,
@@ -80,8 +58,8 @@
 			{
 				"type": "rank",
 				"weight": 25,
-				"display": "무딘 뒤틀린 균사 검",
-				"model": 1,
+				"display": "무딘 나무 검",
+				"model": 0,
 				"attributes": {
 					"attack_damage": {
 						"min": 2.007,
@@ -93,8 +71,8 @@
 			{
 				"type": "rank",
 				"weight": 35,
-				"display": "무난한 뒤틀린 균사 검",
-				"model": 1,
+				"display": "무난한 나무 검",
+				"model": 0,
 				"attributes": {
 					"attack_damage": {
 						"min": 2.147,
@@ -107,8 +85,8 @@
 				"type": "rank",
 				"weight": 30,
 				"quality": 0,
-				"display": "평범한 뒤틀린 균사 검",
-				"model": 1,
+				"display": "평범한 나무 검",
+				"model": 0,
 				"attributes": {
 					"attack_damage": {
 						"min": 2.240,
@@ -121,8 +99,8 @@
 				"type": "rank",
 				"weight": 30,
 				"quality": 0,
-				"display": "쓸만한 뒤틀린 균사 검",
-				"model": 1,
+				"display": "쓸만한 나무 검",
+				"model": 0,
 				"attributes": {
 					"attack_damage": {
 						"min": 2.450,
@@ -134,8 +112,8 @@
 			{
 				"type": "rank",
 				"weight": 30,
-				"display": "잘 만들어진 뒤틀린 균사 검",
-				"model": 1,
+				"display": "잘 만들어진 나무 검",
+				"model": 0,
 				"attributes": {
 					"attack_damage": {
 						"min": 2.613,
@@ -147,8 +125,8 @@
 			{
 				"type": "rank",
 				"weight": 20,
-				"display": "예사롭지 않은 뒤틀린 균사 검",
-				"model": 1,
+				"display": "예사롭지 않은 나무 검",
+				"model": 0,
 				"attributes": {
 					"attack_damage": {
 						"min": 2.730,
@@ -160,8 +138,8 @@
 			{
 				"type": "rank",
 				"weight": 1,
-				"display": "전설적인 뒤틀린 균사 검",
-				"model": 1,
+				"display": "전설적인 나무 검",
+				"model": 0,
 				"broadcast": true,
 				"attributes": {
 					"attack_damage": 2.800,
