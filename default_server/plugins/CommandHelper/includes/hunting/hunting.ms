@@ -675,7 +675,7 @@ if(@server == 'main') {
     if(is_array(@tag)) {
       @slot = pheld_slot(@player)
       @item = get_inventory_item(@uuid, @slot)
-      if(is_array(@item) && array_index_exists(@item, 'meta', 'model') && !is_null(@item['meta']['model']) && @item['meta']['model'] > 0) {
+      if(is_array(@item) && @item['name'] == 'COMPASS' && array_index_exists(@item, 'meta', 'model') && !is_null(@item['meta']['model']) && @item['meta']['model'] > 0) {
         @location = _place_trace(@tag, false)
         entity_remove(@id)
         @item['meta']['lodestone'] = false
@@ -699,7 +699,7 @@ if(@server == 'main') {
       if(is_array(@tag)) {
         @slot = pheld_slot(@player)
         @item = get_inventory_item(@uuid, @slot)
-        if(is_array(@item) && array_index_exists(@item, 'meta', 'model') && !is_null(@item['meta']['model']) && @item['meta']['model'] > 0) {
+        if(is_array(@item) && @item['name'] == 'COMPASS' && array_index_exists(@item, 'meta', 'model') && !is_null(@item['meta']['model']) && @item['meta']['model'] > 0) {
           @location = _place_trace(@tag, false)
           entity_remove(@item_frame)
           @item['meta']['lodestone'] = false

@@ -156,6 +156,8 @@ proc _get_modified_item(@entry, @item) {
       'NETHERITE_PICKAXE',
       'NETHERITE_AXE',
       'NETHERITE_HOE',
+
+      'BUCKET',
       
       'TRIDENT'
     ),

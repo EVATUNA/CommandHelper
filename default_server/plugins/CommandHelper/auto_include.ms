@@ -116,6 +116,14 @@ foreach(@scoreboard in get_scoreboards()) {
 
 ### Initial Including Procedure
 
+proc _send_action_msg_normal(@player, @message) {
+  action_msg(@player, @message)
+}
+
+proc _send_action_msg_raw(@player, @raw) {
+  @json = json_encode(@raw)
+  runas('~console', "/title @player actionbar @json")
+}
 /*
 # 팁 메시지 보여주기
 proc _set_tooltips(@player, @uuid, @player_data) {

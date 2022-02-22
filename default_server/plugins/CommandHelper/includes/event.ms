@@ -79,7 +79,7 @@ foreach(@player in all_players()) {
     @skill_manager = @player_data['skill_manager']
     @selected_methods = json_decode(@skill_manager[4])
     @selected_combat_method = @selected_methods['combat_method']
-    if(@selected_combat_method != '') {
+    if(@selected_combat_method != '' && array_index_exists(@player_data['active_skill'], @selected_combat_method)) {
       @active_skill = @player_data['active_skill'][@selected_combat_method]
       _save_active_skill(@uuid, @selected_combat_method, @active_skill)
     }
@@ -1602,7 +1602,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
     }
     # use item
     @is_item_available = false
-    if(@event['hand'] == 'main_hand' && !is_null(@event['item'])) {
+    if(/*@event['hand'] == 'main_hand' && */!is_null(@event['item'])) {
       @is_item_available = true
     }
     # block interacting
@@ -2222,151 +2222,166 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       }
     }
     if(@is_item_available) {
-      switch(@event['item']['name']) {
+      @item = @event['item']
+      switch(@item['name']) {
+      case 'FISHING_ROD':
+        if(pworld(@player) != 'spawn_minecraft_residence') {
+          cancel()
+          _send_action_msg_normal(@player, '낚시는 거주월드에서만 가능합니다.')
+        }
+        break()
       #case 'BUCKET':
       case 'TURTLE_HELMET': // 물뿌리개
-        @block = @event['block']
-        @waterable = false
-        switch(@block) {
-        case 'FARMLAND':
-          @waterable = true
-          @location = array('x': @event['location']['x'], 'y': @event['location']['y'], 'z': @event['location']['z'], 'world': @event['location']['world'])
-          break()
-        case 'WHEAT':
-        case 'BEETROOTS':
-        case 'CARROTS':
-        case 'POTATOES':
-        case 'PUMPKIN_STEM':
-        case 'MELON_STEM':
-        case 'SWEET_BERRY_BUSH':
-          @waterable = true
-          @location = array('x': @event['location']['x'], 'y': @event['location']['y'] - 1, 'z': @event['location']['z'], 'world': @event['location']['world'])
-          break()
-        }
-        if(!is_null(@event['item']['meta']) && @waterable && pcooldown(@player, 'TURTLE_HELMET') == 0) {
-          switch(@event['item']['meta']['model']) {
-          case 1: // 구리 물뿌리개
-            @range = 1
-            @min_power = 4
-            @max_power = 6
+        if(@event['hand'] == 'main_hand') {
+          @block = @event['block']
+          @waterable = false
+          switch(@block) {
+          case 'FARMLAND':
+            @waterable = true
+            @location = array('x': @event['location']['x'], 'y': @event['location']['y'], 'z': @event['location']['z'], 'world': @event['location']['world'])
             break()
-          case 2: // 금 물뿌리개
-            @range = 5
-            @min_power = 0
-            @max_power = 2
-            break()
-          case 3: // 다이아몬드 물뿌리개
-            @range = 3
-            @min_power = 1
-            @max_power = 4
-            break()
-          case 4: // 네더라이트 물뿌리개
-            @range = 5
-            @min_power = 1
-            @max_power = 4
-            break()
-          default:
+          case 'WHEAT':
+          case 'BEETROOTS':
+          case 'CARROTS':
+          case 'POTATOES':
+          case 'PUMPKIN_STEM':
+          case 'MELON_STEM':
+          case 'SWEET_BERRY_BUSH':
+            @waterable = true
+            @location = array('x': @event['location']['x'], 'y': @event['location']['y'] - 1, 'z': @event['location']['z'], 'world': @event['location']['world'])
             break()
           }
-          # 쿨타임, 기타 효과, 사운드
-          set_pcooldown(@player, 'TURTLE_HELMET', 14) // 쿨타임 설정
-          pswing_hand(@player, 'main_hand')
-          set_peffect(@player, 'MINING_FATIGUE', 4, 1, false, false)
-          play_named_sound(@location, array('sound': 'block.water.ambient', 'category': 'players', 'volum': 0.5, 'pitch': 2))
-          # 파티클
-          @closure = closure() {
-            # 플레이어 위치
-            @ploc = ploc(@player)
-            # 물뿌리개 위치 (물 발사 지점 세팅)
-            @ploc['yaw'] += 45
-            @ploc['pitch'] = 0
-            @player_vector = get_vector(@ploc, 0.5)
-            for(@i = 0, @i < 5, @i++) {
-              @hand_location = array(
-                'x': @ploc['x'] + @player_vector['x'] + (rand() - 0.5) / 10,
-                'y': @ploc['y'] + 2.2 + (rand() - 0.5) / 10,
-                'z': @ploc['z'] + @player_vector['z'] + (rand() - 0.5) / 10
-              )
-              # 타겟 위치 // x z 에 랜덤한 @range 더하기;
-              @target_location = array(
-                'x': @location['x'] + 0.5 + (rand() - 0.5) * @range ** 0.7,
-                'y': @location['y'] + 1.1,
-                'z': @location['z'] + 0.5 + (rand() - 0.5) * @range ** 0.7
-              )
-              # 수평, 수직 거리 구하기
-              @xz_pos1 = array(
-                'x': @hand_location['x'],
-                'y': 0,
-                'z': @hand_location['z'],
-                'world': @location['world']
-              )
-              @xz_pos2 = array(
-                'x': @target_location['x'],
-                'y': 0,
-                'z': @target_location['z'],
-                'world': @location['world']
-              )
-              @xz_distance = distance(@xz_pos1, @xz_pos2) ** 0.25
-              @y_distance = (@hand_location['y'] - @target_location['y']) ** 0.25
-              # 벡터 구하기
-              @vector = array(
-                'x': (@target_location['x'] - @hand_location['x']) * @xz_distance * 0.1 / (@y_distance * 0.9),
-                'y': 0.0,
-                'z': (@target_location['z'] - @hand_location['z']) * @xz_distance * 0.1 / (@y_distance * 0.9)
-              )
-              mom_playerparticle(@uuid, 'WATER_SPLASH', @hand_location['x'], @hand_location['y'], @hand_location['z'], 0, @vector['x'], @vector['y'], @vector['z'], 0.8)
+          if(!is_null(@item['meta']) && @waterable && pcooldown(@player, 'TURTLE_HELMET') == 0) {
+            switch(@item['meta']['model']) {
+            case 1: // 구리 물뿌리개
+              @range = 1
+              @min_power = 4
+              @max_power = 6
+              break()
+            case 2: // 금 물뿌리개
+              @range = 5
+              @min_power = 0
+              @max_power = 2
+              break()
+            case 3: // 다이아몬드 물뿌리개
+              @range = 3
+              @min_power = 1
+              @max_power = 4
+              break()
+            case 4: // 네더라이트 물뿌리개
+              @range = 5
+              @min_power = 1
+              @max_power = 4
+              break()
+            default:
+              break()
             }
-          }
-          @time = time()
-          for(@i = 0, @i < 20, @i++) {
-            queue_push(@closure, 'wartering.'.@time)
-          }
-          # 물뿌리개 물주기
-          for(@x = 0, @x < @range, @x++) {
-            for(@z = 0, @z < @range, @z++) {
-              @x_offset = @x - integer(@range / 2)
-              @z_offset = @z - integer(@range / 2)
-              @watering_location = array('x': @location['x'] + @x_offset, 'y': @location['y'], 'z': @location['z'] + @z_offset, 'world': @location['world'])
-              if(get_block(@watering_location) == 'FARMLAND') {
-                # 경작지 세팅
-                @blockdata = get_blockdata(@watering_location)
-                @blockdata['moisture'] += rand(@min_power, @max_power + 1)
-                if(@blockdata['moisture'] > 6) { @blockdata['moisture'] = 6 }
-                set_blockdata(@watering_location,@blockdata)
+            # 쿨타임, 기타 효과, 사운드
+            set_pcooldown(@player, 'TURTLE_HELMET', 14) // 쿨타임 설정
+            pswing_hand(@player, 'main_hand')
+            set_peffect(@player, 'MINING_FATIGUE', 4, 1, false, false)
+            play_named_sound(@location, array('sound': 'block.water.ambient', 'category': 'players', 'volum': 0.5, 'pitch': 2))
+            # 파티클
+            @closure = closure() {
+              # 플레이어 위치
+              @ploc = ploc(@player)
+              # 물뿌리개 위치 (물 발사 지점 세팅)
+              @ploc['yaw'] += 45
+              @ploc['pitch'] = 0
+              @player_vector = get_vector(@ploc, 0.5)
+              for(@i = 0, @i < 5, @i++) {
+                @hand_location = array(
+                  'x': @ploc['x'] + @player_vector['x'] + (rand() - 0.5) / 10,
+                  'y': @ploc['y'] + 2.2 + (rand() - 0.5) / 10,
+                  'z': @ploc['z'] + @player_vector['z'] + (rand() - 0.5) / 10
+                )
+                # 타겟 위치 // x z 에 랜덤한 @range 더하기;
+                @target_location = array(
+                  'x': @location['x'] + 0.5 + (rand() - 0.5) * @range ** 0.7,
+                  'y': @location['y'] + 1.1,
+                  'z': @location['z'] + 0.5 + (rand() - 0.5) * @range ** 0.7
+                )
+                # 수평, 수직 거리 구하기
+                @xz_pos1 = array(
+                  'x': @hand_location['x'],
+                  'y': 0,
+                  'z': @hand_location['z'],
+                  'world': @location['world']
+                )
+                @xz_pos2 = array(
+                  'x': @target_location['x'],
+                  'y': 0,
+                  'z': @target_location['z'],
+                  'world': @location['world']
+                )
+                @xz_distance = distance(@xz_pos1, @xz_pos2) ** 0.25
+                @y_distance = (@hand_location['y'] - @target_location['y']) ** 0.25
+                # 벡터 구하기
+                @vector = array(
+                  'x': (@target_location['x'] - @hand_location['x']) * @xz_distance * 0.1 / (@y_distance * 0.9),
+                  'y': 0.0,
+                  'z': (@target_location['z'] - @hand_location['z']) * @xz_distance * 0.1 / (@y_distance * 0.9)
+                )
+                mom_playerparticle(@uuid, 'WATER_SPLASH', @hand_location['x'], @hand_location['y'], @hand_location['z'], 0, @vector['x'], @vector['y'], @vector['z'], 0.8)
               }
             }
-          }
-          # 아이템 세팅
-          @max_durability = material_info('TURTLE_HELMET', 'maxDurability')
-          @item = @event['item']
-          @max_capacity = integer(@item['meta']['modifiers'][0]['amount'])
-          @capacity = integer((@item['meta']['damage'] - 1) / integer(@max_durability / @max_capacity))
-          if(@capacity < @max_capacity - 1) {
-            @item['meta']['damage'] = integer(@max_durability / @max_capacity * (@capacity + 1) + 1)
-            set_inventory_item(@uuid, pheld_slot(@player), @item)
-          } else {
-            @item['name'] = 'BUCKET'
-            @item['meta']['damage'] = 0
-            set_inventory_item(@uuid, pheld_slot(@player), @item)
+            @time = time()
+            for(@i = 0, @i < 20, @i++) {
+              queue_push(@closure, 'wartering.'.@time)
+            }
+            # 물뿌리개 물주기
+            for(@x = 0, @x < @range, @x++) {
+              for(@z = 0, @z < @range, @z++) {
+                @x_offset = @x - integer(@range / 2)
+                @z_offset = @z - integer(@range / 2)
+                @watering_location = array('x': @location['x'] + @x_offset, 'y': @location['y'], 'z': @location['z'] + @z_offset, 'world': @location['world'])
+                if(get_block(@watering_location) == 'FARMLAND') {
+                  # 경작지 세팅
+                  @blockdata = get_blockdata(@watering_location)
+                  @blockdata['moisture'] += rand(@min_power, @max_power + 1)
+                  if(@blockdata['moisture'] > 6) { @blockdata['moisture'] = 6 }
+                  set_blockdata(@watering_location,@blockdata)
+                }
+              }
+            }
+            # 아이템 세팅
+            @max_durability = material_info('TURTLE_HELMET', 'maxDurability')
+            @max_capacity = integer(@item['meta']['modifiers'][0]['amount'])
+            @capacity = integer((@item['meta']['damage'] - 1) / integer(@max_durability / @max_capacity))
+            if(@capacity < @max_capacity - 1) {
+              @item['meta']['damage'] = integer(@max_durability / @max_capacity * (@capacity + 1) + 1)
+              set_inventory_item(@uuid, pheld_slot(@player), @item)
+            } else {
+              @item['name'] = 'BUCKET'
+              @item['meta']['damage'] = 0
+              set_inventory_item(@uuid, pheld_slot(@player), @item)
+            }
           }
         }
         break()
       case 'ENCHANTED_BOOK':
         # 스크롤, 비법서, 마법의 끈 사용시
-        if(!is_null(@event['item']['meta'])) {
-          switch(@event['item']['meta']['model']) {
+        if(!is_null(@item['meta'])) {
+          switch(@item['meta']['model']) {
           case 1: // 스킬 포인트 초기화 비법서
-            _ask_using_skill_reset_scroll(@player, @uuid, @event['item'], @players_data, @skills_spec, @text)
+            _ask_using_skill_reset_scroll(@player, @uuid, @item, @players_data, @skills_spec, @text)
             #_reset_skills(@player_data, @player, @uuid, @skills_spec)
             break()
           }
         }
         break();
       case 'EXPERIENCE_BOTTLE':
-        if(!is_null(@event['item']['meta']) && @event['item']['meta']['model'] > 0) {
+        if(!is_null(@item['meta']) && @item['meta']['model'] > 0) {
           cancel()
         }
-        break();
+        break()
+      case 'COMPASS':
+        if(!is_null(@item['meta']) && array_index_exists(@item, 'meta', 'model') && !is_null(@item['meta']['model']) && @item['meta']['model'] > 0) {
+          if(@event['block'] == 'LODESTONE') {
+            cancel()
+          }
+        }
+        break()
       case 'NAME_TAG':
         if(psneaking(@player)) {
           # 이름 수정
@@ -2388,6 +2403,8 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         }
         break();
       }
+    } else {
+      
     }
   }
 }
