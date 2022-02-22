@@ -398,7 +398,6 @@ bind('inventory_click', array('priority': 'LOWEST', 'id': 'crafting'), array('sl
           if(array_index_exists(@entries, 'type')) {
             @final_entry = _get_final_entry_from_entries(@entries, @result_item_rank, @luck)
             @modified_item = _get_modified_item(@final_entry, @result_item)
-            broadcast(@modified_item)
             modify_event('slotitem', @modified_item)
           } else {
             broadcast('잘못된 json!', '*') #타입을 작성하지 않음

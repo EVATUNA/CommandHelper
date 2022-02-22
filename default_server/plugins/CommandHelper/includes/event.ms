@@ -125,6 +125,7 @@ bind('player_join', null, null, @event, @reconnecting_datas, @players_data, @ski
   set_timeout(100, closure() {
     _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
   })
+  set_placeholders(@uuid, 'tunalevel')
 }
 
 # 플레이어 로그아웃
@@ -2880,6 +2881,11 @@ bind('item_damage', null, null, @event, @players_data, @effective_items, @skills
   if(!is_cancelled() && array_index_exists(@players_data, @uuid) && ponline(@player)) {
     @player_data = @players_data[@uuid]
     @item = @event['item']
+    //if(@item['name'] == 'SHIELD') {
+    //  broadcast(AB get_entity_immunity_ticks(@uuid))
+    //}
+
+
     @max_durability = material_info(@item['name'], 'maxDurability')
     if(is_null(@item['meta'])) {
       @durability = @event['damage']
@@ -2919,7 +2925,7 @@ bind('projectile_launch', null,, array('shootertype': 'PLAYER'), @event, @player
 }
 
 // 원거리 공격, 근거리 공격, 방어 관련 처리
-bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text, @server) {
+bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, @skills_spec, @text, @server) {
   @allowed_entity = array(
     'MAGMA_CUBE': 0.75,
     'SILVERFISH': 0.3,
@@ -3065,35 +3071,59 @@ bind('entity_damage', null, null, @event, @players_data, @skills_spec, @text, @s
   }
   # 방어
   if(@event['type'] == 'PLAYER') {
-    //broadcast(entity_type(@event['damager']) @event['amount'] @event['finalamount'])
     @player = @event['player']
     @puuid = @event['id']
     if(array_index_exists(@players_data, @puuid)) {
       @items = @players_data[@puuid]['item']
       if(@event['finalamount'] == 0 && pblocking(@player)) {
-        if(!is_null(@items['main_hand']) && @items['main_hand']['name'] == 'SHIELD') {
-          @shield_slot = pheld_slot(@player)
-        } else {
-          @shield_slot = 40
+        @blocking = true
+        # 예외 처리
+        if(!is_null(@event['damager']) && strip_colors(get_mob_name(@event['damager'])) == '티아마트' && @event['amount'] < 1.5) {
+          @blocking = false
         }
-        set_timeout(1, closure() {
-          @damaged_item = get_inventory_item(@puuid, @shield_slot)
-          if(@damaged_item['name'] == 'SHIELD') {
-            @dummy_item = array(
-              'name': 'CLOCK',
-              'qty': 1,
-              'meta': array(
-                'model': 1,
-                'display': ' '
-              )
-            )
-            set_inventory_item(@puuid, @shield_slot, @dummy_item)
-            set_timeout(1, closure() {set_inventory_item(@puuid, @shield_slot, @damaged_item)})
+
+        if(@blocking) {
+          if(!is_null(@items['main_hand']) && @items['main_hand']['name'] == 'SHIELD') {
+            @shield_slot = pheld_slot(@player)
+          } else {
+            @shield_slot = 40
           }
-        })
-        @skill_data = @players_data[@puuid]['skill_data']['blocking']
-        @point = @skill_data[0]
-        set_pcooldown(@player, 'SHIELD', integer(@event['amount'] * (5 - @point)))
+          # 막기 스킬 레벨 구하기
+          @point = 0
+          @skill_methods = json_decode(@players_data[@puuid]['skill_manager'][4])
+          if(array_index_exists(@skill_methods, 'combat_method') && @skill_methods['combat_method'] == 'blocking') {
+            @skill_data = @players_data[@puuid]['skill_data']['blocking']
+            @point = @skill_data[0]
+          }
+          # 미몹 스킬 다중 히트 방지
+          if(get_entity_immunity_ticks(@puuid) == 0) {
+            set_entity_immunity_ticks(@puuid, 1)
+          }
+          # 쿨다운
+          @cooldown_large = @event['amount'] * (10 - @point * 1.5)
+          if(@cooldown_large < 0) { @cooldown_large = 0 }
+          @cooldown_small = 10 - @point * 0.5
+          if(@cooldown_small < 0) { @cooldown_small = 0 }
+          @cooldown = integer(@cooldown_large + @cooldown_small)
+          set_pcooldown(@player, 'SHIELD', @cooldown)
+          # 아이템 새로고침
+          set_timeout(1, closure() {
+            @damaged_item = get_inventory_item(@puuid, @shield_slot)
+            if(@damaged_item['name'] == 'SHIELD') {
+              @dummy_item = array(
+                'name': 'CLOCK',
+                'qty': 1,
+                'meta': array(
+                  'model': 1,
+                  'display': ' '
+                )
+              )
+              set_inventory_item(@puuid, @shield_slot, @dummy_item)
+              set_timeout(1, closure() {set_inventory_item(@puuid, @shield_slot, @damaged_item)})
+            }
+          })
+
+        }
       }
     }
   }

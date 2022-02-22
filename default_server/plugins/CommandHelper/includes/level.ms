@@ -74,6 +74,7 @@ proc _show_tunalevel(@uuid, @player_data, @text) {
   # level
   @tunalevel_text = _replace_tunalevel_text(@tunalevel)
   _set_sidebar(@uuid, 5, color('#fd0000').@text['space_fonts']['space.-92'].@bar.@text['space_fonts']['space.-83'].@tunalevel_text, @text)
+  set_placeholders(player(@uuid), 'tunalevel')
 }
 
 # 레벨 데이터 set
@@ -84,6 +85,56 @@ proc _set_tunalevel(@uuid, @player_data, @tunalevel_data, @text) {
   _set_skill_manager(@uuid, @skill_manager)
   _show_tunalevel(@uuid, @player_data, @text)
 }
+
+# 플레이스홀더
+register_placeholder_hook('player', closure(@player, @placeholder){
+  if(is_null(@player)) {
+    return("")
+  }
+  if(@placeholder == 'tunalevel') {
+    @uuid = puuid(@player)
+    if(array_index_exists(@players_data, @uuid)) {
+      @level = @players_data[@uuid]['skill_manager'][0]
+      switch(integer(@level/10)) {
+      case 0:
+        @color = '§a'
+        break()
+      case 1:
+        @color = '§e'
+        break()
+      case 2:
+        @color = '§6'
+        break()
+      case 3:
+        @color = '§c'
+        break()
+      case 4:
+        @color = '§d'
+        break()
+      case 5:
+        @color = '§5'
+        break()
+      case 6:
+        @color = '§9'
+        break()
+      case 7:
+        @color = '§b'
+        break()
+      case 8:
+        @color = '§f'
+        break()
+      default:
+        @color = '§7'
+        break()
+      }
+      @text = @color.@level
+      @return = @text
+    } else {
+      @return = '-'
+    }
+    return(@return)
+  }
+});
 
 # 튜나레벨 맥스 경치 get 함수
 proc _get_max_experience(@level) {

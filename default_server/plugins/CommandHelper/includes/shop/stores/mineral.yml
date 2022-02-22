@@ -1,5 +1,17 @@
 PRODUCTS:
-  11:
+  19:
+    name: COAL
+    meta:
+      price:
+        sell: 1
+      detail: NONE
+  20:
+    name: QUARTZ
+    meta:
+      price:
+        sell: 1
+      detail: NONE
+  21:
     name: COPPER_INGOT
     meta:
       display: §f구리 주괴
@@ -7,7 +19,7 @@ PRODUCTS:
       price:
         sell: 5
       detail: NONE
-  12:
+  22:
     name: IRON_INGOT
     meta:
       display: §f철괴
@@ -15,7 +27,7 @@ PRODUCTS:
       price:
         sell: 7.5
       detail: NONE
-  13:
+  23:
     name: GOLD_INGOT
     meta:
       display: §f금괴
@@ -23,7 +35,7 @@ PRODUCTS:
       price:
         sell: 10
       detail: NONE
-  14:
+  24:
     name: DIAMOND
     meta:
       display: §f다이아몬드
@@ -31,43 +43,13 @@ PRODUCTS:
       price:
         sell: 20
       detail: NONE
-  15:
+  25:
     name: NETHERITE_INGOT
     meta:
       display: §f네더라이트 주괴
       model: 2
       price:
         sell: 50
-      detail: NONE
-  29:
-    name: COAL
-    meta:
-      price:
-        sell: 0.46875
-      detail: NONE
-  30:
-    name: QUARTZ
-    meta:
-      price:
-        sell: 0.390625
-      detail: NONE
-  31:
-    name: LAPIS_LAZULI
-    meta:
-      price:
-        sell: 0.546875
-      detail: NONE
-  32:
-    name: REDSTONE
-    meta:
-      price:
-        sell: 0.625
-      detail: NONE
-  33:
-    name: EMERALD
-    meta:
-      price:
-        sell: 2.65625
       detail: NONE
   50:
     name: IRON_INGOT

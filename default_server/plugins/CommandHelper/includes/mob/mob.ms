@@ -125,12 +125,14 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards) {
 # 스폰된 몹 들 입고있는 아이템 떨구지 안토록 수정
 bind('creature_spawn', null, null, @event) {
   @uuid = @event['id']
-  set_equipment_droprates(@uuid, array(
-    'HELMET': 0,
-    'CHESTPLATE': 0,
-    'LEGGINGS': 0,
-    'BOOTS': 0,
-    'WEAPON': 0,
-    'OFF_HAND': 0
-  ))
+  if(entity_type(@uuid) != 'ARMOR_STAND') {
+    set_equipment_droprates(@uuid, array(
+      'HELMET': 0,
+      'CHESTPLATE': 0,
+      'LEGGINGS': 0,
+      'BOOTS': 0,
+      'WEAPON': 0,
+      'OFF_HAND': 0
+    ))
+  }
 }
