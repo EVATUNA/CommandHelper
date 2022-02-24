@@ -31,40 +31,16 @@ set_timeout(1000, closure() {
   ### 서버 정보 명령어
   ###
   proc _info_command(@command, @player, @args, @text) {
-    @raw = array(
-      array(
-        'text': @text['space_fonts']['space.128'].'\ue008\n\n\n\n\n\n'
-      ),
-      array(
-        'text': @text['space_fonts']['space.8'].'환영합니다! 에바참치는 기존 마인크래프트 야생의 장점을 살려 재해석한 서버입니다.\n\n',
-        'color': '#80c8ff'
-      ),
-      array(
-        'text': '서버에 적응하는 것을 도와드리기 위해 가이드를 준비하였으니 꼭 확인해보시기 바랍니다.\n'
-      ),
-      array(
-        'text': @text['space_fonts']['space.112'].'( ESC > 에바참치 가이드 )',
-        'color': 'gray'
-      )/*,
-      array(
-        'keybind': 'key.advancements'
-      ),
-      array(
-        'text': ''
-      ),*/
-    )
-    _tellraw(@player, @raw)
-
-    #msg(@text['prefix']['info'].' §b서버 정보')
-    #msg(' §7서버명: §f에바참치 §7(§fEvatuna§7)')
-    #msg(' §7서버 장르: 야생')
-    #msg(' §7총 관리자: 앨리스(§btele§f: @alicearcade, §7dis§f: AA_2#1787)')
-    #msg(' §7공식 이메일: support@evatuna.fish')
-    #msg(' §7공식 홈페이지 : §7/site')
-    #msg(' §7공식 카페 : §a(네이버)§7/cafe')
-    #msg(' §7공식 디스코드: §7/discord')
-    #msg(' §7마인리스트: §7/vote')
-    #msg(' §7서버오픈일: 2021년 06월 03일')
+    msg(@text['prefix']['info'].' §b서버 정보')
+    msg(' §7서버명: §f에바참치 §7(§fEvatuna§7)')
+    msg(' §7서버 장르: 야생')
+    msg(' §7총 관리자: 앨리스(§btele§f: @alicearcade, §7dis§f: AA_2#1787)')
+    msg(' §7공식 이메일: support@evatuna.fish')
+    msg(' §7공식 홈페이지 : §7/site')
+    msg(' §7공식 카페 : §a(네이버)§7/cafe')
+    msg(' §7공식 디스코드: §7/discord')
+    msg(' §7마인리스트: §7/vote')
+    msg(' §7서버오픈일: 2021년 06월 03일')
   }
   if(_is_command_registered('info')) { unregister_command('info') }
   //if(_is_command_registered('version')) { unregister_command('version') }
@@ -1031,19 +1007,12 @@ register_command('chatobserver', array(
 ))
 
 register_command('sendwarn', array(
-  #permission: 'sendwarn',
+  permission: 'sendwarn',
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
     @target_name = @args[0]
-    @target_uuid = puuid(@target_name)
-    @player_data = @players_data[@target_uuid]
-    @tooltip_data = array(
-      'type': 'warn',
-      'message': array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' '),
-      'countdown': 3
-    )
-    //_add_tooltip(@target_name, @target_uuid, @player_data, @tooltip_data)
-    //_set_tooltips(@target_name, @target_uuid, @player_data)
+    @message = array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' ')
+    _send_action_msg_normal(@target_name, @message)
   }
 ))
 

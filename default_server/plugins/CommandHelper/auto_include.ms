@@ -18,7 +18,9 @@ array_reverse(@splited_absolute_path)
     'failure': '\ue4de',
     'warn': '\ue4dd',
     'info': '\ue4e3',
-    'broadcast': '\ue4db'
+    'broadcast': '\ue4db',
+    'join': '\ue4e5',
+    'leave': '\ue4e6'
   )
 )
 

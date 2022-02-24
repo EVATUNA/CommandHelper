@@ -44,6 +44,7 @@ register_command('giveitemrand', array(
 ))
 
 register_command('giveitemone', array(
+  permission: 'giveitemone',
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
     if(array_size(@args) > 2) {

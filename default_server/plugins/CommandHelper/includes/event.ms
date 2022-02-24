@@ -2902,7 +2902,6 @@ bind('item_damage', null, null, @event, @players_data, @effective_items, @skills
     //  broadcast(AB get_entity_immunity_ticks(@uuid))
     //}
 
-
     @max_durability = material_info(@item['name'], 'maxDurability')
     if(is_null(@item['meta'])) {
       @durability = @event['damage']

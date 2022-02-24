@@ -239,6 +239,7 @@ proc _tunalevel_command(@command, @player, @args, @text, @players_data) {
   }
 }
 register_command('tunalevel', array(
+  permission: 'tunalevel',
   'tabcompleter': closure(@command, @player, @args) {
     switch(array_size(@args)) {
     case 1:
@@ -281,6 +282,7 @@ proc _give_tunalevel_random_experience(@uuid, @player_data, @adding_default_expe
 }
 
 register_command('tunalevelrand', array(
+  permission: 'tunalevelrand',
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
     if(array_size(@args) == 3) {
@@ -390,6 +392,7 @@ proc _give_arcanelevel_random_experience(@player, @uuid, @adding_default_experie
 }
 
 register_command('arcanelevelrand', array(
+  permission: 'arcanelevelrand',
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
     if(array_size(@args) == 3) {

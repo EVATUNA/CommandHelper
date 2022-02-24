@@ -1861,6 +1861,7 @@ proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting) {
 }
 
 register_command('broadcast', array(
+  permission: 'broadcast',
   'description': 'can broadcast',
   'usage': '/broadcast <msg>',
   'aliases': array('say'),
