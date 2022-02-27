@@ -242,6 +242,12 @@ bind('block_place', null, null, @event, @players_data, @skills_spec) {
       }
     }
   }
+  if(@event['block'] == 'DIAMOND_BLOCK' && psneaking(@player)) {
+    @pworld = pworld(@player)
+    if(array_contains(array('spawn', 'dungeon'), @pworld)) {
+      cancel()
+    }
+  }
 }
 
 # 블럭 파괴
@@ -2420,10 +2426,58 @@ bind('inventory_click', null, null, @event) {
   }
 }
 
-# 주민, 떠상 상호 작용
+# 주민, 떠상 상호 작용, 동물 상호작용
 bind('player_interact_entity', null, null, @event) {
+  @player = @event['player']
+  @uuid = puuid(@player)
   if(@event['clicked'] == 'VILLAGER' || @event['clicked'] == 'WANDERING_TRADER') {
     cancel()
+  } else {
+    @breading_items = array(
+      'AXOLOTL': array('TROPICAL_FISH_BUCKET'),
+      'BEE': array('DANDELION','POPPY', 'BLUE_ORCHID', 'ALLIUM', 'AZURE_BLUET', 'RED_TULIP', 'ORANGE_TULIP', 'WHITE_TULIP', 'PINK_TULIP', 'OXEYE_DAISY', 'CORNFLOWER', 'LILY_OF_THE_VALLEY', 'WITHER_ROSE', 'SUNFLOWER', 'LILAC', 'PEONY', 'ROSE_BUSH', 'FLOWERING_AZALEA_LEAVES', 'FLOWERING_AZALEA', 'WHTHER_ROSE'),
+      'CAT': array('COD', 'SALMON'),
+      'CHICKEN': array('BEETROOT_SEEDS', 'MELON_SEEDS', 'PUMPKIN_SEEDS', 'WHEAT_SEEDS'),
+      'COW': array('WHEAT'),
+      'DONKEY': array('GOLDEN_APPLE', 'ENCHANTED_GOLDEN_APPLE', 'GOLDEN_CARROT', 'SURGER', 'APPLE', 'WHEAT', 'HAY_BLOCK'),
+      'FOX': array('SWEET_BERRIES', 'GLOW_BERRIES'),
+      'GOAT': array('WHEAT'),
+      'HOGLIN': array('CRIMSON_FUNGUS'),
+      'HORSE': array('GOLDEN_APPLE', 'ENCHANTED_GOLDEN_APPLE', 'GOLDEN_CARROT', 'SURGER', 'APPLE', 'WHEAT', 'HAY_BLOCK'),
+      'LLAMA': array('HAY_BLOCK', 'WHEAT'),
+      'MUSHROOM_COW': array('WHEAT'),
+      'MULE': array('GOLDEN_APPLE', 'ENCHANTED_GOLDEN_APPLE', 'GOLDEN_CARROT', 'SURGER', 'APPLE', 'WHEAT', 'HAY_BLOCK'),
+      'OCELOT': array('COD', 'SALMON'),
+      'PANDA': array('BAMBOO'), 
+      'PARROT': array('BEETROOT_SEEDS', 'MELON_SEEDS', 'PUMPKIN_SEEDS', 'WHEAT_SEEDS'),
+      'PIG': array('CARROT', 'POTATO', 'BEETROOT'),
+      'RABBIT': array('DANDELION', 'CARROT', 'GOLDEN_CARROT'),
+      'SHEEP': array('WHEAT'),
+      'STRIDER': array('WARPER_FUNGUS'),
+      'TRADER_LLAMA': array('HAY_BLOCK', 'WHEAT'),
+      'TURTLE': array('SEAGRASS'),
+      'WOLF': array('BONE', 'PORKCHOP', 'COOKED_PORKCHOP', 'BEEF', 'COOKED_BEEF', 'CHICKEN', 'COOKED_CHICKEN', 'RABBIT', 'COOKED_RABBIT', 'MUTTON', 'COOKED_MUTTON', 'ROTTEN_FLESH')
+    )
+    if(array_index_exists(@breading_items, @event['clicked'])) {
+      if(@event['hand'] == 'main_hand') {
+        @item = get_inventory_item(@uuid, pheld_slot(@player))
+      } else {
+        @item = get_inventory_item(@uuid, 40)
+      }
+      if(is_array(@item) && array_contains(@breading_items[@event['clicked']], @item['name'])) {
+        cancel()
+      }
+    }
+  }
+}
+
+bind('piston_extend', null, null, @event) {
+  broadcast(@event['affectedBlocks'])
+  foreach(@affectedBlock in @event['affectedBlocks']) {
+    if(@affectedBlock['name'] == 'CACTUS' || @affectedBlock['name'] == 'SUGAR_CANE') {
+      broadcast(작물 밈)
+      cancel()
+    }
   }
 }
 
