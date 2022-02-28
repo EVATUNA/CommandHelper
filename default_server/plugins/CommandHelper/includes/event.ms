@@ -2471,15 +2471,50 @@ bind('player_interact_entity', null, null, @event) {
   }
 }
 
+# 피스톤 캔슬
 bind('piston_extend', null, null, @event) {
-  broadcast(@event['affectedBlocks'])
+  @immovable_blocks = array(
+    'CACTUS',
+    'SUGAR_CANE',
+    'GRASS_BLOCK',
+    'DIRT',
+    'COARSE_DIRT',
+    'ROOTED_DIRT',
+    'PODZOL',
+    'SAND',
+    'MOSS_BLOCK',
+    'MYCELIUM',
+    'RED_SAND'
+  )
   foreach(@affectedBlock in @event['affectedBlocks']) {
-    if(@affectedBlock['name'] == 'CACTUS' || @affectedBlock['name'] == 'SUGAR_CANE') {
-      broadcast(작물 밈)
+    if(array_contains(@immovable_blocks, @affectedBlock['name'])) {
       cancel()
+      break()
     }
   }
 }
+bind('piston_retract', null, null, @event) {
+    @immovable_blocks = array(
+    'CACTUS',
+    'SUGAR_CANE',
+    'GRASS_BLOCK',
+    'DIRT',
+    'COARSE_DIRT',
+    'ROOTED_DIRT',
+    'PODZOL',
+    'SAND',
+    'MOSS_BLOCK',
+    'MYCELIUM',
+    'RED_SAND'
+  )
+  foreach(@affectedBlock in @event['affectedBlocks']) {
+    if(array_contains(@immovable_blocks, @affectedBlock['name'])) {
+      cancel()
+      break()
+    }
+  }
+}
+
 
 # 스폰 상호 작용
 if(@server == 'main') {

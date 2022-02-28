@@ -1,17 +1,7 @@
 [
   {
-    "name": "music.minecraft",
-    "time": 234,
-    "volume": 1.0
-  },
-  {
-    "name": "music.clark",
-    "time": 191,
-    "volume": 1.0
-  },
-  {
-    "name": "music.sweden",
-    "time": 215,
-    "volume": 1.0
+    "name": "music.spawn_1",
+    "time": 160,
+    "volume": 0.4
   }
 ]
