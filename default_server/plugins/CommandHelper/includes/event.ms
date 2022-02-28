@@ -2515,6 +2515,15 @@ bind('piston_retract', null, null, @event) {
   }
 }
 
+# 나무 벌집 제거
+bind('tree_grow', null, null, @event) {
+  set_timeout(1, closure() {
+    @last_location = @event['blocks'][-1]
+    if(get_block(@last_location) == 'BEE_NEST') {
+      set_block(@last_location, 'AIR')
+    }
+  })
+}
 
 # 스폰 상호 작용
 if(@server == 'main') {
