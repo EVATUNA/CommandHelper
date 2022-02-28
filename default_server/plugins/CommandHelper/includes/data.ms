@@ -7,7 +7,6 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
   # sidebar
   _load_sidebar(@player, @uuid, @text)
 
-
   # cache
   @player_data['cache'] = array(
     'is_dash': false,
@@ -16,6 +15,7 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
     'tooltips': array(),
     'indicator_id': '',
     'indicator_remove_task': 0,
+    'music_remove_task': 0,
     'last_sender': '',
     'last_whisper_sender': '',
     'whisper_target': '',
@@ -198,10 +198,8 @@ proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_
       break()
     case 'SUCCESSFULLY_LOADED':
       _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @effective_items, @text)
+      _play_world_music(@player, @uuid, @players_data, @musics_data)
       unbind()
-      if(pworld(@player) == 'spawn') {
-        _play_spawn_music(@player, @uuid, @musics_data)
-      }
       break()
     }
   }
@@ -231,6 +229,9 @@ proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @
 # 플레이어 접속
 proc _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data) {
   runas('~console', "/recipe give @player *")
+  runas('~console', "/recipe take @player tunalands:release_flag")
+  runas('~console', "/recipe take @player tunalands:take_flag")
+  
   runas('~console', "/advancement grant @player everything")
   if(!array_index_exists(@reconnecting_datas, @uuid)) {
     //_send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
@@ -262,9 +263,7 @@ proc _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spe
       }
       array_remove(@reconnecting_datas, @uuid)
       
-      if(pworld(@player) == 'spawn') {
-        _play_spawn_music(@player, @uuid, @musics_data)
-      }
+      _play_world_music(@player, @uuid, @players_data, @musics_data)
     #})
   }
 }

@@ -3,9 +3,7 @@ foreach(@player in all_players()) {
   @uuid = puuid(@player)
   set_timeout(1, closure() {
     _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, null)
-    if(pworld(@player) == 'spawn') {
-      _play_spawn_music(@player, @uuid, @musics_data)
-    }
+    _play_world_music(@player, @uuid, @players_data, @musics_data)
   })
 }
 

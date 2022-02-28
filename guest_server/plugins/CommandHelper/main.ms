@@ -33,6 +33,7 @@ bind('resource_pack_status', null,, null, @event) {
     break()
   case 'SUCCESSFULLY_LOADED':
     runas(@player, '/resourcepackdone')
+    play_named_sound(ploc(@player), array('category': 'MASTER', 'sound': 'music.spawn_1', 'volume': 0.4, 'pitch': 1), array(@player))
     break()
   }
 }
