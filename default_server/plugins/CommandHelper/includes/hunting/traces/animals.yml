@@ -24,41 +24,41 @@ sheep:
       OLD_GROWTH_PINE_TAIGA: 1.0
       OLD_GROWTH_SPRUCE_TAIGA: 1.0
 
-      DESERT: 0.0
+      DESERT: 1.0
       
-      SAVANNA: 0.75
-      SAVANNA_PLATEAU: 0.75
-      WINDSWEPT_SAVANNA: 0.75
+      SAVANNA: 1.0
+      SAVANNA_PLATEAU: 1.0
+      WINDSWEPT_SAVANNA: 1.0
 
-      BADLANDS: 0.0
-      WOODED_BADLANDS: 0.0
-      ERODED_BADLANDS: 0.0
+      BADLANDS: 1.0
+      WOODED_BADLANDS: 1.0
+      ERODED_BADLANDS: 1.0
 
       SWAMP: 1.0
 
-      JUNGLE: 0.9
-      SPARSE_JUNGLE: 0.9
-      BAMBOO_JUNGLE: 0.9
+      JUNGLE: 1.0
+      SPARSE_JUNGLE: 1.0
+      BAMBOO_JUNGLE: 1.0
 
-      SNOWY_PLAINS: 0.8
-      SNOWY_TAIGA: 0.8
-      ICE_SPIKES: 0.5
+      SNOWY_PLAINS: 1.0
+      SNOWY_TAIGA: 1.0
+      ICE_SPIKES: 1.0
 
       MEADOW: 1.0
-      WINDSWEPT_GRAVELLY_HILLS: 0.75
-      STONY_PEAKS: 0.5
-      JAGGED_PEAKS: 0.5
-      GROVE: 0.5
-      SNOWY_SLOPES: 0.5
-      FROZEN_PEAKS: 0.5
+      WINDSWEPT_GRAVELLY_HILLS: 1.0
+      STONY_PEAKS: 1.0
+      JAGGED_PEAKS: 1.0
+      GROVE: 1.0
+      SNOWY_SLOPES: 1.0
+      FROZEN_PEAKS: 1.0
 
-      MUSHROOM_FIELDS: 0.0
+      MUSHROOM_FIELDS: 1.0
 
       RIVER: 0.5
-      FROZEN_RIVER: 0.25
+      FROZEN_RIVER: 0.5
 
       BEACH: 0.75
-      STONY_SHORE: 0.5
+      STONY_SHORE: 0.75
       SNOWY_BEACH: 0.75
 
       OCEAN: 0.0
@@ -104,10 +104,8 @@ sheep:
     # log는 무조건 normal_model만 적용됨
     item: 
       name: 'NAUTILUS_SHELL'
-      normal_model: 101
-      snow_model: 151
-
-
+      normal_model: 105
+      snow_model: 155
 
 pig:
   min_move: 10
@@ -134,41 +132,41 @@ pig:
       OLD_GROWTH_PINE_TAIGA: 1.0
       OLD_GROWTH_SPRUCE_TAIGA: 1.0
 
-      DESERT: 0.0
+      DESERT: 1.0
       
-      SAVANNA: 0.75
-      SAVANNA_PLATEAU: 0.75
-      WINDSWEPT_SAVANNA: 0.75
+      SAVANNA: 1.0
+      SAVANNA_PLATEAU: 1.0
+      WINDSWEPT_SAVANNA: 1.0
 
-      BADLANDS: 0.0
-      WOODED_BADLANDS: 0.0
-      ERODED_BADLANDS: 0.0
+      BADLANDS: 1.0
+      WOODED_BADLANDS: 1.0
+      ERODED_BADLANDS: 1.0
 
       SWAMP: 1.0
 
-      JUNGLE: 0.9
-      SPARSE_JUNGLE: 0.9
-      BAMBOO_JUNGLE: 0.9
+      JUNGLE: 1.0
+      SPARSE_JUNGLE: 1.0
+      BAMBOO_JUNGLE: 1.0
 
-      SNOWY_PLAINS: 0.8
-      SNOWY_TAIGA: 0.8
-      ICE_SPIKES: 0.5
+      SNOWY_PLAINS: 1.0
+      SNOWY_TAIGA: 1.0
+      ICE_SPIKES: 1.0
 
       MEADOW: 1.0
-      WINDSWEPT_GRAVELLY_HILLS: 0.75
-      STONY_PEAKS: 0.5
-      JAGGED_PEAKS: 0.5
-      GROVE: 0.5
-      SNOWY_SLOPES: 0.5
-      FROZEN_PEAKS: 0.5
+      WINDSWEPT_GRAVELLY_HILLS: 1.0
+      STONY_PEAKS: 1.0
+      JAGGED_PEAKS: 1.0
+      GROVE: 1.0
+      SNOWY_SLOPES: 1.0
+      FROZEN_PEAKS: 1.0
 
-      MUSHROOM_FIELDS: 0.0
+      MUSHROOM_FIELDS: 1.0
 
       RIVER: 0.5
-      FROZEN_RIVER: 0.25
+      FROZEN_RIVER: 0.5
 
       BEACH: 0.75
-      STONY_SHORE: 0.5
+      STONY_SHORE: 0.75
       SNOWY_BEACH: 0.75
 
       OCEAN: 0.0
@@ -193,5 +191,269 @@ pig:
     facing: RANDOM
     item: 
       name: 'NAUTILUS_SHELL'
-      normal_model: 101
-      snow_model: 151
+      normal_model: 105
+      snow_model: 155
+
+cow:
+  min_move: 10
+  max_move: 20
+  mob: cow
+  count: 1
+  conditions:
+    chance_by_biomes:
+      PLAINS: 1.0
+      WINDSWEPT_HILLS: 1.0
+
+      FOREST: 1.0
+      WINDSWEPT_FOREST: 1.0
+
+      SUNFLOWER_PLAINS: 1.0
+      FLOWER_FOREST: 1.0
+
+      BIRCH_FOREST: 1.0
+      OLD_GROWTH_BIRCH_FOREST: 1.0
+      
+      DARK_FOREST: 1.0
+
+      TAIGA: 1.0
+      OLD_GROWTH_PINE_TAIGA: 1.0
+      OLD_GROWTH_SPRUCE_TAIGA: 1.0
+
+      DESERT: 1.0
+      
+      SAVANNA: 1.0
+      SAVANNA_PLATEAU: 1.0
+      WINDSWEPT_SAVANNA: 1.0
+
+      BADLANDS: 1.0
+      WOODED_BADLANDS: 1.0
+      ERODED_BADLANDS: 1.0
+
+      SWAMP: 1.0
+
+      JUNGLE: 1.0
+      SPARSE_JUNGLE: 1.0
+      BAMBOO_JUNGLE: 1.0
+
+      SNOWY_PLAINS: 1.0
+      SNOWY_TAIGA: 1.0
+      ICE_SPIKES: 1.0
+
+      MEADOW: 1.0
+      WINDSWEPT_GRAVELLY_HILLS: 1.0
+      STONY_PEAKS: 1.0
+      JAGGED_PEAKS: 1.0
+      GROVE: 1.0
+      SNOWY_SLOPES: 1.0
+      FROZEN_PEAKS: 1.0
+
+      MUSHROOM_FIELDS: 1.0
+
+      RIVER: 0.5
+      FROZEN_RIVER: 0.5
+
+      BEACH: 0.75
+      STONY_SHORE: 0.75
+      SNOWY_BEACH: 0.75
+
+      OCEAN: 0.0
+      DEEP_OCEAN: 0.0
+      DEEP_COLD_OCEAN: 0.0
+      COLD_OCEAN: 0.0
+      FROZEN_OCEAN: 0.0
+      DEEP_FROZEN_OCEAN: 0.0
+      LUKEWARM_OCEAN: 0.0
+      DEEP_LUKEWARM_OCEAN: 0.0
+      WARM_OCEAN: 0.0
+
+      LUSH_CAVES: 0.0
+      DRIPSTONE_CAVES: 0.0
+
+    height_difference_for_chance: 40
+    #min_y: 63 // 강을 건너지 않도록 하는 용도로 주요 사용됨
+    #max_y: 320
+  trace_term: 3
+  traces:
+    type: normal
+    facing: RANDOM
+    item: 
+      name: 'NAUTILUS_SHELL'
+      normal_model: 102
+      snow_model: 152
+ 
+rabbit:
+  min_move: 10
+  max_move: 20
+  mob: rabbit
+  count: 1
+  conditions:
+    chance_by_biomes:
+      PLAINS: 1.0
+      WINDSWEPT_HILLS: 1.0
+
+      FOREST: 1.0
+      WINDSWEPT_FOREST: 1.0
+
+      SUNFLOWER_PLAINS: 1.0
+      FLOWER_FOREST: 1.0
+
+      BIRCH_FOREST: 1.0
+      OLD_GROWTH_BIRCH_FOREST: 1.0
+      
+      DARK_FOREST: 1.0
+
+      TAIGA: 1.0
+      OLD_GROWTH_PINE_TAIGA: 1.0
+      OLD_GROWTH_SPRUCE_TAIGA: 1.0
+
+      DESERT: 1.0
+      
+      SAVANNA: 1.0
+      SAVANNA_PLATEAU: 1.0
+      WINDSWEPT_SAVANNA: 1.0
+
+      BADLANDS: 1.0
+      WOODED_BADLANDS: 1.0
+      ERODED_BADLANDS: 1.0
+
+      SWAMP: 1.0
+
+      JUNGLE: 1.0
+      SPARSE_JUNGLE: 1.0
+      BAMBOO_JUNGLE: 1.0
+
+      SNOWY_PLAINS: 1.0
+      SNOWY_TAIGA: 1.0
+      ICE_SPIKES: 1.0
+
+      MEADOW: 1.0
+      WINDSWEPT_GRAVELLY_HILLS: 1.0
+      STONY_PEAKS: 1.0
+      JAGGED_PEAKS: 1.0
+      GROVE: 1.0
+      SNOWY_SLOPES: 1.0
+      FROZEN_PEAKS: 1.0
+
+      MUSHROOM_FIELDS: 1.0
+
+      RIVER: 0.5
+      FROZEN_RIVER: 0.5
+
+      BEACH: 0.75
+      STONY_SHORE: 0.75
+      SNOWY_BEACH: 0.75
+
+      OCEAN: 0.0
+      DEEP_OCEAN: 0.0
+      DEEP_COLD_OCEAN: 0.0
+      COLD_OCEAN: 0.0
+      FROZEN_OCEAN: 0.0
+      DEEP_FROZEN_OCEAN: 0.0
+      LUKEWARM_OCEAN: 0.0
+      DEEP_LUKEWARM_OCEAN: 0.0
+      WARM_OCEAN: 0.0
+
+      LUSH_CAVES: 0.0
+      DRIPSTONE_CAVES: 0.0
+
+    height_difference_for_chance: 40
+    #min_y: 63 // 강을 건너지 않도록 하는 용도로 주요 사용됨
+    #max_y: 320
+  trace_term: 3
+  traces:
+    type: normal
+    facing: RANDOM
+    item: 
+      name: 'NAUTILUS_SHELL'
+      normal_model: 106
+      snow_model: 156
+
+chicken:
+  min_move: 10
+  max_move: 20
+  mob: chicken
+  count: 1
+  conditions:
+    chance_by_biomes:
+      PLAINS: 1.0
+      WINDSWEPT_HILLS: 1.0
+
+      FOREST: 1.0
+      WINDSWEPT_FOREST: 1.0
+
+      SUNFLOWER_PLAINS: 1.0
+      FLOWER_FOREST: 1.0
+
+      BIRCH_FOREST: 1.0
+      OLD_GROWTH_BIRCH_FOREST: 1.0
+      
+      DARK_FOREST: 1.0
+
+      TAIGA: 1.0
+      OLD_GROWTH_PINE_TAIGA: 1.0
+      OLD_GROWTH_SPRUCE_TAIGA: 1.0
+
+      DESERT: 1.0
+      
+      SAVANNA: 1.0
+      SAVANNA_PLATEAU: 1.0
+      WINDSWEPT_SAVANNA: 1.0
+
+      BADLANDS: 1.0
+      WOODED_BADLANDS: 1.0
+      ERODED_BADLANDS: 1.0
+
+      SWAMP: 1.0
+
+      JUNGLE: 1.0
+      SPARSE_JUNGLE: 1.0
+      BAMBOO_JUNGLE: 1.0
+
+      SNOWY_PLAINS: 1.0
+      SNOWY_TAIGA: 1.0
+      ICE_SPIKES: 1.0
+
+      MEADOW: 1.0
+      WINDSWEPT_GRAVELLY_HILLS: 1.0
+      STONY_PEAKS: 1.0
+      JAGGED_PEAKS: 1.0
+      GROVE: 1.0
+      SNOWY_SLOPES: 1.0
+      FROZEN_PEAKS: 1.0
+
+      MUSHROOM_FIELDS: 1.0
+
+      RIVER: 0.5
+      FROZEN_RIVER: 0.5
+
+      BEACH: 0.75
+      STONY_SHORE: 0.75
+      SNOWY_BEACH: 0.75
+
+      OCEAN: 0.0
+      DEEP_OCEAN: 0.0
+      DEEP_COLD_OCEAN: 0.0
+      COLD_OCEAN: 0.0
+      FROZEN_OCEAN: 0.0
+      DEEP_FROZEN_OCEAN: 0.0
+      LUKEWARM_OCEAN: 0.0
+      DEEP_LUKEWARM_OCEAN: 0.0
+      WARM_OCEAN: 0.0
+
+      LUSH_CAVES: 0.0
+      DRIPSTONE_CAVES: 0.0
+
+      LUSH_CAVES: 0.0
+      DRIPSTONE_CAVES: 0.0
+
+    height_difference_for_chance: 40
+    #min_y: 63 // 강을 건너지 않도록 하는 용도로 주요 사용됨
+    #max_y: 320
+  trace_term: 3
+  traces:
+    type: normal
+    facing: RANDOM
+    item: 
+      name: 'NAUTILUS_SHELL'
+      normal_model: 103
+      snow_model: 153

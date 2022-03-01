@@ -307,7 +307,7 @@ proc _quit_event(@uuid, @players_data, @server) {
       _save_active_skill(@uuid, @selected_harvesting_method, @active_skill)
     }
     //룬에도 액티브 스킬 있을 경우 룬 불러와야 함
-
+    clear_task(@players_data[@uuid]['cache']['music_remove_task'])
     array_remove(@players_data, @uuid)
     #_update_tip_data(@uuid, @players_data)
   }
