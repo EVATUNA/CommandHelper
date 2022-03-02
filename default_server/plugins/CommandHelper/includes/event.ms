@@ -2,6 +2,7 @@
 foreach(@player in all_players()) {
   @uuid = puuid(@player)
   set_timeout(1, closure() {
+    runas('~console', "/stopsound @player music")
     _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, null)
     _play_world_music(@player, @uuid, @players_data, @musics_data)
   })

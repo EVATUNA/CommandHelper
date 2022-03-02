@@ -30,7 +30,7 @@ proc _play_world_music(@player, @uuid, @players_data, @musics_data) {
       @music_name = @music_data['name']
       @music_time = @music_data['time']
       @music_volume = @music_data['volume']
-      runas('~console', "/stopsound @player music")
+      //runas('~console', "/stopsound @player music")
       set_timeout(100, closure() {
         play_named_sound(ploc(@player), array('category': 'MUSIC', 'sound': @music_name, 'volume': @music_volume, 'pitch': 1), array(@player))
         @players_data[@uuid]['cache']['music_remove_task'] = set_timeout(@music_time * 1000, closure() {
