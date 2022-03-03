@@ -81,7 +81,7 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
     @items['armor'] = null
   }
   _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text)
-  
+
   # tunalevel
   _show_tunalevel(@uuid, @player_data, @text)
 

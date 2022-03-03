@@ -1,33 +1,3 @@
-@shop_log_data = array()
-if(@server == 'main') {
-  @date = simple_date('yyyy-MM-dd')
-  @shop_log_data = array(
-    'date': @date,
-    'path': 'logs/'.@date.'.log'
-  )
-
-  if(!file_exists(@shop_log_data['path'])) {
-    create_file(@shop_log_data['path'])
-  }
-
-  @cron_task = set_cron('0 0 * * *', closure() {
-    @date = simple_date('yyyy-MM-dd')
-    @shop_log_data['date'] = @date
-    @shop_log_data['path'] = 'logs/'.@date.'.log'
-  })
-
-  proc _shop_logging(@shop_log_data, @player, @uuid, @type, @item, @qty, @price) {
-    if(array_index_exists(@item, 'meta', 'display') && @item['meta']['display'] != '') {
-      @item_name = strip_colors(@item['meta']['display'])
-    } else {
-      @item_name = @item['name']
-    }
-    @message = @player.'('.@uuid.') '.@type.' '.@item_name.' x'.@qty.' (price:'.@price.')' 
-    @log = string('['.simple_date('HH:mm:ss').'] '.@message.'\n')
-    write_file(@shop_log_data['path'], @log, 'APPEND')
-  }
-}
-
 proc _formConvertGuiForm(@item, @itemId) {
   @item['itemId'] = @itemId // @itemId 선언
   if(array_index_exists(@item, 'meta')) {
@@ -183,7 +153,7 @@ void proc _buyItem(@player, @itemMeta) { # 구매
   }
 }
 
-void proc _sellItem(@player, @itemMeta, @detail, @shop_log_data) { # 판매
+void proc _sellItem(@player, @itemMeta, @detail, @shop_log_path) { # 판매
   @price = @itemMeta['meta']['price']['sell']
   @taken_qty = _takeItem(@player, @itemMeta, @detail)
   @selling_price = @price * @taken_qty
@@ -191,7 +161,7 @@ void proc _sellItem(@player, @itemMeta, @detail, @shop_log_data) { # 판매
     acc_add(player(), @selling_price)
     if(is_proc('_shop_logging')) {
       @uuid = puuid(@player)
-      _shop_logging(@shop_log_data, @player, @uuid, 'sell', @itemMeta, @taken_qty, @selling_price)
+      _shop_logging(@shop_log_path, @player, @uuid, 'sell', @itemMeta, @taken_qty, @selling_price)
     }
   }
 }
@@ -267,12 +237,12 @@ proc _setupFrame(@storeName, @player, @stores) { ## gui 열 때 구성시켜주�
   return(@frame)
 }
 
-proc _setupEvent(@player, @stores, @shop_log_data) { ## GUI 이벤트 함수(클릭 이벤트 여깄슴)
+proc _setupEvent(@player, @stores, @shop_log_path) { ## GUI 이벤트 함수(클릭 이벤트 여깄슴)
   @guiFrames = @stores['guiFrames']
   @viewers = @stores['viewers']
   @products = @stores['products']
   @returnList = array()
-  @returnList[] = bind('inventory_click', null, array('virtual': true, 'player': @player), @e, @player, @guiFrames, @viewers, @stores, @products, @shop_log_data) {
+  @returnList[] = bind('inventory_click', null, array('virtual': true, 'player': @player), @e, @player, @guiFrames, @viewers, @stores, @products, @shop_log_path) {
     cancel()
     @hitSlot = @e['rawslot']
     if(@hitSlot < 54, cancel()) # STORE CLICK CANCEL
@@ -324,11 +294,11 @@ proc _setupEvent(@player, @stores, @shop_log_data) { ## GUI 이벤트 함수(클
             if(array_index_exists(@hitItemMeta['meta'], 'detail')) {
               @detail = @hitItemMeta['meta']['detail']
             }
-            _sellItem(@player, @targetItem, @detail, @shop_log_data)
+            _sellItem(@player, @targetItem, @detail, @shop_log_path)
           }
         }
       }
-      _showGui(@player, @storeName, @stores, @shop_log_data)
+      _showGui(@player, @storeName, @stores, @shop_log_path)
     }
   }
   @returnList[] = bind('inventory_drag', null, array('virtual': true), @e, @player) {
@@ -352,7 +322,7 @@ proc _existGui(@guiId) {
 
 proc _guiId(@player) { return('STOREGUI.'.@player) }
 
-void proc _showGui(@player, @storeName, @stores, @shop_log_data) { ## GUI 여는 함수
+void proc _showGui(@player, @storeName, @stores, @shop_log_path) { ## GUI 여는 함수
   @guiId = _guiId(@player)
 
   @viewers = @stores['viewers']
@@ -360,7 +330,7 @@ void proc _showGui(@player, @storeName, @stores, @shop_log_data) { ## GUI 여는
   if(!array_index_exists(@viewers, @player)) {
     popen_inventory(@player, @guiId)
     @viewers[@player] = array( ## SET VALUE
-      'events': _setupEvent(@player, @stores, @shop_log_data),
+      'events': _setupEvent(@player, @stores, @shop_log_path),
       'storeName': @storeName,
       'tradeInfo': array(
         'count': 1,
@@ -377,7 +347,7 @@ void proc _showGui(@player, @storeName, @stores, @shop_log_data) { ## GUI 여는
 register_command('quickeasyshop', array(
   'aliases': array('store', 'evatunastore'),
   'executor': closure(@prefix, @sender, @inArguments) {
-    _showGui(@sender, @inArguments[0], @stores, @shop_log_data)
+    _showGui(@sender, @inArguments[0], @stores, @shop_log_path)
   },
   'tabcompleter': closure(@prefix, @sender, @inArguments) {
     return(array())

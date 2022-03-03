@@ -10,7 +10,9 @@ foreach(@player in all_players()) {
 
 # 1초 반복
 @interval_task = set_interval(1000, closure() {
-  _countdown_reconnectable_players(@reconnecting_datas)
+  if(is_proc('_countdown_reconnectable_players')) {
+    _countdown_reconnectable_players(@reconnecting_datas)
+  }
   foreach(@uuid: @player_data in @players_data) {
     @player = player(@uuid)
     if(ponline(@player)) {
@@ -2534,12 +2536,13 @@ bind('tree_grow', null, null, @event) {
 
 # 스폰 상호 작용
 if(@server == 'main') {
-  bind('player_interact_entity', null, array('clicked': 'PLAYER', 'hand': 'main_hand'), @event, @stores, @shop_log_data) {
+  bind('player_interact_entity', null, array('clicked': 'PLAYER', 'hand': 'main_hand'), @event, @stores, @log_paths) {
     @player = @event['player']
     @uuid = puuid(@player)
+    @shop_log_path = @log_paths['shop']
     switch(@event['data']) {
     case '편돌이튜나':
-      _showGui(@player, 'crop', @stores, @shop_log_data)
+      _showGui(@player, 'crop', @stores, @shop_log_path)
       break()
     }
   }
