@@ -239,7 +239,7 @@ bind('inventory_close', null, array('virtual': true), @event) {
   @player = @event['player']
   @id = pinventory_holder(@player)
   set_timeout(1, closure() {
-    #if(has_bind('open'.@id)) { unbind('open'.@id) } #의미 없음
+    #if(has_bind("open.@id")) { unbind("open.@id") } #의미 없음
     if(has_bind("click.@id")) { unbind("click.@id") }
     if(has_bind("drag.@id")) { unbind("drag.@id") }
     if(has_bind("close.@id")) { unbind("close.@id") }

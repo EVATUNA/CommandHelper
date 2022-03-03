@@ -221,7 +221,7 @@ proc _ask_using_skill_reset_scroll(@player, @uuid, @item, @players_data, @skills
   @inventory[5]['meta']['display'] = '§a네'
   @inventory[7]['meta']['display'] = '§c아니요'
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @item, @players_data, @skills_spec, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @item, @players_data, @skills_spec, @text) {
+    bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @player, @uuid, @item, @players_data, @skills_spec, @text) {
       cancel()
       # 슬롯
       if(@event['action'] == 'PICKUP_ALL') {
@@ -352,7 +352,7 @@ proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page
       'display': '§8비어 있음',
       'lore': array(
         '§7해당 슬롯에 장착한 룬이 없습니다.',
-        '§7아래, 룬 백에서 룬을 좌클릭하여 룬을 장착할 수 있습니다.'
+        '§7아래, 룬 백에서 룬을 좌 클릭하여 룬을 장착할 수 있습니다.'
       ),
       'model': 1
     )
@@ -411,7 +411,7 @@ proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page
         'display': "§8Lv.@rune_level @rune_display @selected_rune",
         'lore': array(
           '§7이 슬롯에는§c'@rune_display'§7룬이 장착되어 있습니다.',
-          '§7좌클릭 시, 룬 장착을 해제합니다.',
+          '§7좌 클릭 시 룬 장착을 해제합니다.',
           ''
         ),
         'model': @rune_info['icon']
@@ -493,7 +493,7 @@ proc _open_rune(@player, @uuid, @players_data, @skills_info, @skills_spec, @page
   @texture_layer = @text['space_fonts']['space.-8'].'\uec2b'.@text['space_fonts']['space.-169'].@line_1.@text['space_fonts']['space.-18'].@up_arrow.@text['space_fonts']['space.-18'].@down_arrow.@text['space_fonts']['space.-144'].@lines[0].@text['space_fonts']['space.-126'].@lines[1].@text['space_fonts']['space.-126'].@lines[2].@text['space_fonts']['space.-126'].@lines[3].@text['space_fonts']['space.-144']
   @message = '룬 백'
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_info, @skills_spec, @page, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec,@page,  @text) {
+    bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec,@page,  @text) {
       cancel()
       # 데이터 선언
       @player_data = @players_data[@uuid]
@@ -614,18 +614,18 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
     @category = @skill_spec['category']
     @skill_display = @skill_info['display']
     if(@skill_point == 0) {
-      @skill_point_text = "§8Lv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+      @skill_point_text = "§8Lv.@skill_point @skill_display §8(최대: @skill_max_point)"
       @skill_icon = @skill_info['icon']['off']
       if(@category == 'combat_method') {
         @lore = array(
-          '§7포인트를 사용하여 스킬 레벨을 올린 후,',
-          '§7스킬 아이콘 좌클릭 시, 전투 방식이 선택되며',
+          '§7포인트를 사용하여 스킬 레벨을 올릴 시',
+          '§7스킬 아이콘 좌 클릭하면 전투 방식이 선택되며',
           '§7스킬 효과를 받을 수 있습니다.',
           ''
         )
       } else {
         @lore = array(
-          '§7포인트를 사용하여 스킬 레벨을 올릴 시,',
+          '§7포인트를 사용하여 스킬 레벨을 올릴 시',
           '§7스킬 효과를 받을 수 있습니다.',
           ''
         )
@@ -634,32 +634,32 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
     } else {
       if(@category == 'combat_method') {
         if(@skill == @selected_combat_method) {
-          @skill_point_text = "§bLv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+          @skill_point_text = "§bLv.@skill_point @skill_display §8(최대: @skill_max_point)"
           @skill_icon = @skill_info['icon']['on']
           @lore = array(
             '§7현재 해당 전투 방식 사용중입니다.',
-            '§7좌클릭 시, 해당 전투 방식 사용을 해제합니다.',
+            '§7좌 클릭 시 해당 전투 방식 사용을 해제합니다.',
             ''
           )
         } else {
-          @skill_point_text = "§8Lv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+          @skill_point_text = "§8Lv.@skill_point @skill_display §8(최대: @skill_max_point)"
           @skill_icon = @skill_info['icon']['off']
           if(@selected_combat_method == '') {
             @lore = array(
               '§7현재 사용중인 전투 방식이 없습니다.',
-              '§7좌클릭 시, §c'.@skill_display.' §7전투 방식을 사용합니다.',
+              '§7좌 클릭 시 §c'.@skill_display.' §7전투 방식을 사용합니다.',
               ''
             )
           } else {
             @lore = array(
               '§7현재 §c'.@skills_info[@selected_combat_method]['display'].'§7 전투 방식 사용중입니다.',
-              '§7좌클릭 시, §c'.@skill_display.' §7전투 방식을 사용합니다.',
+              '§7좌 클릭 시 §c'.@skill_display.' §7전투 방식을 사용합니다.',
               ''
             )
           }
         }
       } else {
-        @skill_point_text = "§bLv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+        @skill_point_text = "§bLv.@skill_point @skill_display §8(최대: @skill_max_point)"
         @skill_icon = @skill_info['icon']['on']
         @lore = array()
       }
@@ -705,7 +705,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
     if(@remaining_point > 0 && @skills_data[@skill][0] < @skills_data[@skill][1]) {
       @inventory[@slots['button']]['skill'] = @skill
       @inventory[@slots['button']]['slot_type'] = 'button'
-      @inventory[@slots['button']]['meta']['display'] = '§7좌클릭 시, 포인트 사용'
+      @inventory[@slots['button']]['meta']['display'] = '§7좌 클릭 시 포인트 사용'
       @inventory[@slots['button']]['meta']['model'] = 6
       @inventory[@slots['button']]['meta']['lore'] = array_merge(
         array(
@@ -720,7 +720,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
   @inventory[53]['meta']['display'] = '§f채광'
   # GUI 이벤트 익스큐터 설정
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_info, @skills_spec, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
+    bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
       cancel()
       # 데이터 선언
       @player_data = @players_data[@uuid]
@@ -871,72 +871,72 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
     @category = @skill_spec['category']
     @skill_display = @skill_info['display']
     if(@skill_point == 0) {
-      @skill_point_text = "§8Lv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+      @skill_point_text = "§8Lv.@skill_point @skill_display §8(최대: @skill_max_point)"
       @skill_icon = @skill_info['icon']['off']
       if(@category == 'sowing_method') {
         @lore = array(
-          '§7포인트를 사용하여 스킬 레벨을 올린 후,',
-          '§7스킬 아이콘 좌클릭 시, 파종 방식이 선택되며',
-          '§7스킬 사용 시, 효과를 받을 수 있습니다.',
+          '§7포인트를 사용하여 스킬 레벨을 올릴 시',
+          '§7스킬 아이콘 좌 클릭하면 파종 방식이 선택되며',
+          '§7스킬 사용 시 효과를 받을 수 있습니다.',
           ''
         )
       } else if(@category == 'harvesting_method') {
         @lore = array(
-          '§7포인트를 사용하여 스킬 레벨을 올린 후,',
-          '§7스킬 아이콘 좌클릭 시, 수확 방식이 선택되며',
-          '§7스킬 사용 시, 효과를 받을 수 있습니다.',
+          '§7포인트를 사용하여 스킬 레벨을 올릴 시',
+          '§7스킬 아이콘 좌 클릭하면 수확 방식이 선택되며',
+          '§7스킬 사용 시 효과를 받을 수 있습니다.',
           ''
         )
       }
     } else {
       if(@category == 'sowing_method') {
         if(@skill == @selected_sowing_method) {
-          @skill_point_text = "§bLv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+          @skill_point_text = "§bLv.@skill_point @skill_display §8(최대: @skill_max_point)"
           @skill_icon = @skill_info['icon']['on']
           @lore = array(
             '§7현재 해당 파종 방식 사용중입니다.',
-            '§7좌클릭 시, 해당 파종 방식 사용을 해제합니다.',
+            '§7좌 클릭 시 해당 파종 방식 사용을 해제합니다.',
             ''
           )
         } else {
-          @skill_point_text = "§8Lv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+          @skill_point_text = "§8Lv.@skill_point @skill_display §8(최대: @skill_max_point)"
           @skill_icon = @skill_info['icon']['off']
           if(@selected_sowing_method == '') {
             @lore = array(
               '§7현재 사용중인 파종 방식이 없습니다.',
-              '§7좌클릭 시, §c'.@skill_display.' §7파종 방식을 사용합니다.',
+              '§7좌 클릭 시 §c'.@skill_display.' §7파종 방식을 사용합니다.',
               ''
             )
           } else {
             @lore = array(
               '§7현재 §c'.@skills_info[@selected_sowing_method]['display'].'§7 파종 방식 사용중입니다.',
-              '§7좌클릭 시, §c'.@skill_display.' §7파종 방식을 사용합니다.',
+              '§7좌 클릭 시 §c'.@skill_display.' §7파종 방식을 사용합니다.',
               ''
             )
           }
         }
       } else if(@category == 'harvesting_method') {
         if(@skill == @selected_harvesting_method) {
-          @skill_point_text = "§bLv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+          @skill_point_text = "§bLv.@skill_point @skill_display §8(최대: @skill_max_point)"
           @skill_icon = @skill_info['icon']['on']
           @lore = array(
             '§7현재 해당 수확 방식 사용중입니다.',
-            '§7좌클릭 시, 해당 수확 방식 사용을 해제합니다.',
+            '§7좌 클릭 시 해당 수확 방식 사용을 해제합니다.',
             ''
           )
         } else {
-          @skill_point_text = "§8Lv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+          @skill_point_text = "§8Lv.@skill_point @skill_display §8(최대: @skill_max_point)"
           @skill_icon = @skill_info['icon']['off']
           if(@selected_harvesting_method == '') {
             @lore = array(
               '§7현재 사용중인 수확 방식이 없습니다.',
-              '§7좌클릭 시, §c'.@skill_display.' §7수확 방식을 사용합니다.',
+              '§7좌 클릭 시 §c'.@skill_display.' §7수확 방식을 사용합니다.',
               ''
             )
           } else {
             @lore = array(
               '§7현재 §c'.@skills_info[@selected_harvesting_method]['display'].'§7 수확 방식 사용중입니다.',
-              '§7좌클릭 시, §c'.@skill_display.' §7수확 방식을 사용합니다.',
+              '§7좌 클릭 시 §c'.@skill_display.' §7수확 방식을 사용합니다.',
               ''
             )
           }
@@ -984,7 +984,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
     if(@remaining_point > 0 && @skills_data[@skill][0] < @skills_data[@skill][1]) {
       @inventory[@slots['button']]['skill'] = @skill
       @inventory[@slots['button']]['slot_type'] = 'button'
-      @inventory[@slots['button']]['meta']['display'] = '§7좌클릭 시, 포인트 사용'
+      @inventory[@slots['button']]['meta']['display'] = '§7좌 클릭 시 포인트 사용'
       @inventory[@slots['button']]['meta']['model'] = 6
       @inventory[@slots['button']]['meta']['lore'] = array_merge(
         array(
@@ -999,7 +999,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
   @inventory[53]['meta']['display'] = '§f전투 방식 · 보조 전투'
   # GUI 이벤트 익스큐터 설정
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_info, @skills_spec, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
+    bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
       cancel()
       # 데이터 선언
       @player_data = @players_data[@uuid]
@@ -1207,15 +1207,15 @@ proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_sp
     @category = @skill_spec['category']
     @skill_display = @skill_info['display']
     if(@skill_point == 0) {
-      @skill_point_text = "§8Lv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+      @skill_point_text = "§8Lv.@skill_point @skill_display §8(최대: @skill_max_point)"
       @skill_icon = @skill_info['icon']['off']
       @lore = array(
-        '§7포인트를 사용하여 스킬 레벨을 올릴 시,',
+        '§7포인트를 사용하여 스킬 레벨을 올릴 시',
         '§7스킬 효과를 받을 수 있습니다.',
         ''
       )
     } else {
-        @skill_point_text = "§bLv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+        @skill_point_text = "§bLv.@skill_point @skill_display §8(최대: @skill_max_point)"
         @skill_icon = @skill_info['icon']['on']
         @lore = array()
     }
@@ -1260,7 +1260,7 @@ proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_sp
     if(@remaining_point > 0 && @skills_data[@skill][0] < @skills_data[@skill][1]) {
       @inventory[@slots['button']]['skill'] = @skill
       @inventory[@slots['button']]['slot_type'] = 'button'
-      @inventory[@slots['button']]['meta']['display'] = '§7좌클릭 시, 포인트 사용'
+      @inventory[@slots['button']]['meta']['display'] = '§7좌 클릭 시 포인트 사용'
       @inventory[@slots['button']]['meta']['model'] = 6
       @inventory[@slots['button']]['meta']['lore'] = array_merge(
         array(
@@ -1275,7 +1275,7 @@ proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_sp
   @inventory[53]['meta']['display'] = '§f파종 · 수확 방식'
   # GUI 이벤트 익스큐터 설정
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_info, @skills_spec, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
+    bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
       cancel()
       # 데이터 선언
       @player_data = @players_data[@uuid]
@@ -1388,15 +1388,15 @@ proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
     @category = @skill_spec['category']
     @skill_display = @skill_info['display']
     if(@skill_point == 0) {
-      @skill_point_text = "§8Lv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+      @skill_point_text = "§8Lv.@skill_point @skill_display §8(최대: @skill_max_point)"
       @skill_icon = @skill_info['icon']['off']
       @lore = array(
-        '§7포인트를 사용하여 스킬 레벨을 올릴 시,',
+        '§7포인트를 사용하여 스킬 레벨을 올릴 시',
         '§7스킬 효과를 받을 수 있습니다.',
         ''
       )
     } else {
-        @skill_point_text = "§bLv.@skill_point @skill_display §8(MaxLv: @skill_max_point)"
+        @skill_point_text = "§bLv.@skill_point @skill_display §8(최대: @skill_max_point)"
         @skill_icon = @skill_info['icon']['on']
         @lore = array()
     }
@@ -1441,7 +1441,7 @@ proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
     if(@remaining_point > 0 && @skills_data[@skill][0] < @skills_data[@skill][1]) {
       @inventory[@slots['button']]['skill'] = @skill
       @inventory[@slots['button']]['slot_type'] = 'button'
-      @inventory[@slots['button']]['meta']['display'] = '§7좌클릭 시, 포인트 사용'
+      @inventory[@slots['button']]['meta']['display'] = '§7좌 클릭 시 포인트 사용'
       @inventory[@slots['button']]['meta']['model'] = 6
       @inventory[@slots['button']]['meta']['lore'] = array_merge(
         array(
@@ -1456,7 +1456,7 @@ proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
   @inventory[53]['meta']['display'] = '§f농사'
   # GUI 이벤트 익스큐터 설정
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_info, @skills_spec, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
+    bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
       cancel()
       # 데이터 선언
       @player_data = @players_data[@uuid]

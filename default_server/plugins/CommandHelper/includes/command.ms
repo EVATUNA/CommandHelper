@@ -342,7 +342,7 @@ proc _util_command(@command, @player, @args, @text) {
   @inventory[16]['meta']['lore'] = array('§c준 비 중')
   //@inventory[16]['meta']['lore'] = array('§7좌클릭 시, 설정 GUI를 엽니다.')
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @id) {
+    bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @player, @id) {
       cancel()
       if(@event['action'] == 'PICKUP_ALL') {
         switch(@event['rawslot']) {
@@ -396,7 +396,7 @@ proc _setting_command(@command, @player, @args, @text) {
   @inventory[14]['meta']['display'] = '§f화면 설정'
   @inventory[14]['meta']['lore'] = array('§7좌클릭 시, 화면 설정 GUI를 엽니다.')
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @texture_layer, @message, @inventory, @closure, @uuid, @text) {
+    bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @player, @texture_layer, @message, @inventory, @closure, @uuid, @text) {
       cancel()
       if(@event['action'] == 'PICKUP_ALL') {
         switch(@event['rawslot']) {
@@ -586,7 +586,7 @@ proc _screen_command(@command, @player, @args, @text, @uuid, @players_data, @ski
   )
 
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_spec, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_spec, @text) {
+    bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @player, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_spec, @text) {
       @is_using_right_hand = @players_data[@uuid]['setting'][1]
       cancel()
       if(@event['action'] == 'PICKUP_ALL') {
@@ -773,7 +773,7 @@ register_command('screen', array(
     )
   )
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_spec, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_spec, @text) {
+    bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @player, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_spec, @text) {
       cancel()
       if(@event['action'] == 'PICKUP_ALL') {
         switch(@event['rawslot']) {
@@ -856,7 +856,7 @@ proc _warp_command(@command, @player, @args, @text, @server) {
     26: @random_teleport_item,
   )
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @server) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @server) {
+    bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @player, @server) {
       cancel()
       if(@event['action'] == 'PICKUP_ALL') {
         switch(@event['rawslot']) {

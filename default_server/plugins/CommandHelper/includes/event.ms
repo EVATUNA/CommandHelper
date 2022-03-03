@@ -747,11 +747,11 @@ proc _get_repair_result(@inventory, @ingredient_name) {
     }
     @repairing_durability = integer(round(@repairing_percentage * 0.01 * @max_durability))
     @breaking_durability = integer(round(@breaking_percentage * 0.01 * @max_durability))
-    # 실패시 아이템 세팅
+    # 실패 시 아이템 세팅
     @failure_durability = @durability - @breaking_durability
     @failure_item = array_deep_clone(@repairing_item)
     @failure_item['meta']['damage'] = @max_durability - @failure_durability
-    @failure_item['meta']['display'] = '§e수리 실패시,'
+    @failure_item['meta']['display'] = '§e수리 실패 시'
     if(@failure_durability < 1) {
       @oversized_failure_durability = @failure_durability * -1 + 1
       @penalty = @oversized_failure_durability / @max_durability * 10
@@ -760,9 +760,9 @@ proc _get_repair_result(@inventory, @ingredient_name) {
       @failure_item['meta']['lore'] = array(
         '§c아이템 파괴됨',
         ' §7'.@ingredient_amount.'개의 수리 재료를 사용하였으므로',
-        ' §7수리 실패시, '.@breaking_durability.'('.@breaking_percentage.'%)'.'의 내구도가 감소합니다.',
+        ' §7수리 실패 시 '.@breaking_durability.'('.@breaking_percentage.'%)'.'의 내구도가 감소합니다.',
         '§c수리 확률 -'.@string_penalty,
-        ' §7수리 실패시, 아이템이 파괴될 정도로',
+        ' §7수리 실패 시 아이템이 파괴될 정도로',
         ' §7많은 양의 수리 재료를 사용하여',
         ' §7수리 확률 패널티가 부과됩니다.'
       )
@@ -770,13 +770,13 @@ proc _get_repair_result(@inventory, @ingredient_name) {
       @failure_item['meta']['lore'] = array(
         '§c내구도 -'.@breaking_durability.'('.@breaking_percentage.'%)',
         ' §7'.@ingredient_amount.'개의 수리 재료를 사용하였으므로',
-        ' §7수리 실패시, '.@breaking_durability.'('.@breaking_percentage.'%)의 내구도가 감소합니다.'
+        ' §7수리 실패 시 '.@breaking_durability.'('.@breaking_percentage.'%)의 내구도가 감소합니다.'
       )
     }
     @success_durability = @durability + @repairing_durability
     @success_item = array_deep_clone(@repairing_item)
     @success_item['meta']['damage'] = @max_durability - @success_durability
-    @success_item['meta']['display'] = '§e수리 성공시,'
+    @success_item['meta']['display'] = '§e수리 성공 시'
     if(@success_durability >= @max_durability) {
       @oversized_success_durability = @success_durability - @max_durability + 1
       @bonus = @oversized_success_durability / @max_durability * 10
@@ -785,9 +785,9 @@ proc _get_repair_result(@inventory, @ingredient_name) {
       @success_item['meta']['lore'] = array(
         '§a아이템 완벽히 수리됨',
         ' §7'.@ingredient_amount.'개의 수리 재료를 사용하였으므로',
-        ' §7수리 성공시, '.@repairing_durability.'('.@repairing_percentage.'%)의 내구도가 증가합니다.',
+        ' §7수리 성공 시 '.@repairing_durability.'('.@repairing_percentage.'%)의 내구도가 증가합니다.',
         '§a수리 확률 +'.@string_bonus,
-        ' §7수리 성공시, 아이템이 완벽히 수리될 정도로',
+        ' §7수리 성공 시 아이템이 완벽히 수리될 정도로',
         ' §7많은 양의 수리 재료를 사용하여',
         ' §7수리 확률 보너스가 추가됩니다.'
       )
@@ -795,7 +795,7 @@ proc _get_repair_result(@inventory, @ingredient_name) {
       @success_item['meta']['lore'] = array(
         '§a내구도 +'.@repairing_durability.'('.@repairing_percentage.'%)',
         ' §7'.@ingredient_amount.'개의 수리 재료를 사용하였으므로',
-        ' §7수리 성공시, '.@repairing_durability.'('.@repairing_percentage.'%)의 내구도가 증가합니다.'
+        ' §7수리 성공 시 '.@repairing_durability.'('.@repairing_percentage.'%)의 내구도가 증가합니다.'
       )
     }
     @return = array(
@@ -879,7 +879,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
       'meta': array(
         'display': '§b수리',
         'lore': array(
-          '§7좌클릭 시, 아이템을 수리합니다',
+          '§7좌클릭 시 아이템을 수리합니다',
           '',
           '§c수리 확률과 수리 결과를',
           '§c잘 확인한 후 수리하세요!'
@@ -892,7 +892,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
       'meta': array(
         'display': '§8수리',
         'lore': array(
-          '§7수리할 아이템과 수리 재료를 넣을 시,',
+          '§7수리할 아이템과 수리 재료를 넣을 시',
           '§7수리 버튼이 활성화됩니다.',
         ),
         'model': 1
@@ -903,7 +903,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
       'meta': array(
         'display': '§b수리 결과 새로고침',
         'lore': array(
-          '§7좌클릭 시, 수리 성공/실패 확률과',
+          '§7좌클릭 시 수리 성공/실패 확률과',
           '§7수리 성공 여부에 따른 수리 후의',
           '§7아이템 상태를 확인할 수 있습니다.',
           '',
@@ -918,7 +918,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
       'meta': array(
         'display': '§8수리 결과 새로고침',
         'lore': array(
-          '§7좌클릭 시, 수리 성공/실패 확률과',
+          '§7좌클릭 시 수리 성공/실패 확률과',
           '§7수리 성공 여부에 따른 수리 후의',
           '§7아이템 상태를 확인할 수 있습니다.'
         ),
@@ -1417,9 +1417,11 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
                           if(@is_success) {
                             play_named_sound(@particle_location, array('sound': 'entity.experience_orb.pickup', 'category': 'BLOCKS', 'volume': 0.5, 'pitch': 1))
                             mom_playerparticle(@uuid, 'FIREWORKS_SPARK', @particle_location['x'], @particle_location['y'], @particle_location['z'], 5, 0.1, 0.1, 0.1, 0.1)
+                            title(@player, '성공!', '', 0, 15, 10)
                           } else {
                             play_named_sound(@particle_location, array('sound': 'entity.item.break', 'category': 'BLOCKS', 'volume': 0.5, 'pitch': 1))
                             mom_playerparticle(@uuid, 'CLOUD', @particle_location['x'], @particle_location['y'], @particle_location['z'], 5, 0.1, 0.1, 0.1, 0.1)
+                            title(@player, '실패...', '', 0, 15, 10)
                           }
                           @return_item = @result
                           if(!is_null(@return_item)) {
@@ -1544,7 +1546,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
       }
       #아이템 안뽑고 그냥 닫을시
       set_timeout(1, closure() {
-        bind('inventory_drag', array('id': 'drag'.@id), array('virtual': true), @event, @player, @uuid) {
+        bind('inventory_drag', array('id': "drag.@id"), array('virtual': true), @event, @player, @uuid) {
           if(@event['player'] == @player) {
             @indexs = array_keys(@event['newitems'])
             foreach(@index in @indexs) {
@@ -2015,7 +2017,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
                 'meta': array(
                   'display': '§b변환의 끈',
                   'lore': array(
-                    '§7이 마법의 끈으로 비법서를 묶을 시,',
+                    '§7이 마법의 끈으로 비법서를 묶을 시',
                     '§7비법서의 스킬 종류가 변환됩니다.',
                     '',
                     '§7같은 카테고리의 스킬로만 변환됩니다.',
@@ -2029,7 +2031,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
                 'meta': array(
                   'display': '§b놀라운 변환의 끈',
                   'lore': array(
-                    '§7이 마법의 끈으로 비법서를 묶을 시,',
+                    '§7이 마법의 끈으로 비법서를 묶을 시',
                     '§7비법서의 스킬 종류가 변환됩니다.',
                     '',
                     '§7다른 카테고리의 스킬로 변환될 수 있습니다.',
@@ -2043,7 +2045,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
                 'meta': array(
                   'display': '§b강력한 변환의 끈',
                   'lore': array(
-                    '§7이 마법의 끈으로 비법서를 묶을 시,',
+                    '§7이 마법의 끈으로 비법서를 묶을 시',
                     '§7비법서의 레벨이 변환됩니다.',
                     '',
                     '§7다른 변환의 끈과 달리,',
@@ -2059,7 +2061,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
                 'meta': array(
                   'display': '§b스킬 포인트 초기화 스크롤',
                   'lore': array(
-                    '§7해당 스크롤 사용 시,',
+                    '§7해당 스크롤 사용 시',
                     '§7스킬에 사용한 포인트가 모두 반환되어',
                     '§7다시 스킬 포인트를 분배 할 수 있습니다.'
                   ),
