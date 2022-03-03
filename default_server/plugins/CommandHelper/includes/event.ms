@@ -2087,10 +2087,10 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
               'meta': array(
                 'display': '§f재료 아이템을 넣은 후, 만들 아이템을 선택하세요.',
                 'lore': array(
-                  '§7재료 아이템과 추출된 경험 레벨을 이용하여,',
+                  '§7재료 아이템과 추출된 아케인 레벨을 이용하여,',
                   '§7새로운 특수한 아이템을 만들 수 있습니다.',
                   '',
-                  '§7추출되는 만큼 경험 레벨이 감소합니다.'
+                  '§7추출되는 만큼 아케인 레벨이 감소합니다.'
                 ),
                 'model': 1
               )
@@ -2109,43 +2109,43 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
             @inventory[3]['meta']['lore'][] = ''
             @inventory[3]['meta']['lore'][] = '§e- 재료'
             @inventory[3]['meta']['lore'][] = '§f 유리병'
-            @inventory[3]['meta']['lore'][] = '§f 30 경험 레벨'
+            @inventory[3]['meta']['lore'][] = '§f 30 아케인 레벨'
             @inventory[12] = array_deep_clone(@magic_items['변환의 끈'])
             @inventory[12]['meta']['lore'][] = ''
             @inventory[12]['meta']['lore'][] = '§e- 재료'
             @inventory[12]['meta']['lore'][] = '§c 비활성화'
             //@inventory[12]['meta']['lore'][] = '§f 실'
-            @inventory[12]['meta']['lore'][] = '§f 30 경험 레벨'
+            @inventory[12]['meta']['lore'][] = '§f 30 아케인 레벨'
             # 60
             @inventory[5] = array_deep_clone(@magic_items['농축된 마법의 정수'])
             @inventory[5]['meta']['lore'][] = ''
             @inventory[5]['meta']['lore'][] = '§e- 재료'
             @inventory[5]['meta']['lore'][] = '§f 유리병'
-            @inventory[5]['meta']['lore'][] = '§f 60 경험 레벨'
+            @inventory[5]['meta']['lore'][] = '§f 60 아케인 레벨'
             @inventory[14] = array_deep_clone(@magic_items['놀라운 변환의 끈'])
             @inventory[14]['meta']['lore'][] = ''
             @inventory[14]['meta']['lore'][] = '§e- 재료'
             @inventory[14]['meta']['lore'][] = '§c 비활성화'
             //@inventory[14]['meta']['lore'][] = '§f 실'
-            @inventory[14]['meta']['lore'][] = '§f 60 경험 레벨'
+            @inventory[14]['meta']['lore'][] = '§f 60 아케인 레벨'
             # 90
             @inventory[7] = array_deep_clone(@magic_items['강력한 마법의 정수'])
             @inventory[7]['meta']['lore'][] = ''
             @inventory[7]['meta']['lore'][] = '§e- 재료'
             @inventory[7]['meta']['lore'][] = '§f 유리병'
-            @inventory[7]['meta']['lore'][] = '§f 90 경험 레벨'
+            @inventory[7]['meta']['lore'][] = '§f 90 아케인 레벨'
             @inventory[16] = array_deep_clone(@magic_items['강력한 변환의 끈'])
             @inventory[16]['meta']['lore'][] = ''
             @inventory[16]['meta']['lore'][] = '§e- 재료'
             @inventory[16]['meta']['lore'][] = '§c 비활성화'
             //@inventory[16]['meta']['lore'][] = '§f 실'
-            @inventory[16]['meta']['lore'][] = '§f 90 경험 레벨'
+            @inventory[16]['meta']['lore'][] = '§f 90 아케인 레벨'
             # 120
             @inventory[30] = array_deep_clone(@magic_items['스킬 포인트 초기화 스크롤'])
             @inventory[30]['meta']['lore'][] = ''
             @inventory[30]['meta']['lore'][] = '§e- 재료'
             @inventory[30]['meta']['lore'][] = '§f 종이'
-            @inventory[30]['meta']['lore'][] = '§f 120 경험 레벨'
+            @inventory[30]['meta']['lore'][] = '§f 120 아케인 레벨'
             # location
             @block_location = @event['location']
             # proc

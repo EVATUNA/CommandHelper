@@ -23,7 +23,7 @@
 				"type": "rank",
 				"weight": 5,
 				"display": "부서질듯한 구리 도끼",
-				"model": 0,
+				"model": 1,
 				"attributes": {
 					"attack_damage": {
 						"min": 5.200,
@@ -39,7 +39,7 @@
 				"type": "rank",
 				"weight": 10,
 				"display": "의미를 알 수 없는 구리 도끼",
-				"model": 0,
+				"model": 1,
 				"attributes": {
 					"attack_damage": {
 						"min": 5.200,
@@ -55,7 +55,7 @@
 				"type": "rank",
 				"weight": 10,
 				"display": "제 기능을 하기 힘든 구리 도끼",
-				"model": 0,
+				"model": 1,
 				"attributes": {
 					"attack_damage": {
 						"min": 5.330,
@@ -71,7 +71,7 @@
 				"type": "rank",
 				"weight": 25,
 				"display": "무딘 구리 도끼",
-				"model": 0,
+				"model": 1,
 				"attributes": {
 					"attack_damage": {
 						"min": 5.590,
@@ -84,7 +84,7 @@
 				"type": "rank",
 				"weight": 35,
 				"display": "무난한 구리 도끼",
-				"model": 0,
+				"model": 1,
 				"attributes": {
 					"attack_damage": {
 						"min": 5.980,
@@ -98,7 +98,7 @@
 				"weight": 30,
 				"quality": 0,
 				"display": "평범한 구리 도끼",
-				"model": 0,
+				"model": 1,
 				"attributes": {
 					"attack_damage": {
 						"min": 6.240,
@@ -112,7 +112,7 @@
 				"weight": 30,
 				"quality": 0,
 				"display": "쓸만한 구리 도끼",
-				"model": 0,
+				"model": 1,
 				"attributes": {
 					"attack_damage": {
 						"min": 6.825,
@@ -125,7 +125,7 @@
 				"type": "rank",
 				"weight": 30,
 				"display": "잘 만들어진 구리 도끼",
-				"model": 0,
+				"model": 1,
 				"attributes": {
 					"attack_damage": {
 						"min": 7.280,
@@ -138,7 +138,7 @@
 				"type": "rank",
 				"weight": 20,
 				"display": "예사롭지 않은 구리 도끼",
-				"model": 0,
+				"model": 1,
 				"attributes": {
 					"attack_damage": {
 						"min": 7.605,
@@ -151,7 +151,7 @@
 				"type": "rank",
 				"weight": 1,
 				"display": "전설적인 구리 도끼",
-				"model": 0,
+				"model": 1,
 				"broadcast": true,
 				"attributes": {
 					"attack_damage": 7.800,
