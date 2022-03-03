@@ -49,7 +49,6 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
 
   # skill
   _load_skills(@player_data, @player, @uuid, @skills_spec)
-
   # item
   @player_data['item'] = array(
     'is_inv_open': false,
@@ -82,7 +81,7 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
     @items['armor'] = null
   }
   _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text)
-
+  
   # tunalevel
   _show_tunalevel(@uuid, @player_data, @text)
 
@@ -190,7 +189,7 @@ proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_
   title(@player, '§a예§7를 눌러주세요!', '§7서버 리소스팩 사용은 필수입니다.', 0, 99999999, 0)
   @resource_pack_event_id = 'pack_download_checker.'.@uuid
   if(has_bind(@resource_pack_event_id)) { unbind(@resource_pack_event_id) }
-  bind('resource_pack_status', array('id': @resource_pack_event_id), array('player': @player), @event, @player, @uuid, @join_spec, @players_data, @skills_spec, @text) {
+  bind('resource_pack_status', array('id': @resource_pack_event_id), array('player': @player), @event, @player, @uuid, @join_spec, @players_data, @skills_spec, @text, @effective_items, @musics_data) {
     switch(@event['status']) {
     case 'DECLINED':
       pkick(@player, _color('#ff4040').'§l서버 리소스팩을 사용하도록 설정해 주시기 바랍니다.\n'._color('#c0c0c0').'§l에바참치 서버를 선택한 후, 수정 버튼을 눌러\n서버 리소스팩을 사용으로 설정해 주세요.\n\n'._color('#ffff80').'§l버그 문의: ')
@@ -198,7 +197,9 @@ proc _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_
       break()
     case 'SUCCESSFULLY_LOADED':
       _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @effective_items, @text)
-      _play_world_music(@player, @uuid, @players_data, @musics_data)
+      set_timeout(1000, closure() {
+        _play_world_music(@player, @uuid, @players_data, @musics_data)
+      })
       unbind()
       break()
     }
@@ -228,14 +229,9 @@ proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @
 
 # 플레이어 접속
 proc _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data) {
-  runas('~console', "/recipe give @player *")
-  runas('~console', "/recipe take @player tunalands:release_flag")
-  runas('~console', "/recipe take @player tunalands:take_flag")
-  
-  runas('~console', "/advancement grant @player everything")
   if(!array_index_exists(@reconnecting_datas, @uuid)) {
-    //_send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
-    broadcast('리팩보냄')
+    _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
+    //broadcast('리팩보냄')
   } else {
     #set_timeout(500, closure() {
       @reconnecting_data = @reconnecting_datas[@uuid]
@@ -243,6 +239,11 @@ proc _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spe
       _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @reconnecting_data)
       # 첫접속시 가이드 안내 메시지
       if(@reconnecting_data['server'] == 'guest') {
+        runas('~console', "/recipe give @player *")
+        runas('~console', "/recipe take @player tunalands:release_flag")
+        runas('~console', "/recipe take @player tunalands:take_flag")
+        
+        runas('~console', "/advancement grant @player everything")
         @raw = array(
           array(
             'text': @text['space_fonts']['space.128'].'\ue008\n\n\n\n\n\n'
