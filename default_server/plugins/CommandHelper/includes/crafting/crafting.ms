@@ -409,75 +409,75 @@ bind('inventory_click', array('priority': 'LOWEST', 'id': 'crafting'), array('sl
     }
 
     /*
-    if(!is_null(@result_item) && array_index_exists(@result_item, 'meta', 'display')) {
-      @item_display = strip_colors(@result_item['meta']['display'])
-      if(array_index_exists(@craftings, @item_display)) {
-        @max_stack_size = max_stack_size(@result_item)
-        # 재료 배열 만들기, 쉬프트 조합, 컨트롤 버리기 조합시 최대 갯수 지정
-        @max_craftable_qty = 64
-        @ingredient_items = array()
-        foreach(@key: @ingredient_item in @event['inventory']) {
-          if(@key != 0) {
-            @ingredient_items[] = @ingredient_item
-            if(is_array(@ingredient_item) && @ingredient_item['qty'] < @max_craftable_qty) {
-              @max_craftable_qty = @ingredient_item['qty']
+      if(!is_null(@result_item) && array_index_exists(@result_item, 'meta', 'display')) {
+        @item_display = strip_colors(@result_item['meta']['display'])
+        if(array_index_exists(@craftings, @item_display)) {
+          @max_stack_size = max_stack_size(@result_item)
+          # 재료 배열 만들기, 쉬프트 조합, 컨트롤 버리기 조합시 최대 갯수 지정
+          @max_craftable_qty = 64
+          @ingredient_items = array()
+          foreach(@key: @ingredient_item in @event['inventory']) {
+            if(@key != 0) {
+              @ingredient_items[] = @ingredient_item
+              if(is_array(@ingredient_item) && @ingredient_item['qty'] < @max_craftable_qty) {
+                @max_craftable_qty = @ingredient_item['qty']
+              }
+            }
+          }
+
+          //broadcast(@ingredient_items @max_craftable_qty)
+            //broadcast(@event['inventory'])
+          if(is_null(@event['cursoritem'])) {
+            @result_item['meta']['lore'][] = 'asdf'
+            modify_event('slotitem', @result_item)
+            cancel()
+
+            //broadcast(@result_item)
+            //modify_event('cursoritem', array(
+            //  'name': 'STONE'
+            //))
+          } else {
+            if(array_contains(array('SHIFT_LEFT', 'SHIFT_RIGHT'), @event['clicktype'])) {
+              //modify_event('slotitem', array(name: STONE))
+              //@crafted_qty = 0
+              //for(@i = 0, @i < @max_craftable_qty, @i++) {
+              //  @is_space_left = !pgive_item(@player, array(name: 'AIR'))
+              //  if(@is_space_left) {
+              //    pgive_item(@player, array(name: 'STONE_SWORD')) // 조합아이템 주는걸로 바꾸기
+              //  } else {
+              //    break()
+              //  }
+              //  @crafted_qty++
+              //}
+              //foreach(@index: @ingredient_item in @ingredient_items) {
+              //  if(is_array(@ingredient_items[@index])) {
+              //    @ingredient_items[@index]['qty'] -= @crafted_qty
+              //    if(@ingredient_items[@index]['qty'] <= 0) {
+              //      @ingredient_items[@index] = null
+              //    }
+              //  }
+              //}
+              //broadcast(@ingredient_items)
+              //broadcast(@inventory)
+              @inventory = get_inventory(pinventory_holder(@player))
+              array_remove(@inventory, 36)
+              array_remove(@inventory, 37)
+              array_remove(@inventory, 38)
+              array_remove(@inventory, 39)
+              array_remove(@inventory, 40)
+              broadcast(@inventory)
+              //broadcast(A)
+            } else if(array_contains(array('DROP', 'CONTROL_DROP'), @event['clicktype'])) {
+              @ranking_craftable = false
+              cancel()
+              broadcast(B)
+            } else {
+              @ranking_craftable = false
+              cancel()
             }
           }
         }
-
-        //broadcast(@ingredient_items @max_craftable_qty)
-          //broadcast(@event['inventory'])
-        if(is_null(@event['cursoritem'])) {
-          @result_item['meta']['lore'][] = 'asdf'
-          modify_event('slotitem', @result_item)
-          cancel()
-
-          //broadcast(@result_item)
-          //modify_event('cursoritem', array(
-          //  'name': 'STONE'
-          //))
-        } else {
-          if(array_contains(array('SHIFT_LEFT', 'SHIFT_RIGHT'), @event['clicktype'])) {
-            //modify_event('slotitem', array(name: STONE))
-            //@crafted_qty = 0
-            //for(@i = 0, @i < @max_craftable_qty, @i++) {
-            //  @is_space_left = !pgive_item(@player, array(name: 'AIR'))
-            //  if(@is_space_left) {
-            //    pgive_item(@player, array(name: 'STONE_SWORD')) // 조합아이템 주는걸로 바꾸기
-            //  } else {
-            //    break()
-            //  }
-            //  @crafted_qty++
-            //}
-            //foreach(@index: @ingredient_item in @ingredient_items) {
-            //  if(is_array(@ingredient_items[@index])) {
-            //    @ingredient_items[@index]['qty'] -= @crafted_qty
-            //    if(@ingredient_items[@index]['qty'] <= 0) {
-            //      @ingredient_items[@index] = null
-            //    }
-            //  }
-            //}
-            //broadcast(@ingredient_items)
-            //broadcast(@inventory)
-            @inventory = get_inventory(pinventory_holder(@player))
-            array_remove(@inventory, 36)
-            array_remove(@inventory, 37)
-            array_remove(@inventory, 38)
-            array_remove(@inventory, 39)
-            array_remove(@inventory, 40)
-            broadcast(@inventory)
-            //broadcast(A)
-          } else if(array_contains(array('DROP', 'CONTROL_DROP'), @event['clicktype'])) {
-            @ranking_craftable = false
-            cancel()
-            broadcast(B)
-          } else {
-            @ranking_craftable = false
-            cancel()
-          }
-        }
       }
-    }
 
 
     */

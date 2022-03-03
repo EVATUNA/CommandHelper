@@ -421,7 +421,7 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
   @line_4 = @magic_items['스킬 포인트 초기화 스크롤']['text'].@text['space_fonts']['space.-18']
   @texture_layer = @backgroundtext.@book_text.@line_0.@line_1.@line_2.@line_3.@line_4
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @block_location, @magic_items, @text) {
-    bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @id, @texture_layer, @block_location, @magic_items, @text) {
+    bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @player, @uuid, @id, @texture_layer, @block_location, @magic_items, @text) {
       @rawslot = @event['rawslot']
       @action = @event['action']
       @cursor_item = @event['cursoritem']
@@ -517,7 +517,7 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
             break();
           }
           if(@change_gui) {
-            unbind('close'.@id)
+            unbind("close.@id")
             set_timeout(1, closure() {
               @inventory = get_inventory(@id)
               _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_items, @text)
@@ -560,7 +560,7 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
             }
             if(@converting_level > 0 && @magic_item['text'] != @text['space_fonts']['space.18']) {
               play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-              unbind('close'.@id)
+              unbind("close.@id")
               @item = @ingredient
               @item['qty'] -= 1
               set_timeout(0, closure() {
@@ -573,7 +573,7 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
               @location = array('x': @block_location['x'] + 0.5, 'y': @block_location['y'] + 1.01, 'z': @block_location['z'] + 0.5, 'world': @block_location['world'])
               set_pcooldown(@player, 'BEDROCK', @converting_level)
               @task = array('tick': integer(@converting_level / 3), 'id': null)
-              @id = set_interval(100 , closure() {
+              @task_id = set_interval(100 , closure() {
                 if(ponline(@player) && ploc(@player)['world'] == @block_location['world']) {
                   if(@task['tick'] > 0) {
                     @ploc = ploc(@player)
@@ -603,7 +603,7 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
                   clear_task()
                 }
               })
-              @task['id'] = @id
+              @task['id'] = @task_id
             }
           }
         }
@@ -618,7 +618,7 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
             drop_item(@ploc, @item, false)
           })
         }
-        unbind('close'.@id)
+        unbind("close.@id")
         set_timeout(0, closure() {
           @inventory = get_inventory(@id)
           _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_items, @text)
@@ -627,13 +627,15 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
     }
     #아이템 안뽑고 그냥 닫을시
     set_timeout(1, closure() {
-      bind('inventory_close', array('id': 'close'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @magic_items) {
-        @item = @event['inventory'][1]
-        if(!is_null(@item)) {
-          @item['qty'] = pgive_item(@player, @item)
-          @ploc = ploc(@player)
-          @ploc['y'] += 1
-          drop_item(@ploc, @item, false)
+      bind('inventory_close', array('id': "close.@id"), array('virtual': true), @event, @player, @uuid, @magic_items) {
+        if(@event['player'] == @player) {
+          @item = @event['inventory'][1]
+          if(!is_null(@item)) {
+            @item['qty'] = pgive_item(@player, @item)
+            @ploc = ploc(@player)
+            @ploc['y'] += 1
+            drop_item(@ploc, @item, false)
+          }
         }
       }
     })
@@ -1062,7 +1064,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
     }
     @texture_layer = @backgroundtext.@text['space_fonts']['space.72'].@line_1.@text['space_fonts']['space.-90'].@line_2.@text['space_fonts']['space.-162'].@title_text.@percent_text
     @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @ingredient_name, @repairable_items, @repairing_item_slot, @ingredient_slot, @actvated_repair_button, @unactvated_repair_button, @actvated_refresh_button, @unactvated_refresh_button, @rounded_failure_probability, @rounded_success_probability, @block_location, @text) {
-      bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @id, @texture_layer, @ingredient_name, @repairable_items, @repairing_item_slot, @ingredient_slot, @actvated_repair_button, @unactvated_repair_button, @actvated_refresh_button, @unactvated_refresh_button, @rounded_failure_probability, @rounded_success_probability, @block_location, @text) {
+      bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @player, @uuid, @id, @texture_layer, @ingredient_name, @repairable_items, @repairing_item_slot, @ingredient_slot, @actvated_repair_button, @unactvated_repair_button, @actvated_refresh_button, @unactvated_refresh_button, @rounded_failure_probability, @rounded_success_probability, @block_location, @text) {
         @rawslot = @event['rawslot']
         @action = @event['action']
         @cursor_item = @event['cursoritem']
@@ -1178,7 +1180,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
                 }
               }
               if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
-                unbind('close'.@id)
+                unbind("close.@id")
               }
               set_timeout(1, closure() {
                 @inventory = get_inventory(@id)
@@ -1385,7 +1387,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
                 }
               }
               if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
-                unbind('close'.@id)
+                unbind("close.@id")
                 set_timeout(1000, closure() {
                   for(@i = 5, @i > 0, @i --) {
                     if(@i > 1) {
@@ -1472,7 +1474,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
               }
               @inventory[44] = @unactvated_refresh_button
               if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
-                unbind('close'.@id)
+                unbind("close.@id")
               }
               set_timeout(1, closure() {
                 @is_refresh = true
@@ -1496,7 +1498,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
                 @inventory[1] = @old_slot_item
                 set_pinv(@player, @slot, null)
                 if(array_contains(array('ANVIL', 'CHIPPED_ANVIL', 'DAMAGED_ANVIL'), get_block(@block_location))) {
-                  unbind('close'.@id)
+                  unbind("close.@id")
                 }
                 set_timeout(1, closure() {
                   @is_refresh = false
@@ -1542,39 +1544,43 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
       }
       #아이템 안뽑고 그냥 닫을시
       set_timeout(1, closure() {
-        bind('inventory_drag', array('id': 'drag'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid) {
-          @indexs = array_keys(@event['newitems'])
-          foreach(@index in @indexs) {
-            if(@index <  45) {
-              cancel()
+        bind('inventory_drag', array('id': 'drag'.@id), array('virtual': true), @event, @player, @uuid) {
+          if(@event['player'] == @player) {
+            @indexs = array_keys(@event['newitems'])
+            foreach(@index in @indexs) {
+              if(@index < 45) {
+                cancel()
+              }
             }
           }
         }
-        bind('inventory_close', array('id': 'close'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid) {
-          @inventory = @event['inventory']
-          @return_item = @inventory[1]
-          if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
-            @return_item['qty'] = pgive_item(@player, @return_item)
-            @ploc = ploc(@player)
-            @ploc['y'] += 1
-            drop_item(@ploc, @return_item, false)
-          }
-          for(@index = 4, @index < 9, @index++) {
-            @return_item = @inventory[@index]
+        bind('inventory_close', array('id': "close.@id"), array('virtual': true), @event, @player, @uuid) {
+          if(@event['player'] == @player) {
+            @inventory = @event['inventory']
+            @return_item = @inventory[1]
             if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
               @return_item['qty'] = pgive_item(@player, @return_item)
               @ploc = ploc(@player)
               @ploc['y'] += 1
               drop_item(@ploc, @return_item, false)
             }
-          }
-          for(@index = 13, @index < 18, @index++) {
-            @return_item = @inventory[@index]
-            if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
-              @return_item['qty'] = pgive_item(@player, @return_item)
-              @ploc = ploc(@player)
-              @ploc['y'] += 1
-              drop_item(@ploc, @return_item, false)
+            for(@index = 4, @index < 9, @index++) {
+              @return_item = @inventory[@index]
+              if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
+                @return_item['qty'] = pgive_item(@player, @return_item)
+                @ploc = ploc(@player)
+                @ploc['y'] += 1
+                drop_item(@ploc, @return_item, false)
+              }
+            }
+            for(@index = 13, @index < 18, @index++) {
+              @return_item = @inventory[@index]
+              if(!is_null(@return_item) && @return_item['name'] != 'STRUCTURE_VOID') {
+                @return_item['qty'] = pgive_item(@player, @return_item)
+                @ploc = ploc(@player)
+                @ploc['y'] += 1
+                drop_item(@ploc, @return_item, false)
+              }
             }
           }
         }
@@ -1745,7 +1751,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
               # 이벤트 세팅
               @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @essences, @location, @uuid, @item_armorstand, @essence_armorstand, @text) {
                 #인첸트 안하고 그냥 인벤 닫을시
-                bind('inventory_close', array('id': 'close'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @item_armorstand, @essence_armorstand) {
+                bind('inventory_close', array('id': "close.@id"), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @item_armorstand, @essence_armorstand) {
                   @item = @event['inventory'][22]
                   if(!is_null(@item)) {
                     @item['qty'] = pgive_item(@player, @item)
@@ -1758,7 +1764,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
                   set_mob_name(@essence_armorstand, '')
                 }
                 #인첸트 할시
-                bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @id, @location, @item_armorstand, @essence_armorstand, @essences) {
+                bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @id, @location, @item_armorstand, @essence_armorstand, @essences) {
                   @enchantable_items = array(
                     'LEATHER_BOOTS': array(
                       'luck': 1.5,
@@ -1928,7 +1934,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
                           @enchanted_item = _get_enchanted_item(@enchanting_item, @entries, @enchantable_item['luck'])
                         }
                         cancel()
-                        unbind('close'.@id)
+                        unbind("close.@id")
                         modify_event('cursoritem', @cursor_item)
                         close_pinv(@player)
                         # 시각 효과
@@ -2398,7 +2404,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
           @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @text) {
             #set_inventory(@id, @inventory)
             broadcast(get_inventory(@id))
-            bind('inventory_click', array('id': 'click'.@id), array('player': @player, 'virtual': true), @event, @player, @id) {
+            bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @player, @id) {
               #cancel()
               broadcast(@event)
             }
@@ -3191,7 +3197,7 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
       if(@event['finalamount'] == 0 && pblocking(@player)) {
         @blocking = true
         # 예외 처리
-        if(!is_null(@event['damager']) && strip_colors(get_mob_name(@event['damager'])) == '티아마트' && @event['amount'] < 1.5) {
+        if(!is_null(@event['damager']) && !ponline(@event['damager']) && strip_colors(get_mob_name(@event['damager'])) == '티아마트' && @event['amount'] < 1.5) {
           @blocking = false
         }
 
