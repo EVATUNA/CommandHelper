@@ -17,7 +17,7 @@ PRODUCTS:
       display: §f구리 주괴
       model: 2
       price:
-        sell: 2.6
+        sell: 2.5
       detail: NONE
   22:
     name: IRON_INGOT
@@ -49,7 +49,7 @@ PRODUCTS:
       display: §f네더라이트 주괴
       model: 2
       price:
-        sell: 25.0
+        sell: 50.0
       detail: NONE
   50:
     name: IRON_INGOT
