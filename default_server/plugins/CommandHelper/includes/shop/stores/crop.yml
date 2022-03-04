@@ -5,7 +5,7 @@ PRODUCTS:
       display: §f밀
       model: 1
       price:
-        sell: 2.0
+        sell: 1.0
       detail: NONE
   11:
     name: BEETROOT
@@ -13,7 +13,7 @@ PRODUCTS:
       display: §f사탕무
       model: 1
       price:
-        sell: 1.15
+        sell: 0.55
       detail: NONE
   12:
     name: POTATO
@@ -21,7 +21,7 @@ PRODUCTS:
       display: §f감자
       model: 1
       price:
-        sell: 0.65
+        sell: 0.3
       detail: NONE
   13:
     name: CARROT
@@ -29,7 +29,7 @@ PRODUCTS:
       display: §f당근
       model: 1
       price:
-        sell: 0.65
+        sell: 0.3
       detail: NONE
   14:
     name: SWEET_BERRIES
@@ -37,7 +37,7 @@ PRODUCTS:
       display: §f크랜베리
       model: 1
       price:
-        sell: 1.5
+        sell: 0.7
       detail: NONE
   15:
     name: PUMPKIN
@@ -45,7 +45,7 @@ PRODUCTS:
       display: §f호박
       model: 1
       price:
-        sell: 5
+        sell: 2.5
       detail: NONE
   16:
     name: MELON
@@ -53,49 +53,49 @@ PRODUCTS:
       display: §f수박
       model: 1
       price:
-        sell: 5
+        sell: 2.5
       detail: NONE
   28:
     name: SUGAR_CANE
     meta:
       price:
-        sell: 0.04
+        sell: 0.015
       detail: NONE
   29:
     name: CACTUS
     meta:
       price:
-        sell: 0.035
+        sell: 0.015
       detail: NONE
   30:
     name: COCOA_BEANS
     meta:
       price:
-        sell: 0.08
+        sell: 0.04
       detail: NONE
   31:
     name: APPLE
     meta:
       price:
-        sell: 2.0
+        sell: 1.0
       detail: NONE
   32:
     name: NETHER_WART
     meta:
       price:
-        sell: 0.1
+        sell: 0.05
       detail: NONE
   33:
     name: RED_MUSHROOM
     meta:
       price:
-        sell: 0.5
+        sell: 0.25
       detail: NONE
   34:
     name: BROWN_MUSHROOM
     meta:
       price:
-        sell: 0.6
+        sell: 0.3
       detail: NONE
   50:
     name: IRON_INGOT

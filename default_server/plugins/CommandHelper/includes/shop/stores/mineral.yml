@@ -3,13 +3,13 @@ PRODUCTS:
     name: COAL
     meta:
       price:
-        sell: 1
+        sell: 0.1
       detail: NONE
   20:
     name: QUARTZ
     meta:
       price:
-        sell: 1
+        sell: 0.1
       detail: NONE
   21:
     name: COPPER_INGOT
@@ -17,7 +17,7 @@ PRODUCTS:
       display: §f구리 주괴
       model: 2
       price:
-        sell: 5
+        sell: 2.6
       detail: NONE
   22:
     name: IRON_INGOT
@@ -25,7 +25,7 @@ PRODUCTS:
       display: §f철괴
       model: 2
       price:
-        sell: 7.5
+        sell: 3.5
       detail: NONE
   23:
     name: GOLD_INGOT
@@ -33,7 +33,7 @@ PRODUCTS:
       display: §f금괴
       model: 2
       price:
-        sell: 10
+        sell: 5.0
       detail: NONE
   24:
     name: DIAMOND
@@ -41,7 +41,7 @@ PRODUCTS:
       display: §f다이아몬드
       model: 2
       price:
-        sell: 20
+        sell: 10.0
       detail: NONE
   25:
     name: NETHERITE_INGOT
@@ -49,7 +49,7 @@ PRODUCTS:
       display: §f네더라이트 주괴
       model: 2
       price:
-        sell: 50
+        sell: 25.0
       detail: NONE
   50:
     name: IRON_INGOT

@@ -122,8 +122,6 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards) {
 }
 */
 
-
-
 bind('entity_death', null, null, @event, @players_data, @text) {
   if(array_index_exists(@event['cause'],'damager') && ponline(@event['cause']['damager'])) {
     # 플레이어에 의하여 죽을시
