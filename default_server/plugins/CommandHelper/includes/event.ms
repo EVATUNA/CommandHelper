@@ -151,7 +151,7 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
 }
 
 # 카프카
-bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @resourcepack, @server) {
+bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @resourcepack, @server, @log_paths) {
   switch(@event['key']) {
 
   case 'ch.inform_player_quit':
@@ -168,23 +168,24 @@ bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @r
     break()
 
   case 'ch.send_chat':
+    @chating_log_path = @log_paths['chating']
     @data = json_decode(@event['value'])
     @channel = @data['sender_chat_data'][0]
     switch(@channel) {
     case 'default':
-      _default_chat(@data, @players_data)
+      _default_chat(@data, @players_data, @chating_log_path)
       break()
     case 'town':
-      _town_chat(@data, @players_data)
+      _town_chat(@data, @players_data, @chating_log_path)
       break()
     case 'local':
-      _local_chat(@data, @players_data, @server)
+      _local_chat(@data, @players_data, @server, @chating_log_path)
       break()
     case 'admin':
-      _admin_chat(@data, @players_data)
+      _admin_chat(@data, @players_data, @chating_log_path)
       break()
     case 'whisper':
-      _whisper_chat(@data, @players_data, @server)
+      _whisper_chat(@data, @players_data, @server, @chating_log_path)
       break()
     }
     break()

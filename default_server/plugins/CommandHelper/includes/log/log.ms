@@ -69,7 +69,6 @@ if(@server == 'main') {
     # 로깅
     write_file(@shop_log_path, @log, 'APPEND')
   }
-
   proc _harvesting_logging(@harvesting_log_path, @player, @uuid, @item, @location) {
     #시간
     @time = simple_date('HH:mm:ss')
@@ -85,9 +84,9 @@ if(@server == 'main') {
     @z = integer(@location['z'])
     # 매시지 부분
     @log = "[@time] @player(@uuid) harvest @item_name in x: @x y: @y z: @z\n"
+    # 로깅
     write_file(@harvesting_log_path, @log, 'APPEND')
   }
-
 }
 
 if(@server == 'over' || @server == 'nether') {
@@ -106,7 +105,18 @@ if(@server == 'over' || @server == 'nether') {
     @z = integer(@location['z'])
     # 매시지 부분
     @log = "[@time] @player(@uuid) mine @item_name in x: @x y: @y z: @z\n"
+    # 로깅
     write_file(@mining_log_path, @log, 'APPEND')
   }
+}
 
+proc _chating_logging(@chating_log_path, @content) {
+  # 콘솔 로깅
+  mom_log('INFO', @content)
+  # 시간
+  @time = simple_date('HH:mm:ss')
+  # 메시지 부분
+  @log = "[@time] @content\n"
+  # 파일 로깅
+  write_file(@chating_log_path, @log, 'APPEND')
 }

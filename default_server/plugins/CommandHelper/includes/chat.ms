@@ -1305,7 +1305,7 @@ proc _get_message_raws(@channel, @message, @receivers, @town_members) {
 }
 
 # Default Chat
-proc _default_chat(@data, @players_data) {
+proc _default_chat(@data, @players_data, @chating_log_path) {
   # 변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1394,10 +1394,10 @@ proc _default_chat(@data, @players_data) {
     }
   }
   # 로깅
-  mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
+  _chating_logging(@chating_log_path, "[@channel] @sender_name(@sender_server): @message")
 }
 
-proc _town_chat(@data, @players_data) {
+proc _town_chat(@data, @players_data, @chating_log_path) {
   # 변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1496,10 +1496,10 @@ proc _town_chat(@data, @players_data) {
     }
   }
   # 로깅
-  mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
+  _chating_logging(@chating_log_path, "[@channel] @sender_name(@sender_server): @message")
 }
 
-proc _local_chat(@data, @players_data, @server) {
+proc _local_chat(@data, @players_data, @server, @chating_log_path) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1576,10 +1576,10 @@ proc _local_chat(@data, @players_data, @server) {
     }
   }
   # 로깅
-  mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
+  _chating_logging(@chating_log_path, "[@channel] @sender_name(@sender_server): @message")
 }
 
-proc _admin_chat(@data, @players_data) {
+proc _admin_chat(@data, @players_data, @chating_log_path) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1660,10 +1660,10 @@ proc _admin_chat(@data, @players_data) {
     }
   }
   # 로깅
-  mom_log('INFO', "[@channel] @sender_name(@sender_server): @message")
+  _chating_logging(@chating_log_path, "[@channel] @sender_name(@sender_server): @message")
 }
 
-proc _whisper_chat(@data, @players_data, @server) {
+proc _whisper_chat(@data, @players_data, @server, @chating_log_path) {
   # 변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1745,7 +1745,7 @@ proc _whisper_chat(@data, @players_data, @server) {
     @players_data[@receiver_uuid]['cache']['last_sender'] = "whisper.@sender_name.to.@target_name"
   }
   # 로깅
-  mom_log('INFO', "[@channel] @sender_name(@sender_server) → @target_name(@target_server) @message")
+  _chating_logging(@chating_log_path, "[@channel] @sender_name(@sender_server) → @target_name(@target_server) @message")
 }
 
 bind('async_player_chat', null , null, @event, @players_data, @text, @server) {
@@ -1816,7 +1816,7 @@ bind('async_player_chat', null , null, @event, @players_data, @text, @server) {
   }
 }
 
-proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting) {
+proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @chating_log_path) {
   @enko = @setting[1]
   if(@enko) {
     @modified_message = _convert_eng_to_kor(@unmodified_message)
@@ -1833,7 +1833,7 @@ proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting) {
     @modified_message = @unmodified_message
   }
   # logging
-  sys_out('[Broadcast]]'@sender_name.':'@modified_message)
+  _chating_logging(@chating_log_path, "[Broadcast] @sender_name: @modified_message")
 
   @raw = array(
     array(
@@ -1867,6 +1867,7 @@ register_command('broadcast', array(
   'aliases': array('say'),
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
+    @chating_log_path = @log_paths['chating']
     if(ponline(@player)) {
       if(pisop(@player)) {
         @sender_name = @player
@@ -1874,7 +1875,7 @@ register_command('broadcast', array(
         if(array_index_exists(@players_data, @sender_uuid) && array_size(@args) > 0) {
           @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
           @setting = @players_data[@sender_uuid]['setting']
-          _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting)
+          _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @chating_log_path)
         } else {
           tmsg(@player, color('yellow')'/'.@command'<message>')
         }
@@ -1887,7 +1888,7 @@ register_command('broadcast', array(
       if(array_size(@args) > 0) {
         @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
         @setting = array('broadcast', false)
-        _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting)
+        _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @chating_log_path)
       } else {
         console(color('yellow')'/'.@command'<message>')
       }

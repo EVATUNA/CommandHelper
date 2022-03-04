@@ -1521,7 +1521,7 @@ proc _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skill
     'DROWNED': 1.95,
     'EVOKER': 1.95,
     'ENDERMITE': 0.3,
-    'PLAYER': 1.8,
+    //'PLAYER': 1.8,
     'SALMON': 0.4,
     'ZOMBIE': 1.95,
     'STRIDER': 1.7,
@@ -1646,9 +1646,9 @@ proc _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skill
         @player_data['cache']['last_weapon_effect'] = @time
         @entity_location = entity_loc(@euuid)
         if((get_highest_block_at(@entity_location)['y'] <= @entity_location['y'] + 2 && (has_thunder(@entity_location['world']) || has_storm(@entity_location['world']))) || get_block(@entity_location) == 'WATER') {
-          @range = 10
+          @range = 15
         } else {
-          @range = 5
+          @range = 7
         }
         @entity_location['x'] += rand() / 2 - 0.25
         @entity_location['y'] += 1 + rand() * @allowed_entity[@entity_type] * 0.5 - @allowed_entity[@entity_type] * 0.25
@@ -1681,16 +1681,16 @@ proc _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skill
       if(rand() < 0.25 * @weapon_chance_multiply) {
         @player_data['cache']['last_weapon_effect'] = @time
         @entity_location = entity_loc(@euuid)
-        @range = 5
+        @range = 7
         @has_storm = false
         if(get_block(@entity_location) == 'WATER') {
-          @range = 10
+          @range = 15
         }
         if(get_highest_block_at(@entity_location)['y'] <= @entity_location['y'] + 2) {
           if(has_thunder(@entity_location['world'])) {
-            @range = 10
+            @range = 15
           } else if(has_storm(@entity_location['world'])) {
-            @range = 10
+            @range = 15
             @has_storm = true
           }
         }
