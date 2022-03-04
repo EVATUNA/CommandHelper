@@ -21,10 +21,10 @@ proc _create_log_files(@log_paths, @server) {
     if(!file_exists(@log_paths['shop'])) { create_file(@log_paths['shop']) }
 
     # 농사
-    @farming_log_dir_path = "@main_log_dir_path/farming"
-    if(!file_exists(@farming_log_dir_path)) { create_dir(@farming_log_dir_path) }
-    @log_paths['farming'] = "@farming_log_dir_path/@date.log"
-    if(!file_exists(@log_paths['farming'])) { create_file(@log_paths['farming']) }
+    @harvesting_log_dir_path = "@main_log_dir_path/harvesting"
+    if(!file_exists(@harvesting_log_dir_path)) { create_dir(@harvesting_log_dir_path) }
+    @log_paths['harvesting'] = "@harvesting_log_dir_path/@date.log"
+    if(!file_exists(@log_paths['harvesting'])) { create_file(@log_paths['harvesting']) }
   }
 
   # 오버, 네더 서버에서만 로깅
@@ -54,20 +54,59 @@ _create_log_files(@log_paths, @server)
   _create_log_files(@log_paths, @server)
 })
 
-
-
 if(@server == 'main') {
   proc _shop_logging(@shop_log_path, @player, @uuid, @type, @item, @qty, @price) {
+    #시간
     @time = simple_date('HH:mm:ss')
-    # 아이템 이름 세팅
+    # 아이템 이름
     if(array_index_exists(@item, 'meta', 'display') && @item['meta']['display'] != '') {
       @item_name = strip_colors(@item['meta']['display'])
     } else {
       @item_name = @item['name']
     }
-
     # 메시지 부분
     @log = "[@time] @player(@uuid) @type @item_name x@qty (price: @price)\n"
+    # 로깅
     write_file(@shop_log_path, @log, 'APPEND')
   }
+
+  proc _harvesting_logging(@harvesting_log_path, @player, @uuid, @item, @location) {
+    #시간
+    @time = simple_date('HH:mm:ss')
+    # 아이템 이름
+    if(array_index_exists(@item, 'meta', 'display') && @item['meta']['display'] != '') {
+      @item_name = strip_colors(@item['meta']['display'])
+    } else {
+      @item_name = @item['name']
+    }
+    # 좌표
+    @x = integer(@location['x']) 
+    @y = integer(@location['y'])
+    @z = integer(@location['z'])
+    # 매시지 부분
+    @log = "[@time] @player(@uuid) harvest @item_name in x: @x y: @y z: @z\n"
+    write_file(@harvesting_log_path, @log, 'APPEND')
+  }
+
+}
+
+if(@server == 'over' || @server == 'nether') {
+  proc _mining_logging(@mining_log_path, @player, @uuid, @item, @location) {
+    # 시간
+    @time = simple_date('HH:mm:ss')
+    # 아이템 이름
+    if(array_index_exists(@item, 'meta', 'display') && @item['meta']['display'] != '') {
+      @item_name = strip_colors(@item['meta']['display'])
+    } else {
+      @item_name = @item['name']
+    }
+    # 좌표
+    @x = integer(@location['x'])
+    @y = integer(@location['y'])
+    @z = integer(@location['z'])
+    # 매시지 부분
+    @log = "[@time] @player(@uuid) mine @item_name in x: @x y: @y z: @z\n"
+    write_file(@mining_log_path, @log, 'APPEND')
+  }
+
 }

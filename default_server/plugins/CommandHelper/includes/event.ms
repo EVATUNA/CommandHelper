@@ -252,16 +252,19 @@ bind('block_place', null, null, @event, @players_data, @skills_spec) {
 }
 
 # 블럭 파괴
-bind('block_break', null, null, @event, @players_data, @hp_blocks, @mineral_rewards, @mining_log_data, @crop_rewards, @harvesting_log_data, @skills_spec, @text, @server) {
+bind('block_break', null, null, @event, @players_data, @hp_blocks, @mineral_rewards, @crop_rewards, @skills_spec, @text, @server, @log_paths) {
   @player = @event['player']
   @uuid = puuid(@player)
   if(pmode(@player) == 'SURVIVAL') {
     if(@server == 'main' && pworld(@player) == 'spawn_minecraft_residence') {
-      _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @skills_spec, @text, @harvesting_log_data)
+      @harvesting_log_path = @log_paths['harvesting']
+      _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @skills_spec, @text, @harvesting_log_path)
     }
     if(@server != 'main') {
-      _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @mineral_rewards, @skills_spec, @text, @mining_log_data)
-
+      @mining_log_path = @log_paths['mining']
+      _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @mineral_rewards, @skills_spec, @text, @mining_log_path)
+      
+      /*
       # 일반 블럭들 튜나 레벨 주기?
       @stones = array(
         'STONE': 1,
@@ -281,6 +284,7 @@ bind('block_break', null, null, @event, @players_data, @hp_blocks, @mineral_rewa
         @skill = 'tough_shoulder'
         @skill_data = @players_data[@uuid]['skill_data'][@skill]
       }
+      */
 
       # 네더 채광 효과 반영
       if(@server == 'nether') {

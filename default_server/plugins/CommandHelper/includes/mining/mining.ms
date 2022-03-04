@@ -16,41 +16,7 @@ foreach(@file in @files) {
   }
 }
 
-# 광질 로깅
-@mining_log_data = array()
-if(@server != 'main') {
-  @date = simple_date('yyyy-MM-dd')
-  @mining_log_data = array(
-    'date': @date,
-    'path': 'logs/'.@date.'.log'
-  )
-
-  if(!file_exists(@mining_log_data['path'])) {
-    create_file(@mining_log_data['path'])
-  }
-
-  @cron_task = set_cron('0 0 * * *', closure() {
-    @date = simple_date('yyyy-MM-dd')
-    @mining_log_data['date'] = @date
-    @mining_log_data['path'] = 'logs/'.@date.'.log'
-  })
-
-  proc _mining_logging(@mining_log_data, @player, @uuid, @item, @location) {
-    if(array_index_exists(@item, 'meta', 'display') && @item['meta']['display'] != '') {
-      @item_name = strip_colors(@item['meta']['display'])
-    } else {
-      @item_name = @item['name']
-    }
-    @x = integer(@location['x']) 
-    @y = integer(@location['y'])
-    @z = integer(@location['z'])
-    @message = "@player(@uuid) mine @item_name in x: @x y: @y z: @z"
-    @log = string('['.simple_date('HH:mm:ss').'] '.@message.'\n')
-    write_file(@mining_log_data['path'], @log, 'APPEND')
-  }
-}
-
-proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @mineral_rewards, @skills_spec, @text, @mining_log_data) {
+proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @mineral_rewards, @skills_spec, @text, @mining_log_path) {
   @player_data = @players_data[@uuid]
   # 부순 블럭 선언
   @mineral = @event['block']
@@ -241,7 +207,7 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
             @max_weight = @min_weight + @entry['weight']
             if(@max_weight > @result_weight) {
               drop_item(@location, @entry['item'], false)
-              _mining_logging(@mining_log_data, @player, @uuid, @entry['item'], @location)
+              _mining_logging(@mining_log_path, @player, @uuid, @entry['item'], @location)
               break()
             } else {
               @min_weight = @max_weight
