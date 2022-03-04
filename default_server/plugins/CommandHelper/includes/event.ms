@@ -3256,3 +3256,17 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
     }
   }
 }
+
+// 월드이동
+bind('world_changed', null, null, @event, @players_data, @musics_data, @text) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+  set_timeout(1000, closure() {
+    # 음악 재생
+    _play_world_music(@player, @uuid, @players_data, @musics_data)
+    # 이동시 사이드바 초기화 해결
+    @scoreboard = "ch_scoreboard.@uuid"
+    set_pscoreboard(@player, @scoreboard)
+    set_objective_display('objective', array('slot': 'SIDEBAR', 'displayname': @text['space_fonts']['space.-4']), @scoreboard)
+  })
+}

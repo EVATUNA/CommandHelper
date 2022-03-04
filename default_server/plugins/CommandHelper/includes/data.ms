@@ -1,3 +1,14 @@
+# 서버 이동시 카운트 다운 (카운트 다운이 다 되면 서버 나간것으로 간주)
+proc _countdown_reconnectable_players(@reconnecting_datas) {
+  foreach(@uuid: @reconnecting_data in @reconnecting_datas) {
+    if(@reconnecting_data['countdown'] > 0) {
+      @reconnecting_data['countdown'] -= 1
+    } else {
+      array_remove(@reconnecting_datas, @uuid)
+    }
+  }
+}
+
 ## Data Procedure
 proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @reconnecting_data) {
   # 배열로 선언
@@ -311,16 +322,5 @@ proc _quit_event(@uuid, @players_data, @server) {
     clear_task(@players_data[@uuid]['cache']['music_remove_task'])
     array_remove(@players_data, @uuid)
     #_update_tip_data(@uuid, @players_data)
-  }
-}
-
-# 서버 이동시 카운트 다운 (카운트 다운이 다 되면 서버 나간것으로 간주)
-proc _countdown_reconnectable_players(@reconnecting_datas) {
-  foreach(@uuid: @reconnecting_data in @reconnecting_datas) {
-    if(@reconnecting_data['countdown'] > 0) {
-      @reconnecting_data['countdown'] -= 1
-    } else {
-      array_remove(@reconnecting_datas, @uuid)
-    }
   }
 }

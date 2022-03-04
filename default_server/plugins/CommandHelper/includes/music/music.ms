@@ -40,13 +40,3 @@ proc _play_world_music(@player, @uuid, @players_data, @musics_data) {
     }
   }
 }
-
-bind('world_changed', null, null, @event, @players_data, @musics_data) {
-  @player = @event['player']
-  @uuid = puuid(@player)
-  @queue_name = "music.@uuid"
-  queue_clear(@queue_name)
-  set_timeout(1000, closure() {
-    _play_world_music(@player, @uuid, @players_data, @musics_data)
-  })
-}
