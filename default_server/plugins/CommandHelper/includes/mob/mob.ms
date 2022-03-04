@@ -122,6 +122,25 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards) {
 }
 */
 
+
+
+bind('entity_death', null, null, @event, @players_data, @text) {
+  if(array_index_exists(@event['cause'],'damager') && ponline(@event['cause']['damager'])) {
+    # 플레이어에 의하여 죽을시
+    @player = @event['cause']['damager']
+    @uuid = puuid(@player)
+    @player_data = @players_data[@uuid]
+
+    @id = @event['id']
+    @target_name = get_mob_name(@id)
+
+    if(@target_name == '') { // 바닐라몹일시
+      @xp = @event['xp']
+      _give_tunalevel_random_experience(@uuid, @player_data, 0, @xp, @text)
+    }
+  }
+}
+
 # 스폰된 몹 들 입고있는 아이템 떨구지 안토록 수정
 bind('creature_spawn', null, null, @event) {
   @uuid = @event['id']
