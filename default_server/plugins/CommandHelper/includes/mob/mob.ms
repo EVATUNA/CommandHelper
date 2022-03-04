@@ -136,3 +136,8 @@ bind('creature_spawn', null, null, @event) {
     ))
   }
 }
+
+# 스포너 스폰 캔슬
+bind('spawner_spawn', null, null, @event) {
+  cancel()
+}
