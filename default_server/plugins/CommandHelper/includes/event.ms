@@ -3262,7 +3262,8 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
 bind('world_changed', null, null, @event, @players_data, @musics_data, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
-  set_timeout(1000, closure() {
+  set_timeout(1, closure() {
+    runas('~console', "/stopsound @player music")
     # 음악 재생
     _play_world_music(@player, @uuid, @players_data, @musics_data)
     # 이동시 사이드바 초기화 해결

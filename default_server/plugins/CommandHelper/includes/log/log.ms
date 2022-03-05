@@ -18,13 +18,13 @@ proc _create_log_files(@log_paths, @server) {
     @shop_log_dir_path = "@main_log_dir_path/shop"
     if(!file_exists(@shop_log_dir_path)) { create_dir(@shop_log_dir_path) }
     @log_paths['shop'] = "@shop_log_dir_path/@date.log"
-    if(!file_exists(@log_paths['shop'])) { create_file(@log_paths['shop']) }
+    if(!file_exists(@log_paths['shop'])) { create_file(@log_paths['shop']) write_file(@log_paths['shop'], '[]', 'OVERWRITE') }
 
     # 농사
     @harvesting_log_dir_path = "@main_log_dir_path/harvesting"
     if(!file_exists(@harvesting_log_dir_path)) { create_dir(@harvesting_log_dir_path) }
     @log_paths['harvesting'] = "@harvesting_log_dir_path/@date.log"
-    if(!file_exists(@log_paths['harvesting'])) { create_file(@log_paths['harvesting']) }
+    if(!file_exists(@log_paths['harvesting'])) { create_file(@log_paths['harvesting']) write_file(@log_paths['harvesting'], '[]', 'OVERWRITE') }
   }
 
   # 오버, 네더 서버에서만 로깅
@@ -34,7 +34,7 @@ proc _create_log_files(@log_paths, @server) {
     @mining_log_dir_path = "@main_log_dir_path/mining"
     if(!file_exists(@mining_log_dir_path)) { create_dir(@mining_log_dir_path) }
     @log_paths['mining'] = "@mining_log_dir_path/@date.log"
-    if(!file_exists(@log_paths['mining'])) { create_file(@log_paths['mining']) }
+    if(!file_exists(@log_paths['mining'])) { create_file(@log_paths['mining']) write_file(@log_paths['mining'], '[]', 'mining') }
 
   }
 
@@ -42,7 +42,7 @@ proc _create_log_files(@log_paths, @server) {
   @chating_log_dir_path = "@main_log_dir_path/chating"
   if(!file_exists(@chating_log_dir_path)) { create_dir(@chating_log_dir_path) }
   @log_paths['chating'] = "@chating_log_dir_path/@date.log"
-  if(!file_exists(@log_paths['chating'])) { create_file(@log_paths['chating']) }
+  if(!file_exists(@log_paths['chating'])) { create_file(@log_paths['chating']) write_file(@log_paths['chating'], '[]', 'chating') }
 
 }
 
@@ -83,7 +83,7 @@ if(@server == 'main') {
     @y = integer(@location['y'])
     @z = integer(@location['z'])
     # 매시지 부분
-    @log = "[@time] @player(@uuid) harvest @item_name in x: @x y: @y z: @z\n"
+    @log = "[@time] @player(@uuid) harvest @item_name in x: @x y: @y z: @z"
     # 로깅
     write_file(@harvesting_log_path, @log, 'APPEND')
   }
@@ -120,3 +120,10 @@ proc _chating_logging(@chating_log_path, @content) {
   # 파일 로깅
   write_file(@chating_log_path, @log, 'APPEND')
 }
+/*
+set_timeout(2000, closure() {
+  for(@i = 0, @i < 10, @i++) {
+    queue_push(closure() { broadcast(@i) broadcast(time()) }, 'test')
+  }
+})
+ */
