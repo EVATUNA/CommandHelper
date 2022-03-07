@@ -168,7 +168,7 @@ bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @r
     break()
 
   case 'ch.send_chat':
-    @chating_log_path = @log_paths['chating']
+    @chating_log_path = @log_paths['chat']
     @data = json_decode(@event['value'])
     @channel = @data['sender_chat_data'][0]
     switch(@channel) {

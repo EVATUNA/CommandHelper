@@ -1305,7 +1305,7 @@ proc _get_message_raws(@channel, @message, @receivers, @town_members) {
 }
 
 # Default Chat
-proc _default_chat(@data, @players_data, @chating_log_path) {
+proc _default_chat(@data, @players_data, @chat_log_path) {
   # 변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1394,10 +1394,10 @@ proc _default_chat(@data, @players_data, @chating_log_path) {
     }
   }
   # 로깅
-  _chating_logging(@chating_log_path, "[@channel] @sender_name(@sender_server): @message")
+  //_chat_logging(@chat_log_path, "[@channel] @sender_name(@sender_server): @message")
 }
 
-proc _town_chat(@data, @players_data, @chating_log_path) {
+proc _town_chat(@data, @players_data, @chat_log_path) {
   # 변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1496,10 +1496,10 @@ proc _town_chat(@data, @players_data, @chating_log_path) {
     }
   }
   # 로깅
-  _chating_logging(@chating_log_path, "[@channel] @sender_name(@sender_server): @message")
+  //_chat_logging(@chat_log_path, "[@channel] @sender_name(@sender_server): @message")
 }
 
-proc _local_chat(@data, @players_data, @server, @chating_log_path) {
+proc _local_chat(@data, @players_data, @server, @chat_log_path) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1576,10 +1576,10 @@ proc _local_chat(@data, @players_data, @server, @chating_log_path) {
     }
   }
   # 로깅
-  _chating_logging(@chating_log_path, "[@channel] @sender_name(@sender_server): @message")
+  //_chat_logging(@chat_log_path, "[@channel] @sender_name(@sender_server): @message")
 }
 
-proc _admin_chat(@data, @players_data, @chating_log_path) {
+proc _admin_chat(@data, @players_data, @chat_log_path) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1660,10 +1660,10 @@ proc _admin_chat(@data, @players_data, @chating_log_path) {
     }
   }
   # 로깅
-  _chating_logging(@chating_log_path, "[@channel] @sender_name(@sender_server): @message")
+  //_chat_logging(@chat_log_path, "[@channel] @sender_name(@sender_server): @message")
 }
 
-proc _whisper_chat(@data, @players_data, @server, @chating_log_path) {
+proc _whisper_chat(@data, @players_data, @server, @chat_log_path) {
   # 변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1745,7 +1745,7 @@ proc _whisper_chat(@data, @players_data, @server, @chating_log_path) {
     @players_data[@receiver_uuid]['cache']['last_sender'] = "whisper.@sender_name.to.@target_name"
   }
   # 로깅
-  _chating_logging(@chating_log_path, "[@channel] @sender_name(@sender_server) → @target_name(@target_server) @message")
+  //_chat_logging(@chat_log_path, "[@channel] @sender_name(@sender_server) → @target_name(@target_server) @message")
 }
 
 bind('async_player_chat', null , null, @event, @players_data, @text, @server) {
@@ -1816,7 +1816,7 @@ bind('async_player_chat', null , null, @event, @players_data, @text, @server) {
   }
 }
 
-proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @chating_log_path) {
+proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @chat_log_path) {
   @enko = @setting[1]
   if(@enko) {
     @modified_message = _convert_eng_to_kor(@unmodified_message)
@@ -1833,7 +1833,7 @@ proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @chat
     @modified_message = @unmodified_message
   }
   # logging
-  _chating_logging(@chating_log_path, "[Broadcast] @sender_name: @modified_message")
+  //_chat_logging(@chat_log_path, "[Broadcast] @sender_name: @modified_message")
 
   @raw = array(
     array(
@@ -1860,6 +1860,36 @@ proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @chat
   kafka_send('send_broadcast', json_encode(@data))
 }
 
+proc _broadcast_chat(@data, @players_data, @chat_log_path, @icon, @color) {
+  # 변수 선언
+  @sender_name = @data['sender_name']
+  @sender_server = @data['sender_server']
+  @message = @data['message']
+  @channel = 'broadcast'
+
+  # 메시지 부분 raw (해당 함수에서 @receivers를 수정할 수 있음)
+  @message_raws = _get_message_raws(@channel, @message, @receivers)
+
+  # 메시지 보내기
+  foreach(@receiver_name in all_players()) {
+    @receiver_uuid = puuid(@receiver_name)
+    if(array_index_exists(@players_data, @receiver_uuid)) {
+      # 이름 부분 raw
+      @is_sender_same = @players_data[@receiver_uuid]['cache']['last_sender'] == "broadcast.@sender_name"
+      @is_type_messenger = @players_data[@receiver_uuid]['chat'][6]
+      @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, @icon, @color)
+      # 메시지 보내기
+      _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
+      # ls 세팅
+      @players_data[@receiver_uuid]['cache']['last_sender'] = "broadcast.@sender_name"
+      # 사운드
+      play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+    }
+  }
+  # 로깅
+  //_chat_logging(@chat_log_path, "[@channel] @sender_name(@sender_server): @message")
+}
+
 register_command('broadcast', array(
   permission: 'broadcast',
   'description': 'can broadcast',
@@ -1867,31 +1897,35 @@ register_command('broadcast', array(
   'aliases': array('say'),
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
-    @chating_log_path = @log_paths['chating']
+    @chat_log_path = @log_paths['chat']
+    @sender_name = @player
+    @sender_uuid = ''
+    @message = ''
     if(ponline(@player)) {
       if(pisop(@player)) {
-        @sender_name = @player
         @sender_uuid = puuid(@sender_name)
         if(array_index_exists(@players_data, @sender_uuid) && array_size(@args) > 0) {
-          @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
-          @setting = @players_data[@sender_uuid]['setting']
-          _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @chating_log_path)
+          @message = array_implode(@args, ' ')
         } else {
-          tmsg(@player, color('yellow')'/'.@command'<message>')
+          tmsg(@player, @text['prefix']['warn'] color('yellow')."/@command <message>")
         }
       } else {
         return(false)
       }
     } else {
-      @sender_name = 'console'
-      @sender_uuid = 'console'
-      if(array_size(@args) > 0) {
-        @imploded_message = array_implode(array_get(@args, cslice(0, array_size(@args) - 1)), ' ')
-        @setting = array('broadcast', false)
-        _broadcast(@sender_name, @sender_uuid, @imploded_message, @setting, @chating_log_path)
+      if(array_index_exists(@players_data, @sender_uuid) && array_size(@args) > 0) {
+        @message = array_implode(@args, ' ')
       } else {
-        console(color('yellow')'/'.@command'<message>')
+        tmsg(@player, @text['prefix']['warn'] color('yellow')."/@command <message>")
       }
+    }
+    if(@message != '') {
+      @data = array(
+        'sender_name': @sender_name,
+        'sender_server': @server,
+        'message': @message
+      )
+      _broadcast_chat(@data, @players_data, @chat_log_path, @text['prefix']['broadcast'], '#80c8ff')
     }
   }
 ))
@@ -1919,7 +1953,7 @@ register_command('whisper', array(
     if(array_index_exists(@players_data, @sender_uuid)) {
       switch(array_size(@args)) {
       case 0:
-        tmsg(@player, '\ue4dd'color('yellow').'/'.@command'<플레이어> <할 말>'.color('gray').'을 통해 귓속말을 보낼 수 있습니다.\n 또는,'color('yellow').'/'.@command'<플레이어>'.color('gray').'를 통해 귓속말을 채팅으로 보낼 수 있습니다.')
+        tmsg(@player, @text['prefix']['warn'] color('yellow').'/'.@command'<플레이어> <할 말>'.color('gray').'을 통해 귓속말을 보낼 수 있습니다.\n 또는,'color('yellow').'/'.@command'<플레이어>'.color('gray').'를 통해 귓속말을 채팅으로 보낼 수 있습니다.')
         break();
       case 1:
         @online_players = array()
