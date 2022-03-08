@@ -248,13 +248,12 @@ proc _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spe
       @reconnecting_data = @reconnecting_datas[@uuid]
       # 플레이어 데이터 로드
       _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @reconnecting_data)
+      runas('~console', "/advancement grant @player everything")
       # 첫접속시 가이드 안내 메시지
       if(@reconnecting_data['server'] == 'guest') {
         runas('~console', "/recipe give @player *")
         runas('~console', "/recipe take @player tunalands:release_flag")
         runas('~console', "/recipe take @player tunalands:take_flag")
-        
-        runas('~console', "/advancement grant @player everything")
         @raw = array(
           array(
             'text': @text['space_fonts']['space.128'].'\ue008\n\n\n\n\n\n'
