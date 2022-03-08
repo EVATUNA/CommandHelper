@@ -151,7 +151,7 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
 }
 
 # 카프카
-bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @resourcepack, @server, @log_paths) {
+bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @resourcepack, @server) {
   switch(@event['key']) {
 
   case 'ch.inform_player_quit':
@@ -168,24 +168,23 @@ bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @r
     break()
 
   case 'ch.send_chat':
-    @chating_log_path = @log_paths['chat']
     @data = json_decode(@event['value'])
     @channel = @data['sender_chat_data'][0]
     switch(@channel) {
     case 'default':
-      _default_chat(@data, @players_data, @chating_log_path)
+      _default_chat(@data, @players_data, @server)
       break()
     case 'town':
-      _town_chat(@data, @players_data, @chating_log_path)
+      _town_chat(@data, @players_data, @server)
       break()
     case 'local':
-      _local_chat(@data, @players_data, @server, @chating_log_path)
+      _local_chat(@data, @players_data, @server)
       break()
     case 'admin':
-      _admin_chat(@data, @players_data, @chating_log_path)
+      _admin_chat(@data, @players_data, @server)
       break()
     case 'whisper':
-      _whisper_chat(@data, @players_data, @server, @chating_log_path)
+      _whisper_chat(@data, @players_data, @server)
       break()
     }
     break()
@@ -253,17 +252,15 @@ bind('block_place', null, null, @event, @players_data, @skills_spec) {
 }
 
 # 블럭 파괴
-bind('block_break', null, null, @event, @players_data, @hp_blocks, @mineral_rewards, @crop_rewards, @skills_spec, @text, @server, @log_paths) {
+bind('block_break', null, null, @event, @players_data, @hp_blocks, @mineral_rewards, @crop_rewards, @skills_spec, @text, @server) {
   @player = @event['player']
   @uuid = puuid(@player)
   if(pmode(@player) == 'SURVIVAL') {
     if(@server == 'main' && pworld(@player) == 'spawn_minecraft_residence') {
-      @harvesting_log_path = @log_paths['harvesting']
-      _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @skills_spec, @text, @harvesting_log_path)
+      _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @skills_spec, @text, @server)
     }
     if(@server != 'main') {
-      @mining_log_path = @log_paths['mining']
-      _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @mineral_rewards, @skills_spec, @text, @mining_log_path)
+      _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @mineral_rewards, @skills_spec, @text, @server)
       
       /*
       # 일반 블럭들 튜나 레벨 주기?
@@ -2541,13 +2538,12 @@ bind('tree_grow', null, null, @event) {
 
 # 스폰 상호 작용
 if(@server == 'main') {
-  bind('player_interact_entity', null, array('clicked': 'PLAYER', 'hand': 'main_hand'), @event, @stores, @log_paths) {
+  bind('player_interact_entity', null, array('clicked': 'PLAYER', 'hand': 'main_hand'), @event, @stores) {
     @player = @event['player']
     @uuid = puuid(@player)
-    @shop_log_path = @log_paths['shop']
     switch(@event['data']) {
     case '편돌이튜나':
-      _showGui(@player, 'crop', @stores, @shop_log_path)
+      _showGui(@player, 'crop', @stores)
       break()
     }
   }

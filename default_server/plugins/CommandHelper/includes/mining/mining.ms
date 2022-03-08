@@ -16,7 +16,7 @@ foreach(@file in @files) {
   }
 }
 
-proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @mineral_rewards, @skills_spec, @text, @mining_log_path) {
+proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @mineral_rewards, @skills_spec, @text, @server) {
   @player_data = @players_data[@uuid]
   # 부순 블럭 선언
   @mineral = @event['block']
@@ -207,7 +207,7 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
             @max_weight = @min_weight + @entry['weight']
             if(@max_weight > @result_weight) {
               drop_item(@location, @entry['item'], false)
-              _mining_logging(@mining_log_path, @player, @uuid, @entry['item'], @location)
+              _logging('mine', time(), @server, @location, @player, @uuid, @entry['item'])
               break()
             } else {
               @min_weight = @max_weight

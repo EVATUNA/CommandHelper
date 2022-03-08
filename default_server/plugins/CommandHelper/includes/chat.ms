@@ -316,10 +316,10 @@ register_command('channel', array(
 
 proc _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, @sender_badge, @color, @target) {
   switch(@channel) {
-  case 'Default':
-  case 'Town':
-  case 'Local':
-  case 'Admin':
+  case 'default':
+  case 'town':
+  case 'local':
+  case 'admin':
     if(@is_type_messenger) {
       if(@is_sender_same) {
         @name_raws = array(
@@ -389,7 +389,7 @@ proc _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name,
       )
     }
     break()
-  case 'Whisper':
+  case 'whisper':
     if(@is_type_messenger) {
       if(@is_sender_same) {
         @name_raws = array(
@@ -617,6 +617,18 @@ proc _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name,
       }
     }
     break()
+  case 'broadcast':
+    @name_raws = array(
+      array(
+        'text': '',
+        'color': @color
+      ),
+      array(
+        'text': @sender_badge.' ',
+        'color': '#ffffff'
+      )
+    )
+    break()
   }
   return(@name_raws)
 }
@@ -627,7 +639,7 @@ proc _get_message_raws(@channel, @message, @receivers, @town_members) {
     array('text': '')
   )
   switch(@channel) {
-  case 'Default':
+  case 'default':
     foreach(@key: @string in parse_args(@message)) {
       @is_message_modified = false
       if(string_starts_with(@string, '@')) {
@@ -765,7 +777,7 @@ proc _get_message_raws(@channel, @message, @receivers, @town_members) {
       }
     }
     break()
-  case 'Town':
+  case 'town':
     foreach(@key: @string in parse_args(@message)) {
       @is_message_modified = false
       if(string_starts_with(@string, '@')) {
@@ -999,7 +1011,7 @@ proc _get_message_raws(@channel, @message, @receivers, @town_members) {
       }
     }
     break()
-  case 'Local':
+  case 'local':
     foreach(@key: @string in parse_args(@message)) {
       @is_message_modified = false
       if(string_starts_with(@string, '@')) {
@@ -1108,7 +1120,7 @@ proc _get_message_raws(@channel, @message, @receivers, @town_members) {
       }
     }
     break()
-  case 'Admin':
+  case 'admin':
     foreach(@key: @string in parse_args(@message)) {
       @is_message_modified = false
       if(string_starts_with(@string, '@')) {
@@ -1244,9 +1256,65 @@ proc _get_message_raws(@channel, @message, @receivers, @town_members) {
       }
     }
     break()
-  case 'Whisper':
+  case 'whisper':
     foreach(@key: @string in parse_args(@message)) {
       @is_message_modified = false
+      /*
+      if(string_starts_with(@string, '@')) {
+        @mentioned_message = substr(@string, 1) 
+        @eng_length = reg_count('[A-z0-9_]',@mentioned_message)
+        @kr_length = reg_count('[가-힣]', @mentioned_message)
+        @length = length(@mentioned_message)
+        if(@length != 0) {
+          if(@length == @eng_length) {
+            if(!array_contains(@mentioned_messages, @mentioned_message)) {
+              if(@mentioned_message == 타겟네임
+              foreach(@receiver_uuid: @receiver_data in @receivers) {
+                if(@mentioned_message == @receiver_data['name'] && @receiver_data['is_near_player']) {
+                  @receivers[@receiver_uuid]['is_mentioned'] = true
+                  @mentioned_messages[] = @mentioned_message
+                  @is_message_modified = true
+                  @message_raw = array(
+                    'text': @string,
+                    'color': 'red',
+                    'insertion': @string.' ',
+                    'hoverEvent': array(
+                      'action': 'show_text',
+                      'value': array(
+                        '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                        '좌클릭 시, 유저에게 귓속말을 보냅니다',
+                      )
+                    ),
+                    'clickEvent': array(
+                      'action': 'suggest_command',
+                      'value': '/w'@mentioned_message''
+                    )
+                  )
+                  break()
+                }
+              }
+            } else {
+              @is_message_modified = true
+              @message_raw = array(
+                'text': @string,
+                'color': 'red',
+                'insertion': @string.' ',
+                'hoverEvent': array(
+                  'action': 'show_text',
+                  'value': array(
+                    '쉬프트 좌클릭 시, 커서에 유저 호출 메시지가 입력됩니다.\n',
+                    '좌클릭 시, 유저에게 귓속말을 보냅니다',
+                  )
+                ),
+                'clickEvent': array(
+                  'action': 'suggest_command',
+                  'value': '/w'@mentioned_message''
+                )
+              )
+            }
+          }
+        }
+      } else */
       if(string_starts_with(@string, './')) {
         @string = replace(@string, './', '/')
         @string = replace(@string, '_', ' ')
@@ -1300,12 +1368,17 @@ proc _get_message_raws(@channel, @message, @receivers, @town_members) {
       }
     }
     break()
+  case 'broadcast':
+    @message_raws[] = array(
+      'text': @message
+    )
+    break()
   }
   return(@message_raws)
 }
 
 # Default Chat
-proc _default_chat(@data, @players_data, @chat_log_path) {
+proc _default_chat(@data, @players_data, @server) {
   # 변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1313,7 +1386,8 @@ proc _default_chat(@data, @players_data, @chat_log_path) {
   @sender_badge = @data['sender_badge']
   @sender_chat_data = @data['sender_chat_data']
   @message = @data['message']
-  @channel = 'Default'
+  @channel = 'default'
+  @is_server_same = @sender_server == @server
   # 리시버 데이터 세팅
   @receivers = array()
   foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
@@ -1394,10 +1468,12 @@ proc _default_chat(@data, @players_data, @chat_log_path) {
     }
   }
   # 로깅
-  //_chat_logging(@chat_log_path, "[@channel] @sender_name(@sender_server): @message")
+  if(@is_server_same) {
+    _logging('chat', time(), @server, @channel, @sender_name, @sender_uuid, '', '', @message)
+  }
 }
 
-proc _town_chat(@data, @players_data, @chat_log_path) {
+proc _town_chat(@data, @players_data, @server) {
   # 변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1405,8 +1481,9 @@ proc _town_chat(@data, @players_data, @chat_log_path) {
   @sender_badge = @data['sender_badge']
   @sender_chat_data = @data['sender_chat_data']
   @message = @data['message']
-  @channel = 'Town'
+  @channel = 'town'
   @town_members = @data['town_members']
+  @is_server_same = @sender_server == @server
   # 리시버 설정
   @receivers = array()
   foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
@@ -1496,10 +1573,12 @@ proc _town_chat(@data, @players_data, @chat_log_path) {
     }
   }
   # 로깅
-  //_chat_logging(@chat_log_path, "[@channel] @sender_name(@sender_server): @message")
+  if(@is_server_same) {
+    _logging('chat', time(), @server, @channel, @sender_name, @sender_uuid, '', '', @message)
+  }
 }
 
-proc _local_chat(@data, @players_data, @server, @chat_log_path) {
+proc _local_chat(@data, @players_data, @server) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1507,8 +1586,9 @@ proc _local_chat(@data, @players_data, @server, @chat_log_path) {
   @sender_badge = @data['sender_badge']
   @sender_chat_data = @data['sender_chat_data']
   @message = @data['message']
-  @channel = 'Local'
+  @channel = 'local'
   @near_players = @data['near_players']
+  @is_server_same = @sender_server == @server
   #리시버 설정
   @receivers = array()
   foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
@@ -1522,7 +1602,7 @@ proc _local_chat(@data, @players_data, @server, @chat_log_path) {
       } else {
         @is_listening = false
       }
-      if(@sender_server == @server && array_contains(@near_players, @receiver_name)) {
+      if(@is_server_same && array_contains(@near_players, @receiver_name)) {
         @receivers[@receiver_uuid] = array(
           'name': @receiver_name,
           'channel': @chat_data[0],
@@ -1576,10 +1656,12 @@ proc _local_chat(@data, @players_data, @server, @chat_log_path) {
     }
   }
   # 로깅
-  //_chat_logging(@chat_log_path, "[@channel] @sender_name(@sender_server): @message")
+  if(@is_server_same) {
+    _logging('chat', time(), @server, @channel, @sender_name, @sender_uuid, '', '', @message)
+  }
 }
 
-proc _admin_chat(@data, @players_data, @chat_log_path) {
+proc _admin_chat(@data, @players_data, @server) {
   #변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1587,7 +1669,8 @@ proc _admin_chat(@data, @players_data, @chat_log_path) {
   @sender_badge = @data['sender_badge']
   @sender_chat_data = @data['sender_chat_data']
   @message = @data['message']
-  @channel = 'Admin'
+  @channel = 'admin'
+  @is_server_same = @sender_server == @server
   #리시버 설정
   @receivers = array()
   foreach(@receiver_uuid in bukkitlinked_get_all_players()) {
@@ -1660,10 +1743,12 @@ proc _admin_chat(@data, @players_data, @chat_log_path) {
     }
   }
   # 로깅
-  //_chat_logging(@chat_log_path, "[@channel] @sender_name(@sender_server): @message")
+  if(@is_server_same) {
+    _logging('chat', time(), @server, @channel, @sender_name, @sender_uuid, '', '', @message)
+  }
 }
 
-proc _whisper_chat(@data, @players_data, @server, @chat_log_path) {
+proc _whisper_chat(@data, @players_data, @server) {
   # 변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
@@ -1671,10 +1756,10 @@ proc _whisper_chat(@data, @players_data, @server, @chat_log_path) {
   @sender_badge = @data['sender_badge']
   @sender_chat_data = @data['sender_chat_data']
   @message = @data['message']
-  @channel = 'Whisper'
+  @channel = 'whisper'
   @target_name = @data['target_name']
   @target_uuid = @data['target_uuid']
-  @target_server = 'other'
+  @is_server_same = @sender_server == @server
   # 리시버 설정
   @receivers = array()
   foreach(@receiver_name in all_players()) {
@@ -1698,7 +1783,6 @@ proc _whisper_chat(@data, @players_data, @server, @chat_log_path) {
           'is_observer': @chat_data[3],
           'is_mentioned': true
         )
-        @target_server = @server
       } else if(!is_null(@chat_data) && @chat_data[3]) {
         @receivers[@receiver_uuid] = array(
           'name': @receiver_name,
@@ -1745,7 +1829,9 @@ proc _whisper_chat(@data, @players_data, @server, @chat_log_path) {
     @players_data[@receiver_uuid]['cache']['last_sender'] = "whisper.@sender_name.to.@target_name"
   }
   # 로깅
-  //_chat_logging(@chat_log_path, "[@channel] @sender_name(@sender_server) → @target_name(@target_server) @message")
+  if(@is_server_same) {
+    _logging('chat', time(), @server, @channel, @sender_name, @sender_uuid, @target_name, @target_uuid, @message)
+  }
 }
 
 bind('async_player_chat', null , null, @event, @players_data, @text, @server) {
@@ -1816,59 +1902,16 @@ bind('async_player_chat', null , null, @event, @players_data, @text, @server) {
   }
 }
 
-proc _broadcast(@sender_name, @sender_uuid, @unmodified_message, @setting, @chat_log_path) {
-  @enko = @setting[1]
-  if(@enko) {
-    @modified_message = _convert_eng_to_kor(@unmodified_message)
-    if(@modified_message){
-      @reg = reg_match_all('\\[([^\\]]*)\\]', @unmodified_message)
-      foreach(@arr in @reg){
-        @converted = _convert_eng_to_kor(@arr[0])
-        @modified_message = replace(@modified_message, @converted, @arr[1])
-      }
-    } else {
-      @modified_message = @unmodified_message
-    }
-  } else {
-    @modified_message = @unmodified_message
-  }
-  # logging
-  //_chat_logging(@chat_log_path, "[Broadcast] @sender_name: @modified_message")
-
-  @raw = array(
-    array(
-      'text': '\ue4db '
-    ),
-    array(
-      'text': @modified_message,
-      'color': '#80c8ff'
-    )
-  )
-  @receiver_uuids = bukkitlinked_get_all_players()
-  foreach(@receiver_uuid in @receiver_uuids) {
-    @receiver_name = bukkitlinked_get_player_name(@receiver_uuid)
-    if(ponline(@receiver_name)) {
-      tellraw(@receiver_name, @raw)
-      if(ponline(@receiver_name)) {
-        play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
-      }
-    }
-  }
-  @data = array(
-    'raw': @raw
-  )
-  kafka_send('send_broadcast', json_encode(@data))
-}
-
-proc _broadcast_chat(@data, @players_data, @chat_log_path, @icon, @color) {
+proc _broadcast_chat(@data, @players_data, @icon, @color, @server) {
   # 변수 선언
   @sender_name = @data['sender_name']
+  @sender_uuid = @data['sender_uuid']
   @sender_server = @data['sender_server']
   @message = @data['message']
   @channel = 'broadcast'
-
-  # 메시지 부분 raw (해당 함수에서 @receivers를 수정할 수 있음)
-  @message_raws = _get_message_raws(@channel, @message, @receivers)
+  @is_server_same = @sender_server == @server
+  # 메시지 부분 raw
+  @message_raws = _get_message_raws(@channel, @message, array())
 
   # 메시지 보내기
   foreach(@receiver_name in all_players()) {
@@ -1886,8 +1929,9 @@ proc _broadcast_chat(@data, @players_data, @chat_log_path, @icon, @color) {
       play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
     }
   }
-  # 로깅
-  //_chat_logging(@chat_log_path, "[@channel] @sender_name(@sender_server): @message")
+  if(@is_server_same) {
+    _logging('chat', time(), @server, @channel, @sender_name, @sender_uuid, '', '', @message)
+  }
 }
 
 register_command('broadcast', array(
@@ -1897,14 +1941,13 @@ register_command('broadcast', array(
   'aliases': array('say'),
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
-    @chat_log_path = @log_paths['chat']
     @sender_name = @player
     @sender_uuid = ''
     @message = ''
     if(ponline(@player)) {
-      if(pisop(@player)) {
+      if(pisop(@player) && array_index_exists(@players_data, @sender_uuid)) {
         @sender_uuid = puuid(@sender_name)
-        if(array_index_exists(@players_data, @sender_uuid) && array_size(@args) > 0) {
+        if(array_size(@args) > 0) {
           @message = array_implode(@args, ' ')
         } else {
           tmsg(@player, @text['prefix']['warn'] color('yellow')."/@command <message>")
@@ -1913,19 +1956,20 @@ register_command('broadcast', array(
         return(false)
       }
     } else {
-      if(array_index_exists(@players_data, @sender_uuid) && array_size(@args) > 0) {
+      if(array_size(@args) > 0) {
         @message = array_implode(@args, ' ')
       } else {
-        tmsg(@player, @text['prefix']['warn'] color('yellow')."/@command <message>")
+        mom_log('INFO', color('yellow')."/@command <message>")
       }
     }
     if(@message != '') {
       @data = array(
         'sender_name': @sender_name,
+        'sender_uuid': @sender_uuid,
         'sender_server': @server,
         'message': @message
       )
-      _broadcast_chat(@data, @players_data, @chat_log_path, @text['prefix']['broadcast'], '#80c8ff')
+      _broadcast_chat(@data, @players_data, @text['prefix']['broadcast'], '#80c8ff', @server)
     }
   }
 ))

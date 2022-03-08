@@ -16,7 +16,7 @@ foreach(@file in @files) {
   }
 }
 
-proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @skills_spec, @text, @harvesting_log_path) {
+proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @skills_spec, @text, @server) {
   @player_data = @players_data[@uuid]
   @skill_manager = @player_data['skill_manager']
   # 부순 블럭 선언
@@ -93,7 +93,8 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
                 @max_weight = @min_weight + @entry['weight']
                 if(@max_weight > @result_weight) {
                   drop_item(@center_location, @entry['item'], false)
-                  _harvesting_logging(@harvesting_log_path, @player, @uuid, @entry['item'], @center_location)
+                  broadcast(A)
+                  _logging('harvest', time(), @server, @center_location, @player, @uuid, @entry['item'])
                   break()
                 } else {
                   @min_weight = @max_weight
@@ -226,7 +227,8 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
                   @max_weight = @min_weight + @entry['weight']
                   if(@max_weight > @result_weight) {
                     drop_item(@location, @entry['item'], false)
-                    _harvesting_logging(@harvesting_log_path, @player, @uuid, @entry['item'], @center_location)
+                    broadcast(B)
+                    _logging('harvest', time(), @server, @center_location, @player, @uuid, @entry['item'])
                     break()
                   } else {
                     @min_weight = @max_weight
