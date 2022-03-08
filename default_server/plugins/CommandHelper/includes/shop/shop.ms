@@ -137,7 +137,7 @@ proc _takeItem(@player, @take_item, @detail) {
   return(@taken_qty)
 }
 
-void proc _buyItem(@player, @itemMeta) { # 구매
+void proc _buyItem(@player, @itemMeta, @server, @shop_name) { # 구매
   @money = acc_balance(@player)
   @purchase_price = @itemMeta['meta']['price']['buy'] * @itemMeta['qty']
   if(@money >= @purchase_price) {
@@ -148,21 +148,23 @@ void proc _buyItem(@player, @itemMeta) { # 구매
       drop_item(ploc(@player), @itemMeta)
       msg('§c인벤토리에 공간이 없어 아이템이 바닥에 떨어집니다!')
     }
+    # 로깅
+    @uuid = puuid(@player)
+    _logging('shop', time(), @server, @shop_name, @player, @uuid, @itemMeta, 'buy', @itemMeta['qty'], @itemMeta['meta']['price']['buy'])
   } else {
     #돈 부족
   }
 }
 
-void proc _sellItem(@player, @itemMeta, @detail) { # 판매
+void proc _sellItem(@player, @itemMeta, @detail, @server, @shop_name) { # 판매
   @price = @itemMeta['meta']['price']['sell']
   @taken_qty = _takeItem(@player, @itemMeta, @detail)
   @selling_price = @price * @taken_qty
   if(@selling_price > 0) {
-    //acc_add(player(), @selling_price)
-    //if(is_proc('_shop_logging')) {
-    //  @uuid = puuid(@player)
-    //  _shop_logging(@shop_log_path, @player, @uuid, 'sell', @itemMeta, @taken_qty, @selling_price)
-    //}
+    acc_add(player(), @selling_price)
+    # 로깅
+    @uuid = puuid(@player)
+    _logging('shop', time(), @server, @shop_name, @player, @uuid, @itemMeta, 'sell', @taken_qty, @price)
   }
 }
 
@@ -237,12 +239,12 @@ proc _setupFrame(@storeName, @player, @stores) { ## gui 열 때 구성시켜주�
   return(@frame)
 }
 
-proc _setupEvent(@player, @stores) { ## GUI 이벤트 함수(클릭 이벤트 여깄슴)
+proc _setupEvent(@player, @stores, @server) { ## GUI 이벤트 함수(클릭 이벤트 여깄슴)
   @guiFrames = @stores['guiFrames']
   @viewers = @stores['viewers']
   @products = @stores['products']
   @returnList = array()
-  @returnList[] = bind('inventory_click', null, array('virtual': true, 'player': @player), @e, @player, @guiFrames, @viewers, @stores, @products) {
+  @returnList[] = bind('inventory_click', null, array('virtual': true, 'player': @player), @e, @player, @guiFrames, @viewers, @stores, @products, @server) {
     cancel()
     @hitSlot = @e['rawslot']
     if(@hitSlot < 54, cancel()) # STORE CLICK CANCEL
@@ -284,9 +286,10 @@ proc _setupEvent(@player, @stores) { ## GUI 이벤트 함수(클릭 이벤트 �
         if(array_index_exists(@hitItemMeta['meta'], 'opengui')) {
           @storeName = @hitItemMeta['meta']['opengui']
         } else if(array_index_exists(@hitItemMeta['meta'], 'price')) {
+          @shop_name = @viewers[@player]['storeName']
           if(array_index_exists(@hitItemMeta['meta']['price'], 'buy') && @tradeInfo['type'] == 'BUY') {
             @hitItemMeta['qty'] = @tradeInfo['count']
-            _buyItem(@player, @hitItemMeta)
+            _buyItem(@player, @hitItemMeta, @server, @shop_name)
           } else if(array_index_exists(@hitItemMeta['meta']['price'], 'sell') && @tradeInfo['type'] == 'SELL') { ## SELL ITEM
             @targetItem = array_deep_clone(@hitItemMeta)
             @targetItem['qty'] = @tradeInfo['count']
@@ -294,11 +297,11 @@ proc _setupEvent(@player, @stores) { ## GUI 이벤트 함수(클릭 이벤트 �
             if(array_index_exists(@hitItemMeta['meta'], 'detail')) {
               @detail = @hitItemMeta['meta']['detail']
             }
-            _sellItem(@player, @targetItem, @detail)
+            _sellItem(@player, @targetItem, @detail, @server, @shop_name)
           }
         }
       }
-      _showGui(@player, @storeName, @stores)
+      _showGui(@player, @storeName, @stores, @server)
     }
   }
   @returnList[] = bind('inventory_drag', null, array('virtual': true), @e, @player) {
@@ -322,7 +325,7 @@ proc _existGui(@guiId) {
 
 proc _guiId(@player) { return('STOREGUI.'.@player) }
 
-void proc _showGui(@player, @storeName, @stores) { ## GUI 여는 함수
+void proc _showGui(@player, @storeName, @stores, @server) { ## GUI 여는 함수
   @guiId = _guiId(@player)
 
   @viewers = @stores['viewers']
@@ -330,7 +333,7 @@ void proc _showGui(@player, @storeName, @stores) { ## GUI 여는 함수
   if(!array_index_exists(@viewers, @player)) {
     popen_inventory(@player, @guiId)
     @viewers[@player] = array( ## SET VALUE
-      'events': _setupEvent(@player, @stores),
+      'events': _setupEvent(@player, @stores, @server),
       'storeName': @storeName,
       'tradeInfo': array(
         'count': 1,
@@ -347,7 +350,7 @@ void proc _showGui(@player, @storeName, @stores) { ## GUI 여는 함수
 register_command('quickeasyshop', array(
   'aliases': array('store', 'evatunastore'),
   'executor': closure(@prefix, @sender, @inArguments) {
-    _showGui(@sender, @inArguments[0], @stores)
+    _showGui(@sender, @inArguments[0], @stores, @server)
   },
   'tabcompleter': closure(@prefix, @sender, @inArguments) {
     return(array())

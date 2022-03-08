@@ -91,19 +91,17 @@ proc _logging(@type, @time, @server) {
       }
       break()
     case 'shop':
-      // @type, @time, @server, @location, @player, @uuid, @item, @sub_type, @each_price
-      if(@arguments_size == 7) {
-        @location = @arguments[3]
+      // @type, @time, @server, @shop_name, @player, @uuid, @item, @sub_type, @qty, @each_price
+      if(@arguments_size == 10) {
+        @shop_name = @arguments[3]
         @player = @arguments[4]
         @uuid = @arguments[5]
+        @item = @arguments[6]
+        @sub_type = @arguments[7]
+        @qty = @arguments[8]
+        @each_price = @arguments[9]
         // time_stamp
         @time_stamp = simple_date('yyyy-MM-dd HH:mm:ss', time())
-        // location_stamp
-        @location_x = @location['x']
-        @location_y = @location['y']
-        @location_z = @location['z']
-        @location_world = @location['world']
-        @location_stamp = "@location_world/@location_x.@location_y.@location_z"
         // item_name
         if(array_index_exists(@item, 'meta', 'display') && @item['meta']['display'] != '') {
           @item_name = strip_colors(@item['meta']['display'])
@@ -111,7 +109,7 @@ proc _logging(@type, @time, @server) {
           @item_name = @item['name']
         }
         // log
-        @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@location_stamp] @player (@uuid) @item_name\n"
+        @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@shop_name] @player (@uuid) @sub_type @qty @each_price @item_name\n"
       }
       break()
     }
@@ -119,8 +117,7 @@ proc _logging(@type, @time, @server) {
   # file append
   if(file_exists(@path)) {
     write_file(@path, @log, 'APPEND')
-    broadcast(@log)
   } else {
-    broadcast('로깅 실패')
+    //broadcast('로깅 실패')
   }
 }

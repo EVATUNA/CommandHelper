@@ -2538,12 +2538,12 @@ bind('tree_grow', null, null, @event) {
 
 # 스폰 상호 작용
 if(@server == 'main') {
-  bind('player_interact_entity', null, array('clicked': 'PLAYER', 'hand': 'main_hand'), @event, @stores) {
+  bind('player_interact_entity', null, array('clicked': 'PLAYER', 'hand': 'main_hand'), @event, @stores, @server) {
     @player = @event['player']
     @uuid = puuid(@player)
     switch(@event['data']) {
     case '편돌이튜나':
-      _showGui(@player, 'crop', @stores)
+      _showGui(@player, 'crop', @stores, @server)
       break()
     }
   }
