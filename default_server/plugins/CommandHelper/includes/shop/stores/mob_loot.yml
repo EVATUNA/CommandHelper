@@ -3,103 +3,103 @@ PRODUCTS:
     name: PORKCHOP
     meta:
       price:
-        sell: 0.344
+        sell: 0.07
       detail: NONE
   11:
     name: BEEF
     meta:
       price:
-        sell: 0.148
+        sell: 0.05
       detail: NONE
   12:
     name: MUTTON
     meta:
       price:
-        sell: 0.351
+        sell: 0.07
       detail: NONE
   13:
     name: CHICKEN
     meta:
       price:
-        sell: 0.148
+        sell: 0.03
       detail: NONE
   14:
     name: RABBIT
     meta:
       price:
-        sell: 0.312
+        sell: 0.625
       detail: NONE
   19:
     name: LEATHER
     meta:
       price:
-        sell: 0.78
+        sell: 0.155
       detail: NONE
   20:
     name: WHITE_WOOL
     meta:
       price:
-        sell: 0.156
+        sell: 0.031
       detail: NONE
   21:
     name: FEATHER
     meta:
       price:
-        sell: 0.2
+        sell: 0.04
       detail: NONE
   22:
     name: EGG
     meta:
       price:
-        sell: 0.2
+        sell: 0.04
       detail: NONE
   23:
     name: RABBIT_HIDE
     meta:
       price:
-        sell: 0.376
+        sell: 0.075
       detail: NONE
   24:
     name: RABBIT_FOOT
     meta:
       price:
-        sell: 1.562
+        sell: 0.315
       detail: NONE
   28:
     name: ROTTEN_FLESH
     meta:
       price:
-        sell: 0.39
+        sell: 0.08
       detail: NONE
   29:
     name: STRING
     meta:
       price:
-        sell: 0.43
+        sell: 0.085
       detail: NONE
   30:
     name: SPIDER_EYE
     meta:
       price:
-        sell: 0.468
+        sell: 0.095
       detail: NONE
   31:
     name: GUNPOWDER
     meta:
       price:
-        sell: 0.508
+        sell: 0.1
       detail: NONE
   32:
     name: ENDER_PEARL
     meta:
       price:
-        sell: 0.625
+        sell: 0.125
       detail: NONE
   33:
     name: SLIME_BALL
     meta:
       price:
-        sell: 0.468
+        sell: 0.95
       detail: NONE
   37:
     name: BLAZE_POWDER
@@ -111,13 +111,13 @@ PRODUCTS:
     name: MAGMA_CREAM
     meta:
       price:
-        sell: 0.508
+        sell: 0.110
       detail: NONE
   39:
     name: GHAST_TEAR
     meta:
       price:
-        sell: 0.781
+        sell: 0.155
       detail: NONE
   50:
     name: IRON_INGOT
