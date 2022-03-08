@@ -93,7 +93,6 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
                 @max_weight = @min_weight + @entry['weight']
                 if(@max_weight > @result_weight) {
                   drop_item(@center_location, @entry['item'], false)
-                  broadcast(A)
                   _logging('harvest', time(), @server, @center_location, @player, @uuid, @entry['item'])
                   break()
                 } else {
@@ -227,7 +226,6 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
                   @max_weight = @min_weight + @entry['weight']
                   if(@max_weight > @result_weight) {
                     drop_item(@location, @entry['item'], false)
-                    broadcast(B)
                     _logging('harvest', time(), @server, @center_location, @player, @uuid, @entry['item'])
                     break()
                   } else {

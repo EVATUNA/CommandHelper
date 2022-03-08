@@ -58,9 +58,9 @@ proc _logging(@type, @time, @server) {
         @time_stamp = simple_date('yyyy-MM-dd HH:mm:ss', time())
         // log
         if(@target_name == '') { // 일반 채팅
-          @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@channel] @sender_name (@sender_uuid) : @message\n"
+          @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@channel] @sender_name (@sender_uuid): @message\n"
         } else { // 귓속말
-          @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@channel] @sender_name (@sender_uuid) → @target_name (@target_uuid) : @message\n"
+          @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@channel] @sender_name (@sender_uuid) to @target_name (@target_uuid): @message\n"
         }
       }
       break()
@@ -75,11 +75,11 @@ proc _logging(@type, @time, @server) {
         // time_stamp
         @time_stamp = simple_date('yyyy-MM-dd HH:mm:ss', time())
         // location_stamp
-        @location_x = @location['x']
-        @location_y = @location['y']
-        @location_z = @location['z']
+        @location_x = integer(@location['x'])
+        @location_y = integer(@location['y'])
+        @location_z = integer(@location['z'])
         @location_world = @location['world']
-        @location_stamp = "@location_world/@location_x.@location_y.@location_z"
+        @location_stamp = "@location_world, @location_x, @location_y, @location_z"
         // item_name
         if(array_index_exists(@item, 'meta', 'display') && @item['meta']['display'] != '') {
           @item_name = strip_colors(@item['meta']['display'])
@@ -109,7 +109,7 @@ proc _logging(@type, @time, @server) {
           @item_name = @item['name']
         }
         // log
-        @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@shop_name] @player (@uuid) @sub_type @qty @each_price @item_name\n"
+        @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@shop_name] @player (@uuid) @sub_type x@qty @each_price @item_name\n"
       }
       break()
     }
