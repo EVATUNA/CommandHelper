@@ -618,16 +618,79 @@ proc _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name,
     }
     break()
   case 'broadcast':
-    @name_raws = array(
-      array(
-        'text': '',
-        'color': @color
-      ),
-      array(
-        'text': @sender_badge.' ',
-        'color': '#ffffff'
+    if(@sender_name == 'TUNA_BOT') {
+      if(@is_type_messenger) {
+        if(@is_sender_same) {
+          @name_raws = array(
+            array(
+              'text': ' > ',
+              'color': @color
+            )
+          )
+        } else {
+          @name_raws = array(
+            array(
+              'text': '',
+              'color': @color
+            ),
+            array(
+              'text': @sender_badge.' ',
+              'color': '#ffffff'
+            ),
+            array(
+              'text': '튜나 봇',
+              'hoverEvent': array(
+                'action': 'show_text',
+                'value': array(
+                  '"에바참치 서버에서 알바하고 있어요."'
+                )
+              ),
+              'color': '#80c8ff'
+            ),
+            array(
+              'text': '\n > ',
+              'color': @color
+            )
+          )
+        }
+      } else {
+        @name_raws = array(
+          array(
+            'text': '',
+            'color': @color
+          ),
+          array(
+            'text': @sender_badge.' ',
+            'color': '#ffffff'
+          ),
+          array(
+            'text': '튜나 봇',
+            'hoverEvent': array(
+              'action': 'show_text',
+              'value': array(
+                '"에바참치 서버에서 알바하고 있어요."'
+              )
+            ),
+            'color': '#80c8ff'
+          ),
+          array(
+            'text': ' :: ',
+            'color': @color
+          )
+        )
+      }
+    } else {
+      @name_raws = array(
+        array(
+          'text': '',
+          'color': @color
+        ),
+        array(
+          'text': @sender_badge.' ',
+          'color': '#ffffff'
+        )
       )
-    )
+    }
     break()
   }
   return(@name_raws)
@@ -1902,12 +1965,14 @@ bind('async_player_chat', null , null, @event, @players_data, @text, @server) {
   }
 }
 
-proc _broadcast_chat(@data, @players_data, @icon, @color, @server) {
+proc _broadcast_chat(@data, @players_data, @server) {
   # 변수 선언
   @sender_name = @data['sender_name']
   @sender_uuid = @data['sender_uuid']
   @sender_server = @data['sender_server']
   @message = @data['message']
+  @color = @data['color']
+  @prefix = @data['prefix']
   @channel = 'broadcast'
   @is_server_same = @sender_server == @server
   # 메시지 부분 raw
@@ -1920,7 +1985,7 @@ proc _broadcast_chat(@data, @players_data, @icon, @color, @server) {
       # 이름 부분 raw
       @is_sender_same = @players_data[@receiver_uuid]['cache']['last_sender'] == "broadcast.@sender_name"
       @is_type_messenger = @players_data[@receiver_uuid]['chat'][6]
-      @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, @icon, @color)
+      @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, @prefix, @color)
       # 메시지 보내기
       _tellraw(@receiver_name, array_merge(@name_raws, @message_raws))
       # ls 세팅
@@ -1934,6 +1999,32 @@ proc _broadcast_chat(@data, @players_data, @icon, @color, @server) {
   }
 }
 
+proc _system_broadcast(@prefix, @color, @message, @server) {
+  @data = array(
+    'sender_name': 'SYSTEM',
+    'sender_uuid': '',
+    'sender_server': @server,
+    'sender_chat_data': array('broadcast'),
+    'message': @message,
+    'color': @color,
+    'prefix': @prefix
+  )
+  kafka_send('ch.send_chat', json_encode(@data))
+}
+
+proc _tunabot_broadcast(@message, @server) {
+  @data = array(
+    'sender_name': 'TUNA_BOT',
+    'sender_uuid': '',
+    'sender_server': @server,
+    'sender_chat_data': array('broadcast'),
+    'message': @message,
+    'color': '#ffffff',
+    'prefix': '\ue4e3'
+  )
+  kafka_send('ch.send_chat', json_encode(@data))
+}
+
 register_command('broadcast', array(
   permission: 'broadcast',
   'description': 'can broadcast',
@@ -1945,8 +2036,8 @@ register_command('broadcast', array(
     @sender_uuid = ''
     @message = ''
     if(ponline(@player)) {
+      @sender_uuid = puuid(@sender_name)
       if(pisop(@player) && array_index_exists(@players_data, @sender_uuid)) {
-        @sender_uuid = puuid(@sender_name)
         if(array_size(@args) > 0) {
           @message = array_implode(@args, ' ')
         } else {
@@ -1967,9 +2058,12 @@ register_command('broadcast', array(
         'sender_name': @sender_name,
         'sender_uuid': @sender_uuid,
         'sender_server': @server,
-        'message': @message
+        'sender_chat_data': array('broadcast'),
+        'message': @message,
+        'color': '#80c8ff',
+        'prefix': @text['prefix']['broadcast']
       )
-      _broadcast_chat(@data, @players_data, @text['prefix']['broadcast'], '#80c8ff', @server)
+      kafka_send('ch.send_chat', json_encode(@data))
     }
   }
 ))

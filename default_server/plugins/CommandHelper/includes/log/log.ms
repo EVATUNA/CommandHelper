@@ -53,7 +53,7 @@ proc _logging(@type, @time, @server) {
         @sender_uuid = @arguments[5]
         @target_name = @arguments[6]
         @target_uuid = @arguments[7]
-        @message = @arguments[8]
+        @message = strip_colors(@arguments[8])
         // time_stamp
         @time_stamp = simple_date('yyyy-MM-dd HH:mm:ss', time())
         // log

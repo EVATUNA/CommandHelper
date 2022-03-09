@@ -62,6 +62,9 @@ foreach(@player in all_players()) {
       _natural_heal_per_sec(@player)
     }
   }
+  if(@server == 'main') {
+    _autoquiz(@server)
+  }
 })
 
 # 1분 반복
@@ -173,6 +176,40 @@ bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @r
     switch(@channel) {
     case 'default':
       _default_chat(@data, @players_data, @server)
+      // autoquiz
+      @player = @data['sender_name']
+      if (import('evaquiz.status') == 0, exit())
+      if (@data['message'] == import('evaquiz.question_answer') && !array_contains(_getUser(), @player)) {
+        @reward = import('evaquiz.reward')
+        @chance = import('evaquiz.chance')
+        if (@reward < 1, @reward = 1)
+        if (@chance == 1, @reward_message = "§e+".@reward."무", @message = "§a무경험치 +".@reward)
+
+        @size = array_size(_getUser())
+        if (@size == 0) {
+          if (@chance == 3 || @chance == 4) {
+            _tunabot_broadcast("@player 님이 가장 빠르게 문장을 입력하셨습니다!", @server)
+            export('evaquiz.settime', time() + 7000)
+          } else {
+            _tunabot_broadcast("@player 님이 가장 빠르게 정답을 맞추셨습니다!", @server)
+            export('evaquiz.settime', time() + 4000)
+          }
+          //broadcast(@prefix'§7보상 : '.@message)
+          export('evaquiz.status', 2)
+        } else {
+          @size = @size + 1
+          if (@chance == 3 || @chance == 4) {
+            //msg(@prefix'당신은 '.@size.'번째로 문장을 입력하셨습니다!')
+          } else {
+            //msg(@prefix'당신은 '.@size.'번째로 정답을 맞추셨습니다!')
+          }
+          //msg(@prefix'§7보상 : '.@message)
+        }
+
+        if (@chance == 1, acc_add(@player, @reward), runas('~console', '/giveexp'@player @reward))
+        export('evaquiz.reward', round(@reward / 1.4, 3))
+        _addUser(@player)
+      }
       break()
     case 'town':
       _town_chat(@data, @players_data, @server)
@@ -186,17 +223,11 @@ bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @r
     case 'whisper':
       _whisper_chat(@data, @players_data, @server)
       break()
+    case 'broadcast':
+      _broadcast_chat(@data, @players_data, @server)
+      break()
     }
     break()
-  
-  case 'ch.send_broadcast':
-    @data = json_decode(@event['value'])
-    foreach(@receiver_name in all_players()) {
-      tellraw(@receiver_name, @data['raw'])
-      play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
-    }
-    break()
-    
   }
 }
 

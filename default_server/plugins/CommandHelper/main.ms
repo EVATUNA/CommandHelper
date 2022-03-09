@@ -52,6 +52,8 @@ include('includes/mob/mob.ms')
 
 # 채팅 시스템
 include('includes/chat.ms')
+# 오토퀴즈 시스템
+include('includes/autoquiz/autoquiz.ms')
 # 치장 시스템
 #include('includes/decoration/decoration.ms')
 # 상점 시스템
