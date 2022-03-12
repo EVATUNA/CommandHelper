@@ -30,7 +30,7 @@ proc _addUser(@value){
 proc _initUser() { export('evaquiz.process_user', array()) }
 
 # 시간
-if (import('evaquiz.settime') == 0) { export('evaquiz.settime', time() + 5000 /*1500000*/ ) }
+if (import('evaquiz.settime') == 0) { export('evaquiz.settime', time() + 1500000 ) }
 
 # 상태
 proc _initQuiz(){
@@ -41,7 +41,7 @@ proc _initQuiz(){
 proc _autoquiz(@server) {
   @prefix = ''
   @air = '  '
-  @rand = rand(150000,180000/*1500000,1800000*/)
+  @rand = rand(1500000,1800000)
   if (import('evaquiz.status') == 2) {
     if (time() >= import('evaquiz.settime')) {
       _tunabot_broadcast('끝! '.array_size(_getUser()).'명이 참여해주셨습니다.', @server)

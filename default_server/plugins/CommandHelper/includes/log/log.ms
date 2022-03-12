@@ -29,7 +29,7 @@ proc _create_log_files(@server) {
 # 커헬 로드 후 파일세팅
 _create_log_files(@server)
 # 날짜 갱신 후 파일세팅
-@cron_task = set_cron('0 0 * * *', closure() {
+set_cron('0 0 * * *', closure() {
   _create_log_files(@server)
 })
 

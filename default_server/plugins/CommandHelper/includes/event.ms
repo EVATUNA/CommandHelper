@@ -9,116 +9,119 @@ foreach(@player in all_players()) {
 }
 
 # 1초 반복
-@interval_task = set_interval(1000, closure() {
-  if(is_proc('_countdown_reconnectable_players')) {
-    _countdown_reconnectable_players(@reconnecting_datas)
-  }
-  foreach(@uuid: @player_data in @players_data) {
-    @player = player(@uuid)
-    if(ponline(@player)) {
+set_timeout(5000, closure() {
+  set_interval(1000, closure() {
+    if(is_proc('_countdown_reconnectable_players')) {
+      _countdown_reconnectable_players(@reconnecting_datas)
+    }
+    foreach(@uuid: @player_data in @players_data) {
+      @player = player(@uuid)
+      if(ponline(@player)) {
 
-      //broadcast(@player_data['cache']['last_sender'])
-      # Update Skill Hud
-      _update_skill_hud(@player, @uuid, @player_data, @skills_spec, @text)
+        //broadcast(@player_data['cache']['last_sender'])
+        # Update Skill Hud
+        //broadcast(A)
+        _update_skill_hud(@player, @uuid, @player_data, @skills_spec, @text)
 
-      # 액티브 스킬 카운드다운
-      foreach(@skill: @active_skill in @player_data['active_skill']) { // 활성화된 액티브 스킬 포리치
-        @proc_name = "_apply_countdown_by_@skill"
-        @skill_spec = @skills_spec[@skill]
-        @point = @player_data['skill_data'][@skill][0]
-        if(is_proc(@proc_name)) {
-          #broadcast(@proc_name @player @skill @point @active_skill)
-          call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skill_spec, @point)
-        }
-      }
-
-      #apply enchantment effects
-      _apply_passive_armor_enchantment(@player, @player_data)
-
-      #apply nether field effects
-      if(@server == 'nether') {
-        if(array_contains(array('SURVIVAL', 'ADVENTURE'), pmode(@player)) && !array_index_exists(get_peffect(@player), 'fire_resistance') && entity_onfire(@uuid) < 20) {
-          switch(@player_data['item']['enchantments']['armor']) {
-          case '반엔트로피':
-            break()
-          case '원소 보호':
-            if(rand() < 0.02) {
-              set_entity_onfire(@uuid, entity_onfire(@uuid) + 6)
-            }
-            break()
-          default:
-            if(rand() < 0.075) {
-              set_entity_onfire(@uuid, entity_onfire(@uuid) + 10)
-            }
-            break()
+        # 액티브 스킬 카운드다운
+        foreach(@skill: @active_skill in @player_data['active_skill']) { // 활성화된 액티브 스킬 포리치
+          @proc_name = "_apply_countdown_by_@skill"
+          @skill_spec = @skills_spec[@skill]
+          @point = @player_data['skill_data'][@skill][0]
+          if(is_proc(@proc_name)) {
+            #broadcast(@proc_name @player @skill @point @active_skill)
+            call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skill_spec, @point)
           }
         }
-      }
 
-      if(ploc(@player)['world'] == 'spawn_minecraft_residence') {
-        _generate_trace(@player, @traces)
-      }
-      # 피 자연회복
-      _natural_heal_per_sec(@player)
-    }
-  }
-  if(@server == 'main') {
-    _autoquiz(@server)
-  }
-})
+        #apply enchantment effects
+        _apply_passive_armor_enchantment(@player, @player_data)
 
-# 1분 반복
-@cron_task = set_cron('*/1 * * * *', closure() {
-  foreach(@id: @hp_block in @hp_blocks) {
-    if(@hp_block['reset_countdown'] > 0) {
-      @hp_block['reset_countdown'] -= 1
-    } else {
-      array_remove(@hp_blocks, @id)
-    }
-    #broadcast(@hp_block)
-  }
-
-  foreach(@uuid: @player_data in @players_data) {
-    # 액티브 스킬 저장
-    @skill_manager = @player_data['skill_manager']
-    @selected_methods = json_decode(@skill_manager[4])
-    @selected_combat_method = @selected_methods['combat_method']
-    if(@selected_combat_method != '' && array_index_exists(@player_data['active_skill'], @selected_combat_method)) {
-      @active_skill = @player_data['active_skill'][@selected_combat_method]
-      _save_active_skill(@uuid, @selected_combat_method, @active_skill)
-    }
-
-    @selected_sowing_method = @selected_methods['sowing_method']
-    if(@selected_sowing_method != '') {
-      @active_skill = @player_data['active_skill'][@selected_sowing_method]
-      _save_active_skill(@uuid, @selected_sowing_method, @active_skill)
-    }
-
-    @selected_harvesting_method = @selected_methods['harvesting_method']
-    if(@selected_harvesting_method != '') {
-      @active_skill = @player_data['active_skill'][@selected_harvesting_method]
-      _save_active_skill(@uuid, @selected_harvesting_method, @active_skill)
-    }
-
-  }
-
-  if(@server == 'main') {
-    foreach(@loaded_chunk in get_loaded_chunks('spawn_minecraft_residence')) {
-      foreach(@id in all_entities(@loaded_chunk['world'], @loaded_chunk['x'], @loaded_chunk['z'])) {
-        if(entity_type(@id) == 'ITEM_FRAME' && get_mob_name(@id) == 'trace') {
-          @tag = _get_tag(@id)
-          if(is_array(@tag)) {
-            @tag['minute']--
-            if(@tag['minute'] > 0) {
-              _update_tag(@id, @tag)
-            } else {
-              entity_remove(@id)
+        #apply nether field effects
+        if(@server == 'nether') {
+          if(array_contains(array('SURVIVAL', 'ADVENTURE'), pmode(@player)) && !array_index_exists(get_peffect(@player), 'fire_resistance') && entity_onfire(@uuid) < 20) {
+            switch(@player_data['item']['enchantments']['armor']) {
+            case '반엔트로피':
+              break()
+            case '원소 보호':
+              if(rand() < 0.02) {
+                set_entity_onfire(@uuid, entity_onfire(@uuid) + 6)
+              }
+              break()
+            default:
+              if(rand() < 0.075) {
+                set_entity_onfire(@uuid, entity_onfire(@uuid) + 10)
+              }
+              break()
             }
           }
         }
+
+        if(ploc(@player)['world'] == 'spawn_minecraft_residence') {
+          _generate_trace(@player, @traces)
+        }
+        # 피 자연회복
+        _natural_heal_per_sec(@player)
       }
     }
-  }
+    if(@server == 'main') {
+      _autoquiz(@server)
+    }
+  })
+
+  # 1분 반복
+  set_cron('*/1 * * * *', closure() {
+    foreach(@id: @hp_block in @hp_blocks) {
+      if(@hp_block['reset_countdown'] > 0) {
+        @hp_block['reset_countdown'] -= 1
+      } else {
+        array_remove(@hp_blocks, @id)
+      }
+      #broadcast(@hp_block)
+    }
+
+    foreach(@uuid: @player_data in @players_data) {
+      # 액티브 스킬 저장
+      @skill_manager = @player_data['skill_manager']
+      @selected_methods = json_decode(@skill_manager[4])
+      @selected_combat_method = @selected_methods['combat_method']
+      if(@selected_combat_method != '' && array_index_exists(@player_data['active_skill'], @selected_combat_method)) {
+        @active_skill = @player_data['active_skill'][@selected_combat_method]
+        _save_active_skill(@uuid, @selected_combat_method, @active_skill)
+      }
+
+      @selected_sowing_method = @selected_methods['sowing_method']
+      if(@selected_sowing_method != '') {
+        @active_skill = @player_data['active_skill'][@selected_sowing_method]
+        _save_active_skill(@uuid, @selected_sowing_method, @active_skill)
+      }
+
+      @selected_harvesting_method = @selected_methods['harvesting_method']
+      if(@selected_harvesting_method != '') {
+        @active_skill = @player_data['active_skill'][@selected_harvesting_method]
+        _save_active_skill(@uuid, @selected_harvesting_method, @active_skill)
+      }
+
+    }
+
+    if(@server == 'main') {
+      foreach(@loaded_chunk in get_loaded_chunks('spawn_minecraft_residence')) {
+        foreach(@id in all_entities(@loaded_chunk['world'], @loaded_chunk['x'], @loaded_chunk['z'])) {
+          if(entity_type(@id) == 'ITEM_FRAME' && get_mob_name(@id) == 'trace') {
+            @tag = _get_tag(@id)
+            if(is_array(@tag)) {
+              @tag['minute']--
+              if(@tag['minute'] > 0) {
+                _update_tag(@id, @tag)
+              } else {
+                entity_remove(@id)
+              }
+            }
+          }
+        }
+      }
+    }
+  })
 })
 
 # 플레이어 로그인
@@ -153,6 +156,10 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
   }
 }
 
+bind('region_change', null, null, @event) {
+  broadcast(@event['toRegions'])
+}
+
 # 카프카
 bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @resourcepack, @server) {
   switch(@event['key']) {
@@ -170,6 +177,24 @@ bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @r
     store_value('resourcepack', @url)
     break()
 
+  case 'ch.give_autoquiz_reward':
+    @data = json_decode(@event['value'])
+    @player = @data['player']
+    @reward = @data['reward']
+    if(ponline(@player)) {
+      acc_add(@player, @reward)
+    }
+    break()
+
+  case 'ch.send_message':
+    @data = json_decode(@event['value'])
+    @player = @data['player']
+    @message = @data['message']
+    if(ponline(@player)) {
+      tmsg(@player, @message)
+    }
+    break()
+
   case 'ch.send_chat':
     @data = json_decode(@event['value'])
     @channel = @data['sender_chat_data'][0]
@@ -183,7 +208,6 @@ bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @r
         @reward = import('evaquiz.reward')
         @chance = import('evaquiz.chance')
         if (@reward < 1, @reward = 1)
-        if (@chance == 1, @reward_message = "§e+".@reward."무", @message = "§a무경험치 +".@reward)
 
         @size = array_size(_getUser())
         if (@size == 0) {
@@ -194,19 +218,16 @@ bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @r
             _tunabot_broadcast("@player 님이 가장 빠르게 정답을 맞추셨습니다!", @server)
             export('evaquiz.settime', time() + 4000)
           }
-          //broadcast(@prefix'§7보상 : '.@message)
           export('evaquiz.status', 2)
         } else {
           @size = @size + 1
           if (@chance == 3 || @chance == 4) {
-            //msg(@prefix'당신은 '.@size.'번째로 문장을 입력하셨습니다!')
+            kafka_send('ch.send_message', json_encode(array('player': @player, 'message': "당신은 @size번쨰로 문장을 입력하셨습니다!")))
           } else {
-            //msg(@prefix'당신은 '.@size.'번째로 정답을 맞추셨습니다!')
+            kafka_send('ch.send_message', json_encode(array('player': @player, 'message': "당신은 @size번쨰로 정답을 맞추셨습니다!")))
           }
-          //msg(@prefix'§7보상 : '.@message)
         }
-
-        if (@chance == 1, acc_add(@player, @reward), runas('~console', '/giveexp'@player @reward))
+        kafka_send('ch.give_autoquiz_reward', json_encode(array('player': @player, 'reward': @reward)))
         export('evaquiz.reward', round(@reward / 1.4, 3))
         _addUser(@player)
       }
