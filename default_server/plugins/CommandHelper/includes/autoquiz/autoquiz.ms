@@ -1,24 +1,3 @@
-# 오토퀴즈 데이터
-export('evaquiz.answer', '')
-export('evaquiz.question_message', '')
-export('evaquiz.question_math_message', '')
-export('evaquiz.question_type', '')
-export('evaquiz.question_answer', '')
-export('evaquiz.reward', 0)
-export('evaquiz.status', 0)
-export('evaquiz.settime', 0)
-export('evaquiz.chance', 0)
-export('evaquiz.proverb.ko', split('\n', comp_read('proverb_ko.txt')))
-export('evaquiz.proverb.en', split('\n', comp_read('proverb_en.txt')))
-
-register_command('quiztest', array(
-  permission: 'admin.use',
-  'executor': closure(@cmd, @sender, @cArgs){}
-))
-
-# 참여 유저 관리
-export('evaquiz.process_user', array())
-
 proc _getUser() { return(import('evaquiz.process_user')) }
 
 proc _addUser(@value){
@@ -29,14 +8,40 @@ proc _addUser(@value){
 
 proc _initUser() { export('evaquiz.process_user', array()) }
 
-# 시간
-if (import('evaquiz.settime') == 0) { export('evaquiz.settime', time() + 1500000 ) }
+proc _autoquiz_init(@init_time) {
+
+  # 오토퀴즈 데이터
+  export('evaquiz.answer', '')
+  export('evaquiz.question_message', '')
+  export('evaquiz.question_math_message', '')
+  export('evaquiz.question_type', '')
+  export('evaquiz.question_answer', '')
+  export('evaquiz.reward', 0)
+  export('evaquiz.status', 0)
+  export('evaquiz.settime', 0)
+  export('evaquiz.chance', 0)
+  export('evaquiz.proverb.ko', split('\n', comp_read('proverb_ko.txt')))
+  export('evaquiz.proverb.en', split('\n', comp_read('proverb_en.txt')))
+  # 참여 유저 관리
+  export('evaquiz.process_user', array())
+
+  #시간
+  if (import('evaquiz.settime') == 0) { export('evaquiz.settime', time() + @init_time ) }
+}
+_autoquiz_init(1500000)
 
 # 상태
 proc _initQuiz(){
   export('evaquiz.status', 0)
   _initUser()
 }
+
+register_command('newquiz', array(
+  permission: 'newquiz',
+  'executor': closure(@cmd, @player, @args) {
+    _autoquiz_init(1000)
+  }
+))
 
 proc _autoquiz(@server) {
   @prefix = ''

@@ -2020,7 +2020,7 @@ proc _tunabot_broadcast(@message, @server) {
     'sender_chat_data': array('broadcast'),
     'message': @message,
     'color': '#ffffff',
-    'prefix': '\ue4e3'
+    'prefix': '\ue4e9'
   )
   kafka_send('ch.send_chat', json_encode(@data))
 }
