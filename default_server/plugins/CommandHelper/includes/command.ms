@@ -33,14 +33,14 @@ set_timeout(1000, closure() {
   proc _info_command(@command, @player, @args, @text) {
     msg(@text['prefix']['info'].' §b서버 정보')
     msg(' §7서버명: §f에바참치 §7(§fEvatuna§7)')
-    msg(' §7서버 장르: 야생')
     msg(' §7총 관리자: 앨리스(§btele§f: @alicearcade, §7dis§f: AA_2#1787)')
     msg(' §7공식 이메일: support@evatuna.fish')
     msg(' §7공식 홈페이지 : §7/site')
     msg(' §7공식 카페 : §a(네이버)§7/cafe')
     msg(' §7공식 디스코드: §7/discord')
+    msg(' §7공식 블로그: §7/blog')
     msg(' §7마인리스트: §7/vote')
-    msg(' §7서버오픈일: 2021년 06월 03일')
+    msg(' §7서버오픈일: 2022년 03월 15일')
   }
   if(_is_command_registered('info')) { unregister_command('info') }
   //if(_is_command_registered('version')) { unregister_command('version') }
@@ -55,20 +55,43 @@ set_timeout(1000, closure() {
   ))
 
   register_command('cafe', array(
-    'executor': closure(@cmd, @sender, @cArgs){
+    'executor': closure(@command, @player, @args) {
       msg(@text['prefix']['info']'§aNaverCafe §r : https://cafe.evatuna.fish')
     }
   ))
   register_command('discord', array(
-    'executor': closure(@cmd, @sender, @cArgs){
+    'executor': closure(@command, @player, @args) {
       msg(@text['prefix']['info']'§7Discord §r : https://discord.evatuna.fish/')
     }
   ))
   register_command('site', array(
-    'executor': closure(@cmd, @sender, @cArgs){
+    'executor': closure(@command, @player, @args) {
       msg(@text['prefix']['info']'§9EvatunaOffical §r : https://evatuna.fish/')
     }
   ))
+  register_command('blog', array(
+    'executor': closure(@command, @player, @args) {
+      msg(@text['prefix']['info']'§9EvatunaBlog §r : https://blog.evatuna.fish/')
+    }
+  ))
+  
+  register_command('guide', array(
+    'executor': closure(@command, @player, @args) {
+      if(array_size(@args) != 1) {
+        @arg = ''
+      } else {
+        @arg = @args[0]
+      }
+      switch(@arg) {
+      case 'usershop':
+        msg(@text['prefix']['info']'§7유저 상점 가이드\n §7https://lavender-tugboat-45a.notion.site/9189f462fa7047af809d3aa8fa90edb0')
+      default:
+        msg(@text['prefix']['info']'§7가이드 목록')
+        msg(' §7usershop')
+      }
+    }
+  ))
+
   ###
   ### 도움말 명령어
   ###
@@ -178,7 +201,7 @@ set_timeout(1000, closure() {
       break()
     }
     # 페이지에 따른 메시지
-    @max_page = 4
+    @max_page = 5
     if(!is_null(@page)) {
       msg('')
       _show_help_page_message(@player, @command, @page, @max_page, @text)
@@ -189,13 +212,21 @@ set_timeout(1000, closure() {
         msg(' §b# 도움말')
         _help_message(@player, 'help', array('command', 'commands', 'cmd', 'cmds', '도움말', '명령어', '헬프', '커맨드'), '[페이지]', '서버 명령어를 확인합니다.')
         _help_message(@player, 'info', array('about', 'version', 'ver', '서버', '서버정보'), null, '서버 정보를 확인합니다.')
-        #_help_message(@player, 'guide', array('newbie', '가이드', '뉴비'), null, '뉴비 가이드를 봅니다.')
+        _help_message(@player, 'guide', array('가이드'), '[가이드 이름]', '가이드를 봅니다.')
+        break()
+      case 2:
         msg(' §b# 채팅')
-        _help_message(@player, 'whisper', array('w', 'm', 'msg', 'tell', '귓속말', '귓'), '<닉네임> <할 말>', '플레이어에게 귓속말을 보냅니다.')
+        _help_message(@player, 'whisper', array('w', 'm', 'msg', 'tell', '귓속말', '귓'), '<닉네임> [할 말]', '플레이어에게 귓속말을 보냅니다.')
+        _help_message(@player, 'reply', array('r', '답장'), '[할 말]', '마지막으로 귓말을 보낸 사람에게 귓속말을 보냅니다.')
+        msg(' §7whisper 명령어와 reply 명령어 사용 시 할 말을 비워두면 귓속말을 보낼 유저를 대상으로한 귓속말 채널로 전환이 가능합니다.')
         _help_message(@player, 'channel', array('ch', '채널'), '[채널]', '채팅 채널을 변경합니다.')
         _help_message(@player, 'enko', array(), null, '한영 치환 입력을 활성/비활성합니다.')
         break()
-      case 2:
+        //msg(' §b# 설정')
+        //_help_message(@player, 'setting', array('설정'), null, '설정 GUI를 엽니다.')
+        //_help_message(@player, 'screen', array('graphics', '화면설정'), null, '화면 설정 GUI를 엽니다.')
+        //_help_message(@player, 'hud', array(), '<너비>', 'HUD 표시 너비를 조정합니다.')
+      case 3:
         msg(' §b# 유틸')
         _help_message(@player, 'util', array('gui', '유틸'), null, '유틸 GUI를 엽니다.')
         msg(' §b# 텔레포트')
@@ -204,25 +235,23 @@ set_timeout(1000, closure() {
         _help_message(@player, 'warp', array('워프'), null, '워프 GUI를 엽니다.')
         _help_message(@player, 'randomteleport', array('rt', '랜덤텔포', '랜덤티피',), null, '랜덤 텔레포트 GUI를 엽니다.')
         break()
-      case 3:
+      case 4:
         msg(' §b# 스킬')
         _help_message(@player, 'skillbook', array('skill', 'abilitybook', 'ability', 'masterybook', 'mastery', '스킬북', '스킬', '어빌리티북', '어빌리티', '마스터리북', '마스터리'), null, '스킬북을 엽니다.')
-        //msg(' §b# 설정')
-        //_help_message(@player, 'setting', array('설정'), null, '설정 GUI를 엽니다.')
-        //_help_message(@player, 'screen', array('graphics', '화면설정'), null, '화면 설정 GUI를 엽니다.')
-        //_help_message(@player, 'hud', array(), '<너비>', 'HUD 표시 너비를 조정합니다.')
         msg(' §b# 로그 조사')
         _help_message(@player, 'co i', array(), null, '로그조사 (토글)')
-        break()
-      case 4:
         msg(' §b# 돈')
         _help_message(@player, 'money', array(), null, '현재 소지한 돈을 확인합니다.')
         _help_message(@player, 'pay', array(), '<닉네임> <수량>', '플레이어에게 돈을 송금합니다.')
-        msg(' §b# 튜나랜드')
+        break()
+      case 5:
+        msg(' §b# 튜나랜드 (마을)')
         _help_message(@player, 'tunaland', array('tl'), null, '거주 월드 청크 관리 명령어입니다.')
-        msg(' §b# 길드')
-        _help_message(@player, 'guild', array(), null, '길드 관리 명령어입니다.')
-        #_help_message(@player, '', array(), null, '')
+        msg(' §b# 유저 상점')
+        _help_message(@player, 'ushop', array('tl'), null, '유저 상점 GUI를 엽니다.')
+        msg(' §7유저 상점 사용에 관한 자세한 설명은 §e/guide usershop§7를 통해 확인할 수 있습니다.')
+        msg(' §b# 레이드')
+        _help_message(@player, 'raid', array(), null, '레이드 GUI를 엽니다.')
         break()
       default:
         msg(' §7해당 페이지의 도움말이 존재하지 않습니다.')

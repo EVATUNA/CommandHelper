@@ -29,6 +29,9 @@ include('includes/data.ms')
 # 월드 시스템 (데스패널티, 필드효과)
 include('includes/world_system/world_system.ms')
 
+# 스폰 이벤트 (황금돼지, 랜덤텔포)
+include('includes/spawn_region/spawn_region.ms')
+
 # 야생월드의 채광 시스템
 include('includes/mining/mining.ms')
 # 야생월드의 벌목 시스템

@@ -52,7 +52,7 @@ register_command('giveitemone', array(
       @target_uuid = puuid(@target_name)
       @category = @args[1]
       @ch_item_name = array_implode(array_get(@args, cslice(2, array_size(@args) - 1)), ' ')
-      broadcast(@ch_item_name)
+      //broadcast(@ch_item_name)
       if(array_index_exists(@ch_items, @category, @ch_item_name)) {
         pgive_item(@target_name, @ch_items[@category][@ch_item_name])
       }

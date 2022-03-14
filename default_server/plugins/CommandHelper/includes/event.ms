@@ -8,12 +8,20 @@ foreach(@player in all_players()) {
   })
 }
 
+
+
 # 1초 반복
 set_timeout(5000, closure() {
   set_interval(1000, closure() {
-    if(is_proc('_countdown_reconnectable_players')) {
-      _countdown_reconnectable_players(@reconnecting_datas)
+
+    foreach(@uuid: @reconnecting_data in @reconnecting_datas) {
+      if(@reconnecting_data['countdown'] > 0) {
+        @reconnecting_data['countdown'] -= 1
+      } else {
+        array_remove(@reconnecting_datas, @uuid)
+      }
     }
+
     foreach(@uuid: @player_data in @players_data) {
       @player = player(@uuid)
       if(ponline(@player)) {
@@ -154,10 +162,6 @@ bind('player_toggle_sneak', null, null, @event, @players_data) {
       set_peffect(@player, 'SLOW_FALLING', 4, 11.5, false, true)
     }
   }
-}
-
-bind('region_change', null, null, @event) {
-  broadcast(@event['toRegions'])
 }
 
 # 카프카
@@ -569,7 +573,7 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
             break();
           default:
             @change_gui = false
-            broadcast(@change_gui @event['action'] @cursor_item)
+            //broadcast(@change_gui @event['action'] @cursor_item)
             break();
           }
           if(@change_gui) {
@@ -1700,23 +1704,25 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         }
         if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
           cancel()
-          @inventory = array()
-          for(@index = 0, @index < 45, @index++) {
-            @inventory[@index] = array(
-              'name': 'STRUCTURE_VOID',
-              'meta': array(
-                'display': ' ',
-                'model': 1
+          if(pworld(@player) != 'spawn') {
+            @inventory = array()
+            for(@index = 0, @index < 45, @index++) {
+              @inventory[@index] = array(
+                'name': 'STRUCTURE_VOID',
+                'meta': array(
+                  'display': ' ',
+                  'model': 1
+                )
               )
-            )
+            }
+            @inventory[1] = null
+            # proc
+            @rounded_failure_probability = null
+            @rounded_success_probability = null
+            @is_refresh = false
+            @block_location = @event['location']
+            _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @rounded_success_probability, @is_refresh, @block_location, @text)
           }
-          @inventory[1] = null
-          # proc
-          @rounded_failure_probability = null
-          @rounded_success_probability = null
-          @is_refresh = false
-          @block_location = @event['location']
-          _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @rounded_success_probability, @is_refresh, @block_location, @text)
         }
         break()
       case 'SMITHING_TABLE':
@@ -2063,149 +2069,151 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         }
         if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
           cancel()
-          if(pcooldown(@player, 'BEDROCK') == 0) {
-            @magic_items = array(
-              '미약한 마법의 정수': array_deep_clone(@essences['미약한 마법의 정수']['item']),
-              '농축된 마법의 정수': array_deep_clone(@essences['농축된 마법의 정수']['item']),
-              '강력한 마법의 정수': array_deep_clone(@essences['강력한 마법의 정수']['item']),
-              '변환의 끈': array(
-                'name': 'ENCHANTED_BOOK',
-                'meta': array(
-                  'display': '§b변환의 끈',
-                  'lore': array(
-                    '§7이 마법의 끈으로 비법서를 묶을 시',
-                    '§7비법서의 스킬 종류가 변환됩니다.',
-                    '',
-                    '§7같은 카테고리의 스킬로만 변환됩니다.',
-                    '§7변환 후 스크롤의 레벨이 미약하게 감소합니다.'
-                  ),
-                  'model': 2
-                )
-              ),
-              '놀라운 변환의 끈': array(
-                'name': 'ENCHANTED_BOOK',
-                'meta': array(
-                  'display': '§b놀라운 변환의 끈',
-                  'lore': array(
-                    '§7이 마법의 끈으로 비법서를 묶을 시',
-                    '§7비법서의 스킬 종류가 변환됩니다.',
-                    '',
-                    '§7다른 카테고리의 스킬로 변환될 수 있습니다.',
-                    '§7변환 후 스크롤의 레벨이 약간 감소합니다.'
-                  ),
-                  'model': 3
-                )
-              ),
-              '강력한 변환의 끈': array(
-                'name': 'ENCHANTED_BOOK',
-                'meta': array(
-                  'display': '§b강력한 변환의 끈',
-                  'lore': array(
-                    '§7이 마법의 끈으로 비법서를 묶을 시',
-                    '§7비법서의 레벨이 변환됩니다.',
-                    '',
-                    '§7다른 변환의 끈과 달리,',
-                    '§7스킬의 종류가 변환되지 않는 대신 ',
-                    '§7변환 후, 스크롤의 레벨이 감소되거나',
-                    '§7증가될 수 있습니다.'
-                  ),
-                  'model': 4
-                )
-              ),
-              '스킬 포인트 초기화 스크롤': array(
-                'name': 'ENCHANTED_BOOK',
-                'meta': array(
-                  'display': '§b스킬 포인트 초기화 스크롤',
-                  'lore': array(
-                    '§7해당 스크롤 사용 시',
-                    '§7스킬에 사용한 포인트가 모두 반환되어',
-                    '§7다시 스킬 포인트를 분배 할 수 있습니다.'
-                  ),
-                  'model': 1
+          if(pworld(@player) != 'spawn') {
+            if(pcooldown(@player, 'BEDROCK') == 0) {
+              @magic_items = array(
+                '미약한 마법의 정수': array_deep_clone(@essences['미약한 마법의 정수']['item']),
+                '농축된 마법의 정수': array_deep_clone(@essences['농축된 마법의 정수']['item']),
+                '강력한 마법의 정수': array_deep_clone(@essences['강력한 마법의 정수']['item']),
+                '변환의 끈': array(
+                  'name': 'ENCHANTED_BOOK',
+                  'meta': array(
+                    'display': '§b변환의 끈',
+                    'lore': array(
+                      '§7이 마법의 끈으로 비법서를 묶을 시',
+                      '§7비법서의 스킬 종류가 변환됩니다.',
+                      '',
+                      '§7같은 카테고리의 스킬로만 변환됩니다.',
+                      '§7변환 후 스크롤의 레벨이 미약하게 감소합니다.'
+                    ),
+                    'model': 2
+                  )
+                ),
+                '놀라운 변환의 끈': array(
+                  'name': 'ENCHANTED_BOOK',
+                  'meta': array(
+                    'display': '§b놀라운 변환의 끈',
+                    'lore': array(
+                      '§7이 마법의 끈으로 비법서를 묶을 시',
+                      '§7비법서의 스킬 종류가 변환됩니다.',
+                      '',
+                      '§7다른 카테고리의 스킬로 변환될 수 있습니다.',
+                      '§7변환 후 스크롤의 레벨이 약간 감소합니다.'
+                    ),
+                    'model': 3
+                  )
+                ),
+                '강력한 변환의 끈': array(
+                  'name': 'ENCHANTED_BOOK',
+                  'meta': array(
+                    'display': '§b강력한 변환의 끈',
+                    'lore': array(
+                      '§7이 마법의 끈으로 비법서를 묶을 시',
+                      '§7비법서의 레벨이 변환됩니다.',
+                      '',
+                      '§7다른 변환의 끈과 달리,',
+                      '§7스킬의 종류가 변환되지 않는 대신 ',
+                      '§7변환 후, 스크롤의 레벨이 감소되거나',
+                      '§7증가될 수 있습니다.'
+                    ),
+                    'model': 4
+                  )
+                ),
+                '스킬 포인트 초기화 스크롤': array(
+                  'name': 'ENCHANTED_BOOK',
+                  'meta': array(
+                    'display': '§b스킬 포인트 초기화 스크롤',
+                    'lore': array(
+                      '§7해당 스크롤 사용 시',
+                      '§7스킬에 사용한 포인트가 모두 반환되어',
+                      '§7다시 스킬 포인트를 분배 할 수 있습니다.'
+                    ),
+                    'model': 1
+                  )
                 )
               )
-            )
-            @inventory = array()
-            for(@index = 0, @index < 45, @index++) {
-              @inventory[@index] = array(
+              @inventory = array()
+              for(@index = 0, @index < 45, @index++) {
+                @inventory[@index] = array(
+                  'name': 'STRUCTURE_VOID',
+                  'meta': array(
+                    'display': ' ',
+                    'model': 1
+                  )
+                )
+              }
+              # 재료
+              @inventory[1] = null
+              # 설명
+              @info = array(
                 'name': 'STRUCTURE_VOID',
                 'meta': array(
-                  'display': ' ',
+                  'display': '§f재료 아이템을 넣은 후, 만들 아이템을 선택하세요.',
+                  'lore': array(
+                    '§7재료 아이템과 추출된 아케인 레벨을 이용하여,',
+                    '§7새로운 특수한 아이템을 만들 수 있습니다.',
+                    '',
+                    '§7추출되는 만큼 아케인 레벨이 감소합니다.'
+                  ),
                   'model': 1
                 )
               )
+              @inventory[9] = @info
+              @inventory[10] = @info
+              @inventory[11] = @info
+              @inventory[18] = @info
+              @inventory[19] = @info
+              @inventory[20] = @info
+              @inventory[27] = @info
+              @inventory[28] = @info
+              @inventory[29] = @info
+              # 30
+              @inventory[3] = array_deep_clone(@magic_items['미약한 마법의 정수'])
+              @inventory[3]['meta']['lore'][] = ''
+              @inventory[3]['meta']['lore'][] = '§e- 재료'
+              @inventory[3]['meta']['lore'][] = '§f 유리병'
+              @inventory[3]['meta']['lore'][] = '§f 30 아케인 레벨'
+              @inventory[12] = array_deep_clone(@magic_items['변환의 끈'])
+              @inventory[12]['meta']['lore'][] = ''
+              @inventory[12]['meta']['lore'][] = '§e- 재료'
+              @inventory[12]['meta']['lore'][] = '§c 비활성화'
+              //@inventory[12]['meta']['lore'][] = '§f 실'
+              @inventory[12]['meta']['lore'][] = '§f 30 아케인 레벨'
+              # 60
+              @inventory[5] = array_deep_clone(@magic_items['농축된 마법의 정수'])
+              @inventory[5]['meta']['lore'][] = ''
+              @inventory[5]['meta']['lore'][] = '§e- 재료'
+              @inventory[5]['meta']['lore'][] = '§f 유리병'
+              @inventory[5]['meta']['lore'][] = '§f 60 아케인 레벨'
+              @inventory[14] = array_deep_clone(@magic_items['놀라운 변환의 끈'])
+              @inventory[14]['meta']['lore'][] = ''
+              @inventory[14]['meta']['lore'][] = '§e- 재료'
+              @inventory[14]['meta']['lore'][] = '§c 비활성화'
+              //@inventory[14]['meta']['lore'][] = '§f 실'
+              @inventory[14]['meta']['lore'][] = '§f 60 아케인 레벨'
+              # 90
+              @inventory[7] = array_deep_clone(@magic_items['강력한 마법의 정수'])
+              @inventory[7]['meta']['lore'][] = ''
+              @inventory[7]['meta']['lore'][] = '§e- 재료'
+              @inventory[7]['meta']['lore'][] = '§f 유리병'
+              @inventory[7]['meta']['lore'][] = '§f 90 아케인 레벨'
+              @inventory[16] = array_deep_clone(@magic_items['강력한 변환의 끈'])
+              @inventory[16]['meta']['lore'][] = ''
+              @inventory[16]['meta']['lore'][] = '§e- 재료'
+              @inventory[16]['meta']['lore'][] = '§c 비활성화'
+              //@inventory[16]['meta']['lore'][] = '§f 실'
+              @inventory[16]['meta']['lore'][] = '§f 90 아케인 레벨'
+              # 120
+              @inventory[30] = array_deep_clone(@magic_items['스킬 포인트 초기화 스크롤'])
+              @inventory[30]['meta']['lore'][] = ''
+              @inventory[30]['meta']['lore'][] = '§e- 재료'
+              @inventory[30]['meta']['lore'][] = '§f 종이'
+              @inventory[30]['meta']['lore'][] = '§f 120 아케인 레벨'
+              # location
+              @block_location = @event['location']
+              # proc
+              _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_items, @text)
             }
-            # 재료
-            @inventory[1] = null
-            # 설명
-            @info = array(
-              'name': 'STRUCTURE_VOID',
-              'meta': array(
-                'display': '§f재료 아이템을 넣은 후, 만들 아이템을 선택하세요.',
-                'lore': array(
-                  '§7재료 아이템과 추출된 아케인 레벨을 이용하여,',
-                  '§7새로운 특수한 아이템을 만들 수 있습니다.',
-                  '',
-                  '§7추출되는 만큼 아케인 레벨이 감소합니다.'
-                ),
-                'model': 1
-              )
-            )
-            @inventory[9] = @info
-            @inventory[10] = @info
-            @inventory[11] = @info
-            @inventory[18] = @info
-            @inventory[19] = @info
-            @inventory[20] = @info
-            @inventory[27] = @info
-            @inventory[28] = @info
-            @inventory[29] = @info
-            # 30
-            @inventory[3] = array_deep_clone(@magic_items['미약한 마법의 정수'])
-            @inventory[3]['meta']['lore'][] = ''
-            @inventory[3]['meta']['lore'][] = '§e- 재료'
-            @inventory[3]['meta']['lore'][] = '§f 유리병'
-            @inventory[3]['meta']['lore'][] = '§f 30 아케인 레벨'
-            @inventory[12] = array_deep_clone(@magic_items['변환의 끈'])
-            @inventory[12]['meta']['lore'][] = ''
-            @inventory[12]['meta']['lore'][] = '§e- 재료'
-            @inventory[12]['meta']['lore'][] = '§c 비활성화'
-            //@inventory[12]['meta']['lore'][] = '§f 실'
-            @inventory[12]['meta']['lore'][] = '§f 30 아케인 레벨'
-            # 60
-            @inventory[5] = array_deep_clone(@magic_items['농축된 마법의 정수'])
-            @inventory[5]['meta']['lore'][] = ''
-            @inventory[5]['meta']['lore'][] = '§e- 재료'
-            @inventory[5]['meta']['lore'][] = '§f 유리병'
-            @inventory[5]['meta']['lore'][] = '§f 60 아케인 레벨'
-            @inventory[14] = array_deep_clone(@magic_items['놀라운 변환의 끈'])
-            @inventory[14]['meta']['lore'][] = ''
-            @inventory[14]['meta']['lore'][] = '§e- 재료'
-            @inventory[14]['meta']['lore'][] = '§c 비활성화'
-            //@inventory[14]['meta']['lore'][] = '§f 실'
-            @inventory[14]['meta']['lore'][] = '§f 60 아케인 레벨'
-            # 90
-            @inventory[7] = array_deep_clone(@magic_items['강력한 마법의 정수'])
-            @inventory[7]['meta']['lore'][] = ''
-            @inventory[7]['meta']['lore'][] = '§e- 재료'
-            @inventory[7]['meta']['lore'][] = '§f 유리병'
-            @inventory[7]['meta']['lore'][] = '§f 90 아케인 레벨'
-            @inventory[16] = array_deep_clone(@magic_items['강력한 변환의 끈'])
-            @inventory[16]['meta']['lore'][] = ''
-            @inventory[16]['meta']['lore'][] = '§e- 재료'
-            @inventory[16]['meta']['lore'][] = '§c 비활성화'
-            //@inventory[16]['meta']['lore'][] = '§f 실'
-            @inventory[16]['meta']['lore'][] = '§f 90 아케인 레벨'
-            # 120
-            @inventory[30] = array_deep_clone(@magic_items['스킬 포인트 초기화 스크롤'])
-            @inventory[30]['meta']['lore'][] = ''
-            @inventory[30]['meta']['lore'][] = '§e- 재료'
-            @inventory[30]['meta']['lore'][] = '§f 종이'
-            @inventory[30]['meta']['lore'][] = '§f 120 아케인 레벨'
-            # location
-            @block_location = @event['location']
-            # proc
-            _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_items, @text)
           }
         }
         break()
@@ -2597,22 +2605,6 @@ if(@server == 'main') {
     case '편돌이튜나':
       _showGui(@player, 'crop', @stores, @server)
       break()
-    }
-  }
-
-  bind('player_move', null, array('world': 'spawn'), @event) {
-    @portal = array(
-      'min_x': 482.5,
-      'min_y': 64.0,
-      'min_z': 361.5,
-      'max_x': 487.5,
-      'max_y': 68.0,
-      'max_z': 365.5
-    )
-    if(@event['to']['x'] > @portal['min_x'] && @event['to']['x'] < @portal['max_x'] && @event['to']['y'] > @portal['min_y'] && @event['to']['y'] < @portal['max_y'] && @event['to']['z'] > @portal['min_z'] && @event['to']['z'] < @portal['max_z']) {
-      if(!(@event['from']['x'] > @portal['min_x'] && @event['from']['x'] < @portal['max_x'] && @event['from']['y'] > @portal['min_y'] && @event['from']['y'] < @portal['max_y'] && @event['from']['z'] > @portal['min_z'] && @event['from']['z'] < @portal['max_z'])) {
-        runas(@event['player'], '/randomteleport')
-      }
     }
   }
 }
