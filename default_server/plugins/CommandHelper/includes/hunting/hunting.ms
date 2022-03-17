@@ -1,4 +1,6 @@
-if(@server == 'main') {
+@tunaland_queue = array()
+
+if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_query')) {
   proc _get_chunk_info(@x, @z) {
     @location = array(
       'x': @x * 16 + 8,
@@ -8,11 +10,9 @@ if(@server == 'main') {
     )
     @chunk_info = array(
       get_biome(@location),
-      0, //tunalands_get_owner_uuid_with_chunk_query(@location['world'], "@x:@z")
       integer(_get_highest_block_at(@location)['y'])
     )
     return(@chunk_info)
-    //broadcast("§7@x:@z" @chunk_info)
   }
 
   proc _get_highest_block_at(@location) {
@@ -109,10 +109,42 @@ if(@server == 'main') {
     return(@return)
   }
 
-  proc _update_chunks_info(@offset_x, @offset_z, @radius, @force_update, @clear_queue)  {
-    if(@clear_queue) {
-      queue_clear('update_chunk')
+  # 튜나랜드 히스토리
+  if(!file_exists('tunaland_history.json')) {
+    async_write_file('tunaland_history.json', '[]', 'OVERWRITE')
+  }
+
+  proc _push_tunaland_queue(@x, @z, @tunaland_queue) {
+    @owner = tunalands_get_owner_uuid_with_chunk_query('spawn_minecraft_residence', "@x:@z")
+    if(is_null(@owner)) {
+      @chunk = @x.'_'.@z
+      @tunaland_queue[] = @chunk
+      if(array_size(@tunaland_queue) == 1) {
+        _update_tunaland_queue(@tunaland_queue)
+      }
     }
+  }
+
+  proc _update_tunaland_queue(@tunaland_queue) {
+    @path = 'tunaland_history.json'
+    async_read(@path, closure(@content) {
+      @chunks = json_decode(@content)
+      @chunk = @tunaland_queue[0]
+      if(!array_contains(@chunks, @chunk)) {
+        @chunks[] = @chunk
+      }
+      async_write_file(@path, json_encode(@chunks), 'OVERWRITE', closure() {
+        array_remove(@tunaland_queue, 0)
+        if(array_size(@tunaland_queue) > 0) {
+          _update_tunaland_queue(@tunaland_queue)
+        }
+      })
+    })
+  }
+  
+  proc _update_chunks_info(@radius) {
+    queue_clear('update_chunk')
+
     broadcast('0%' simple_date('HH:mm:ss'))
     @biomes = array(
       "BEACH": array(),
@@ -179,67 +211,75 @@ if(@server == 'main') {
       "GROVE": array(),
       "CRIMSON_FOREST": array()
     )
-    for(@x = -@radius, @x < @radius, @x ++) {
-      for(@z = -@radius, @z < @radius, @z ++) {
-        @closure = closure() {
-          // 진행도 디버그
-          if(@z == @radius - 1) {
-            if(integer(@radius * 0.1 * 2) == integer((@x + @radius))) { broadcast('10%' simple_date('HH:mm:ss')) }
-            else if(integer(@radius * 0.2 * 2) == integer((@x + @radius))) { broadcast('20%' simple_date('HH:mm:ss')) }
-            else if(integer(@radius * 0.3 * 2) == integer((@x + @radius))) { broadcast('30%' simple_date('HH:mm:ss')) }
-            else if(integer(@radius * 0.4 * 2) == integer((@x + @radius))) { broadcast('40%' simple_date('HH:mm:ss')) }
-            else if(integer(@radius * 0.5 * 2) == integer((@x + @radius))) { broadcast('50%' simple_date('HH:mm:ss')) }
-            else if(integer(@radius * 0.6 * 2) == integer((@x + @radius))) { broadcast('60%' simple_date('HH:mm:ss')) }
-            else if(integer(@radius * 0.7 * 2) == integer((@x + @radius))) { broadcast('70%' simple_date('HH:mm:ss')) }
-            else if(integer(@radius * 0.8 * 2) == integer((@x + @radius))) { broadcast('80%' simple_date('HH:mm:ss')) }
-            else if(integer(@radius * 0.9 * 2) == integer((@x + @radius))) { broadcast('90%' simple_date('HH:mm:ss')) }
-          }
+    for(@mass_x = -@radius, @mass_x < @radius, @mass_x ++) {
+      for(@mass_z = -@radius, @mass_z < @radius, @mass_z ++) {
+      
+        # 파일 경로 생성 및 파일 생성
+        @path = 'masses/'.@mass_x.'_'.@mass_z.'.json'
 
-          @path = 'chunks/'.(@offset_x + @x).'_'.(@offset_z + @z).'.json'
-          @is_update = true
-          if(!@force_update && file_exists(@path)) { @is_update = false }
-          if(@is_update) {
-            @chunk_info = _get_chunk_info(@offset_x + @x, @offset_z + @z)
-            @biomes[@chunk_info[0]][] = (@offset_x + @x).'_'.(@offset_z + @z)
-            async_write_file(@path, json_encode(@chunk_info))
+        # 매스 info
+        @chunk_infos = array()
+
+        # 내부 반복문
+        for(@i = 0, @i < 256, @i++) {
+
+          @closure = closure() {
+            # 청크 구하기
+            @chunk_x = @mass_x * 16 + integer(@i / 16)
+            @chunk_z = @mass_z * 16 + @i % 16
+
+            # 청크 데이터 불러오기
+            @chunk_info = _get_chunk_info(@chunk_x, @chunk_z)
+            //broadcast("§7@chunk_x:@chunk_z" @chunk_info)
+            
+            # 청크 데이터 넣기
+            @chunk_infos[] = @chunk_info
+
+            # 바이옴에 따라 바이옴 파일에 청크 넣기
+            @biomes[@chunk_info[0]][] = @chunk_x.'_'.@chunk_z
           }
+          queue_push(@closure, 'update_chunk')
 
         }
+
+        # 내부 반복 끝날시
+        @closure = closure() {
+          # 파일 쓰기
+          async_write_file(@path, json_encode(@chunk_infos), 'OVERWRITE')
+          # 진행도 출력
+          if(@mass_z == @radius - 1) {
+            if(integer(@radius * 0.1 * 2) == integer((@mass_x + @radius))) { broadcast('10%' simple_date('HH:mm:ss')) }
+            else if(integer(@radius * 0.2 * 2) == integer((@mass_x + @radius))) { broadcast('20%' simple_date('HH:mm:ss')) }
+            else if(integer(@radius * 0.3 * 2) == integer((@mass_x + @radius))) { broadcast('30%' simple_date('HH:mm:ss')) }
+            else if(integer(@radius * 0.4 * 2) == integer((@mass_x + @radius))) { broadcast('40%' simple_date('HH:mm:ss')) }
+            else if(integer(@radius * 0.5 * 2) == integer((@mass_x + @radius))) { broadcast('50%' simple_date('HH:mm:ss')) }
+            else if(integer(@radius * 0.6 * 2) == integer((@mass_x + @radius))) { broadcast('60%' simple_date('HH:mm:ss')) }
+            else if(integer(@radius * 0.7 * 2) == integer((@mass_x + @radius))) { broadcast('70%' simple_date('HH:mm:ss')) }
+            else if(integer(@radius * 0.8 * 2) == integer((@mass_x + @radius))) { broadcast('80%' simple_date('HH:mm:ss')) }
+            else if(integer(@radius * 0.9 * 2) == integer((@mass_x + @radius))) { broadcast('90%' simple_date('HH:mm:ss')) }
+          }
+        }
         queue_push(@closure, 'update_chunk')
+
       }
     }
+
+    // 모든 반복 다 끝났을시 바이옴 파일 처리
     @closure = closure() {
       broadcast('100%' simple_date('HH:mm:ss'))
       foreach(@biome: @chunks in @biomes) {
         @path = "biomes/@biome.json"
-        async_write_file(@path, json_encode(@chunks))
+        async_write_file(@path, json_encode(@chunks), 'OVERWRITE')
+        //broadcast(@biome @chunks)
       }
     }
     queue_push(@closure, 'update_chunk')
   }
 
-  proc _update_chunk_tunaland(@x, @z) {
-    if(function_exists('tunalands_get_owner_uuid_with_chunk_query')) {
-      @owner = tunalands_get_owner_uuid_with_chunk_query('spawn_minecraft_residence', "@x:@z")
-      @path = 'chunks/'.@x.'_'.@z.'.json'
-      if(is_null(@owner)) {
-        async_read(@path, closure(@content) {
-          @chunk_info = json_decode(@content)
-          if(!@chunk_info[1]) {
-            if(!is_null(tunalands_get_owner_uuid_with_chunk_query('spawn_minecraft_residence', "@x:@z"))) {
-              @chunk_info[1] = 1
-              async_write_file(@path, json_encode(@chunk_info), 'OVERWRITE')
-            }
-          }
-        })
-      }
-    }
-  }
-
   // 월드 초기화 해서 청크 로딩 해야할시 청크 마스터로 반지금 7500블럭 미리 로드 한 후에 청크 불러와야함 
-  //_update_chunks_info(0, 0, 450, true, true)
+  //_update_chunks_info(29)
   //queue_clear('update_chunk')
-
+  
   # 바이옴별 청크 저장
   @biomes = array()
   @files = list_files('biomes')
@@ -275,21 +315,21 @@ if(@server == 'main') {
   }
 
   # 다야 블럭 설치하여 땅 생성 시도시
-  bind('block_place', null, array('block': 'DIAMOND_BLOCK'), @event) { // _ro 붙이기
+  bind('block_place', null, array('block': 'DIAMOND_BLOCK'), @event, @tunaland_queue) { // _ro 붙이기
     if(@event['location']['world'] == 'spawn_minecraft_residence' && psneaking(@event['player'])) {
       @chunk = get_chunk_loc(@event['location'])
-      _update_chunk_tunaland(@chunk['x'], @chunk['z'])
+      _push_tunaland_queue(@chunk['x'], @chunk['z'], @tunaland_queue)
     }
   }
 
   # 점유 깃발 사용시
-  bind('player_interact', null, array('button': 'right', 'itemname': 'GREEN_BANNER'), @event) {
+  bind('player_interact', null, array('button': 'right', 'itemname': 'GREEN_BANNER'), @event, @tunaland_queue) {
     if(@event['action'] == 'right_click_block' && @event['location']['world'] == 'spawn_minecraft_residence') {
       @chunk = get_chunk_loc(@event['location'])
-      _update_chunk_tunaland(@chunk['x'], @chunk['z'])
+      _push_tunaland_queue(@chunk['x'], @chunk['z'], @tunaland_queue)
     }
   }
-
+  /*
   proc _get_near_chunk(@x, @z, @min_radius, @max_radius) {
     @x_rand = array_get_rand(array(1, -1)) * rand(@min_radius, @max_radius)
     @z_rand = array_get_rand(array(1, -1)) * rand(@min_radius, @max_radius)
@@ -598,7 +638,10 @@ if(@server == 'main') {
       }
     }
   }
+  */
 
+  /*
+  
   proc _place_trace(@tag, @is_start) {
     @tag['minute'] = 5
     @moves = @tag['moves']
@@ -612,7 +655,7 @@ if(@server == 'main') {
       if(!@is_start && @trace_term > 1) {
         @trace_term--
         array_remove(@moves, 0)
-      } else if(array_contains(array(/*'RIVER', 'FROZEN_RIVER', 'BEACH', 'STONY_SHORE', 'SNOWY_BEACH',*/ 'OCEAN', 'DEEP_OCEAN', 'DEEP_COLD_OCEAN', 'COLD_OCEAN', 'FROZEN_OCEAN', 'DEEP_FROZEN_OCEAN', 'LUKEWARM_OCEAN', 'DEEP_LUKEWARM_OCEAN', 'WARM_OCEAN'), @moves[0]['biome'])) {
+      } else if(array_contains(array(*//*'RIVER', 'FROZEN_RIVER', 'BEACH', 'STONY_SHORE', 'SNOWY_BEACH',*//* 'OCEAN', 'DEEP_OCEAN', 'DEEP_COLD_OCEAN', 'COLD_OCEAN', 'FROZEN_OCEAN', 'DEEP_FROZEN_OCEAN', 'LUKEWARM_OCEAN', 'DEEP_LUKEWARM_OCEAN', 'WARM_OCEAN'), @moves[0]['biome'])) {
         array_remove(@moves, 0)
       } else {
         break()
@@ -710,4 +753,5 @@ if(@server == 'main') {
       }
     }
   }
+*/
 }
