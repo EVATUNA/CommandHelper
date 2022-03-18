@@ -654,6 +654,7 @@ proc _open_level_converter(@player, @uuid, @inventory, @block_location, @magic_i
                     clear_task()
                     play_named_sound(@location, array('sound': 'minecraft:block.enchantment_table.use', 'category': 'NEUTRAL', 'volume': 1, 'pitch': 1))
                     set_plevel(@player, plevel(@player) - @converting_level)
+                    _show_arcanelevel(@player, @uuid, @text)
                     drop_item(@location, @magic_item, false)
                   }
                 } else {
