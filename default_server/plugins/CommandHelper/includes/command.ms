@@ -36,11 +36,11 @@ set_timeout(1000, closure() {
     msg(' §7총 관리자: 앨리스(§btele§f: @alicearcade, §7dis§f: AA_2#1787)')
     msg(' §7공식 이메일: support@evatuna.fish')
     msg(' §7공식 홈페이지 : §7/site')
-    msg(' §7공식 카페 : §a(네이버)§7/cafe')
+    msg(' §7공식 네이버 카페 : /cafe')
     msg(' §7공식 디스코드: §7/discord')
     msg(' §7공식 블로그: §7/blog')
     msg(' §7마인리스트: §7/vote')
-    msg(' §7서버오픈일: 2022년 03월 15일')
+    msg(' §7서버오픈일: 2022년 03월 19일')
   }
   if(_is_command_registered('info')) { unregister_command('info') }
   //if(_is_command_registered('version')) { unregister_command('version') }

@@ -1,6 +1,36 @@
 @tunaland_queue = array()
 
 if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_query')) {
+
+  proc _get_mass_from_chunk(@chunk) {
+    @mass = array(
+      'x': integer(@chunk['x'] / 16),
+      'z': integer(@chunk['z'] / 16),
+    )
+    return(@mass)
+  }
+
+  proc _get_chunk_from_mass(@mass, @index) {
+    @chunk = array(
+      'x': @mass['x'] * 16 + integer(@index / 16),
+      'z': @mass['z'] * 16 + @index % 16
+    )
+    return(@chunk)
+  }
+
+  proc _get_relative_chunk_index(@chunk) {
+    //청크 구하는 기능 인덱스 구하는 기능 둘다 넣기?
+    return((@chunk['x'] % 16) * 16) + (@chunk['z'] % 16)
+  }
+
+  proc _get_relative_chunk_xz(@index) { // 굳이..?
+    @relative_chunk = array(
+      'x': integer(@index / 16),
+      'z': @index % 16
+    )
+    return(@relative_chunk)
+  }
+
   proc _get_chunk_info(@x, @z) {
     @location = array(
       'x': @x * 16 + 8,
@@ -225,8 +255,9 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
 
           @closure = closure() {
             # 청크 구하기
-            @chunk_x = @mass_x * 16 + integer(@i / 16)
-            @chunk_z = @mass_z * 16 + @i % 16
+            @chunk_array = _get_chunk_from_mass(array('x': @mass_x, 'z': @mass_z), @i)
+            @chunk_x = @chunk_array['x']
+            @chunk_z = @chunk_array['z']
 
             # 청크 데이터 불러오기
             @chunk_info = _get_chunk_info(@chunk_x, @chunk_z)
@@ -329,7 +360,7 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
       _push_tunaland_queue(@chunk['x'], @chunk['z'], @tunaland_queue)
     }
   }
-  /*
+
   proc _get_near_chunk(@x, @z, @min_radius, @max_radius) {
     @x_rand = array_get_rand(array(1, -1)) * rand(@min_radius, @max_radius)
     @z_rand = array_get_rand(array(1, -1)) * rand(@min_radius, @max_radius)
@@ -338,36 +369,53 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
 
   proc _generate_trace(@player, @traces) {
     if(rand() < 0.1) {
+      @read_masses = array()
       @chunk = get_chunk_loc(ploc(@player))
-      @path = 'chunks/'.@chunk['x'].'_'.@chunk['z'].'.json'
+      @mass = _get_mass_from_chunk(@chunk)
+      @path = 'masses/'.@mass['x'].'_'.@mass['z'].'.json'
       async_read(@path, closure(@content) {
-        @chunk_info = json_decode(@content)
-        if(@chunk_info[1]) {
-          @chance = 0.5
-          @min_radius = 5
-          @max_radius = 10
-        } else {
-          @chance = 1
-          @min_radius = 3
-          @max_radius = 8
-        }
-        if(rand() < @chance) {
-          @near_chunk = _get_near_chunk(@chunk['x'], @chunk['z'], @min_radius, @max_radius)
-          @path = 'chunks/'.@near_chunk['x'].'_'.@near_chunk['z'].'.json'
-          if(file_exists(@path)) {
-            async_read(@path, closure(@content) {
-              @chunk_info = json_decode(@content)
-              if(!@chunk_info[1]) {
-                _start_moving(@near_chunk['x'], @chunk_info[2], @near_chunk['z'], @chunk_info[0], @traces)
-              }
-            })
+        @mass_info = json_decode(@content)
+        @read_masses[@path] = @mass_info
+        async_read('tunaland_history.json', closure(@content) {
+          @tunaland_history = json_decode(@content)
+          if(array_contains(@tunaland_history, @chunk['x'].'_'.@chunk['z'])) { // 마을 안
+            @chance = 0.5
+            @min_radius = 5
+            @max_radius = 10
+          } else { //마을 밖
+            @chance = 1
+            @min_radius = 3
+            @max_radius = 8
           }
-        }
+          
+          if(rand() < @chance) {
+            @near_chunk = _get_near_chunk(@chunk['x'], @chunk['z'], @min_radius, @max_radius)
+            @near_mass = _get_mass_from_chunk(@near_chunk)
+            @near_path = 'masses/'.@near_mass['x'].'_'.@near_mass['z'].'.json'
+            if(array_index_exists(@read_masses, @near_path)) { // mass 있음
+              @index = _get_relative_chunk_index(@near_chunk)
+              @chunk_info = @mass_info[@index]
+              if(!array_contains(@tunaland_history, @near_chunk['x'].'_'.@near_chunk['z'])) {
+                _start_moving(@near_chunk['x'], @chunk_info[1], @near_chunk['z'], @chunk_info[0], @traces, @read_masses)
+              }
+            } else if(file_exists(@near_path)) { // mass 없음
+              async_read(@near_path, closure(@content) {
+                @mass_info = json_decode(@content)
+                @read_masses[@near_path] = @mass_info
+                @index = _get_relative_chunk_index(@near_chunk)
+                @chunk_info = @mass_info[@index]
+                if(!array_contains(@tunaland_history, @near_chunk['x'].'_'.@near_chunk['z'])) {
+                  _start_moving(@near_chunk['x'], @chunk_info[1], @near_chunk['z'], @chunk_info[0], @traces, @read_masses)
+                }
+              })
+            }
+          }
+        })
       })
     }
   }
 
-  proc _start_moving(@x, @y, @z, @biome, @traces) {
+  proc _start_moving(@x, @y, @z, @biome, @traces, @read_masses) {
     @traces = array_deep_clone(@traces)
     foreach(@trace_name: @trace_data in @traces) {
       if(array_index_exists(@trace_data, 'conditions', 'chance_by_biomes', @biome)) {
@@ -391,11 +439,11 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
           'facing': @facing
         )
       )
-      _try_moving(@moves, 0, @traces, @trace_name)
+      _try_moving(@moves, 0, @traces, @trace_name, @read_masses)
     }
   }
 
-  proc _try_moving(@moves, @failures, @traces, @trace_name) {
+  proc _try_moving(@moves, @failures, @traces, @trace_name, @read_masses) {
     @trace_data = @traces[@trace_name]
     @moving_count = array_size(@moves)
     if(@moving_count < @trace_data['max_move']) {
@@ -500,13 +548,21 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
             break()
           }
 
-          @path = 'chunks/'.@new_x.'_'.@new_z.'.json'
-          if(file_exists(@path)) {
-            async_read(@path, closure(@content) {
-              @chunk_info = json_decode(@content)
-              if(!@chunk_info[1]) {
+          @new_chunk = array('x': @new_x, 'z': @new_z)
+          @new_mass = _get_mass_from_chunk(@new_chunk)
+          @new_path = 'masses/'.@new_mass['x'].'_'.@new_mass['z'].'.json'
+          
+          async_read('tunaland_history.json', closure(@content) {
+            @tunaland_history = json_decode(@content)
+
+            if(array_index_exists(@read_masses, @new_path)) { // mass 있음
+              @mass_info = @read_masses[@new_path]
+              @index = _get_relative_chunk_index(@new_chunk)
+              @chunk_info = @mass_info[@index]
+              # 튜나랜드 땅인지 아닌지
+              if(!array_contains(@tunaland_history, @new_chunk['x'].'_'.@new_chunk['z'])) {
                 @is_succeeded = true
-                @new_y = @chunk_info[2]
+                @new_y = @chunk_info[1]
                 @new_biome = @chunk_info[0]
                 if(array_index_exists(@trace_data, 'conditions')) {
                   @conditions = @trace_data['conditions']
@@ -571,26 +627,110 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
                 } else {
                   @failures += 1
                 }
-                _try_moving(@moves, @failures, @traces, @trace_name)
+                _try_moving(@moves, @failures, @traces, @trace_name, @read_masses)
               } else if(rand() < 0.666) { // 이동 경로에 튜랜 땅 있을 시
                 @first_move = @moves[0]
                 //broadcast('경로 생성 재시도 (튜랜 땅이 경로에 걸림)')
-                _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces)
+                _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces, @read_masses)
               } else {
                 //broadcast('경로 생성 실패')
               }
-            })
-          } else if(rand() < 0.333) { // 청크 파일 없을시
-            @first_move = @moves[0]
-            //broadcast('경로 생성 재시도 (청크 파일 없음)')
-            _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces)
-          } else {
-            //broadcast('경로 생성 실패 (청크 파일 없음)')
-          }
+            } else if(file_exists(@new_path)) { // mass 없음
+              async_read(@new_path, closure(@content) {
+                @mass_info = json_decode(@content)
+                @read_masses[@new_path] = @mass_info
+                @index = _get_relative_chunk_index(@new_chunk)
+                @chunk_info = @mass_info[@index]
+                # 튜나랜드 땅인지 아닌지
+                if(!array_contains(@tunaland_history, @new_chunk['x'].'_'.@new_chunk['z'])) {
+                  @is_succeeded = true
+                  @new_y = @chunk_info[1]
+                  @new_biome = @chunk_info[0]
+                  if(array_index_exists(@trace_data, 'conditions')) {
+                    @conditions = @trace_data['conditions']
+
+                    // 디버깅용 변수
+                    @m = array_size(@moves) + 1
+                    @f = @failures + 1
+                    // 바이옴 검사
+                    if(@is_succeeded && array_index_exists(@conditions, 'chance_by_biomes')) {
+                      @chance_by_biomes = @conditions['chance_by_biomes']
+                      if(array_index_exists(@chance_by_biomes, @new_biome)) {
+                        @chance = @chance_by_biomes[@new_biome]
+                      } else {
+                        @chance = 0
+                      }
+                      if(rand() > @chance) {
+                        @is_succeeded = false
+                        //broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (바이옴)")
+                      }
+                    }
+
+                    // 최소 y조사
+                    if(@is_succeeded && array_index_exists(@conditions, 'min_y')) {
+                      if(@conditions['min_y'] > @new_y) {
+                        @is_succeeded = false
+                        //broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (최소 y)")
+                      }
+                    }
+
+                    // 최대 y조사
+                    if(@is_succeeded && array_index_exists(@conditions, 'max_y')) {
+                      if(@conditions['max_y'] < @new_y) {
+                        @is_succeeded = false
+                        //broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (최대 y)")
+                      }
+                    }
+
+                    // y편차 확률 검사
+                    if(@is_succeeded && array_index_exists(@conditions, 'height_difference_for_chance')) {
+                      @old_y = @last_move['y']
+                      if(abs(@old_y - @new_y) > rand() * @conditions['height_difference_for_chance']) {
+                        @is_succeeded = false
+                        //broadcast("§7@trace_name @m§7 번째 이동 실패 (트라이: @f) (y편차)")
+                      }
+                    }
+                  }
+
+                  if(@is_succeeded) {
+                    @move = array(
+                      'x': @new_x,
+                      'y': @new_y,
+                      'z': @new_z,
+                      'biome': @new_biome,
+                      'facing': @new_facing
+                    )
+                    @moves[] = @move
+                    //broadcast(@trace_name array_size(@moves).' 번째 이동 성공 (방향:' @new_facing.')')
+                    if(array_size(@moves) == @trace_data['min_move']) {
+                      //broadcast('경로 생성 가능')
+                    }
+                    @failures = 0
+                  } else {
+                    @failures += 1
+                  }
+                  _try_moving(@moves, @failures, @traces, @trace_name, @read_masses)
+                } else if(rand() < 0.666) { // 이동 경로에 튜랜 땅 있을 시
+                  @first_move = @moves[0]
+                  //broadcast('경로 생성 재시도 (튜랜 땅이 경로에 걸림)')
+                  _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces, @read_masses)
+                } else {
+                  //broadcast('경로 생성 실패')
+                }
+              })
+            } else if(rand() < 0.333) {
+              @first_move = @moves[0]
+              //broadcast('경로 생성 재시도 (청크 파일 없음)')
+              _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces, @read_masses)
+            } else {
+              //broadcast('경로 생성 실패 (청크 파일 없음)')
+            }
+          })
+
         } else if(rand() < 0.666) { // 3번 실패했을시
           @first_move = @moves[0]
           //broadcast('경로 생성 재시도 (3번 실패함)')
-          _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces)
+          _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces, @read_masses)
         } else {
           //broadcast('경로 생성 실패 (3번 실패함)')
         }
@@ -611,7 +751,7 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
         } else if(rand() < 0.666) { // 마지막 청크바이옴이 바다나 강일시
           @first_move = @moves[0]
           //broadcast('경로 생성 재시도 (마지막 청크 바다 or 강)')
-          _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces)
+          _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces, @read_masses)
         } else {
           //broadcast('경로 생성 실패 (마지막 청크 바다 or 강)')
         }
@@ -632,15 +772,13 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
       } else if(rand() < 0.666) { // 마지막 청크바이옴이 바다나 강일시
         @first_move = @moves[0]
         //broadcast('경로 생성 재시도 (마지막 청크 바다 or 강)')
-        _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces)
+        _start_moving(@first_move['x'], @first_move['y'], @first_move['z'], @first_move['biome'], @traces, @read_masses)
       } else {
         //broadcast('경로 생성 실패 (마지막 청크 바다 or 강)')
       }
     }
   }
-  */
 
-  /*
   
   proc _place_trace(@tag, @is_start) {
     @tag['minute'] = 5
@@ -655,7 +793,7 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
       if(!@is_start && @trace_term > 1) {
         @trace_term--
         array_remove(@moves, 0)
-      } else if(array_contains(array(*//*'RIVER', 'FROZEN_RIVER', 'BEACH', 'STONY_SHORE', 'SNOWY_BEACH',*//* 'OCEAN', 'DEEP_OCEAN', 'DEEP_COLD_OCEAN', 'COLD_OCEAN', 'FROZEN_OCEAN', 'DEEP_FROZEN_OCEAN', 'LUKEWARM_OCEAN', 'DEEP_LUKEWARM_OCEAN', 'WARM_OCEAN'), @moves[0]['biome'])) {
+      } else if(array_contains(array(/*'RIVER', 'FROZEN_RIVER', 'BEACH', 'STONY_SHORE', 'SNOWY_BEACH',*/ 'OCEAN', 'DEEP_OCEAN', 'DEEP_COLD_OCEAN', 'COLD_OCEAN', 'FROZEN_OCEAN', 'DEEP_FROZEN_OCEAN', 'LUKEWARM_OCEAN', 'DEEP_LUKEWARM_OCEAN', 'WARM_OCEAN'), @moves[0]['biome'])) {
         array_remove(@moves, 0)
       } else {
         break()
@@ -753,5 +891,4 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
       }
     }
   }
-*/
 }
