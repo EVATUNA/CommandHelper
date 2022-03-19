@@ -70,6 +70,7 @@ proc _show_tunalevel(@uuid, @player_data, @text) {
     '\ueea0', '\ueea1', '\ueea2', '\ueea3', '\ueea4', '\ueea5', '\ueea6', '\ueea7', '\ueea8', '\ueea9', '\ueeaa', '\ueeab', '\ueeac', '\ueead', '\ueeae', '\ueeaf'
   )
   @bar_index = integer((@experience / @max_experience) * 80)
+  if(@bar_index >= 80) {@bar_index = 79}
   @bar = @bars[@bar_index]
   # level
   @tunalevel_text = _replace_tunalevel_text(@tunalevel)
@@ -358,6 +359,7 @@ proc _show_arcanelevel(@player, @uuid, @text) {
     '\ueef0', '\ueef1', '\ueef2', '\ueef3', '\ueef4', '\ueef5', '\ueef6', '\ueef7', '\ueef8', '\ueef9', '\ueefa', '\ueefb', '\ueefc', '\ueefd', '\ueefe', '\ueeff'
   )
   @bar_index = integer(pexp(@player) * 0.8)
+  if(@bar_index >= 80) {@bar_index = 79}
   @bar = @bars[@bar_index]
   
   # level

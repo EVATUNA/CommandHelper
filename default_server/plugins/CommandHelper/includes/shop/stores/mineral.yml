@@ -16,7 +16,7 @@ PRODUCTS:
     name: COPPER_INGOT
     meta:
       price:
-        sell: 0.3125
+        sell: 0.7
       detail: DISPLAY
   12:
     name: COPPER_INGOT
@@ -24,7 +24,7 @@ PRODUCTS:
       display: "§e중급 구리 주괴"
       model: 1
       price:
-        sell: 0.3125
+        sell: 0.7
       detail: DISPLAY
   21:
     name: COPPER_INGOT
@@ -32,7 +32,7 @@ PRODUCTS:
       display: "§b상급 구리 주괴"
       model: 2
       price:
-        sell: 0.3125
+        sell: 0.7
       detail: DISPLAY
   30:
     name: COPPER_INGOT
@@ -40,14 +40,14 @@ PRODUCTS:
       display: "§d최상급 구리 주괴"
       model: 3
       price:
-        sell: 0.3125
+        sell: 0.7
       detail: DISPLAY
 
   4:
     name: IRON_INGOT
     meta:
       price:
-        sell: 0.4375
+        sell: 0.9
       detail: DISPLAY
   13:
     name: IRON_INGOT
@@ -55,7 +55,7 @@ PRODUCTS:
       display: "§e중급 철괴"
       model: 1
       price:
-        sell: 0.4375
+        sell: 0.9
       detail: DISPLAY
   22:
     name: IRON_INGOT
@@ -63,7 +63,7 @@ PRODUCTS:
       display: "§b상급 철괴"
       model: 2
       price:
-        sell: 0.4375
+        sell: 0.9
       detail: DISPLAY
   31:
     name: IRON_INGOT
@@ -71,14 +71,14 @@ PRODUCTS:
       display: "§d최상급 철괴"
       model: 3
       price:
-        sell: 0.4375
+        sell: 0.9
       detail: DISPLAY
 
   5:
     name: GOLD_INGOT
     meta:
       price:
-        sell: 0.625
+        sell: 1.25
       detail: DISPLAY
   14:
     name: GOLD_INGOT
@@ -86,7 +86,7 @@ PRODUCTS:
       display: "§e중급 금괴"
       model: 1
       price:
-        sell: 0.625
+        sell: 1.25
       detail: DISPLAY
   23:
     name: GOLD_INGOT
@@ -94,7 +94,7 @@ PRODUCTS:
       display: "§b상급 금괴"
       model: 2
       price:
-        sell: 0.625
+        sell: 1.25
       detail: DISPLAY
   32:
     name: GOLD_INGOT
@@ -102,14 +102,14 @@ PRODUCTS:
       display: "§d최상급 금괴"
       model: 3
       price:
-        sell: 0.625
+        sell: 1.25
       detail: DISPLAY
 
   6:
     name: DIAMOND
     meta:
       price:
-        sell: 1.25
+        sell: 3
       detail: DISPLAY
   15:
     name: DIAMOND
@@ -117,7 +117,7 @@ PRODUCTS:
       display: "§e중급 다이아몬드"
       model: 1
       price:
-        sell: 1.25
+        sell: 3
       detail: DISPLAY
   24:
     name: DIAMOND
@@ -125,7 +125,7 @@ PRODUCTS:
       display: "§b상급 다이아몬드"
       model: 2
       price:
-        sell: 1.25
+        sell: 3
       detail: DISPLAY
   33:
     name: DIAMOND
@@ -133,14 +133,14 @@ PRODUCTS:
       display: "§d최상급 다이아몬드"
       model: 3
       price:
-        sell: 1.25
+        sell: 3
       detail: DISPLAY
 
   7:
     name: NETHERITE_INGOT
     meta:
       price:
-        sell: 6.25
+        sell: 15
       detail: DISPLAY
   16:
     name: NETHERITE_INGOT
@@ -148,7 +148,7 @@ PRODUCTS:
       display: "§e중급 네더라이트 주괴"
       model: 1
       price:
-        sell: 6.25
+        sell: 15
       detail: DISPLAY
   25:
     name: NETHERITE_INGOT
@@ -156,7 +156,7 @@ PRODUCTS:
       display: "§b상급 네더라이트 주괴"
       model: 2
       price:
-        sell: 6.25
+        sell: 15
       detail: DISPLAY
   34:
     name: NETHERITE_INGOT
@@ -164,7 +164,7 @@ PRODUCTS:
       display: "§d최상급 네더라이트 주괴"
       model: 3
       price:
-        sell: 6.25
+        sell: 15
       detail: DISPLAY
 
   50:

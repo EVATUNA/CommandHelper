@@ -1,6 +1,6 @@
 {
 	"recipe": {
-		"result": "STONE_SWOED",
+		"result": "STONE_SWORD",
 		"ingredients_weight": {
 		}
 	},
@@ -9,7 +9,7 @@
 		"entries": [
 			{
 				"type": "rank",
-				"alt_name": "WOODEN_SWOED",
+				"alt_name": "WOODEN_SWORD",
 				"weight": 5,
 				"display": "부서질듯한 돌 검",
 				"model": 8,
@@ -26,7 +26,7 @@
 			},
 			{
 				"type": "rank",
-				"alt_name": "WOODEN_SWOED",
+				"alt_name": "WOODEN_SWORD",
 				"weight": 10,
 				"display": "의미를 알 수 없는 돌 검",
 				"model": 8,
@@ -43,7 +43,7 @@
 			},
 			{
 				"type": "rank",
-				"alt_name": "WOODEN_SWOED",
+				"alt_name": "WOODEN_SWORD",
 				"weight": 10,
 				"display": "제 기능을 하기 힘든 돌 검",
 				"model": 8,
@@ -60,7 +60,7 @@
 			},
 			{
 				"type": "rank",
-				"alt_name": "WOODEN_SWOED",
+				"alt_name": "WOODEN_SWORD",
 				"weight": 25,
 				"display": "무딘 돌 검",
 				"model": 8,
@@ -74,7 +74,7 @@
 			},
 			{
 				"type": "rank",
-				"alt_name": "WOODEN_SWOED",
+				"alt_name": "WOODEN_SWORD",
 				"weight": 35,
 				"display": "무난한 돌 검",
 				"model": 8,
@@ -88,7 +88,7 @@
 			},
 			{
 				"type": "rank",
-				"alt_name": "WOODEN_SWOED",
+				"alt_name": "WOODEN_SWORD",
 				"weight": 30,
 				"quality": 0,
 				"display": "평범한 돌 검",
@@ -103,7 +103,7 @@
 			},
 			{
 				"type": "rank",
-				"alt_name": "WOODEN_SWOED",
+				"alt_name": "WOODEN_SWORD",
 				"weight": 30,
 				"quality": 0,
 				"display": "쓸만한 돌 검",
@@ -118,7 +118,7 @@
 			},
 			{
 				"type": "rank",
-				"alt_name": "WOODEN_SWOED",
+				"alt_name": "WOODEN_SWORD",
 				"weight": 30,
 				"display": "잘 만들어진 돌 검",
 				"model": 8,
@@ -132,7 +132,7 @@
 			},
 			{
 				"type": "rank",
-				"alt_name": "WOODEN_SWOED",
+				"alt_name": "WOODEN_SWORD",
 				"weight": 20,
 				"display": "예사롭지 않은 돌 검",
 				"model": 8,
@@ -146,7 +146,7 @@
 			},
 			{
 				"type": "rank",
-				"alt_name": "WOODEN_SWOED",
+				"alt_name": "WOODEN_SWORD",
 				"weight": 1,
 				"display": "전설적인 돌 검",
 				"model": 8,

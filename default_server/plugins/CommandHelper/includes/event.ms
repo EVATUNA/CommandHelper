@@ -1816,17 +1816,19 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
               # 이벤트 세팅
               @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @essences, @location, @uuid, @item_armorstand, @essence_armorstand, @text) {
                 #인첸트 안하고 그냥 인벤 닫을시
-                bind('inventory_close', array('id': "close.@id"), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @item_armorstand, @essence_armorstand) {
-                  @item = @event['inventory'][22]
-                  if(!is_null(@item)) {
-                    @item['qty'] = pgive_item(@player, @item)
-                    @ploc = ploc(@player)
-                    @ploc['y'] += 1
-                    drop_item(@ploc, @item, false)
+                bind('inventory_close', array('id': "close.@id"), array('virtual': true), @event, @player, @uuid, @gui_id, @item_armorstand, @essence_armorstand) {
+                  if(@event['player'] == @player) {
+                    @item = @event['inventory'][22]
+                    if(!is_null(@item)) {
+                      @item['qty'] = pgive_item(@player, @item)
+                      @ploc = ploc(@player)
+                      @ploc['y'] += 1
+                      drop_item(@ploc, @item, false)
+                    }
+                    export(@gui_id, '')
+                    set_mob_name(@item_armorstand, '')
+                    set_mob_name(@essence_armorstand, '')
                   }
-                  export(@gui_id, '')
-                  set_mob_name(@item_armorstand, '')
-                  set_mob_name(@essence_armorstand, '')
                 }
                 #인첸트 할시
                 bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @player, @uuid, @gui_id, @id, @location, @item_armorstand, @essence_armorstand, @essences) {
@@ -3279,7 +3281,7 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
           # 아이템 새로고침
           set_timeout(1, closure() {
             @damaged_item = get_inventory_item(@puuid, @shield_slot)
-            if(@damaged_item['name'] == 'SHIELD') {
+            if(!is_null(@damaged_item) && @damaged_item['name'] == 'SHIELD') {
               @dummy_item = array(
                 'name': 'CLOCK',
                 'qty': 1,

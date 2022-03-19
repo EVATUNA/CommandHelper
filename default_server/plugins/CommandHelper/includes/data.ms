@@ -19,6 +19,7 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
     'last_sender': '',
     'last_whisper_sender': '',
     'whisper_target': '',
+    'gui_click_time': 0
   )
 
   # cache edit

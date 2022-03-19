@@ -722,97 +722,109 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
   @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @players_data, @skills_info, @skills_spec, @text) {
     bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @inventory, @player, @uuid, @id, @players_data, @skills_info, @skills_spec, @text) {
       cancel()
+      
       # 데이터 선언
       @player_data = @players_data[@uuid]
-      @skill_manager = @player_data['skill_manager']
-      @skills_data = @player_data['skill_data']
-      # 포인트
-      @total_point = _get_total_skill_point(@skill_manager)
-      @remaining_point = @total_point - @player_data['invested_point']
-      # 선택한 전투 방식
-      @selected_methods = json_decode(@skill_manager[4])
-      # 슬롯
-      @slot = @event['rawslot']
-      if(@event['action'] == 'PICKUP_ALL' && @slot < 54) {
-        switch(@slot) {
-        case 45:
-          runas(@player, '/skill farmingmethod')
-          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-          break()
-        case 53:
-          runas(@player, '/skill mining')
-          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-          break()
-        default:
-          if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
-            switch(@inventory[@slot]['slot_type']) {
-            case 'combat_method':
-              @new_skill = @inventory[@slot]['skill']
-              if(@skills_data[@new_skill][0] > 0) {
-                play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-                @category = 'combat_method'
-                @selected_combat_method = @selected_methods['combat_method']
-                @new_skill_proc_name = "_apply_loading_by_@new_skill"
-                @new_skill_spec = @skills_spec[@new_skill]
-                @new_skill_point = @skills_data[@new_skill][0]
-                if(@selected_combat_method == @new_skill) { // 스킬 사용 해제시
-                  @selected_combat_method = ''
-                  @selected_methods['combat_method'] = @selected_combat_method
-                  @skill_manager[4] = json_encode(@selected_methods)
-                  if(is_proc(@new_skill_proc_name)) {
-                    call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_combat_method)
-                  }
-                } else { // 스킬 선택시
-                  @old_skill = @selected_combat_method
-                  @selected_combat_method = @new_skill
-                  @selected_methods['combat_method'] = @selected_combat_method
-                  @skill_manager[4] = json_encode(@selected_methods)
-                  if(@old_skill != '') { // 스킬 변경시
-                    @old_skill_proc_name = "_apply_loading_by_@old_skill"
-                    @old_skill_spec = @skills_spec[@old_skill]
-                    @old_skill_point = @skills_data[@old_skill][0]
-                    if(is_proc(@old_skill_proc_name)) {
-                      call_proc(@old_skill_proc_name, @player_data, @player, @uuid, @category, @old_skill, @old_skill_spec, @old_skill_point, @selected_combat_method)
+      
+      if(@player_data['cache']['gui_click_time'] < time()) {
+
+        # 스킬 데이터 선언
+        @skill_manager = @player_data['skill_manager']
+        @skills_data = @player_data['skill_data']
+        # 포인트
+        @total_point = _get_total_skill_point(@skill_manager)
+        @remaining_point = @total_point - @player_data['invested_point']
+        # 선택한 전투 방식
+        @selected_methods = json_decode(@skill_manager[4])
+        # 슬롯
+        @slot = @event['rawslot']
+        if(@event['action'] == 'PICKUP_ALL' && @slot < 54) {
+          switch(@slot) {
+          case 45:
+            runas(@player, '/skill farmingmethod')
+            @player_data['cache']['gui_click_time'] = time() + 1000
+            play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
+            break()
+          case 53:
+            runas(@player, '/skill mining')
+            @player_data['cache']['gui_click_time'] = time() + 1000
+            play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
+            break()
+          default:
+            if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
+              switch(@inventory[@slot]['slot_type']) {
+              case 'combat_method':
+                @new_skill = @inventory[@slot]['skill']
+                if(@skills_data[@new_skill][0] > 0) {
+                  play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
+                  @category = 'combat_method'
+                  @selected_combat_method = @selected_methods['combat_method']
+                  @new_skill_proc_name = "_apply_loading_by_@new_skill"
+                  @new_skill_spec = @skills_spec[@new_skill]
+                  @new_skill_point = @skills_data[@new_skill][0]
+                  if(@selected_combat_method == @new_skill) { // 스킬 사용 해제시
+                    @player_data['cache']['gui_click_time'] = time() + 1000
+                    @selected_combat_method = ''
+                    @selected_methods['combat_method'] = @selected_combat_method
+                    @skill_manager[4] = json_encode(@selected_methods)
+                    if(is_proc(@new_skill_proc_name)) {
+                      call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_combat_method)
+                    }
+                  } else { // 스킬 선택시
+                    @player_data['cache']['gui_click_time'] = time() + 1000
+                    @old_skill = @selected_combat_method
+                    @selected_combat_method = @new_skill
+                    @selected_methods['combat_method'] = @selected_combat_method
+                    @skill_manager[4] = json_encode(@selected_methods)
+                    if(@old_skill != '') { // 스킬 변경시
+                      @old_skill_proc_name = "_apply_loading_by_@old_skill"
+                      @old_skill_spec = @skills_spec[@old_skill]
+                      @old_skill_point = @skills_data[@old_skill][0]
+                      if(is_proc(@old_skill_proc_name)) {
+                        call_proc(@old_skill_proc_name, @player_data, @player, @uuid, @category, @old_skill, @old_skill_spec, @old_skill_point, @selected_combat_method)
+                      }
+                    }
+                    if(is_proc(@new_skill_proc_name)) {
+                      call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_combat_method)
                     }
                   }
-                  if(is_proc(@new_skill_proc_name)) {
-                    call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_combat_method)
-                  }
+                  _set_skill_manager(@uuid, @skill_manager)
+                  runas(@player, '/skill')
                 }
-                _set_skill_manager(@uuid, @skill_manager)
-                runas(@player, '/skill')
-              }
-              break()
-            case 'subcombat':
-              break()
-            case 'button':
-              @total_point = _get_total_skill_point(@skill_manager)
-              @remaining_point = @total_point - @player_data['invested_point']
-              if(@remaining_point > 0) {
-                play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-                @skill = @inventory[@slot]['skill']
-                @selected_combat_method = @selected_methods['combat_method']
-                @skills_data[@skill][0] += 1
-                @player_data['invested_point'] += 1
-                _set_skill_data(@uuid, @skill, @skills_data[@skill])
-                _set_skill_manager(@uuid, @skill_manager)
-                if(@skill == @selected_combat_method) {
-                  @category = 'combat_method'
-                  @skill_spec = @skills_spec[@skill]
-                  @point = @skills_data[@skill][0]
-                  @proc_name = "_apply_loading_by_@skill"
-                  if(is_proc(@proc_name)) { // 방식 사용중 포인트 사용시 쿨탐, 어트리뷰트 초기화 
-                    call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, 0, @selected_combat_method)
-                    call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @selected_combat_method)
+                break()
+              case 'subcombat':
+                break()
+              case 'button':
+                @total_point = _get_total_skill_point(@skill_manager)
+                @remaining_point = @total_point - @player_data['invested_point']
+                if(@remaining_point > 0) {
+                  @player_data['cache']['gui_click_time'] = time() + 1000
+                  play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
+                  @skill = @inventory[@slot]['skill']
+                  @selected_combat_method = @selected_methods['combat_method']
+                  @skills_data[@skill][0] += 1
+                  @player_data['invested_point'] += 1
+                  _set_skill_data(@uuid, @skill, @skills_data[@skill])
+                  _set_skill_manager(@uuid, @skill_manager)
+                  if(@skill == @selected_combat_method) {
+                    @category = 'combat_method'
+                    @skill_spec = @skills_spec[@skill]
+                    @point = @skills_data[@skill][0]
+                    @proc_name = "_apply_loading_by_@skill"
+                    if(is_proc(@proc_name)) { // 방식 사용중 포인트 사용시 쿨탐, 어트리뷰트 초기화 
+                      call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, 0, @selected_combat_method)
+                      call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @selected_combat_method)
+                    }
                   }
+                  runas(@player, '/skill')
                 }
-                runas(@player, '/skill')
+                break()
               }
-              break()
             }
+            break()
           }
-          break()
         }
+
       }
     }
   }
@@ -1007,140 +1019,152 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
       cancel()
       # 데이터 선언
       @player_data = @players_data[@uuid]
-      @skill_manager = @player_data['skill_manager']
-      @skills_data = @player_data['skill_data']
-      # 포인트
-      @total_point = _get_total_skill_point(@skill_manager)
-      @remaining_point = @total_point - @player_data['invested_point']
-      # 선택한 전투 방식
-      @selected_methods = json_decode(@skill_manager[4])
-      # 슬롯
-      @slot = @event['rawslot']
-      if(@event['action'] == 'PICKUP_ALL' && @slot < 54) {
-        switch(@slot) {
-        case 45:
-          runas(@player, '/skill farming')
-          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-          break()
-        case 53:
-          runas(@player, '/skill combat')
-          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-          break()
-        default:
-          if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
-            switch(@inventory[@slot]['slot_type']) {
-            case 'sowing_method':
-              @new_skill = @inventory[@slot]['skill']
-              if(@skills_data[@new_skill][0] > 0) {
-                play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-                @category = 'sowing_method'
-                @selected_sowing_method = @selected_methods['sowing_method']
-                @new_skill_proc_name = "_apply_loading_by_@new_skill"
-                @new_skill_spec = @skills_spec[@new_skill]
-                @new_skill_point = @skills_data[@new_skill][0]
-                if(@selected_sowing_method == @new_skill) { // 스킬 사용 해제시
-                  @selected_sowing_method = ''
-                  @selected_methods['sowing_method'] = @selected_sowing_method
-                  @skill_manager[4] = json_encode(@selected_methods)
-                  if(is_proc(@new_skill_proc_name)) {
-                    call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_sowing_method)
-                  }
-                } else { // 스킬 선택시
-                  @old_skill = @selected_sowing_method
-                  @selected_sowing_method = @new_skill
-                  @selected_methods['sowing_method'] = @selected_sowing_method
-                  @skill_manager[4] = json_encode(@selected_methods)
-                  if(@old_skill != '') { // 스킬 변경시
-                    @old_skill_proc_name = "_apply_loading_by_@old_skill"
-                    @old_skill_spec = @skills_spec[@old_skill]
-                    @old_skill_point = @skills_data[@old_skill][0]
-                    if(is_proc(@old_skill_proc_name)) {
-                      call_proc(@old_skill_proc_name, @player_data, @player, @uuid, @category, @old_skill, @old_skill_spec, @old_skill_point, @selected_sowing_method)
-                    }
-                  }
-                  if(is_proc(@new_skill_proc_name)) {
-                    call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_sowing_method)
-                  }
-                }
-                _set_skill_manager(@uuid, @skill_manager)
-                runas(@player, '/skill farmingmethod')
-              }
-              break()
-            case 'harvesting_method':
-              @new_skill = @inventory[@slot]['skill']
-              if(@skills_data[@new_skill][0] > 0) {
-                play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-                @category = 'harvesting_method'
-                @selected_harvesting_method = @selected_methods['harvesting_method']
-                @new_skill_proc_name = "_apply_loading_by_@new_skill"
-                @new_skill_spec = @skills_spec[@new_skill]
-                @new_skill_point = @skills_data[@new_skill][0]
-                if(@selected_harvesting_method == @new_skill) { // 스킬 사용 해제시
-                  @selected_harvesting_method = ''
-                  @selected_methods['harvesting_method'] = @selected_harvesting_method
-                  @skill_manager[4] = json_encode(@selected_methods)
-                  if(is_proc(@new_skill_proc_name)) {
-                    call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_harvesting_method)
-                  }
-                } else { // 스킬 선택시
-                  @old_skill = @selected_harvesting_method
-                  @selected_harvesting_method = @new_skill
-                  @selected_methods['harvesting_method'] = @selected_harvesting_method
-                  @skill_manager[4] = json_encode(@selected_methods)
-                  if(@old_skill != '') { // 스킬 변경시
-                    @old_skill_proc_name = "_apply_loading_by_@old_skill"
-                    @old_skill_spec = @skills_spec[@old_skill]
-                    @old_skill_point = @skills_data[@old_skill][0]
-                    if(is_proc(@old_skill_proc_name)) {
-                      call_proc(@old_skill_proc_name, @player_data, @player, @uuid, @category, @old_skill, @old_skill_spec, @old_skill_point, @selected_harvesting_method)
-                    }
-                  }
-                  if(is_proc(@new_skill_proc_name)) {
-                    call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_harvesting_method)
-                  }
-                }
-                _set_skill_manager(@uuid, @skill_manager)
-                runas(@player, '/skill farmingmethod')
-              }
-              break()
-            case 'button':
-              @total_point = _get_total_skill_point(@skill_manager)
-              @remaining_point = @total_point - @player_data['invested_point']
-              if(@remaining_point > 0) {
-                play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-                @skill = @inventory[@slot]['skill']
-                @selected_sowing_method = @selected_methods['sowing_method']
-                @selected_harvesting_method = @selected_methods['harvesting_method']
-                @skills_data[@skill][0] += 1
-                @player_data['invested_point'] += 1
-                _set_skill_data(@uuid, @skill, @skills_data[@skill])
-                _set_skill_manager(@uuid, @skill_manager)
-                if(@skill == @selected_sowing_method) {
+      
+      if(@player_data['cache']['gui_click_time'] < time()) {
+      
+        @skill_manager = @player_data['skill_manager']
+        @skills_data = @player_data['skill_data']
+        # 포인트
+        @total_point = _get_total_skill_point(@skill_manager)
+        @remaining_point = @total_point - @player_data['invested_point']
+        # 선택한 전투 방식
+        @selected_methods = json_decode(@skill_manager[4])
+        # 슬롯
+        @slot = @event['rawslot']
+        if(@event['action'] == 'PICKUP_ALL' && @slot < 54) {
+          switch(@slot) {
+          case 45:
+            runas(@player, '/skill farming')
+            play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
+            @player_data['cache']['gui_click_time'] = time() + 1000
+            break()
+          case 53:
+            runas(@player, '/skill combat')
+            play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
+            @player_data['cache']['gui_click_time'] = time() + 1000
+            break()
+          default:
+            if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
+              switch(@inventory[@slot]['slot_type']) {
+              case 'sowing_method':
+                @new_skill = @inventory[@slot]['skill']
+                if(@skills_data[@new_skill][0] > 0) {
+                  play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
                   @category = 'sowing_method'
-                  @skill_spec = @skills_spec[@skill]
-                  @point = @skills_data[@skill][0]
-                  @proc_name = "_apply_loading_by_@skill"
-                  if(is_proc(@proc_name)) { // 방식 사용중 포인트 사용시 쿨탐, 어트리뷰트 초기화 
-                    call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, 0, @selected_sowing_method)
-                    call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @selected_sowing_method)
+                  @selected_sowing_method = @selected_methods['sowing_method']
+                  @new_skill_proc_name = "_apply_loading_by_@new_skill"
+                  @new_skill_spec = @skills_spec[@new_skill]
+                  @new_skill_point = @skills_data[@new_skill][0]
+                  if(@selected_sowing_method == @new_skill) { // 스킬 사용 해제시
+                    @player_data['cache']['gui_click_time'] = time() + 1000
+                    @selected_sowing_method = ''
+                    @selected_methods['sowing_method'] = @selected_sowing_method
+                    @skill_manager[4] = json_encode(@selected_methods)
+                    if(is_proc(@new_skill_proc_name)) {
+                      call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_sowing_method)
+                    }
+                  } else { // 스킬 선택시
+                    @player_data['cache']['gui_click_time'] = time() + 1000
+                    @old_skill = @selected_sowing_method
+                    @selected_sowing_method = @new_skill
+                    @selected_methods['sowing_method'] = @selected_sowing_method
+                    @skill_manager[4] = json_encode(@selected_methods)
+                    if(@old_skill != '') { // 스킬 변경시
+                      @old_skill_proc_name = "_apply_loading_by_@old_skill"
+                      @old_skill_spec = @skills_spec[@old_skill]
+                      @old_skill_point = @skills_data[@old_skill][0]
+                      if(is_proc(@old_skill_proc_name)) {
+                        call_proc(@old_skill_proc_name, @player_data, @player, @uuid, @category, @old_skill, @old_skill_spec, @old_skill_point, @selected_sowing_method)
+                      }
+                    }
+                    if(is_proc(@new_skill_proc_name)) {
+                      call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_sowing_method)
+                    }
                   }
-                } else if(@skill == @selected_harvesting_method) {
-                  @category = 'harvesting_method'
-                  @skill_spec = @skills_spec[@skill]
-                  @point = @skills_data[@skill][0]
-                  @proc_name = "_apply_loading_by_@skill"
-                  if(is_proc(@proc_name)) { // 방식 사용중 포인트 사용시 쿨탐, 어트리뷰트 초기화 
-                    call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, 0, @selected_harvesting_method)
-                    call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @selected_harvesting_method)
-                  }
+                  _set_skill_manager(@uuid, @skill_manager)
+                  runas(@player, '/skill farmingmethod')
                 }
-                runas(@player, '/skill farmingmethod')
+                break()
+              case 'harvesting_method':
+                @new_skill = @inventory[@slot]['skill']
+                if(@skills_data[@new_skill][0] > 0) {
+                  play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
+                  @category = 'harvesting_method'
+                  @selected_harvesting_method = @selected_methods['harvesting_method']
+                  @new_skill_proc_name = "_apply_loading_by_@new_skill"
+                  @new_skill_spec = @skills_spec[@new_skill]
+                  @new_skill_point = @skills_data[@new_skill][0]
+                  if(@selected_harvesting_method == @new_skill) { // 스킬 사용 해제시
+                    @player_data['cache']['gui_click_time'] = time() + 1000
+                    @selected_harvesting_method = ''
+                    @selected_methods['harvesting_method'] = @selected_harvesting_method
+                    @skill_manager[4] = json_encode(@selected_methods)
+                    if(is_proc(@new_skill_proc_name)) {
+                      call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_harvesting_method)
+                    }
+                  } else { // 스킬 선택시
+                    @player_data['cache']['gui_click_time'] = time() + 1000
+                    @old_skill = @selected_harvesting_method
+                    @selected_harvesting_method = @new_skill
+                    @selected_methods['harvesting_method'] = @selected_harvesting_method
+                    @skill_manager[4] = json_encode(@selected_methods)
+                    if(@old_skill != '') { // 스킬 변경시
+                      @old_skill_proc_name = "_apply_loading_by_@old_skill"
+                      @old_skill_spec = @skills_spec[@old_skill]
+                      @old_skill_point = @skills_data[@old_skill][0]
+                      if(is_proc(@old_skill_proc_name)) {
+                        call_proc(@old_skill_proc_name, @player_data, @player, @uuid, @category, @old_skill, @old_skill_spec, @old_skill_point, @selected_harvesting_method)
+                      }
+                    }
+                    if(is_proc(@new_skill_proc_name)) {
+                      call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_harvesting_method)
+                    }
+                  }
+                  _set_skill_manager(@uuid, @skill_manager)
+                  runas(@player, '/skill farmingmethod')
+                }
+                break()
+              case 'button':
+                @total_point = _get_total_skill_point(@skill_manager)
+                @remaining_point = @total_point - @player_data['invested_point']
+                if(@remaining_point > 0) {
+                  @player_data['cache']['gui_click_time'] = time() + 1000
+                  play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
+                  @skill = @inventory[@slot]['skill']
+                  @selected_sowing_method = @selected_methods['sowing_method']
+                  @selected_harvesting_method = @selected_methods['harvesting_method']
+                  @skills_data[@skill][0] += 1
+                  @player_data['invested_point'] += 1
+                  _set_skill_data(@uuid, @skill, @skills_data[@skill])
+                  _set_skill_manager(@uuid, @skill_manager)
+                  if(@skill == @selected_sowing_method) {
+                    @category = 'sowing_method'
+                    @skill_spec = @skills_spec[@skill]
+                    @point = @skills_data[@skill][0]
+                    @proc_name = "_apply_loading_by_@skill"
+                    if(is_proc(@proc_name)) { // 방식 사용중 포인트 사용시 쿨탐, 어트리뷰트 초기화 
+                      call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, 0, @selected_sowing_method)
+                      call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @selected_sowing_method)
+                    }
+                  } else if(@skill == @selected_harvesting_method) {
+                    @category = 'harvesting_method'
+                    @skill_spec = @skills_spec[@skill]
+                    @point = @skills_data[@skill][0]
+                    @proc_name = "_apply_loading_by_@skill"
+                    if(is_proc(@proc_name)) { // 방식 사용중 포인트 사용시 쿨탐, 어트리뷰트 초기화 
+                      call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, 0, @selected_harvesting_method)
+                      call_proc(@proc_name, @player_data, @player, @uuid, @category, @skill, @skill_spec, @point, @selected_harvesting_method)
+                    }
+                  }
+                  runas(@player, '/skill farmingmethod')
+                }
+                break()
               }
-              break()
             }
+            break()
           }
-          break()
         }
+        
       }
     }
   }
@@ -1287,45 +1311,53 @@ proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_sp
       cancel()
       # 데이터 선언
       @player_data = @players_data[@uuid]
-      @skill_manager = @player_data['skill_manager']
-      @skills_data = @player_data['skill_data']
-      # 포인트
-      @total_point = _get_total_skill_point(@skill_manager)
-      @remaining_point = @total_point - @player_data['invested_point']
-      # 슬롯
-      @slot = @event['rawslot']
-      if(@event['action'] == 'PICKUP_ALL' && @slot < 54) {
-        switch(@slot) {
-        case 45:
-          runas(@player, '/skill mining')
-          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-          break()
-        case 53:
-          runas(@player, '/skill farmingmethod')
-          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-          break()
-        default:
-          if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
-            switch(@inventory[@slot]['slot_type']) {
-            case 'farming':
-              break()
-            case 'button':
-              @total_point = _get_total_skill_point(@skill_manager)
-              @remaining_point = @total_point - @player_data['invested_point']
-              if(@remaining_point > 0) {
-                play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-                @skill = @inventory[@slot]['skill']
-                @skills_data[@skill][0] += 1
-                @player_data['invested_point'] += 1
-                _set_skill_data(@uuid, @skill, @skills_data[@skill])
-                _set_skill_manager(@uuid, @skill_manager)
-                runas(@player, '/skill farming')
+      
+      if(@player_data['cache']['gui_click_time'] < time()) {
+
+        @skill_manager = @player_data['skill_manager']
+        @skills_data = @player_data['skill_data']
+        # 포인트
+        @total_point = _get_total_skill_point(@skill_manager)
+        @remaining_point = @total_point - @player_data['invested_point']
+        # 슬롯
+        @slot = @event['rawslot']
+        if(@event['action'] == 'PICKUP_ALL' && @slot < 54) {
+          switch(@slot) {
+          case 45:
+            runas(@player, '/skill mining')
+            play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
+            @player_data['cache']['gui_click_time'] = time() + 1000
+            break()
+          case 53:
+            runas(@player, '/skill farmingmethod')
+            play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
+            @player_data['cache']['gui_click_time'] = time() + 1000
+            break()
+          default:
+            if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
+              switch(@inventory[@slot]['slot_type']) {
+              case 'farming':
+                break()
+              case 'button':
+                @total_point = _get_total_skill_point(@skill_manager)
+                @remaining_point = @total_point - @player_data['invested_point']
+                if(@remaining_point > 0) {
+                  @player_data['cache']['gui_click_time'] = time() + 1000
+                  play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
+                  @skill = @inventory[@slot]['skill']
+                  @skills_data[@skill][0] += 1
+                  @player_data['invested_point'] += 1
+                  _set_skill_data(@uuid, @skill, @skills_data[@skill])
+                  _set_skill_manager(@uuid, @skill_manager)
+                  runas(@player, '/skill farming')
+                }
+                break()
               }
-              break()
             }
+            break()
           }
-          break()
         }
+
       }
     }
   }
@@ -1472,45 +1504,53 @@ proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
       cancel()
       # 데이터 선언
       @player_data = @players_data[@uuid]
-      @skill_manager = @player_data['skill_manager']
-      @skills_data = @player_data['skill_data']
-      # 포인트
-      @total_point = _get_total_skill_point(@skill_manager)
-      @remaining_point = @total_point - @player_data['invested_point']
-      # 슬롯
-      @slot = @event['rawslot']
-      if(@event['action'] == 'PICKUP_ALL' && @slot < 54) {
-        switch(@slot) {
-        case 45:
-          runas(@player, '/skill combat')
-          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-          break()
-        case 53:
-          runas(@player, '/skill farming')
-          play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-          break()
-        default:
-          if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
-            switch(@inventory[@slot]['slot_type']) {
-            case 'mining':
-              break()
-            case 'button':
-              @total_point = _get_total_skill_point(@skill_manager)
-              @remaining_point = @total_point - @player_data['invested_point']
-              if(@remaining_point > 0) {
-                play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-                @skill = @inventory[@slot]['skill']
-                @skills_data[@skill][0] += 1
-                @player_data['invested_point'] += 1
-                _set_skill_data(@uuid, @skill, @skills_data[@skill])
-                _set_skill_manager(@uuid, @skill_manager)
-                runas(@player, '/skill mining')
+      
+      if(@player_data['cache']['gui_click_time'] < time()) {
+
+        @skill_manager = @player_data['skill_manager']
+        @skills_data = @player_data['skill_data']
+        # 포인트
+        @total_point = _get_total_skill_point(@skill_manager)
+        @remaining_point = @total_point - @player_data['invested_point']
+        # 슬롯
+        @slot = @event['rawslot']
+        if(@event['action'] == 'PICKUP_ALL' && @slot < 54) {
+          switch(@slot) {
+          case 45:
+            runas(@player, '/skill combat')
+            play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
+            @player_data['cache']['gui_click_time'] = time() + 1000
+            break()
+          case 53:
+            runas(@player, '/skill farming')
+            play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
+            @player_data['cache']['gui_click_time'] = time() + 1000
+            break()
+          default:
+            if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
+              switch(@inventory[@slot]['slot_type']) {
+              case 'mining':
+                break()
+              case 'button':
+                @total_point = _get_total_skill_point(@skill_manager)
+                @remaining_point = @total_point - @player_data['invested_point']
+                if(@remaining_point > 0) {
+                  @player_data['cache']['gui_click_time'] = time() + 1000
+                  play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
+                  @skill = @inventory[@slot]['skill']
+                  @skills_data[@skill][0] += 1
+                  @player_data['invested_point'] += 1
+                  _set_skill_data(@uuid, @skill, @skills_data[@skill])
+                  _set_skill_manager(@uuid, @skill_manager)
+                  runas(@player, '/skill mining')
+                }
+                break()
               }
-              break()
             }
+            break()
           }
-          break()
         }
+
       }
     }
   }
@@ -1613,7 +1653,9 @@ proc _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skill
   if(!is_null(@items['main_hand']) && array_contains(@weapons, @items['main_hand']['name'])) {
     @immunity_tick = integer(20 / @attribute_attack_speed)
     if(@immunity_tick < 20) {
-      set_timeout(0, closure( set_entity_immunity_ticks(@euuid, @immunity_tick) ))
+      if(entity_exists(@euuid)) {
+        set_timeout(0, closure( set_entity_immunity_ticks(@euuid, @immunity_tick) ))
+      }
     }
   }
   # 스킬 효과 적용
