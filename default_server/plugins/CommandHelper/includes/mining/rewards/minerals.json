@@ -123,8 +123,8 @@
             "model": 3
           }
         },
-        "weight": 0.5,
-        "quality": 0.1
+        "weight": 0.025,
+        "quality": 0.01
       }
     ]
   },
@@ -191,8 +191,8 @@
             "model": 3
           }
         },
-        "weight": 0.5,
-        "quality": 0.1
+        "weight": 0.025,
+        "quality": 0.01
       }
     ]
   },
@@ -260,8 +260,8 @@
             "model": 3
           }
         },
-        "weight": 0.5,
-        "quality": 0.1
+        "weight": 0.025,
+        "quality": 0.01
       }
     ]
   },
@@ -328,8 +328,8 @@
             "model": 3
           }
         },
-        "weight": 0.5,
-        "quality": 0.1
+        "weight": 0.025,
+        "quality": 0.01
       }
     ]
   },
@@ -397,8 +397,8 @@
             "model": 3
           }
         },
-        "weight": 0.5,
-        "quality": 0.1
+        "weight": 0.025,
+        "quality": 0.01
       }
     ]
   },
@@ -465,8 +465,8 @@
             "model": 3
           }
         },
-        "weight": 0.5,
-        "quality": 0.1
+        "weight": 0.025,
+        "quality": 0.01
       }
     ]
   },
@@ -533,8 +533,8 @@
             "model": 3
           }
         },
-        "weight": 0.5,
-        "quality": 0.1
+        "weight": 0.025,
+        "quality": 0.01
       }
     ]
   },
@@ -601,8 +601,8 @@
             "model": 3
           }
         },
-        "weight": 0.5,
-        "quality": 0.1
+        "weight": 0.025,
+        "quality": 0.01
       }
     ]
   },
@@ -670,8 +670,8 @@
             "model": 3
           }
         },
-        "weight": 0.5,
-        "quality": 0.1
+        "weight": 0.025,
+        "quality": 0.01
       }
     ]
   },
@@ -738,8 +738,8 @@
             "model": 3
           }
         },
-        "weight": 0.5,
-        "quality": 0.1
+        "weight": 0.025,
+        "quality": 0.01
       }
     ]
   },
@@ -807,8 +807,8 @@
             "model": 3
           }
         },
-        "weight": 0.5,
-        "quality": 0.1
+        "weight": 0.025,
+        "quality": 0.01
       }
     ]
   },

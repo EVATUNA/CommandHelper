@@ -230,6 +230,7 @@ proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @
 # 플레이어 접속
 proc _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data) {
   if(!array_index_exists(@reconnecting_datas, @uuid)) {
+    runas('~console', "/advancement grant @player everything")
     _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
     //broadcast('리팩보냄')
   } else {

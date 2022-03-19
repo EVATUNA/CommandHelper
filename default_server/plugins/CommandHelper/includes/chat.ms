@@ -1519,12 +1519,12 @@ proc _default_chat(@data, @players_data, @server) {
         @players_data[@receiver_uuid]['cache']['last_sender'] = "default.@sender_name"
         # 사운드
         if(@sender_name == @receiver_name) {
-          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'VOICE', 'volum': 100), array(@sender_name))
         } else {
           if(@receiver_data['is_mentioned']) {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'VOICE', 'volum': 100), array(@receiver_name))
           } else {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'VOICE', 'volum': 100), array(@receiver_name))
           }
         }
       }
@@ -1624,12 +1624,12 @@ proc _town_chat(@data, @players_data, @server) {
         @players_data[@receiver_uuid]['cache']['last_sender'] = "town.@sender_name"
         # 사운드
         if(@sender_name == @receiver_name) {
-          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'VOICE', 'volum': 100), array(@sender_name))
         } else {
           if(@receiver_data['is_mentioned']) {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'VOICE', 'volum': 100), array(@receiver_name))
           } else {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'VOICE', 'volum': 100), array(@receiver_name))
           }
         }
       }
@@ -1703,16 +1703,16 @@ proc _local_chat(@data, @players_data, @server) {
       # 사운드
       if(@sender_name == @receiver_name) {
         if(ponline(@sender_name)) {
-          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'VOICE', 'volum': 100), array(@sender_name))
         }
       } else {
         if(@receiver_data['is_mentioned']) {
           if(ponline(@receiver_name)) {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'VOICE', 'volum': 100), array(@receiver_name))
           }
         } else {
           if(ponline(@receiver_name)) {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'VOICE', 'volum': 100), array(@receiver_name))
           }
         }
       }
@@ -1794,12 +1794,12 @@ proc _admin_chat(@data, @players_data, @server) {
         @players_data[@receiver_uuid]['cache']['last_sender'] = "admin.@sender_name"
         # 사운드
         if(@sender_name == @receiver_name) {
-          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+          play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'VOICE', 'volum': 100), array(@sender_name))
         } else {
           if(@receiver_data['is_mentioned']) {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'master', 'volum': 100), array(@receiver_name))
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.mention', 'category': 'VOICE', 'volum': 100), array(@receiver_name))
           } else {
-            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+            play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'VOICE', 'volum': 100), array(@receiver_name))
           }
         }
       }
@@ -1869,13 +1869,13 @@ proc _whisper_chat(@data, @players_data, @server) {
       # 이름 raw
       @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, 'sender', '#fbc8f5', @target_name)
       # 사운드
-      play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'master', 'volum': 100), array(@sender_name))
+      play_named_sound(ploc(@sender_name), array('sound': 'message.out', 'category': 'VOICE', 'volum': 100), array(@sender_name))
       break()
     case 'target':
       # 이름 raw
       @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, 'target', '#fbc8f5', @target_name)
       # 사운드
-      play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+      play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'VOICE', 'volum': 100), array(@receiver_name))
       # lws 세팅
       @players_data[@receiver_uuid]['cache']['last_whisper_sender'] = @sender_name
       break()
@@ -1883,7 +1883,7 @@ proc _whisper_chat(@data, @players_data, @server) {
       # 이름 raw
       @name_raws = _get_name_raws(@is_sender_same, @is_type_messenger, @channel, @sender_name, 'other', '#fbc8f5', @target_name)
       # 사운드
-      play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+      play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'VOICE', 'volum': 100), array(@receiver_name))
       break()
     }
     # 메시지 보내기
@@ -1991,7 +1991,7 @@ proc _broadcast_chat(@data, @players_data, @server) {
       # ls 세팅
       @players_data[@receiver_uuid]['cache']['last_sender'] = "broadcast.@sender_name"
       # 사운드
-      play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'master', 'volum': 100), array(@receiver_name))
+      play_named_sound(ploc(@receiver_name), array('sound': 'message.in', 'category': 'VOICE', 'volum': 100), array(@receiver_name))
     }
   }
   if(@is_server_same) {

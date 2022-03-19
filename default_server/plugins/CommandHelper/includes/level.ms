@@ -51,7 +51,7 @@ proc _replace_tunalevel_text(@tunalevel) {
           ), '6', '\uef06\uf801'
         ), '7', '\uef07\uf801'
       ), '8', '\uef08\uf801'
-    ), '9', '09\uf801'
+    ), '9', '\uef09\uf801'
   )
   @nsf = string_multiply('\uF804', length(@tunalevel))
   @tunalevel_text = '\uef1c\uf801'.@background.'\uf801'.@nsf.'\uf808\uf801'.'\uef1b\uf801'.@text
@@ -93,7 +93,7 @@ register_placeholder_hook('player', closure(@player, @placeholder){
   }
   if(@placeholder == 'tunalevel') {
     @uuid = puuid(@player)
-    if(array_index_exists(@players_data, @uuid)) {
+    if(array_index_exists(@players_data, @uuid, 'skill_manager')) {
       @level = @players_data[@uuid]['skill_manager'][0]
       switch(integer(@level/10)) {
       case 0:
