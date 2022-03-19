@@ -713,5 +713,91 @@
 		}
   },
   "scroll": {},
-  "rune": {}
+  "rune": {},
+	"mineral": {
+		"copper_b": {
+			"name": "COPPER_INGOT",
+			"meta": {
+				"display": "§e중급 구리 주괴",
+				"model": 1
+			}
+		},
+		"copper_a": {
+			"name": "COPPER_INGOT",
+			"meta": {
+				"display": "§b상급 구리 주괴",
+				"model": 2
+			}
+		},
+		"copper_s": {
+			"name": "COPPER_INGOT",
+			"meta": {
+				"display": "§d최상급 구리 주괴",
+				"model": 3
+			}
+		},
+		"iron_b": {
+			"name": "IRON_INGOT",
+			"meta": {
+				"display": "§e중급 철괴",
+				"model": 1
+			}
+		},
+		"iron_a": {
+			"name": "IRON_INGOT",
+			"meta": {
+				"display": "§b상급 철괴",
+				"model": 2
+			}
+		},
+		"iron_s": {
+			"name": "IRON_INGOT",
+			"meta": {
+				"display": "§d최상급 철괴",
+				"model": 3
+			}
+		},
+		"gold_b": {
+			"name": "GOLD_INGOT",
+			"meta": {
+				"display": "§e중급 금괴",
+				"model": 1
+			}
+		},
+		"gold_a": {
+			"name": "GOLD_INGOT",
+			"meta": {
+				"display": "§b상급 금괴",
+				"model": 2
+			}
+		},
+		"gold_s": {
+			"name": "GOLD_INGOT",
+			"meta": {
+				"display": "§d최상급 금괴",
+				"model": 3
+			}
+		},
+		"diamond_b": {
+			"name": "DIAMOND",
+			"meta": {
+				"display": "§e중급 다이아몬드",
+				"model": 1
+			}
+		},
+		"diamond_a": {
+			"name": "DIAMOND",
+			"meta": {
+				"display": "§b상급 다이아몬드",
+				"model": 2
+			}
+		},
+		"diamond_s": {
+			"name": "DIAMOND",
+			"meta": {
+				"display": "§d최상급 다이아몬드",
+				"model": 3
+			}
+		}
+	}
 }
