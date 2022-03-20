@@ -69,7 +69,14 @@ set_timeout(5000, closure() {
           _generate_trace(@player, @traces)
         }
         # 피 자연회복
-        _natural_heal_per_sec(@player)
+        if(phunger(@player) >= 7 && phealth(@player) < get_max_health(@uuid)) {
+          if(psaturation(@player) > 0) {
+            _add_saturation(@player, -0.125)
+          } else {
+            set_peffect(@player, 'HUNGER', 1, 0.05, true)
+          }
+          set_peffect(@player, 'INSTANT_HEALTH', -1, 0.05)
+        }
       }
     }
     if(@server == 'main') {
@@ -3310,8 +3317,10 @@ bind('world_changed', null, null, @event, @players_data, @musics_data, @text) {
     # 음악 재생
     _play_world_music(@player, @uuid, @players_data, @musics_data)
     # 이동시 사이드바 초기화 해결
-    @scoreboard = "ch_scoreboard.@uuid"
-    set_pscoreboard(@player, @scoreboard)
-    set_objective_display('objective', array('slot': 'SIDEBAR', 'displayname': @text['space_fonts']['space.-4']), @scoreboard)
+    if(array_index_exists(@players_data, @uuid)) {
+      @scoreboard = "ch_scoreboard.@uuid"
+      set_pscoreboard(@player, @scoreboard)
+      set_objective_display('objective', array('slot': 'SIDEBAR', 'displayname': @text['space_fonts']['space.-4']), @scoreboard)
+    }
   })
 }

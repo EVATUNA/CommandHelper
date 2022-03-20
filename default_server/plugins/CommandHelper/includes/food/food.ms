@@ -48,18 +48,6 @@ proc _add_saturation(@player, @amount) {
   set_psaturation(@player, @new_amount)
 }
 
-proc _natural_heal_per_sec(@player) {
-  @uuid = puuid(@player)
-  if(phunger(@player) >= 7 && phealth(@player) < get_max_health(@uuid)) {
-    if(psaturation(@player) > 0) {
-      _add_saturation(@player, -0.125)
-    } else {
-      set_peffect(@player, 'HUNGER', 1, 0.05, true)
-    }
-    set_peffect(@player, 'INSTANT_HEALTH', -1, 0.05)
-  }
-}
-
 bind('player_interact', null, array('itemname': 'HONEY_BOTTLE', 'button': 'right'), @event, @food_datas) {
   @player = @event['player']
   @uuid = puuid(@player)

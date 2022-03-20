@@ -262,7 +262,7 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
 proc _farmland_cultivate_event(@event, @player, @uuid, @players_data, @hp_blocks, @skills_spec, @text) {
   @player_data = @players_data[@uuid]
   @block = @event['block']
-  if(@event['action'] == 'right_click_block' && array_contains(array('GRASS_BLOCK', 'DIRT'), @event['block']) && !is_null(@event['item']) && array_index_exists(@event, 'location')) {
+  if(@event['action'] == 'right_click_block' && array_contains(array('GRASS_BLOCK', 'DIRT', 'DIRT_PATH'), @event['block']) && !is_null(@event['item']) && array_index_exists(@event, 'location')) {
     @location = array('x': @event['location']['x'], 'y': @event['location']['y'], 'z': @event['location']['z'], 'world': @event['location']['world'])
     @hoes_cooldown = array(
       'WOODEN_HOE': 40,
@@ -383,8 +383,8 @@ proc _farmland_cultivate_event(@event, @player, @uuid, @players_data, @hp_blocks
 # 작물 성장
 # age가 0일때, 경작지가 아닌곳에서 작물이 자랄때 성장하는것 캔슬
 bind('block_grow', null, null, @event) {
-  if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
-    if(get_blockdata(@event['location'])['age'] > 0) {
+  if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block']) || array_contains(array('PUMPKIN', 'MELON'), @event['newblock'])) {
+    if(array_contains(array('PUMPKIN', 'MELON'), @event['newblock']) || get_blockdata(@event['location'])['age'] > 0) {
       @under_location = array('x': @event['location']['x'], 'y': @event['location']['y'] - 1, 'z': @event['location']['z'], 'world': @event['location']['world'])
       if(get_block(@under_location) != 'FARMLAND') {
         cancel()
@@ -399,7 +399,8 @@ bind('block_grow', null, null, @event) {
 bind('block_fade', null, null, @event) {
   if(@event['block'] == 'FARMLAND') {
     @upper_location = array('x': @event['location']['x'], 'y': @event['location']['y'] + 1, 'z': @event['location']['z'], 'world': @event['location']['world'])
-    if(!get_block_info(@upper_location, 'solid')) {
+    @upper_block = get_block(@upper_location)
+    if(array_contains(array('PUMPKIN', 'MELON'), @upper_block) || !get_block_info(@upper_location, 'solid')) {
       cancel()
     }
   }

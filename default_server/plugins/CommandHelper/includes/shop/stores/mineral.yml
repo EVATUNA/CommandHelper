@@ -16,7 +16,7 @@ PRODUCTS:
     name: COPPER_INGOT
     meta:
       price:
-        sell: 0.7
+        sell: 0.6
       detail: DISPLAY
   12:
     name: COPPER_INGOT
@@ -24,7 +24,7 @@ PRODUCTS:
       display: "§e중급 구리 주괴"
       model: 1
       price:
-        sell: 0.7
+        sell: 0.6
       detail: DISPLAY
   21:
     name: COPPER_INGOT
@@ -32,7 +32,7 @@ PRODUCTS:
       display: "§b상급 구리 주괴"
       model: 2
       price:
-        sell: 0.7
+        sell: 0.6
       detail: DISPLAY
   30:
     name: COPPER_INGOT
@@ -40,7 +40,7 @@ PRODUCTS:
       display: "§d최상급 구리 주괴"
       model: 3
       price:
-        sell: 0.7
+        sell: 0.6
       detail: DISPLAY
 
   4:

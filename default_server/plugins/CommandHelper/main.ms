@@ -42,7 +42,7 @@ include('includes/farming/farming.ms')
 # 거주월드의 사냥 시스템
 include('includes/hunting/hunting.ms')
 # 거주월드의 낚시 시스템
-#include('includes/fishing/fishing.ms')
+include('includes/fishing/fishing.ms')
 
 # 음식 시스템
 include('includes/food/food.ms')
