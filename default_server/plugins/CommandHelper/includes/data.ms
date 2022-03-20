@@ -232,6 +232,7 @@ proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @
 proc _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data) {
   if(!array_index_exists(@reconnecting_datas, @uuid)) {
     runas('~console', "/advancement grant @player everything")
+    runas('~console', "/recipe give @player *")
     _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
     //broadcast('리팩보냄')
   } else {
@@ -240,11 +241,9 @@ proc _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spe
       # 플레이어 데이터 로드
       _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @reconnecting_data)
       runas('~console', "/advancement grant @player everything")
+      runas('~console', "/recipe give @player *")
       # 첫접속시 가이드 안내 메시지
       if(@reconnecting_data['server'] == 'guest') {
-        runas('~console', "/recipe give @player *")
-        runas('~console', "/recipe take @player tunalands:release_flag")
-        runas('~console', "/recipe take @player tunalands:take_flag")
         @raw = array(
           array(
             'text': @text['space_fonts']['space.128'].'\ue008\n\n\n\n\n\n'
@@ -292,7 +291,7 @@ proc _quit_event(@uuid, @players_data, @server) {
     @selected_methods = json_decode(@skill_manager[4])
     
     @selected_combat_method = @selected_methods['combat_method']
-    if(@selected_combat_method != '') {
+    if(@selected_combat_method != '' && array_index_exists(@player_data['active_skill'], @selected_combat_method)) {
       @active_skill = @player_data['active_skill'][@selected_combat_method]
       _save_active_skill(@uuid, @selected_combat_method, @active_skill)
     }

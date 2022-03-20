@@ -20,7 +20,7 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
 
   proc _get_relative_chunk_index(@chunk) {
     //청크 구하는 기능 인덱스 구하는 기능 둘다 넣기?
-    return((@chunk['x'] % 16) * 16) + (@chunk['z'] % 16)
+    return((@chunk['x'] % 16) * 16 + (@chunk['z'] % 16))
   }
 
   proc _get_relative_chunk_xz(@index) { // 굳이..?
