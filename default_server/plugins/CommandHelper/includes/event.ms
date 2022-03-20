@@ -2262,7 +2262,11 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       #case 'NOTE_BLOCK':
       #case 'REDSTONE_ORE':
       #case 'REPEATER':
-      #case 'RESPAWN_ANCHOR':
+      case 'RESPAWN_ANCHOR':
+        if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
+          cancel() // 사용 금지
+        }
+        break()
       #case 'SHULKER_BOX':
       #case 'SMOKER':
       #case 'STONECUTTER':
@@ -2317,7 +2321,11 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
           _send_action_msg_normal(@player, '낚시는 거주월드에서만 가능합니다.')
         }
         break()
-      #case 'BUCKET':
+      case 'WATER_BUCKET':
+      case 'POWDER_SNOW_BUCKET':
+        if(pworld(@player) != 'spawn_minecraft_residence') {
+          cancel()
+        }
       case 'TURTLE_HELMET': // 물뿌리개
         if(@event['hand'] == 'main_hand') {
           @block = @event['block']

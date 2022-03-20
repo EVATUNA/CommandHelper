@@ -65,3 +65,13 @@ bind('player_death', null, null, @event, @death_penalties_multiply, @players_dat
 
 # 필드 효과, 마법경험치 획득 조정 등
 # 특정 월드에서 발생하는것 처리
+
+if(@server == 'nether') {
+  bind('block_dispense', null, null, @event) {
+    @item = @event['item']
+    if(is_array(@item) && array_contains(array('WATER_BUCKET', 'POWDER_SNOW_BUCKET'), @item['name'])) {
+      cancel()
+    }
+    broadcast(@event)
+  }
+}
