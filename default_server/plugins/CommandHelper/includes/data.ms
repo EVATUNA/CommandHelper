@@ -246,7 +246,9 @@ proc _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spe
       runas('~console', "/recipe give @player *")
       # 첫접속시 가이드 안내 메시지
       if(@reconnecting_data['server'] == 'guest') {
-        pgive_item(@player, array('name': 'BIRCH_BOAT'))
+        set_timeout(100, closure() {
+          pgive_item(@player, array('name': 'BIRCH_BOAT'))
+        })
         @raw = array(
           array(
             'text': @text['space_fonts']['space.128'].'\ue008\n\n\n\n\n\n'

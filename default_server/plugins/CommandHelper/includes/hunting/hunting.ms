@@ -833,14 +833,14 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
     } else {
       @move = @moves[0]
       @location = _get_random_surface_in_chunk(@move['x'], @move['z'])
-      @location['x'] += 0.5
-      @location['y'] += 1
-      @location['z'] += 0.5
       if(is_array(@location)) {
+        @location['x'] += 0.5
+        @location['y'] += 1
+        @location['z'] += 0.5
         _summon_mythicmob(@tag['trace_data']['mob'], @tag['trace_data']['count'], @location)
       } else {
         // 흔적이 사라짐
-        broadcast(@tag['trace_data']['mob'] '스폰 불가능')
+        //broadcast(@tag['trace_data']['mob'] '스폰 불가능')
       }
       // 몹 소환
     }

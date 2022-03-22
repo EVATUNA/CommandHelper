@@ -24,7 +24,7 @@ register_command('resourcepackstart', array(
 ))
 
 ## Resourcepack Download Checker
-bind('resource_pack_status', null,, null, @event) {
+bind('resource_pack_status', null, null, @event) {
   @player = @event['player']
   @uuid = puuid(@player)
   switch(@event['status']) {

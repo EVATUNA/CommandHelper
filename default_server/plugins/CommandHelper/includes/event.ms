@@ -2323,9 +2323,28 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         break()
       case 'WATER_BUCKET':
       case 'POWDER_SNOW_BUCKET':
-        if(pworld(@player) != 'spawn_minecraft_residence') {
+        if(pworld(@player) == 'nether') {
           cancel()
         }
+        break()
+      case 'BUCKET':
+        if(@event['block'] == 'WATER_CAULDRON') {
+          if(array_index_exists(@item, 'meta', 'model') && @item['meta']['model'] > 0 && @item['meta']['model'] < 5) {
+            @item['name'] = 'TURTLE_HELMET'
+            @item['meta']['damage'] = 1
+            if(@event['hand'] == 'main_hand') {
+              @slot = pheld_slot(@player)
+            } else if(@event['hand'] == 'off_hand') {
+              @slot = 40
+            }
+            set_timeout(0, closure() {
+              set_inventory_item(@uuid, @slot, @item)
+            })
+          }
+        }
+      case 'EGG':
+        cancel()
+        break()
       case 'TURTLE_HELMET': // 물뿌리개
         if(@event['hand'] == 'main_hand') {
           @block = @event['block']
@@ -2360,12 +2379,12 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
               break()
             case 3: // 다이아몬드 물뿌리개
               @range = 3
-              @min_power = 1
-              @max_power = 4
+              @min_power = 2
+              @max_power = 5
               break()
             case 4: // 네더라이트 물뿌리개
               @range = 5
-              @min_power = 1
+              @min_power = 2
               @max_power = 4
               break()
             default:
@@ -3096,11 +3115,63 @@ bind('item_damage', null, null, @event, @players_data, @effective_items, @skills
 }
 
 // 활, 석궁 쏜사람 화살에 기억
-bind('projectile_launch', null,, array('shootertype': 'PLAYER'), @event, @players_data) {
+bind('projectile_launch', null, array('shootertype': 'PLAYER'), @event, @players_data) {
   @uuid = @event['shooter']
   @player = player(@uuid)
   @projectile = @event['id']
-  if(@event['type'] == 'ARROW' || @event['type'] == 'SPECTRAL_ARROW') {
+  if(@event['type'] == 'TRIDENT') {
+    if(pcooldown(@player, 'TRIDENT') == 0) {
+      cancel()
+      # 아이템 구하기
+      @main_hand_item = @players_data[@uuid]['item']['main_hand']
+      @off_hand_item = @players_data[@uuid]['item']['off_hand']
+      @item = null
+      if(!is_null(@main_hand_item) && @main_hand_item['name'] == 'TRIDENT') {
+        @slot = pheld_slot(@player)
+        @item = @main_hand_item
+      } else if(!is_null(@off_hand_item) && @off_hand_item['name'] == 'TRIDENT') {
+        @slot = 40
+        @item = @off_hand_item
+      }
+      # 내구도 깍기
+      if(is_array(@item)) {
+        @max_durability = material_info(@item['name'], 'maxDurability')
+        if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'damage')) {
+          @damage = 0
+          @item['meta'] = array()
+        } else {
+          @damage = @item['meta']['damage']
+        }
+        if(is_null(@item['meta']) || !array_index_exists(@item['meta'], 'enchants') || !array_index_exists(@item['meta']['enchants'], 'unbreaking')) {
+          @unbreaking_level = 0
+        } else {
+          @unbreaking_level = @item['meta']['enchants']['unbreaking']['elevel']
+        }
+        @breaking_chance = 1 / (@unbreaking_level + 1)
+        if(rand() < @breaking_chance) {
+          @damage += 3
+        }
+        if(@max_durability > @damage) {
+          @item['meta']['damage'] = @damage
+          set_inventory_item(puuid(@player), @slot, @item)
+          # 에너지 삼지창 발사
+          set_pcooldown(@player, 'TRIDENT', '200')
+          set_timeout(0, closure() {
+            @uuid = shoot_projectile(@player, 'TRIDENT')
+            set_timeout(0, closure() {
+              if(array_index_exists(@item, 'meta', 'modifiers', 0)) {
+                @damage = @item['meta']['modifiers'][0]['amount']
+                add_scoreboard_tag(@uuid, @damage)
+                runas('~console', "/data modify entity @uuid pickup set value 0")
+                # todo 공속에 따른 쿨타임, 인첸트 반영
+              }
+            })
+          })
+        }
+      }
+
+    }
+  } else if(@event['type'] == 'ARROW' || @event['type'] == 'SPECTRAL_ARROW') {
     @main_hand_item = @players_data[@uuid]['item']['main_hand']
     @off_hand_item = @players_data[@uuid]['item']['off_hand']
     if(!is_null(@main_hand_item) && array_contains(array('BOW', 'CROSSBOW'), @main_hand_item['name'])) {
@@ -3192,10 +3263,16 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
     if(array_index_exists(@event, 'shooter') && is_string(@event['shooter']) && ponline(@event['shooter'])) {
       @player = @event['shooter']
       @puuid = puuid(@player)
+      @projectile = @event['damager']
+      if(entity_type(@projectile) == 'TRIDENT') {
+        if(array_size(get_scoreboard_tags(@projectile)) > 0) {
+          @damage = integer( get_scoreboard_tags(@projectile)[0] ) * (8 / 9)
+          modify_event('amount', @damage)
+        }
+      }
       if(array_index_exists(@players_data, @puuid)) {
         @euuid = @event['id']
         @entity_type = entity_type(@euuid)
-        @projectile = @event['damager']
         switch(entity_type(@projectile)) {
         case 'ARROW':
         case 'SPECTRAL_ARROW':

@@ -533,6 +533,13 @@ array proc _clone(array @arr) { return(array_deep_clone(@arr)) }
 boolean proc _existsGui(string @guiid) { return(array_contains(get_virtual_inventories(), @guiid)) }
 
 
+proc _debugmsg(@msg) {
+  @player = 'aaaa__'
+  if(ponline(@player)) {
+    tmsg(@player, @msg)
+  }
+}
+
 proc _get_circle_offsets(@radius) {
   @offsets = array(
     array(0, +@radius),

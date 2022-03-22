@@ -72,6 +72,13 @@ if(@server == 'nether') {
     if(is_array(@item) && array_contains(array('WATER_BUCKET', 'POWDER_SNOW_BUCKET'), @item['name'])) {
       cancel()
     }
-    broadcast(@event)
   }
 }
+
+//bind('item_spawn', null, null, @event) {
+  //@location = @event['location']
+  //broadcast(entities_in_radius(@location, 1, 'CHICKEN'))
+  //if(@event['type'] == 'DROPPED_ITEM') {
+    //broadcast(@event)
+  //}
+//}

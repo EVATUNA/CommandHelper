@@ -141,7 +141,7 @@ bind('entity_death', null, null, @event, @players_data, @text) {
 
 # 스폰된 몹 들 입고있는 아이템 떨구지 안토록 수정
 bind('creature_spawn', null, null, @event) {
-  @uuid = '1079a91e-0035-4d87-84a8-fc0cd0aa0917'
+  @uuid = @event['id']
   if(entity_exists(@uuid) && is_entity_living(@uuid) && entity_type(@uuid) != 'UNKNOWN') {
     set_equipment_droprates(@uuid, array(
       'HELMET': 0,
