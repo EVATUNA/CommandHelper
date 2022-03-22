@@ -120,6 +120,16 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
       @center_location = array('x': @event['location']['x'] + 0.5, 'y': @event['location']['y'] + 0.5, 'z': @event['location']['z'] + 0.5, 'world': @event['location']['world'])
       @harvesting_method = json_decode(@skill_manager[4])['harvesting_method']
       @age = get_blockdata(@center_location)['age']
+
+      @item = @player_data['item']['main_hand']
+      if(!is_null(@item) && array_contains(array('WOODEN_HOE', 'STONE_HOE', 'GOLDEN_HOE', 'IRON_HOE', 'DIAMOND_HOE', 'NETHERITE_HOE'), @item['name'])) {
+        if(@harvesting_method == 'golden_finger' && @player_data['active_skill'][@harvesting_method][1] > 0) {
+          if(@age != @crop_reward['max_age']) {
+            cancel()
+          }
+        }
+      } 
+
       set_timeout(1, closure() {
         if(!is_cancelled()) { // 성공적으로 수확 시
           # 괭이 검사
@@ -183,9 +193,6 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
                       set_block(@center_location, @crop)
                     })
                   }
-                } else {
-                  #다 안자란 작물 캘려 하면 안캐지도록 캔슬
-                  cancel()
                 }
                 break()
               default:

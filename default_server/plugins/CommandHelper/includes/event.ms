@@ -66,7 +66,7 @@ set_timeout(5000, closure() {
         }
 
         if(ploc(@player)['world'] == 'spawn_minecraft_residence') {
-          _generate_trace(@player, @traces)
+          //_generate_trace(@player, @traces)
         }
         # 피 자연회복
         if(phunger(@player) >= 7 && phealth(@player) < get_max_health(@uuid)) {

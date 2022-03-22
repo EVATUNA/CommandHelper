@@ -742,12 +742,12 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
           switch(@slot) {
           case 45:
             runas(@player, '/skill farmingmethod')
-            @player_data['cache']['gui_click_time'] = time() + 1000
+            @player_data['cache']['gui_click_time'] = time() + 250
             play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
             break()
           case 53:
             runas(@player, '/skill mining')
-            @player_data['cache']['gui_click_time'] = time() + 1000
+            @player_data['cache']['gui_click_time'] = time() + 250
             play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
             break()
           default:
@@ -763,7 +763,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
                   @new_skill_spec = @skills_spec[@new_skill]
                   @new_skill_point = @skills_data[@new_skill][0]
                   if(@selected_combat_method == @new_skill) { // 스킬 사용 해제시
-                    @player_data['cache']['gui_click_time'] = time() + 1000
+                    @player_data['cache']['gui_click_time'] = time() + 250
                     @selected_combat_method = ''
                     @selected_methods['combat_method'] = @selected_combat_method
                     @skill_manager[4] = json_encode(@selected_methods)
@@ -771,7 +771,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
                       call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_combat_method)
                     }
                   } else { // 스킬 선택시
-                    @player_data['cache']['gui_click_time'] = time() + 1000
+                    @player_data['cache']['gui_click_time'] = time() + 250
                     @old_skill = @selected_combat_method
                     @selected_combat_method = @new_skill
                     @selected_methods['combat_method'] = @selected_combat_method
@@ -798,7 +798,7 @@ proc _open_combat_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
                 @total_point = _get_total_skill_point(@skill_manager)
                 @remaining_point = @total_point - @player_data['invested_point']
                 if(@remaining_point > 0) {
-                  @player_data['cache']['gui_click_time'] = time() + 1000
+                  @player_data['cache']['gui_click_time'] = time() + 250
                   play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
                   @skill = @inventory[@slot]['skill']
                   @selected_combat_method = @selected_methods['combat_method']
@@ -1036,12 +1036,12 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
           case 45:
             runas(@player, '/skill farming')
             play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-            @player_data['cache']['gui_click_time'] = time() + 1000
+            @player_data['cache']['gui_click_time'] = time() + 250
             break()
           case 53:
             runas(@player, '/skill combat')
             play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-            @player_data['cache']['gui_click_time'] = time() + 1000
+            @player_data['cache']['gui_click_time'] = time() + 250
             break()
           default:
             if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
@@ -1056,7 +1056,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
                   @new_skill_spec = @skills_spec[@new_skill]
                   @new_skill_point = @skills_data[@new_skill][0]
                   if(@selected_sowing_method == @new_skill) { // 스킬 사용 해제시
-                    @player_data['cache']['gui_click_time'] = time() + 1000
+                    @player_data['cache']['gui_click_time'] = time() + 250
                     @selected_sowing_method = ''
                     @selected_methods['sowing_method'] = @selected_sowing_method
                     @skill_manager[4] = json_encode(@selected_methods)
@@ -1064,7 +1064,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
                       call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_sowing_method)
                     }
                   } else { // 스킬 선택시
-                    @player_data['cache']['gui_click_time'] = time() + 1000
+                    @player_data['cache']['gui_click_time'] = time() + 250
                     @old_skill = @selected_sowing_method
                     @selected_sowing_method = @new_skill
                     @selected_methods['sowing_method'] = @selected_sowing_method
@@ -1095,7 +1095,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
                   @new_skill_spec = @skills_spec[@new_skill]
                   @new_skill_point = @skills_data[@new_skill][0]
                   if(@selected_harvesting_method == @new_skill) { // 스킬 사용 해제시
-                    @player_data['cache']['gui_click_time'] = time() + 1000
+                    @player_data['cache']['gui_click_time'] = time() + 250
                     @selected_harvesting_method = ''
                     @selected_methods['harvesting_method'] = @selected_harvesting_method
                     @skill_manager[4] = json_encode(@selected_methods)
@@ -1103,7 +1103,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
                       call_proc(@new_skill_proc_name, @player_data, @player, @uuid, @category, @new_skill, @new_skill_spec, @new_skill_point, @selected_harvesting_method)
                     }
                   } else { // 스킬 선택시
-                    @player_data['cache']['gui_click_time'] = time() + 1000
+                    @player_data['cache']['gui_click_time'] = time() + 250
                     @old_skill = @selected_harvesting_method
                     @selected_harvesting_method = @new_skill
                     @selected_methods['harvesting_method'] = @selected_harvesting_method
@@ -1128,7 +1128,7 @@ proc _open_farming_method_skill(@player, @uuid, @players_data, @skills_info, @sk
                 @total_point = _get_total_skill_point(@skill_manager)
                 @remaining_point = @total_point - @player_data['invested_point']
                 if(@remaining_point > 0) {
-                  @player_data['cache']['gui_click_time'] = time() + 1000
+                  @player_data['cache']['gui_click_time'] = time() + 250
                   play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
                   @skill = @inventory[@slot]['skill']
                   @selected_sowing_method = @selected_methods['sowing_method']
@@ -1326,12 +1326,12 @@ proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_sp
           case 45:
             runas(@player, '/skill mining')
             play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-            @player_data['cache']['gui_click_time'] = time() + 1000
+            @player_data['cache']['gui_click_time'] = time() + 250
             break()
           case 53:
             runas(@player, '/skill farmingmethod')
             play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-            @player_data['cache']['gui_click_time'] = time() + 1000
+            @player_data['cache']['gui_click_time'] = time() + 250
             break()
           default:
             if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
@@ -1342,7 +1342,7 @@ proc _open_farming_skill(@player, @uuid, @players_data, @skills_info, @skills_sp
                 @total_point = _get_total_skill_point(@skill_manager)
                 @remaining_point = @total_point - @player_data['invested_point']
                 if(@remaining_point > 0) {
-                  @player_data['cache']['gui_click_time'] = time() + 1000
+                  @player_data['cache']['gui_click_time'] = time() + 250
                   play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
                   @skill = @inventory[@slot]['skill']
                   @skills_data[@skill][0] += 1
@@ -1519,12 +1519,12 @@ proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
           case 45:
             runas(@player, '/skill combat')
             play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-            @player_data['cache']['gui_click_time'] = time() + 1000
+            @player_data['cache']['gui_click_time'] = time() + 250
             break()
           case 53:
             runas(@player, '/skill farming')
             play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
-            @player_data['cache']['gui_click_time'] = time() + 1000
+            @player_data['cache']['gui_click_time'] = time() + 250
             break()
           default:
             if(@slot > 0 && array_index_exists(@inventory[@slot], 'slot_type')) {
@@ -1535,7 +1535,7 @@ proc _open_mining_skill(@player, @uuid, @players_data, @skills_info, @skills_spe
                 @total_point = _get_total_skill_point(@skill_manager)
                 @remaining_point = @total_point - @player_data['invested_point']
                 if(@remaining_point > 0) {
-                  @player_data['cache']['gui_click_time'] = time() + 1000
+                  @player_data['cache']['gui_click_time'] = time() + 250
                   play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
                   @skill = @inventory[@slot]['skill']
                   @skills_data[@skill][0] += 1
