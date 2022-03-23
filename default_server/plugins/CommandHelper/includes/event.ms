@@ -66,7 +66,7 @@ set_timeout(5000, closure() {
         }
 
         if(ploc(@player)['world'] == 'spawn_minecraft_residence') {
-          //_generate_trace(@player, @traces)
+          _generate_trace(@player, @traces)
         }
         # 피 자연회복
         if(phunger(@player) >= 7 && phealth(@player) < get_max_health(@uuid)) {
@@ -1259,7 +1259,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
             break()
           case 4..8:
           case 13..17: // ingredient
-            if(!(@slot_item['name'] == 'STRUCTURE_VOID' && @slot_item['meta']['model'] == 1)) { // 재료를 놓을 수 있는 칸일 시
+            if(!is_null(@slot_item) && !(@slot_item['name'] == 'STRUCTURE_VOID' && @slot_item['meta']['model'] == 1)) { // 재료를 놓을 수 있는 칸일 시
               switch(@action) {
               case 'SWAP_WITH_CURSOR':
                 @cursor_item_copy = array_deep_clone(@cursor_item)
@@ -1287,7 +1287,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
                 break()
               case 'PICKUP_ALL':
               case 'PICKUP_HALF':
-                if(@slot_item['name'] == @ingredient_name) {
+                if(@slot_item['name'] == @ingredient_name && @slot_item['qty'] == 1) {
                   @change_ingredient = true
                   set_timeout(1, closure() {
                     set_inventory_item(@id, @rawslot, @ingredient_slot)

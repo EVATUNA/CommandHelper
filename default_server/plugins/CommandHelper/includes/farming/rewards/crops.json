@@ -3,8 +3,8 @@
     "max_age": 7,
     "default_qty": 1,
     "tunalevel": {
-      "default": -0.25,
-      "extra": 1.5
+      "default": 0,
+      "extra": 1.25
     },
     "arcanelevel": {
       "default": -0.25,
@@ -47,12 +47,12 @@
     "max_age": 3,
     "default_qty": 1,
     "tunalevel": {
-      "default": -1,
-      "extra": 2.25
+      "default": -0.25,
+      "extra": 1.5
     },
     "arcanelevel": {
-      "default": -1,
-      "extra": 2.25
+      "default": -0.25,
+      "extra": 1.5
     },
     "mastery": "beetroot_farming_mastery",
     "loot_table": [
@@ -91,8 +91,8 @@
     "max_age": 7,
     "default_qty": 3,
     "tunalevel": {
-      "default": -0.25,
-      "extra": 1.5
+      "default": 0,
+      "extra": 1.25
     },
     "arcanelevel": {
       "default": -0.25,
@@ -135,8 +135,8 @@
     "max_age": 7,
     "default_qty": 3,
     "tunalevel": {
-      "default": -0.25,
-      "extra": 1.5
+      "default": 0,
+      "extra": 1.25
     },
     "arcanelevel": {
       "default": -0.25,
@@ -179,12 +179,12 @@
     "max_age": 3,
     "default_qty": 2,
     "tunalevel": {
-      "default": -1,
-      "extra": 2.25
+      "default": 0,
+      "extra": 1.25
     },
     "arcanelevel": {
-      "default": -1,
-      "extra": 2.25
+      "default": -0.25,
+      "extra": 1.5
     },
     "mastery": "berries_farming_mastery",
     "loot_table": [
@@ -227,8 +227,8 @@
       "extra": 1
     },
     "arcanelevel": {
-      "default": 0.25,
-      "extra": 1
+      "default": 0,
+      "extra": 1.25
     },
     "mastery": "pumpkin_farming_mastery",
     "loot_table": [
@@ -271,8 +271,8 @@
       "extra": 1
     },
     "arcanelevel": {
-      "default": 0.25,
-      "extra": 1
+      "default": 0,
+      "extra": 1.25
     },
     "mastery": "melon_farming_mastery",
     "loot_table": [

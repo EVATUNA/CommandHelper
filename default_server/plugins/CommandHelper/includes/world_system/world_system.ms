@@ -16,7 +16,7 @@ proc _apply_death_penalty(@player, @uuid, @death_penalties_multiply, @players_da
   @inventory = get_inventory(@uuid)
   modify_event('death_message', null)
   if(@server != 'main') {
-    if(@players_data[@uuid]['item']['enchantments']['armor'] == '귀속') {
+    if(array_index_exists(@players_data, @uuid, 'item', 'enchantments', 'armor') && @players_data[@uuid]['item']['enchantments']['armor'] == '귀속') {
       tmsg(@player, '💀 §7데스패널티로 약 '.integer(round((1 - @death_penalties_multiply[@server]['default']['multiply']) * 50)).'%의 아이템이 소실되었습니다..')
     } else {
       tmsg(@player, '💀 §7데스패널티로 약 '.integer(round((1 - @death_penalties_multiply[@server]['default']['multiply']) * 100)).'%의 아이템이 소실되었습니다..')

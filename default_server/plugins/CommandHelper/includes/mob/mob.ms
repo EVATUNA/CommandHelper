@@ -133,8 +133,7 @@ bind('entity_death', null, null, @event, @players_data, @text) {
     @target_name = get_mob_name(@id)
 
     if(@target_name == '') { // 바닐라몹일시
-      @xp = @event['xp']
-      _give_tunalevel_random_experience(@uuid, @player_data, 0, integer(@xp / 3), @text)
+      _give_tunalevel_random_experience(@uuid, @player_data, 0, @event['xp'] / 3, @text)
     }
   }
 }

@@ -4,20 +4,12 @@
     "hardness": 1,
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.1,
-      "extra": 0.5
+      "default": 0.3,
+      "extra": 0.3
     },
     "arcanelevel": {
-      "default": 0.1,
-      "extra": 0.5
-    },
-    "skills": {
-      "mining": {
-        "ore_selecting": {
-          "default_xp": 1,
-          "extra_xp": 0
-        }
-      }
+      "default": 0.3,
+      "extra": 0.3
     },
     "loot_table": [
       {
@@ -34,20 +26,12 @@
     "hardness": 1,
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.1,
-      "extra": 0.5
+      "default": 0.3,
+      "extra": 0.3
     },
     "arcanelevel": {
-      "default": 0.1,
-      "extra": 0.5
-    },
-    "skills": {
-      "mining": {
-        "ore_selecting": {
-          "default_xp": 1,
-          "extra_xp": 0
-        }
-      }
+      "default": 0.3,
+      "extra": 0.3
     },
     "loot_table": [
       {
@@ -65,26 +49,14 @@
     "hardness": 2,
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.125,
+      "default": 0.25,
       "extra": 1.5
     },
     "arcanelevel": {
-      "default": 0.125,
+      "default": 0.25,
       "extra": 1.5
     },
     "mastery": "copper_mining_mastery",
-    "skills": {
-      "mining": {
-        "copper_mining_mastery": {
-          "default_xp": 1,
-          "extra_xp": 0
-        },
-        "ore_selecting": {
-          "default_xp": 2,
-          "extra_xp": 0
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -133,26 +105,14 @@
     "hardness": 2,
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.125,
+      "default": 0.25,
       "extra": 1.5
     },
     "arcanelevel": {
-      "default": 0.125,
+      "default": 0.25,
       "extra": 1.5
     },
     "mastery": "copper_mining_mastery",
-    "skills": {
-      "mining": {
-        "copper_mining_mastery": {
-          "default_xp": 1,
-          "extra_xp": 0
-        },
-        "ore_selecting": {
-          "default_xp": 2,
-          "extra_xp": 0
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -202,26 +162,14 @@
     "hardness": 3,
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.25,
+      "default": 0.5,
       "extra": 1.75
     },
     "arcanelevel": {
-      "default": 0.25,
+      "default": 0.5,
       "extra": 1.75
     },
     "mastery": "iron_mining_mastery",
-    "skills": {
-      "mining": {
-        "iron_mining_mastery": {
-          "default_xp": 1,
-          "extra_xp": 0
-        },
-        "ore_selecting": {
-          "default_xp": 4,
-          "extra_xp": 0
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -270,26 +218,14 @@
     "hardness": 3,
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.25,
+      "default": 0.5,
       "extra": 1.75
     },
     "arcanelevel": {
-      "default": 0.25,
+      "default": 0.5,
       "extra": 1.75
     },
     "mastery": "iron_mining_mastery",
-    "skills": {
-      "mining": {
-        "iron_mining_mastery": {
-          "default_xp": 1,
-          "extra_xp": 0
-        },
-        "ore_selecting": {
-          "default_xp": 4,
-          "extra_xp": 0
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -339,26 +275,14 @@
     "hardness": 4,
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.75,
+      "default": 1.0,
       "extra": 2.0
     },
     "arcanelevel": {
-      "default": 0.75,
+      "default": 1.0,
       "extra": 2.0
     },
     "mastery": "gold_mining_mastery",
-    "skills": {
-      "mining": {
-        "gold_mining_mastery": {
-          "default_xp": 1,
-          "extra_xp": 0
-        },
-        "ore_selecting": {
-          "default_xp": 7,
-          "extra_xp": 0
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -407,26 +331,14 @@
     "hardness": 4,
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.75,
+      "default": 1.0,
       "extra": 2.0
     },
     "arcanelevel": {
-      "default": 0.75,
+      "default": 1.0,
       "extra": 2.0
     },
     "mastery": "gold_mining_mastery",
-    "skills": {
-      "mining": {
-        "gold_mining_mastery": {
-          "default_xp": 1,
-          "extra_xp": 0
-        },
-        "ore_selecting": {
-          "default_xp": 7,
-          "extra_xp": 0
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -475,26 +387,14 @@
     "hardness": 4,
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.75,
-      "extra": 2.0
+      "default": 1.5,
+      "extra": 2.75
     },
     "arcanelevel": {
-      "default": 0.75,
-      "extra": 2.0
+      "default": 1.5,
+      "extra": 2.75
     },
     "mastery": "gold_mining_mastery",
-    "skills": {
-      "mining": {
-        "gold_mining_mastery": {
-          "default_xp": 7.25,
-          "extra_xp": 0.5
-        },
-        "ore_selecting": {
-          "default_xp": 1,
-          "extra_xp": 0
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -543,26 +443,14 @@
     "hardness": 4,
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.75,
-      "extra": 2.0
+      "default": 1.5,
+      "extra": 2.75
     },
     "arcanelevel": {
-      "default": 0.75,
-      "extra": 2.0
+      "default": 1.5,
+      "extra": 2.75
     },
     "mastery": "gold_mining_mastery",
-    "skills": {
-      "mining": {
-        "gold_mining_mastery": {
-          "default_xp": 7.25,
-          "extra_xp": 0.5
-        },
-        "ore_selecting": {
-          "default_xp": 1,
-          "extra_xp": 0
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -612,26 +500,14 @@
     "hardness": 5,
     "default_qty": 1,
     "tunalevel": {
-      "default": 1.0,
+      "default": 1.5,
       "extra": 2.75
     },
     "arcanelevel": {
-      "default": 1.0,
+      "default": 1.5,
       "extra": 2.75
     },
     "mastery": "diamond_mining_mastery",
-    "skills": {
-      "mining": {
-        "diamond_mining_mastery": {
-          "default_xp": 1,
-          "extra_xp": 0
-        },
-        "ore_selecting": {
-          "default_xp": 15,
-          "extra_xp": 0
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -680,26 +556,14 @@
     "hardness": 5,
     "default_qty": 1,
     "tunalevel": {
-      "default": 1.0,
+      "default": 1.5,
       "extra": 2.75
     },
     "arcanelevel": {
-      "default": 1.0,
+      "default": 1.5,
       "extra": 2.75
     },
     "mastery": "diamond_mining_mastery",
-    "skills": {
-      "mining": {
-        "diamond_mining_mastery": {
-          "default_xp": 1,
-          "extra_xp": 0
-        },
-        "ore_selecting": {
-          "default_xp": 15,
-          "extra_xp": 0
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -749,26 +613,14 @@
     "hardness": 6,
     "default_qty": 1,
     "tunalevel": {
-      "default": 2.5,
-      "extra": 3.75
+      "default": 5.5,
+      "extra": 4.0
     },
     "arcanelevel": {
-      "default": 2.5,
-      "extra": 3.75
+      "default": 5.5,
+      "extra": 4.0
     },
     "mastery": "ancient_debris_mining_mastery",
-    "skills": {
-      "mining": {
-        "ancient_debris_mining_mastery": {
-          "default_xp": 1,
-          "extra_xp": 0
-        },
-        "ore_selecting": {
-          "default_xp": 50,
-          "extra_xp": 0
-        }
-      }
-    },
     "loot_table": [
       {
         "item": {
@@ -818,20 +670,12 @@
     "hardness": 1,
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.1,
-      "extra": 0.5
+      "default": 0.3,
+      "extra": 0.3
     },
     "arcanelevel": {
-      "default": 0.1,
-      "extra": 0.5
-    },
-    "skills": {
-      "mining": {
-        "ore_selecting": {
-          "default_xp": 1.25,
-          "extra_xp": 0.5
-        }
-      }
+      "default": 0.3,
+      "extra": 0.3
     },
     "loot_table": [
       {
@@ -849,12 +693,12 @@
     "hardness": 3,
     "default_qty": 4,
     "tunalevel": {
-      "default": 0.1,
-      "extra": 0.5
+      "default": 0.3,
+      "extra": 0.3
     },
     "arcanelevel": {
-      "default": 0.1,
-      "extra": 0.5
+      "default": 0.3,
+      "extra": 0.3
     },
     "skills": {
       "mining": {
@@ -879,12 +723,12 @@
     "hardness": 3,
     "default_qty": 4,
     "tunalevel": {
-      "default": 0.1,
-      "extra": 0.5
+      "default": 0.3,
+      "extra": 0.3
     },
     "arcanelevel": {
-      "default": 0.1,
-      "extra": 0.5
+      "default": 0.3,
+      "extra": 0.3
     },
     "skills": {
       "mining": {
@@ -910,12 +754,12 @@
     "hardness": 4,
     "default_qty": 4,
     "tunalevel": {
-      "default": 0.1,
-      "extra": 0.5
+      "default": 0.3,
+      "extra": 0.3
     },
     "arcanelevel": {
-      "default": 0.1,
-      "extra": 0.5
+      "default": 0.3,
+      "extra": 0.3
     },
     "skills": {
       "mining": {
@@ -940,12 +784,12 @@
     "hardness": 4,
     "default_qty": 4,
     "tunalevel": {
-      "default": 0.1,
-      "extra": 0.5
+      "default": 0.3,
+      "extra": 0.3
     },
     "arcanelevel": {
-      "default": 0.1,
-      "extra": 0.5
+      "default": 0.3,
+      "extra": 0.3
     },
     "skills": {
       "mining": {
@@ -971,12 +815,12 @@
     "hardness": 4,
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.1,
-      "extra": 0.5
+      "default": 0.3,
+      "extra": 0.3
     },
     "arcanelevel": {
-      "default": 0.1,
-      "extra": 0.5
+      "default": 0.3,
+      "extra": 0.3
     },
     "skills": {
       "mining": {
@@ -1001,20 +845,12 @@
     "hardness": 4,
     "default_qty": 1,
     "tunalevel": {
-      "default": 0.1,
-      "extra": 0.5
+      "default": 0.3,
+      "extra": 0.3
     },
     "arcanelevel": {
-      "default": 0.1,
-      "extra": 0.5
-    },
-    "skills": {
-      "mining": {
-        "ore_selecting": {
-          "default_xp": 1,
-          "extra_xp": 0
-        }
-      }
+      "default": 0.3,
+      "extra": 0.3
     },
     "loot_table": [
       {

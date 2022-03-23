@@ -6,7 +6,7 @@ bind('player_fish', null, null, @event, @players_data, @text) {
       @player_data = @players_data[@uuid]
       @xp = integer(@event['xp'] / 2)
       modify_event('xp', @xp)
-      _give_tunalevel_random_experience(@uuid, @player_data, 0, integer(@xp / 2), @text)
+      _give_tunalevel_random_experience(@uuid, @player_data, 0, @event['xp'] / 3, @text)
     }
   }
 }
