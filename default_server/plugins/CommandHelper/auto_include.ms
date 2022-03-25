@@ -5,6 +5,8 @@
 @splited_absolute_path = split('\\', get_absolute_path())
 array_reverse(@splited_absolute_path)
 @server = @splited_absolute_path[2]
+export('server', @server)
+
 
 # 리소스팩 링크
 @resourcepack = array(

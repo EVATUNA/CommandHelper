@@ -61,7 +61,8 @@ include('includes/autoquiz/autoquiz.ms')
 #include('includes/decoration/decoration.ms')
 # 상점 시스템
 include('includes/shop/shop.ms')
-
+# 떠상 시스템
+include('includes/wandering_trader/wandering_trader.ms')
 
 ### High Include
 

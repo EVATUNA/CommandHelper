@@ -66,7 +66,7 @@ set_timeout(5000, closure() {
         }
 
         if(ploc(@player)['world'] == 'spawn_minecraft_residence') {
-          _generate_trace(@player, @traces)
+          //_generate_trace(@player, @traces)
         }
         # 피 자연회복
         if(phunger(@player) >= 7 && phealth(@player) < get_max_health(@uuid)) {
@@ -3156,17 +3156,17 @@ bind('projectile_launch', null, array('shootertype': 'PLAYER'), @event, @players
           set_inventory_item(puuid(@player), @slot, @item)
           # 에너지 삼지창 발사
           set_pcooldown(@player, 'TRIDENT', '200')
-          set_timeout(0, closure() {
-            @uuid = shoot_projectile(@player, 'TRIDENT')
+          if(array_index_exists(@item, 'meta', 'modifiers', 0)) {
             set_timeout(0, closure() {
-              if(array_index_exists(@item, 'meta', 'modifiers', 0)) {
+              @uuid = shoot_projectile(@player, 'TRIDENT')
+              set_timeout(0, closure() {
                 @damage = @item['meta']['modifiers'][0]['amount']
                 add_scoreboard_tag(@uuid, @damage)
                 runas('~console', "/data modify entity @uuid pickup set value 0")
                 # todo 공속에 따른 쿨타임, 인첸트 반영
-              }
+              })
             })
-          })
+          }
         }
       }
 

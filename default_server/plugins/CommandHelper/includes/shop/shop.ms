@@ -152,6 +152,7 @@ void proc _buyItem(@player, @itemMeta, @server, @shop_name) { # 구매
     @uuid = puuid(@player)
     _logging('shop', time(), @server, @shop_name, @player, @uuid, @itemMeta, 'buy', @itemMeta['qty'], @itemMeta['meta']['price']['buy'])
   } else {
+    tmsg(@player, '\ue4e1 캔이 부족합니다.')
     #돈 부족
   }
 }

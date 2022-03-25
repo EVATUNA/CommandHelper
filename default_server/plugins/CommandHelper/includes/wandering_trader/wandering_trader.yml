@@ -1,0 +1,329 @@
+stayTime: 15 # 상인이 머무는 시간 (분 단위)
+minMessage:
+  15min: '§e떠돌이 상인§7이 §f치킨무 마을§7에서 여행을 시작했습니다!'
+  10min: '§e떠돌이 상인§7이 §b참치 마을§7로 오고 있습니다!'
+  5min: '§e떠돌이 상인§7이 §b참치 마을§7에 거의 도착했습니다!'
+  1min: '§e떠돌이 상인§7이 §b참치 마을§7에서 장사준비를 하고 있습니다!'
+startMessage: '§e떠돌이 상인§7이 장사를 시작합니다!'
+endMessage: '§e떠돌이 상인§7이 마을을 떠났습니다.'
+trader:
+  spawnList:
+    - x: 831
+      y: 67
+      z: 343
+      world: spawn
+    - x: 756
+      y: 66
+      z: 363
+      world: spawn
+    - x: 721
+      y: 64
+      z: 308
+      world: spawn
+    - x: 666
+      y: 68
+      z: 294
+      world: spawn
+    - x: 752
+      y: 70
+      z: 256
+      world: spawn
+  selectItemCount: # 아이템 목록중 몇개를 뽑을 건지
+    BUY: 11~15 # 최소-최대 (랜덤)
+    SELL: 6~10
+tradeItemList: # 아이템 리스트
+  BUY: # 구매 아이템 리스트 (유저 기준 구매)
+    - 'name': 'CHEST'
+      'meta':
+        'display': '§r§f하급 §d전리품 상자'
+        'lore': '§a클릭하여 §f바닐라 몬스터 전리품 획득'
+        'stock': 4~64
+        'price': 20.0
+        'limit': 4
+    - 'name': 'GRANITE'
+      'meta':
+        'stock': -1
+        'price': 0.8
+        'limit': -1
+    - 'name': 'DIORITE'
+      'meta':
+        'stock': -1
+        'price': 0.8
+        'limit': -1
+    - 'name': 'ANDESITE'
+      'meta':
+        'stock': -1
+        'price': 0.8
+        'limit': -1
+    - 'name': 'DIRT'
+      'meta':
+        'stock': 100~300
+        'price': 10.0
+        'limit': 10
+    - 'name': 'SAND'
+      'meta':
+        'stock': 100~300
+        'price': 10.0
+        'limit': 10
+    - 'name': 'SPONGE'
+      'meta':
+        'stock': 16~32
+        'price': 100.0
+        'limit': 1
+    - 'name': 'NETHERRACK'
+      'meta':
+        'stock': -1
+        'price': 0.5
+        'limit': -1
+    - 'name': 'SOUL_SAND'
+      'meta':
+        'stock': -1
+        'price': 0.7
+        'limit': -1
+    - 'name': 'NETHER_QUARTZ_ORE'
+      'meta':
+        'stock': -1
+        'price': 2.0
+        'limit': -1
+    - 'name': 'WHITE_TERRACOTTA'
+      'meta':
+        'stock': -1
+        'price': 2.0
+        'limit': -1
+    - 'name': 'GLASS'
+      'meta':
+        'stock': -1
+        'price': 2.5
+        'limit': -1
+    - 'name': 'PRISMARINE'
+      'meta':
+        'stock': 100~300
+        'price': 12.0
+        'limit': 64
+    - 'name': 'DARK_PRISMARINE'
+      'meta':
+        'stock': 100~300
+        'price': 12.0
+        'limit': 64
+    - 'name': 'PRISMARINE_SHARD'
+      'meta':
+        'stock': 32~64
+        'price': 50.0
+        'limit': 2
+    - 'name': 'SANDSTONE'
+      'meta':
+        'stock': -1
+        'price': 0.8
+        'limit': -1
+    - 'name': 'RED_SANDSTONE'
+      'meta':
+        'stock': -1
+        'price': 0.8
+        'limit': -1
+    - 'name': 'NETHER_BRICKS'
+      'meta':
+        'stock': -1
+        'price': 1.5
+        'limit': -1
+    - 'name': 'TUBE_CORAL'
+      'meta':
+        'stock': -1
+        'price': 4.0
+        'limit': -1
+    - 'name': 'BRAIN_CORAL'
+      'meta':
+        'stock': -1
+        'price': 4.0
+        'limit': -1
+    - 'name': 'BUBBLE_CORAL'
+      'meta':
+        'stock': -1
+        'price': 4.0
+        'limit': -1
+    - 'name': 'FIRE_CORAL'
+      'meta':
+        'stock': -1
+        'price': 4.0
+        'limit': -1
+    - 'name': 'HORN_CORAL'
+      'meta':
+        'stock': -1
+        'price': 4.0
+        'limit': -1
+    - 'name': 'TUBE_CORAL_FAN'
+      'meta':
+        'stock': -1
+        'price': 4.0
+        'limit': -1
+    - 'name': 'BRAIN_CORAL_FAN'
+      'meta':
+        'stock': -1
+        'price': 4.0
+        'limit': -1
+    - 'name': 'BUBBLE_CORAL_FAN'
+      'meta':
+        'stock': -1
+        'price': 4.0
+        'limit': -1
+    - 'name': 'FIRE_CORAL_FAN'
+      'meta':
+        'stock': -1
+        'price': 4.0
+        'limit': -1
+    - 'name': 'HORN_CORAL_FAN'
+      'meta':
+        'stock': -1
+        'price': 4.0
+        'limit': -1
+    - 'name': 'PACKED_ICE'
+      'meta':
+        'stock': -1
+        'price': 3.0
+        'limit': -1
+    - 'name': 'WITHER_ROSE'
+      'meta':
+        'stock': 16~32
+        'price': 100.0
+        'limit': 1
+    - 'name': 'BEETROOT'
+      'meta':
+        'stock': 16~64
+        'price': 10.0
+        'limit': 1
+    - 'name': 'COCOA_BEANS'
+      'meta':
+        'stock': 16~64
+        'price': 10.0
+        'limit': 1
+    - 'name': 'VINE'
+      'meta':
+        'stock': 1~64
+        'price': 10.0
+        'limit': 1
+    - 'name': 'BELL'
+      'meta':
+        'stock': 1~32
+        'price': 300.0
+        'limit': 1
+    - 'name': 'LAVA_BUCKET'
+      'meta':
+        'stock': 1~32
+        'price': 100.0
+        'limit': 1
+    - 'name': 'GLOWSTONE'
+      'meta':
+        'stock': 100~200
+        'price': 100.0
+        'limit': 10
+    - 'name': 'SEA_LANTERN'
+      'meta':
+        'stock': 100~200
+        'price': 90.0
+        'limit': 10
+    - 'name': 'WHITE_WOOL'
+      'meta':
+        'stock': 50~150
+        'price': 6.3
+        'limit': 16
+    - 'name': 'FISHING_ROD'
+      'meta':
+        'stock': 8~16
+        'price': 20.0
+        'limit': 1
+    - 'name': 'ARROW'
+      'meta':
+        'stock': 100~200
+        'price': 2.0
+        'limit': 64
+  SELL:
+    - 'name': 'COPPER_INGOT'
+      'meta':
+        'display': "§e중급 구리 주괴"
+        'model': 1
+        'stock': 1
+        'price': 10.0
+        'limit': 1
+        'detail': 'DISPLAY'
+    - 'name': 'COPPER_INGOT'
+      'meta':
+        'display': "§b상급 구리 주괴"
+        'model': 2
+        'stock': 1
+        'price': 10.0
+        'limit': 1
+        'detail': 'DISPLAY'
+    - 'name': 'STONE'
+      'meta':
+        'stock': 5
+        'price': 10.0
+        'limit': 1
+    - 'name': 'STONE'
+      'meta':
+        'stock': 5
+        'price': 10.0
+        'limit': 1
+    - 'name': 'STONE'
+      'meta':
+        'stock': 5
+        'price': 10.0
+        'limit': 1
+    - 'name': 'STONE'
+      'meta':
+        'stock': 5
+        'price': 10.0
+        'limit': 1
+    - 'name': 'STONE'
+      'meta':
+        'stock': 5
+        'price': 10.0
+        'limit': 1
+    - 'name': 'STONE'
+      'meta':
+        'stock': 5
+        'price': 10.0
+        'limit': 1
+    - 'name': 'STONE'
+      'meta':
+        'stock': 5
+        'price': 10.0
+        'limit': 1
+    - 'name': 'STONE'
+      'meta':
+        'stock': 5
+        'price': 10.0
+        'limit': 1
+    - 'name': 'STONE'
+      'meta':
+        'stock': 5
+        'price': 10.0
+        'limit': 1
+    - 'name': 'STONE'
+      'meta':
+        'stock': 5
+        'price': 10.0
+        'limit': 1
+    - 'name': 'STONE'
+      'meta':
+        'stock': 5
+        'price': 10.0
+        'limit': 1
+    - 'name': 'STONE'
+      'meta':
+        'stock': 5
+        'price': 10.0
+        'limit': 1
+    - 'name': 'STONE'
+      'meta':
+        'stock': 5
+        'price': 10.0
+        'limit': 1
+    - 'name': 'STONE'
+      'meta':
+        'stock': 5
+        'price': 10.0
+        'limit': 1
+    - 'name': 'STONE'
+      'meta':
+        'stock': 5
+        'price': 10.0
+        'limit': 1

@@ -74,7 +74,7 @@ set_timeout(1000, closure() {
       msg(@text['prefix']['info']'§9EvatunaBlog §r : https://blog.evatuna.fish/')
     }
   ))
-  
+  /*
   register_command('guide', array(
     'executor': closure(@command, @player, @args) {
       if(array_size(@args) != 1) {
@@ -91,6 +91,7 @@ set_timeout(1000, closure() {
       }
     }
   ))
+  */
 
   ###
   ### 도움말 명령어
@@ -212,7 +213,7 @@ set_timeout(1000, closure() {
         msg(' §b# 도움말')
         _help_message(@player, 'help', array('command', 'commands', 'cmd', 'cmds', '도움말', '명령어', '헬프', '커맨드'), '[페이지]', '서버 명령어를 확인합니다.')
         _help_message(@player, 'info', array('about', 'version', 'ver', '서버', '서버정보'), null, '서버 정보를 확인합니다.')
-        _help_message(@player, 'guide', array('가이드'), '[가이드 이름]', '가이드를 봅니다.')
+        //_help_message(@player, 'guide', array('가이드'), '[가이드 이름]', '가이드를 봅니다.')
         break()
       case 2:
         msg(' §b# 채팅')
@@ -248,8 +249,8 @@ set_timeout(1000, closure() {
         msg(' §b# 튜나랜드 (마을)')
         _help_message(@player, 'tunaland', array('tl'), null, '거주 월드 청크 관리 명령어입니다.')
         msg(' §b# 유저 상점')
-        _help_message(@player, 'ushop', array('tl'), null, '유저 상점 GUI를 엽니다.')
-        msg(' §7유저 상점 사용에 관한 자세한 설명은 §e/guide usershop§7를 통해 확인할 수 있습니다.')
+        _help_message(@player, 'usershop', array('us', '유저상점'), null, '유저 상점 GUI를 엽니다.')
+        _help_message(@player, 'usershop', array('us', '유저상점'), 'sell <가격> [수량]', '손에든 아이템을 판매합니다.')
         msg(' §b# 레이드')
         _help_message(@player, 'raid', array(), null, '레이드 GUI를 엽니다.')
         break()
@@ -270,6 +271,25 @@ set_timeout(1000, closure() {
     }
   ))
 })
+
+proc _usershop_command(@command, @player, @args, @text) {
+  @args_string = array_implode(@args, ' ')
+  run("/zauction @args_string")
+}
+
+register_command('usershop', array(
+  'aliases': array('us', '유저상점'),
+  'tabcompleter': closure(@command, @player, @args) {
+    if(array_size(@args) == 1) {
+      return(array('sell'))
+    } else {
+      return(array())
+    }
+  },
+  'executor': closure(@command, @player, @args) {
+    _usershop_command(@command, @player, @args, @text)
+  }
+))
 
 ###
 ### 관리자 명령어 (모든 서버에서 작동되도록 수정 해야함)
