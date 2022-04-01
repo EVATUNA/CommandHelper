@@ -23,7 +23,7 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
   # 부순 블럭이 광물일시
   if(array_contains(array_keys(@mineral_rewards), @mineral)) {
     # 광물 스펙 선언
-    @mineral_reward = @mineral_rewards[@mineral]
+    @mineral_reward = array_deep_clone(@mineral_rewards[@mineral])
     ## 곡괭이 관련 데이터 선언
     # 기본 데이터 선언
     @pickaxe_hardness = 0
@@ -97,7 +97,7 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
       # 최대 드랍 갯수 배수에 선광 스킬 배수, 인첸트 반영
       @max_drop_multiply = @ore_selecting_multiply
       if(@player_data['item']['enchantments']['main_hand'] == '행운') {
-        @max_drop_multiply += 1.5
+        @max_drop_multiply += 1
       }
       # id가 존재하지 않거나 광물이 다른 광물로 바뀔경우 기본데이터로 설정
       if(!array_index_exists(@hp_blocks, @id)) {

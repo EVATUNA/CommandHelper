@@ -1065,6 +1065,15 @@ register_command('sendwarn', array(
   }
 ))
 
+register_command('spawntrace', array(
+  permission: 'spawntrace',
+  'tabcompleter': closure(@command, @player, @args) { return(array()) },
+  'executor': closure(@command, @player, @args) {
+    _generate_trace(@player, @traces)
+  }
+))
+
+
 proc _chreload_command(@command, @player, @args, @text, @players_data) {
   foreach(@target_name in all_players()) {
     @target_uuid = puuid(@target_name)

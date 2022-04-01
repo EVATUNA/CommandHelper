@@ -188,6 +188,20 @@
 				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
 			}
 		},
+    "구리 방패": {
+			"name": "SHIELD",
+			"meta": {
+				"display": "§f구리 방패",
+				"model": 1,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
     "금 검": {
 			"name": "GOLDEN_SWORD",
 			"meta": {
@@ -274,6 +288,20 @@
 			"meta": {
 				"display": "§f금 흉갑",
 				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "금 방패": {
+			"name": "SHIELD",
+			"meta": {
+				"display": "§f금 방패",
+				"model": 5,
 				"lore": [
 					"§7재료 아이템의 등급이 높을수록,",
 					"§7더 좋은 아이템을 조합할 수 있습니다.",
@@ -446,6 +474,20 @@
 				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
 			}
 		},
+    "네더라이트 방패": {
+			"name": "SHIELD",
+			"meta": {
+				"display": "§f네더라이트 방패",
+				"model": 9,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
     "다이아몬드 검": {
 			"name": "DIAMOND_SWORD",
 			"meta": {
@@ -532,6 +574,20 @@
 			"meta": {
 				"display": "§f다이아몬드 흉갑",
 				"model": 0,
+				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
+					"§7쉬프트 클릭으로 조합할 수 없습니다."
+				],
+				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
+			}
+		},
+    "다이아몬드 방패": {
+			"name": "SHIELD",
+			"meta": {
+				"display": "§f다이아몬드 방패",
+				"model": 7,
 				"lore": [
 					"§7재료 아이템의 등급이 높을수록,",
 					"§7더 좋은 아이템을 조합할 수 있습니다.",
@@ -700,12 +756,15 @@
 				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
 			}
 		},
-    "쉬프트 클릭으로 조합할 수 없습니다.": {
-			"name": "COMPASS",
+    "철 방패": {
+			"name": "SHIELD",
 			"meta": {
-        "model": 1,
-				"display": "§f추적기",
+				"display": "§f철 방패",
+				"model": 3,
 				"lore": [
+					"§7재료 아이템의 등급이 높을수록,",
+					"§7더 좋은 아이템을 조합할 수 있습니다.",
+					"",
 					"§7쉬프트 클릭으로 조합할 수 없습니다."
 				],
 				"flags": ["HIDE_ENCHANTS", "HIDE_ATTRIBUTES"]
@@ -798,6 +857,56 @@
 				"display": "§d최상급 다이아몬드",
 				"model": 3
 			}
+		},
+		"netherite_scrap_c": {
+			"name": "NETHERITE_SCRAP"
+		},
+		"netherite_scrap_b": {
+			"name": "NETHERITE_SCRAP",
+			"meta": {
+				"display": "§e중급 네더라이트 파편",
+				"model": 1
+			}
+		},
+		"netherite_scrap_a": {
+			"name": "NETHERITE_SCRAP",
+			"meta": {
+				"display": "§b상급 네더라이트 파편",
+				"model": 2
+			}
+		},
+		"netherite_scrap_s": {
+			"name": "NETHERITE_SCRAP",
+			"meta": {
+				"display": "§d최상급 네더라이트 파편",
+				"model": 3
+			}
+		},
+		"netherite_ingot_b": {
+			"name": "NETHERITE_INGOT",
+			"meta": {
+				"display": "§e중급 네더라이트 주괴",
+				"model": 1
+			}
+		},
+		"netherite_ingot_a": {
+			"name": "NETHERITE_INGOT",
+			"meta": {
+				"display": "§b상급 네더라이트 주괴",
+				"model": 2
+			}
+		},
+		"netherite_ingot_s": {
+			"name": "NETHERITE_INGOT",
+			"meta": {
+				"display": "§d최상급 네더라이트 주괴",
+				"model": 3
+			}
+		}
+	},
+	"misc": {
+		"EXPERIENCE_BOTTLE": {
+			"name": "EXPERIENCE_BOTTLE"
 		}
 	}
 }

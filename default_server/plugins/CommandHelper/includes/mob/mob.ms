@@ -122,7 +122,7 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards) {
 }
 */
 
-bind('entity_death', null, null, @event, @players_data, @text) {
+bind('entity_death', null, null, @event, @players_data, @text, @ch_items, @server) {
   if(array_index_exists(@event['cause'],'damager') && ponline(@event['cause']['damager'])) {
     # 플레이어에 의하여 죽을시
     @player = @event['cause']['damager']
@@ -130,10 +130,47 @@ bind('entity_death', null, null, @event, @players_data, @text) {
     @player_data = @players_data[@uuid]
 
     @id = @event['id']
-    @target_name = get_mob_name(@id)
+    @mob_name = strip_colors(get_mob_name(@id))
 
-    if(@target_name == '') { // 바닐라몹일시
+    if(@mob_name == '') { // 바닐라몹일시
       _give_tunalevel_random_experience(@uuid, @player_data, 0, @event['xp'] / 3, @text)
+    } else {
+      @location = @event['location']
+      switch(@mob_name) {
+      case '글룸':
+        @size = array_size(get_scoreboard_tags(@id))
+        @money = 300
+        @tunapoint = 200
+
+        foreach(@target_name in get_scoreboard_tags(@id)) {
+          if(ponline(@target_name)) {
+            @target_uuid = puuid(@target_name)
+            @player_data = @players_data[@target_uuid]
+
+            @money_per_player = @money / @size
+            @tunapoint_per_player = @tunapoint / @size
+            acc_add(@target_name, rand(integer(@money_per_player * 0.5), integer(@money_per_player * 1.5)))
+            _give_tunalevel_random_experience(@target_uuid, @player_data, @tunapoint_per_player / 2, @tunapoint_per_player, @text)
+          }
+        }
+
+        @items = array(
+          _drop_item_random_qty(@location, 'arcane_essence', 'arcane_essence_2', 1, 2, @ch_items),
+          _drop_item_random_qty(@location, 'arcane_essence', 'arcane_essence_6', 1, 1, @ch_items),
+          _drop_item_random_qty(@location, 'mineral', 'netherite_scrap_c', 1, 4, @ch_items),
+          _drop_item_random_qty(@location, 'mineral', 'netherite_scrap_b', -3, 6, @ch_items),
+          _drop_item_random_qty(@location, 'mineral', 'netherite_scrap_a', -8, 10, @ch_items),
+          _drop_item_random_qty(@location, 'mineral', 'netherite_scrap_s', -99, 100, @ch_items),
+          _drop_item_random_qty(@location, 'misc', 'EXPERIENCE_BOTTLE', -99, 100, @ch_items)
+        )
+
+        foreach(@item in @items) {
+          if(!is_null(@item)) {
+            _logging('loot', time(), @server, @location, @mob_name, @item)
+          }
+        }
+        break()
+      }
     }
   }
 }

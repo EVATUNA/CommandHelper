@@ -25,6 +25,11 @@ proc _create_log_files(@server) {
   if(!file_exists(@chat_log_dir_path)) { create_dir(@chat_log_dir_path) }
   @chat_log_path = "@chat_log_dir_path/@date.log"
   if(!file_exists(@chat_log_path)) { create_file(@chat_log_path) }
+  # 루팅
+  @loot_log_dir_path = "@main_log_dir_path/loot"
+  if(!file_exists(@loot_log_dir_path)) { create_dir(@loot_log_dir_path) }
+  @loot_log_path = "@loot_log_dir_path/@date.log"
+  if(!file_exists(@loot_log_path)) { create_file(@loot_log_path) }
 }
 # 커헬 로드 후 파일세팅
 _create_log_files(@server)
@@ -110,6 +115,32 @@ proc _logging(@type, @time, @server) {
         }
         // log
         @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@shop_name] @player (@uuid) @sub_type x@qty @each_price @item_name\n"
+      }
+      break()
+    case 'loot':
+      // @type @time @server, @location, @mob, @item
+      if(@arguments_size == 6) {
+        @location = @arguments[3]
+        @mob = @arguments[4]
+        @item = @arguments[5]
+        // time_stamp
+        @time_stamp = simple_date('yyyy-MM-dd HH:mm:ss', time())
+        // location_stamp
+        @location_x = integer(@location['x'])
+        @location_y = integer(@location['y'])
+        @location_z = integer(@location['z'])
+        @location_world = @location['world']
+        @location_stamp = "@location_world, @location_x, @location_y, @location_z"
+        // item_name
+        if(array_index_exists(@item, 'meta', 'display') && @item['meta']['display'] != '') {
+          @item_name = strip_colors(@item['meta']['display'])
+        } else {
+          @item_name = @item['name']
+        }
+        // qty
+        @qty = @item['qty']
+        // log
+        @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@location_stamp] [@mob] @item_name x@qty\n"
       }
       break()
     }

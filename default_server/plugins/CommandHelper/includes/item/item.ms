@@ -14,6 +14,23 @@ proc _give_item_random_qty(@player, @category, @ch_item_name, @default_qty, @ext
   }
 }
 
+proc _drop_item_random_qty(@location, @category, @ch_item_name, @default_qty, @extra_qty, @ch_items) {
+  if(array_index_exists(@ch_items, @category, @ch_item_name)) {
+    @item = @ch_items[@category][@ch_item_name]
+    @qty = integer(round(@default_qty + rand() * @extra_qty))
+    if(@qty < 0) { @qty = 0 }
+    @item['qty'] = @qty
+    if(@qty > 0) {
+      drop_item(@location, @item)
+      return(@item)
+    } else {
+      return(null)
+    }
+  } else {
+    return(null)
+  }
+}
+
 register_command('giveitemrand', array(
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
@@ -152,6 +169,40 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
       if(!array_contains(@seeds, @item['name'])) {
         # 바닐라 인첸 목록 선언
         @vanilla_enchants = array()
+
+        # 기타 적용
+        if(@item['name'] == 'SHIELD') {
+          @unbreaking = 0
+          if(array_index_exists(@item, 'meta', 'model')) {
+            switch(@item['meta']['model']) {
+            case 0: // 구리
+            case 1:
+              @unbreaking = 3.1
+              break()
+            case 2: // 철
+            case 3:
+              @unbreaking = 6.8
+              break()
+            case 4: // 금
+            case 5:
+              @unbreaking = 0
+              break()
+            case 6: // 다이아
+            case 7:
+              @unbreaking = 47.8
+              break()
+            case 8: // 네더라이트
+            case 9:
+              @unbreaking = 62.5
+              break()
+            }
+          }
+          @vanilla_enchants['unbreaking'] = array(
+            'etype': 'DURABILITY',
+            'elevel': @unbreaking
+          )
+        }
+
         # 스킬 적용
         foreach(@applying_skill: @applying_skill_data in @applying_skills) {
           @skill_spec = @applying_skill_data['skill_spec']
@@ -159,13 +210,7 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
           @proc_name = @applying_skill_data['proc_name']
           call_proc(@proc_name, @player_data, @player, @uuid, @applying_skill, @skill_spec, @point, @item, @vanilla_enchants)
         }
-        # 기타 적용
-        if(@item['name'] == 'TRIDENT') {
-          @vanilla_enchants['loyalty'] = array(
-            'etype': 'LOYALTY',
-            'elevel': 5
-          )
-        }
+
         # 인첸트 적용
         if(!is_null(@item['meta']) && !is_null(@item['meta']['modifiers']) && !is_null(@item['meta']['lore'])) {
           @modifiers = @item['meta']['modifiers']
@@ -175,10 +220,14 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
             @enchantments['main_hand'] = @enchantment
             switch(@enchantment) {
             case '내구성':
-              @vanilla_enchants['unbreaking'] = array(
-                'etype': 'DURABILITY',
-                'elevel': 5
-              )
+              if(array_index_exists(@vanilla_enchants, 'unbreaking')) {
+                @vanilla_enchants['unbreaking']['elevel'] *= 3
+              } else {
+                @vanilla_enchants['unbreaking'] = array(
+                  'etype': 'DURABILITY',
+                  'elevel': 3
+                )
+              }
               break()
             case '효율':
               @vanilla_enchants['efficiency'] = array(
@@ -199,7 +248,15 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
             }
           }
         }
-        if(!@item['meta'] || !@item['meta']['flags']) {
+
+        # 내구성 인첸 소수점 처리
+        if(array_index_exists(@vanilla_enchants, 'unbreaking')) {
+          @vanilla_enchants['unbreaking']['elevel'] = integer(@vanilla_enchants['unbreaking']['elevel'])
+        }
+
+        if(array_index_exists(@item, 'meta', 'flags')) {
+          @item['meta']['flags'] = array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES')
+        } else {
           @item['meta'] = array('flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES'))
         }
         @item['meta']['enchants'] = @vanilla_enchants
@@ -221,6 +278,40 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
       if(!array_contains(@seeds, @item['name'])) {
         # 바닐라 인첸 목록 선언
         @vanilla_enchants = array()
+
+        # 기타 적용
+        if(@item['name'] == 'SHIELD') {
+          @unbreaking = 0
+          if(array_index_exists(@item, 'meta', 'model')) {
+            switch(@item['meta']['model']) {
+            case 0: // 구리
+            case 1:
+              @unbreaking = 3.1
+              break()
+            case 2: // 철
+            case 3:
+              @unbreaking = 6.8
+              break()
+            case 4: // 금
+            case 5:
+              @unbreaking = 0
+              break()
+            case 6: // 다이아
+            case 7:
+              @unbreaking = 47.8
+              break()
+            case 8: // 네더라이트
+            case 9:
+              @unbreaking = 62.5
+              break()
+            }
+          }
+          @vanilla_enchants['unbreaking'] = array(
+            'etype': 'DURABILITY',
+            'elevel': @unbreaking
+          )
+        }
+
         # 스킬 적용
         foreach(@applying_skill: @applying_skill_data in @applying_skills) {
           @skill_spec = @applying_skill_data['skill_spec']
@@ -228,13 +319,7 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
           @proc_name = @applying_skill_data['proc_name']
           call_proc(@proc_name, @player_data, @player, @uuid, @applying_skill, @skill_spec, @point, @item, @vanilla_enchants)
         }
-        #기타 적용
-        if(@item['name'] == 'TRIDENT') {
-          @vanilla_enchants['loyalty'] = array(
-            'etype': 'LOYALTY',
-            'elevel': 5
-          )
-        }
+
         # 인첸트 적용
         if(!is_null(@item['meta']) && !is_null(@item['meta']['modifiers']) && !is_null(@item['meta']['lore'])) {
           @modifiers = @item['meta']['modifiers']
@@ -244,15 +329,27 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
             @enchantments['off_hand'] = @enchantment
             switch(@enchantment) {
             case '내구성':
-              @vanilla_enchants['unbreaking'] = array(
-                'etype': 'DURABILITY',
-                'elevel': 5
-              )
+              if(array_index_exists(@vanilla_enchants, 'unbreaking')) {
+                @vanilla_enchants['unbreaking']['elevel'] *= 3
+              } else {
+                @vanilla_enchants['unbreaking'] = array(
+                  'etype': 'DURABILITY',
+                  'elevel': 3
+                )
+              }
               break()
             }
           }
         }
-        if(!@item['meta'] || !@item['meta']['flags']) {
+
+        # 내구성 인첸 소수점 처리
+        if(array_index_exists(@vanilla_enchants, 'unbreaking')) {
+          @vanilla_enchants['unbreaking']['elevel'] = integer(@vanilla_enchants['unbreaking']['elevel'])
+        }
+
+        if(array_index_exists(@item, 'meta', 'flags')) {
+          @item['meta']['flags'] = array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES')
+        } else {
           @item['meta'] = array('flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES'))
         }
         @item['meta']['enchants'] = @vanilla_enchants
@@ -338,7 +435,9 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
       }
       set_timeout(0, closure() {
         if(get_inventory_item(@uuid, 36) == @old_items['armor']) {
+          
           set_inventory_item(@uuid, 36, @item)
+
           @decoration_armors = array()
           switch(@item['name']) {
           case 'LEATHER_BOOTS':

@@ -158,6 +158,7 @@ proc _get_modified_item(@entry, @item) {
       'NETHERITE_HOE',
 
       'BUCKET',
+      'SHIELD',
       
       'TRIDENT'
     ),
@@ -191,6 +192,16 @@ proc _get_modified_item(@entry, @item) {
     @lore = array()
     foreach(@attribute: @amount in @attributes) {
       switch(@attribute) {
+      case 'defense_recovery':
+        @ch_attribute = 'HORSE_JUMP_STRENGTH'
+        @operation = 'ADD_NUMBER'
+        if(is_array(@amount)) {
+          @final_amount = @amount['min'] + rand() * (@amount['max'] - @amount['min'])
+        } else {
+          @final_amount = @amount
+        }
+        @string_amount = string(round(@final_amount, 2))
+        @lore[] = "§f\ue454§7 @string_amount 방어 회복"
       case 'capacity':
         @ch_attribute = 'HORSE_JUMP_STRENGTH'
         @operation = 'ADD_NUMBER'

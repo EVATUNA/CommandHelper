@@ -5,8 +5,8 @@
 		"result": "네더라이트 주괴",
 		"ingredients": [ "GOLD_INGOT", "GOLD_INGOT", "GOLD_INGOT", "GOLD_INGOT", "LAVA_BUCKET", "NETHERITE_SCRAP", "NETHERITE_SCRAP", "NETHERITE_SCRAP", "NETHERITE_SCRAP" ],
 		"ingredients_weight": {
-			"GOLD_INGOT": 0.4,
-			"NETHERITE_SCRAP": 1.6
+			"GOLD_INGOT": 0.2,
+			"NETHERITE_SCRAP": 1.8
 		}
 	},
 	"pool": {

@@ -5,7 +5,7 @@ proc _getData() {
   return(import('wanderingTrader'))
 }
 
-proc _setData(@newValue = array('traders': array(), /*tradeID: {'liveTime': time, }*/ 'config': null, 'viewers': array(), 'events': array(),'comeing': array('time': time(), 'mode': 15), /*- 3000 * 1000*/ 'taskID': null)) {
+proc _setData(@newValue = array('traders': array(), /*tradeID: {'liveTime': time, }*/ 'config': null, 'viewers': array(), 'events': array(),'comming': array('time': time(), 'mode': 15), /*- 3000 * 1000*/ 'taskID': null)) {
   export('wanderingTrader', @newValue)
   return(@newValue)
 }
@@ -14,32 +14,29 @@ proc _mainTask() {
   @value = _getData()
   if(@value['taskID'], throw('ms.lang.Error', 'alreadyStartTask'))
   @value['taskID'] = set_interval(1000, closure() {
-    @hour = simple_date('HH')
-    //if(@hour >= 0 && @hour <= 2 || @hour >= 10 && @hour <= 23) {
-      @value = _getData()
-      @config = @value['config']
-      @comeing = @value['comeing']
-      @time = 2400 - ((time() - @comeing['time']) / 1000)
-      @mode = @comeing['mode']
-      @modes = array(
-        '15': '10',
-        '10': '5',
-        '5': '1',
-        '1': 'start',
-        'start': '15'
-      )
-      @min = (@mode.'min')
-      if(@time <= 0 && @mode == 'start') {
-        _debugmsg(/*_chprefix('a')*/ @config['minMessage']['start'])
-        @comeing['mode'] = 15
-        @comeing['time'] = time()
-        //_spawnTrader(array_rand(@config['trader']['spawnList'], 1, false)[0])
-      } else if(is_numeric(@mode) && @time <= @mode * 60 && @modes[@mode] != @mode) {
-        _debugmsg(/*_chprefix('a')*/ @config['minMessage'][@min])
-        @comeing['mode'] = @modes[@mode]
-      }
-      _setData(@value)
-    //}
+    @value = _getData()
+    @config = @value['config']
+    @comming = @value['comming']
+    @time = 2400 - ((time() - @comming['time']) / 1000)
+    @mode = @comming['mode']
+    @modes = array(
+      '15': '10',
+      '10': '5',
+      '5': '1',
+      '1': 'start',
+      'start': '15'
+    )
+    @min = (@mode.'min')
+    if(@time <= 0 && @mode == 'start') {
+      _system_broadcast('\ue4db', 'white', @config['startMessage'], import('server'))
+      @comming['mode'] = 15
+      @comming['time'] = time()
+      _spawnTrader(array_rand(@config['trader']['spawnList'], 1, false)[0])
+    } else if(is_numeric(@mode) && @time <= @mode * 60 && @modes[@mode] != @mode) {
+      _system_broadcast('\ue4db', 'white', @config['minMessage'][@min], import('server'))
+      @comming['mode'] = @modes[@mode]
+    }
+    _setData(@value)
   })
   _setData(@value)
   return()
@@ -203,8 +200,8 @@ proc _assignTraderItems() {
   @itemLimit = @config['trader']['selectItemCount']
   @buySelectCount = _randomStringToInt(@itemLimit['BUY'])
   @sellSelectCount = _randomStringToInt(@itemLimit['SELL'])
-  @sellList = @itemList['SELL']
-  @buyList = @itemList['BUY']
+  @sellList = array_deep_clone(@itemList['SELL'])
+  @buyList = array_deep_clone(@itemList['BUY'])
 
   @buyList = _setItemMeta(@buyList)
   @sellList = _setItemMeta(@sellList)
@@ -293,7 +290,7 @@ proc _closeTrader(@traderID = 0) {
   array_remove(@traderList, @traderID)
   _setData(@value)
 
-  _debugmsg(/*_chprefix('a')*/ @value['config']['endMessage'])
+  _system_broadcast('\ue4db', 'white', @value['config']['endMessage'], import('server'))
 }
 
 proc _backgroundInvForm() {
@@ -346,10 +343,10 @@ proc _uiForm(@viewer = null, @traderID = 0, @seePageArr = array('SELL': 0, 'BUY'
     'name': 'FEATHER', 'meta': array('flags': array('HIDE_ENCHANTS'), 'display': '§f다음 페이지', 'lore': '§7클릭 시 다음 페이지로 이동합니다.')
   )
   @banner = array(
-    'name': 'MOJANG_BANNER_PATTERN', 'meta': array('display': 'n페이지')
+    'name': 'MOJANG_BANNER_PATTERN', 'meta': array('display': 'n 페이지')
   )
   // SellDesign
-  @banner['meta']['display'] = ('§d'.(@seePageArr['SELL'] + 1).'페이지')
+  @banner['meta']['display'] = ('§d'.(@seePageArr['SELL'] + 1)'페이지')
   if(@seePageArr['SELL'] < 1) {
     @undoPageItem['meta']['display'] = '§4이전 페이지가 없습니다.'
     @undoPageItem['meta']['enchants'] = array()
@@ -378,7 +375,7 @@ proc _uiForm(@viewer = null, @traderID = 0, @seePageArr = array('SELL': 0, 'BUY'
     @undoPageItem['qty'] = @seePageArr['BUY'] 
     @undoPageItem['meta']['enchants'] = array(array('elevel': 1, 'etype': 'DIG_SPEED'))
   }
-  @banner['meta']['display'] = ('§d'.(@seePageArr['BUY'] + 1).'페이지')
+  @banner['meta']['display'] = ('§d'.(@seePageArr['BUY'] + 1)'페이지')
   if(!array_index_exists(@tradeList['BUY'], @seePageArr['BUY'] + 1)) {
     @nextPageItem['meta']['display'] = '§4다음 페이지가 없습니다.'
     @nextPageItem['meta']['enchants'] = array()
@@ -636,6 +633,12 @@ register_command('trader', array(
       case 'debug':
         msg(_getData())
         break()
+      case 'come':
+        @comming = @value['comming']
+        @comming['mode'] = 'start'
+        @comming['time'] = 0
+        _setData(@value)
+        break()
       }
       exit()
     }
@@ -646,6 +649,8 @@ register_command('trader', array(
 if(!@value, @value = _setData(), _mainEventBind())
 if(!@value['config'], @value['config'] = import('wandering_trader_data'); _setData(@value))
 
-if(@server == 'main') {
-  _mainTask()
+if(import('server') == 'main') {
+  set_timeout(5000, closure() {
+    _mainTask()
+  })
 }

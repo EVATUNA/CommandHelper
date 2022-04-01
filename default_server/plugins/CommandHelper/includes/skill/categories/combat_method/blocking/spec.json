@@ -4,32 +4,145 @@
 	"effect_by_point": [
 		{
 			"passive": {
-				"unbreaking": 0
+				"unbreaking_multiply": 1.0,
+				"min_cooldown": 20
+			},
+			"active": {
+				"damage_multiply": 1.0,
+				"cooldown": 10,
+				"duration": 3,
+				"count": 0,
+				"energy": 0
 			}
 		},
 		{
 			"passive": {
-				"unbreaking": 1
+				"unbreaking_multiply": 1.2,
+				"min_cooldown": 18
+			},
+			"active": {
+				"damage_multiply": 0.85,
+				"cooldown": 10,
+				"duration": 3,
+				"count": 0,
+				"energy": 0
 			}
 		},
 		{
 			"passive": {
-				"unbreaking": 2
+				"unbreaking_multiply": 1.4,
+				"min_cooldown": 16
+			},
+			"active": {
+				"damage_multiply": 0.7,
+				"cooldown": 10,
+				"duration": 3,
+				"count": 0,
+				"energy": 0
 			}
 		},
 		{
 			"passive": {
-				"unbreaking": 3
+				"unbreaking_multiply": 1.6,
+				"min_cooldown": 14
+			},
+			"active": {
+				"damage_multiply": 0.7,
+				"cooldown": 9,
+				"duration": 3,
+				"count": 0,
+				"energy": 0
 			}
 		},
 		{
 			"passive": {
-				"unbreaking": 4
+				"unbreaking_multiply": 1.8,
+				"min_cooldown": 12
+			},
+			"active": {
+				"damage_multiply": 0.55,
+				"cooldown": 9,
+				"duration": 3,
+				"count": 0,
+				"energy": 0
 			}
 		},
 		{
 			"passive": {
-				"unbreaking": 5
+				"unbreaking_multiply": 2.0,
+				"min_cooldown": 10
+			},
+			"active": {
+				"damage_multiply": 0.55,
+				"cooldown": 8,
+				"duration": 3,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+				"unbreaking_multiply": 2.2,
+				"min_cooldown": 8
+			},
+			"active": {
+				"damage_multiply": 0.4,
+				"cooldown": 8,
+				"duration": 3,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+				"unbreaking_multiply": 2.4,
+				"min_cooldown": 6
+			},
+			"active": {
+				"damage_multiply": 0.4,
+				"cooldown": 7,
+				"duration": 3,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+				"unbreaking_multiply": 2.6,
+				"min_cooldown": 4
+			},
+			"active": {
+				"damage_multiply": 0.25,
+				"cooldown": 7,
+				"duration": 3,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+				"unbreaking_multiply": 2.8,
+				"min_cooldown": 2
+			},
+			"active": {
+				"damage_multiply": 0.25,
+				"cooldown": 6,
+				"duration": 3,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+				"unbreaking_multiply": 3.0,
+				"min_cooldown": 0
+			},
+			"active": {
+				"damage_multiply": 0.1,
+				"cooldown": 6,
+				"duration": 3,
+				"count": 0,
+				"energy": 0
 			}
 		}
 	]

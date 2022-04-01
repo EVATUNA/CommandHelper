@@ -26,6 +26,7 @@ foreach(@category in @categories) {
       case 'attack.ms':
       case 'update_item.ms':
       case 'active.ms':
+      case 'hitted.ms':
       case 'countdown.ms':
         include(@file_path)
         break()

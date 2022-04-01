@@ -1,60 +1,166 @@
 PRODUCTS:
+  1:
+    name: WHEAT
+    meta:
+      price:
+        sell: 0.04
+      detail: DISPLAY
   10:
     name: WHEAT
     meta:
-      display: §f밀
+      display: "§e중급 밀"
       model: 1
       price:
-        sell: 0.2
-      detail: NONE
+        sell: 0.06
+      detail: DISPLAY
+  19:
+    name: WHEAT
+    meta:
+      display: "§b상급 밀"
+      model: 2
+      price:
+        sell: 0.12
+      detail: DISPLAY
+
+  2:
+    name: BEETROOT
+    meta:
+      price:
+        sell: 0.025
+      detail: DISPLAY
   11:
     name: BEETROOT
     meta:
-      display: §f사탕무
+      display: "§e중급 사탕무"
       model: 1
       price:
-        sell: 0.11
-      detail: NONE
+        sell: 0.0375
+      detail: DISPLAY
+  20:
+    name: BEETROOT
+    meta:
+      display: "§b상급 사탕무"
+      model: 2
+      price:
+        sell: 0.075
+      detail: DISPLAY
+
+  3:
+    name: POTATO
+    meta:
+      price:
+        sell: 0.01
+      detail: DISPLAY
   12:
     name: POTATO
     meta:
-      display: §f감자
+      display: "§e중급 감자"
       model: 1
       price:
-        sell: 0.06
-      detail: NONE
+        sell: 0.015
+      detail: DISPLAY
+  21:
+    name: POTATO
+    meta:
+      display: "§b상급 감자"
+      model: 2
+      price:
+        sell: 0.03
+      detail: DISPLAY
+
+  4:
+    name: CARROT
+    meta:
+      price:
+        sell: 0.01
+      detail: DISPLAY
   13:
     name: CARROT
     meta:
-      display: §f당근
+      display: "§e중급 당근"
       model: 1
       price:
-        sell: 0.06
-      detail: NONE
+        sell: 0.015
+      detail: DISPLAY
+  22:
+    name: CARROT
+    meta:
+      display: "§b상급 당근"
+      model: 2
+      price:
+        sell: 0.03
+      detail: DISPLAY
+
+  5:
+    name: SWEET_BERRIES
+    meta:
+      price:
+        sell: 0.035
+      detail: DISPLAY
   14:
     name: SWEET_BERRIES
     meta:
-      display: §f크랜베리
+      display: "§e중급 크랜베리"
       model: 1
       price:
-        sell: 0.14
-      detail: NONE
+        sell: 0.0525
+      detail: DISPLAY
+  23:
+    name: SWEET_BERRIES
+    meta:
+      display: "§b상급 크랜베리"
+      model: 2
+      price:
+        sell: 0.105
+      detail: DISPLAY
+
+  6:
+    name: PUMPKIN
+    meta:
+      price:
+        sell: 0.1
+      detail: DISPLAY
   15:
     name: PUMPKIN
     meta:
-      display: §f호박
+      display: "§e중급 호박"
       model: 1
       price:
-        sell: 0.5
-      detail: NONE
+        sell: 0.15
+      detail: DISPLAY
+  24:
+    name: PUMPKIN
+    meta:
+      display: "§b상급 호박"
+      model: 2
+      price:
+        sell: 0.3
+      detail: DISPLAY
+
+  7:
+    name: MELON
+    meta:
+      price:
+        sell: 0.1
+      detail: DISPLAY
   16:
     name: MELON
     meta:
-      display: §f수박
+      display: "§e중급 수박"
       model: 1
       price:
-        sell: 0.5
-      detail: NONE
+        sell: 0.15
+      detail: DISPLAY
+  25:
+    name: MELON
+    meta:
+      display: "§b상급 수박"
+      model: 2
+      price:
+        sell: 0.3
+      detail: DISPLAY
+
+
   28:
     name: SUGAR_CANE
     meta:

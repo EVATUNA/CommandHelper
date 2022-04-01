@@ -24,7 +24,7 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
   # 부순 블럭이 작물일 시
   if(array_contains(array_keys(@crop_rewards), @crop)) {
     # 작물 스펙 선언
-    @crop_reward = @crop_rewards[@crop]
+    @crop_reward = array_deep_clone(@crop_rewards[@crop])
     ## 스킬 불러오기
     # 수확 숙련 배수
     @farming_mastery_multiply = 1
@@ -39,7 +39,7 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
     # 최대 드랍 갯수 배수에 선광 스킬 배수, 인첸트 반영
     @max_drop_multiply = @plenty_multiply
     if(@player_data['item']['enchantments']['main_hand'] == '행운') {
-      @max_drop_multiply += 1.5
+      @max_drop_multiply += 1
     }
     # 수박 호박 수확할 시
     if(array_contains(array('PUMPKIN', 'MELON'), @crop)) {
@@ -212,7 +212,6 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
                 @locations[] = @center_location
               }
             }
-            _update_item(@player, @uuid, array('main_hand': @item), @player_data, @skills_spec, @text)
             # 루트 테이블 시스템
             @entries = @crop_reward['loot_table']
             @total_weight = 0
@@ -279,6 +278,15 @@ proc _farmland_cultivate_event(@event, @player, @uuid, @players_data, @hp_blocks
       'NETHERITE_HOE': 8,
       'GOLDEN_HOE': 4
     )
+    @seeds = array(
+      'WHEAT_SEEDS',
+      'BEETROOT_SEEDS',
+      'POTATO',
+      'CARROT',
+      'PUMPKIN_SEEDS',
+      'MELON_SEEDS',
+      'SWEET_BERRIES'
+    )
     if(array_contains(array_keys(@hoes_cooldown), @event['item']['name']) && array_contains(array('AIR', 'CAVE_AIR', 'VOID_AIR'), get_block(array('x': @location['x'], 'y': @location['y'] + 1, 'z': @location['z'], 'world': @location['world'])))) {
       if(@event['hand'] == 'main_hand') {
         @slot = pheld_slot(@player)
@@ -286,7 +294,7 @@ proc _farmland_cultivate_event(@event, @player, @uuid, @players_data, @hp_blocks
         @slot = 40
       }
       @item = @player_data['item'][@event['hand']]
-      if(pcooldown(@player, @item['name']) == 0) {
+      if(pcooldown(@player, @event['item']['name']) == 0) {
         if(@player_data['item']['enchantments'][@event['hand']] == '효율') {
           @cooldown_multiply = 0.75
         } else {
@@ -298,6 +306,9 @@ proc _farmland_cultivate_event(@event, @player, @uuid, @players_data, @hp_blocks
           } else {
             set_pcooldown(@player, @hoe, integer(@hoes_cooldown[@item['name']] * @cooldown_multiply))
           }
+        }
+        foreach(@seed in @seeds) {
+          set_pcooldown(@player, @seed, 50)
         }
         @cultivating_power = 1
         if(!is_null(@item['meta']) && !is_null(@item['meta']['modifiers']) && array_index_exists(@item['meta'], 'modifiers')) {
@@ -395,6 +406,12 @@ bind('block_grow', null, null, @event) {
       @under_location = array('x': @event['location']['x'], 'y': @event['location']['y'] - 1, 'z': @event['location']['z'], 'world': @event['location']['world'])
       if(get_block(@under_location) != 'FARMLAND') {
         cancel()
+      } else {
+        if(!array_contains(array('PUMPKIN', 'MELON'), @event['newblock'])) {
+          if(get_blockdata(@under_location)['moisture'] == 0) {
+            cancel()
+          }
+        }
       }
     } else {
       cancel()

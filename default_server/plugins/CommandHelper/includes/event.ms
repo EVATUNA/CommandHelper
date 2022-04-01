@@ -1694,11 +1694,17 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       case 'END_PORTAL_FRAME':
       //case 'ENDER_CHEST':
       case 'GRINDSTONE':
-      case 'SWEET_BERRY_BUSH':
       case 'BREWING_STAND':
       //case 'FLETCHING_TABLE': // 기능 없음
         if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
           cancel() // 사용 금지
+        }
+        break()
+      case 'SWEET_BERRY_BUSH':
+        if(get_blockdata(@event['location'])['age'] >= 2) {
+          if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
+            cancel() // 사용 금지
+          }
         }
         break()
       # COSTOMED BLOCKS
@@ -2315,6 +2321,50 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
     if(@is_item_available) {
       @item = @event['item']
       switch(@item['name']) {
+      case 'SHIELD':
+        if(pcooldown(@player, 'SHIELD') == 0) {
+          @skill_manager = @player_data['skill_manager']
+          @skill_methods = json_decode(@player_data['skill_manager'][4])
+          @skill = 'blocking'
+          if(array_index_exists(@skill_methods, 'combat_method') && @skill_methods['combat_method'] == @skill && array_index_exists(@player_data['active_skill'], @skill)) {
+            @skill_data = @players_data[@uuid]['skill_data'][@skill]
+            @point = @skill_data[0]
+            @skill_spec = @skills_spec[@skill]
+            @proc_name = "_apply_active_by_@skill"
+            if(is_proc(@proc_name)) {
+              call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skill_spec, @point)
+              _update_skill_hud(@player, @uuid, @player_data, @skills_spec, @text)
+            }
+          } else {
+            set_timeout(1000, closure() {
+              if(pcooldown(@player, 'SHIELD') == 0) {
+                if(pblocking(@player)) { // 방패 모션 없애기
+                  @items = @players_data[@uuid]['item']
+                  if(!is_null(@items['main_hand']) && @items['main_hand']['name'] == 'SHIELD') {
+                    @shield_slot = pheld_slot(@player)
+                    @item = @items['main_hand']
+                  } else {
+                    @shield_slot = 40
+                    @item = @items['off_hand']
+                  }
+                  @dummy_item = array(
+                    'name': 'CLOCK',
+                    'qty': 1,
+                    'meta': array(
+                      'model': 1,
+                      'display': ' '
+                    )
+                  )
+                  set_inventory_item(@uuid, @shield_slot, @dummy_item)
+                  set_timeout(1, closure() {set_inventory_item(@uuid, @shield_slot, @item)})
+                }
+                set_pcooldown(@player, 'SHIELD', 100)
+              }
+            })
+          }
+        }
+
+        break()
       case 'FISHING_ROD':
         if(pworld(@player) != 'spawn_minecraft_residence') {
           cancel()
@@ -2628,7 +2678,8 @@ bind('tree_grow', null, null, @event) {
   set_timeout(1, closure() {
     @last_location = @event['blocks'][-1]
     if(get_block(@last_location) == 'BEE_NEST') {
-      set_block(@last_location, 'AIR')
+      //set_block(@last_location, 'AIR')
+      cancel()
     }
   })
 }
@@ -3029,6 +3080,8 @@ bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_s
         @proc_name = "_apply_active_by_@skill"
         if(is_proc(@proc_name)) {
           switch(@skill) {
+          case 'blocking':
+            break()
           case 'knockback':
             call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skills_spec, @text)
             break()
@@ -3259,6 +3312,7 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
     'DOLPHIN': 0.6
   )
   if(array_index_exists(@event, 'damager')) {
+    @euuid = @event['id']
     # 원거리 공격
     if(array_index_exists(@event, 'shooter') && is_string(@event['shooter']) && ponline(@event['shooter'])) {
       @player = @event['shooter']
@@ -3271,7 +3325,6 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
         }
       }
       if(array_index_exists(@players_data, @puuid)) {
-        @euuid = @event['id']
         @entity_type = entity_type(@euuid)
         switch(entity_type(@projectile)) {
         case 'ARROW':
@@ -3291,7 +3344,6 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
       @player = @event['damager']
       @puuid = puuid(@player)
       if(array_index_exists(@players_data, @puuid)) {
-        @euuid = @event['id']
         @entity_type = entity_type(@euuid)
         @items = @players_data[@puuid]['item']
         @weapons = array(
@@ -3332,12 +3384,31 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
         }
       }
     }
+    # 때린 사람
+    @target_name = strip_colors(get_mob_name(@euuid))
+    if(@target_name != '') {
+      switch(@target_name) {
+      case '글룸':
+        if(rand() < 0.05) {
+          if(!array_contains(get_scoreboard_tags(@euuid), @player)) {
+            add_scoreboard_tag(@euuid, @player)
+          }
+        }
+        break()
+      }
+    }
   }
   # 방어
   if(@event['type'] == 'PLAYER') {
     @player = @event['player']
     @puuid = @event['id']
     if(array_index_exists(@players_data, @puuid)) {
+      @player_data = @players_data[@puuid]
+      @skill_manager = @player_data['skill_manager']
+      @selected_methods = json_decode(@skill_manager[4])
+      @selected_combat_method = @selected_methods['combat_method']
+      @selected_runes = @skill_manager[5]
+      @skills_data = @player_data['skill_data']
       @items = @players_data[@puuid]['item']
       if(@event['finalamount'] == 0 && pblocking(@player)) {
         @blocking = true
@@ -3345,31 +3416,46 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
         if(!is_null(@event['damager']) && !ponline(@event['damager']) && strip_colors(get_mob_name(@event['damager'])) == '티아마트' && @event['amount'] < 1.5) {
           @blocking = false
         }
-
         if(@blocking) {
-          if(!is_null(@items['main_hand']) && @items['main_hand']['name'] == 'SHIELD') {
-            @shield_slot = pheld_slot(@player)
-          } else {
-            @shield_slot = 40
-          }
-          # 막기 스킬 레벨 구하기
-          @point = 0
-          @skill_methods = json_decode(@players_data[@puuid]['skill_manager'][4])
-          if(array_index_exists(@skill_methods, 'combat_method') && @skill_methods['combat_method'] == 'blocking') {
-            @skill_data = @players_data[@puuid]['skill_data']['blocking']
-            @point = @skill_data[0]
-          }
           # 미몹 스킬 다중 히트 방지
           if(get_entity_immunity_ticks(@puuid) == 0) {
             set_entity_immunity_ticks(@puuid, 1)
           }
-          # 쿨다운
-          @cooldown_large = @event['amount'] * (10 - @point * 1.5)
+          # 막기 스킬 레벨 구하기
+          @point = 0
+          if(@selected_combat_method == 'blocking') {
+            @skill_data = @skills_data['blocking']
+            @point = @skill_data[0]
+          }
+          @min_cooldown = @skills_spec['blocking']['effect_by_point'][@point]['passive']['min_cooldown']
+          # 방패 구하기
+          if(!is_null(@items['main_hand']) && @items['main_hand']['name'] == 'SHIELD') {
+            @shield_slot = pheld_slot(@player)
+            @item = @items['main_hand']
+          } else {
+            @shield_slot = 40
+            @item = @items['off_hand']
+          }
+          # 방어 회복 구해서 쿨다운 적용
+          @defense_recovery = 1
+          if(array_index_exists(@item, 'meta', 'modifiers')) {
+            foreach(@modifier in @item['meta']['modifiers']) {
+              if(@modifier['attribute'] == 'HORSE_JUMP_STRENGTH') {
+                @defense_recovery = @modifier['amount']
+                break()
+              }
+            }
+          }
+          @cooldown_large = @event['amount'] * (10 - @defense_recovery) // 막은 데미지에 의한 쿨탐
           if(@cooldown_large < 0) { @cooldown_large = 0 }
-          @cooldown_small = 10 - @point * 0.5
+          @cooldown_small = 10 - @defense_recovery // 무기 등급에 따른 기본 쿨탐
           if(@cooldown_small < 0) { @cooldown_small = 0 }
           @cooldown = integer(@cooldown_large + @cooldown_small)
+          if(@cooldown < @min_cooldown) { // 최소 쿨탐 세팅
+            @cooldown = @min_cooldown
+          }
           set_pcooldown(@player, 'SHIELD', @cooldown)
+
           # 아이템 새로고침
           set_timeout(1, closure() {
             @damaged_item = get_inventory_item(@puuid, @shield_slot)
@@ -3387,6 +3473,18 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
             }
           })
 
+        }
+      } else {
+        if(@selected_combat_method != '') {
+          @proc_name = "_apply_hitted_by_@selected_combat_method"
+          if(is_proc(@proc_name)) {
+            @category = 'combat_method'
+            @point = @skill_manager
+            @skill_spec = @skills_spec[@selected_combat_method]
+            @skill_data = @player_data['skill_data'][@selected_combat_method]
+            @point = @skill_data[0]
+            call_proc(@proc_name, @event, @player_data, @player, @puuid, @category, @selected_combat_method, @skill_spec, @point)
+          }
         }
       }
     }

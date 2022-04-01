@@ -86,6 +86,18 @@ register_command('resourceurl', array(
   }
 ))
 
+
+bind('kafka_receive', null, null, @event, @resourcepack, @server) {
+  switch(@event['key']) {
+  case 'ch.inform_player_quit':
+    @reconnecting_data = json_decode(@event['value'])
+    if(@server != @reconnecting_data['server']) {
+      @reconnecting_datas[@reconnecting_data['uuid']] = @reconnecting_data
+    }
+    break()
+  }
+}
+
 bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @server) {
   if(ponline(@event['player'])) {
     @identifier_size = -1

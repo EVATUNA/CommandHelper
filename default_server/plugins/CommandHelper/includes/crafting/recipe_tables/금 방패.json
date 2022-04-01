@@ -1,0 +1,143 @@
+{
+	"recipe": {
+		"key": "golden_shield",
+		"type": "SHAPED",
+		"result": "금 방패",
+		"shape": [
+			"I I",
+			"III",
+			" I "
+		],
+		"ingredients": {
+			"I": "GOLD_INGOT"
+		},
+		"ingredients_weight": {
+			"GOLD_INGOT": 1
+		}
+	},
+	"pool": {
+		"type": "entries_by_crafting_rank",
+		"entries": [
+			{
+				"type": "rank",
+				"weight": 5,
+				"display": "부서질듯한 금 방패",
+				"model": 5,
+				"attributes": {
+					"defense_recovery": {
+						"min": 4.600,
+						"max": 4.600
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 10,
+				"display": "의미를 알 수 없는 금 방패",
+				"model": 5,
+				"attributes": {
+					"defense_recovery": {
+						"min": 4.600,
+						"max": 4.772
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 10,
+				"display": "제 기능을 하기 힘든 금 방패",
+				"model": 5,
+				"attributes": {
+					"defense_recovery": {
+						"min": 4.715,
+						"max": 5.060
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 25,
+				"display": "무딘 금 방패",
+				"model": 5,
+				"attributes": {
+					"defense_recovery": {
+						"min": 4.945,
+						"max": 5.462
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 35,
+				"display": "무난한 금 방패",
+				"model": 5,
+				"attributes": {
+					"defense_recovery": {
+						"min": 5.290,
+						"max": 5.980
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 30,
+				"quality": 0,
+				"display": "평범한 금 방패",
+				"model": 5,
+				"attributes": {
+					"defense_recovery": {
+						"min": 5.520,
+						"max": 6.210
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 30,
+				"quality": 0,
+				"display": "쓸만한 금 방패",
+				"model": 5,
+				"attributes": {
+					"defense_recovery": {
+						"min": 6.037,
+						"max": 6.555
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 30,
+				"display": "잘 만들어진 금 방패",
+				"model": 5,
+				"attributes": {
+					"defense_recovery": {
+						"min": 6.440,
+						"max": 6.785
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 20,
+				"display": "예사롭지 않은 금 방패",
+				"model": 5,
+				"attributes": {
+					"defense_recovery": {
+						"min": 6.727,
+						"max": 6.900
+					}
+				}
+			},
+			{
+				"type": "rank",
+				"weight": 1,
+				"display": "전설적인 금 방패",
+				"model": 5,
+				"broadcast": true,
+				"attributes": {
+					"defense_recovery": 6.900
+				}
+			}
+		]
+	}
+}

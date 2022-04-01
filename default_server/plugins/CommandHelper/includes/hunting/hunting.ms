@@ -46,7 +46,7 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
   }
 
   proc _get_highest_block_at(@location) {
-    @bool = true
+    
     @solid_blocks_to_ignore = array(
       "OAK_LOG",
       "SPRUCE_LOG",
@@ -67,6 +67,7 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
       @location['y'] -= 4
     }
 
+    @bool = true
     while(@bool) {
       @block = get_block(@location)
       @material_info = material_info(@block)
@@ -107,34 +108,38 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
     return(@location)
   }
 
-  proc _get_random_surface_in_chunk(@x, @z) {
-    @location = array(
-      'x': @x * 16 + rand(16),
-      'y': 64,
-      'z': @z * 16 + rand(16),
-      'world': 'spawn_minecraft_residence'
-    )
-    @highest_location = _get_highest_block_at(@location)
-    @highest_location['y'] += 1
-    
-    @block = get_block(@highest_location)
-    @ignore_blocks = array(
-      "OAK_LOG",
-      "SPRUCE_LOG",
-      "BIRCH_LOG",
-      "JUNGLE_LOG",
-      "ACACIA_LOG",
-      "DARK_OAK_LOG"
-    )
+  proc _get_random_surface_in_chunk(@x, @z, @history) {
+      
+    if(array_size(@history) > 0) {
+      @rand_xz = array_get_rand(@history)
+      array_remove_values(@history, @rand_xz)
+      @location = array(
+        'x': @x * 16 + @rand_xz['x'],
+        'y': 64,
+        'z': @z * 16 + @rand_xz['z'],
+        'world': 'spawn_minecraft_residence'
+      )
 
-    if(array_contains(@ignore_blocks, @block) || @highest_location['y'] < 63) {
-      if(rand() > 0.005) {
-        @return = _get_random_surface_in_chunk(@x, @z)
+      @highest_location = _get_highest_block_at(@location)
+      @highest_location['y'] += 1
+
+      @block = get_block(@highest_location)
+      @ignore_blocks = array(
+        "OAK_LOG",
+        "SPRUCE_LOG",
+        "BIRCH_LOG",
+        "JUNGLE_LOG",
+        "ACACIA_LOG",
+        "DARK_OAK_LOG"
+      )
+
+      if(array_contains(@ignore_blocks, @block) || @highest_location['y'] < 63) {
+        @return = _get_random_surface_in_chunk(@x, @z, @history)
       } else {
-        @return = null
+        @return = @highest_location
       }
     } else {
-      @return = @highest_location
+      return(null)
     }
     return(@return)
   }
@@ -802,7 +807,13 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
     if(array_size(@moves) > 1) {
       @move = @moves[0]
       # 발자국일시
-      @location = _get_random_surface_in_chunk(@move['x'], @move['z'])
+      @history = array()
+      for(@i = 0, @i < 256, @i++) {
+        @x = integer(@i / 16)
+        @z = @i % 16
+        @history[] = array('x': @x, 'z': @z)
+      }
+      @location = _get_random_surface_in_chunk(@move['x'], @move['z'], @history)
 
       if(is_array(@location)) {
         @rotation = @move['facing']
@@ -832,7 +843,13 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
       # 다른타입의 흔적일시
     } else {
       @move = @moves[0]
-      @location = _get_random_surface_in_chunk(@move['x'], @move['z'])
+      @history = array()
+      for(@i = 0, @i < 256, @i++) {
+        @x = integer(@i / 16)
+        @z = @i % 16
+        @history[] = array('x': @x, 'z': @z)
+      }
+      @location = _get_random_surface_in_chunk(@move['x'], @move['z'], @history)
       if(is_array(@location)) {
         @location['x'] += 0.5
         @location['y'] += 1
