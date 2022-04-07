@@ -33,13 +33,13 @@ PRODUCTS:
     name: COD
     meta:
       price:
-        sell: 0.01
+        sell: 0.02
       detail: NONE
   16:
     name: SALMON
     meta:
       price:
-        sell: 0.01
+        sell: 0.02
       detail: NONE
   19:
     name: LEATHER

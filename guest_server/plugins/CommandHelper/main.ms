@@ -68,7 +68,23 @@ register_command('resourceurl', array(
   'usage': '/resourceurl <url>',
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
-    if(pisop(@player)) {
+    if(ponline(@player)) {
+      if(pisop(@player)) {
+        if(array_size(@args) == 1) {
+          store_value('resourcepack', @args[0])
+          @resourcepack['url'] = @args[0]
+          @data = array(
+            'url': @args[0]
+          )
+          kafka_send('ch.update_resourcepack_url', @args[0])
+          return(true)
+        } else {
+          return(false)
+        }
+      } else {
+        return(false)
+      }
+    } else {
       if(array_size(@args) == 1) {
         store_value('resourcepack', @args[0])
         @resourcepack['url'] = @args[0]
@@ -80,8 +96,6 @@ register_command('resourceurl', array(
       } else {
         return(false)
       }
-    } else {
-      return(false)
     }
   }
 ))
@@ -89,44 +103,10 @@ register_command('resourceurl', array(
 
 bind('kafka_receive', null, null, @event, @resourcepack, @server) {
   switch(@event['key']) {
-  case 'ch.inform_player_quit':
-    @reconnecting_data = json_decode(@event['value'])
-    if(@server != @reconnecting_data['server']) {
-      @reconnecting_datas[@reconnecting_data['uuid']] = @reconnecting_data
-    }
+  case 'ch.update_resourcepack_url':
+    @url = @event['value']
+    @resourcepack['url'] = @url
+    store_value('resourcepack', @url)
     break()
-  }
-}
-
-bind('plugin_message_received', null, array('channel': 'BungeeCord'), @event, @server) {
-  if(ponline(@event['player'])) {
-    @identifier_size = -1
-    foreach(@key: @byte in @event['bytes']) {
-      #broadcast(@key @byte )
-      if(@key != 0) {
-        #if(@byte == 0) {
-        if(@byte == 123) {
-          @identifier_size = @key - 6 #-2
-          break()
-        }
-      }
-    }
-    #
-    if(@identifier_size != -1) {
-      @value_string = string(ba_get_bytes(@event['bytes'], array_size(@event['bytes']) - @identifier_size - 6, @identifier_size + 6))
-      if(string_starts_with(@value_string, '{"') &&string_ends_with(@value_string, '}')) {
-        @data = array(
-          'identifier': string(ba_get_bytes(@event['bytes'], @identifier_size, 2)),
-          'value': json_decode(@value_string)
-        )
-        switch(@data['identifier']) {
-        case 'ch_resourcepack_url_update':
-          @server['resourcepack'] = @data['value']['url']
-          store_value('resourcepack', @data['value']['url'])
-        }
-      } #else {
-        #broadcast(@value_string)
-      #}
-    }
   }
 }

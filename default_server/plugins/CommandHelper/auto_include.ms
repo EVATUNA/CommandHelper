@@ -7,7 +7,6 @@ array_reverse(@splited_absolute_path)
 @server = @splited_absolute_path[2]
 export('server', @server)
 
-
 # 리소스팩 링크
 @resourcepack = array(
   'url': get_value('resourcepack')
@@ -232,40 +231,6 @@ proc _color(@color) {
   }
 }
 
-# GUI 시스템
-proc _gui_exists(@id) {
-  return(array_contains(get_virtual_inventories(), @id))
-}
-
-bind('inventory_close', null, array('virtual': true), @event) {
-  @player = @event['player']
-  @id = pinventory_holder(@player)
-  set_timeout(1, closure() {
-    #if(has_bind("open.@id")) { unbind("open.@id") } #의미 없음
-    if(has_bind("click.@id")) { unbind("click.@id") }
-    if(has_bind("drag.@id")) { unbind("drag.@id") }
-    if(has_bind("close.@id")) { unbind("close.@id") }
-    if(_gui_exists(@id)) { delete_virtual_inventory(@id) }
-  })
-}
-
-proc _show_gui(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure) {
-  @id = @player.'.'.@gui_id.'.'.time()
-  create_virtual_inventory(@id, @type, color('white').@texture_layer._color('#404040').@message, @inventory)
-  @closure_arguments = array_merge(array(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id), array_get(@arguments, cslice(7, array_size(@arguments) - 1)))
-  #기본 클로저 setter 인수: closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id) @id 뒤에 추가로 기입 가능
-  execute_array(@closure_arguments, @closure)
-  popen_inventory(@player, @id)
-}
-
-proc _close_all_gui() {
-  foreach(@id in get_virtual_inventories()) {
-    foreach(@player in get_inventory_viewers(@id)) {
-      close_pinv(@player)
-    }
-  }
-}
-
 # 파일 이름과 파일 확장자를 나누어 구하기 (확장명이 있는 파일 이름만 넣을 것!)
 proc _get_file_name_and_extension(@file) {
   @full_stop_qty = reg_count('\\.', @file) // . 의 갯수 구하기
@@ -293,6 +258,7 @@ proc _set_sidebar(@uuid, @line, @message, @text) {
     set_team_display(@line, array('prefix': @line.'번째 줄이 너무 깁니다. '.@text['space_fonts']['space.-max'] ), @scoreboard)
   }
 }
+
 proc _show_indicator(@uuid, @player_data, @indicator_data, @text) {
 
   @queue_id = @indicator_data['id']'.'@indicator_data['block']
@@ -372,6 +338,7 @@ proc _show_indicator(@uuid, @player_data, @indicator_data, @text) {
   }
 
   // 인디케이터 제거 큐 푸시
+  if(@indicator_data['countdown'] > 10) { @indicator_data['countdown'] = 10 }
   @closure = closure() {
     @task = set_timeout(integer(@indicator_data['countdown'] * 1000), closure() {
       _set_sidebar(@uuid, 4, '', @text)

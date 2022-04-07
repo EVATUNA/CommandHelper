@@ -1998,6 +1998,7 @@ proc _update_skill_hud(@player, @uuid, @player_data, @skills_spec, @text) {
         @remain_cooldown = @max_cooldown - @active_skill[0]
         @index = 16 - integer(@remain_cooldown / @max_cooldown * 16)
       }
+      if(@index > 16) { @index = 16}
       if(@index == 16 && (@active_skill[2] == 0 || @skill_spec['effect_by_point'][@point]['active']['count'] > @active_skill[2])) {
         @index = 15 // 지속시간 다 끝난후 or 충전 횟수 있을경우 쿨타임 16(쿨타임 다됨)될시 15(쿨타임 꽉참)로 변경
       } else if(@index == 0 && @active_skill[2] == 1 && @active_skill[0] == 0) {

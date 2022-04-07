@@ -287,14 +287,15 @@ proc _farmland_cultivate_event(@event, @player, @uuid, @players_data, @hp_blocks
       'MELON_SEEDS',
       'SWEET_BERRIES'
     )
-    if(array_contains(array_keys(@hoes_cooldown), @event['item']['name']) && array_contains(array('AIR', 'CAVE_AIR', 'VOID_AIR'), get_block(array('x': @location['x'], 'y': @location['y'] + 1, 'z': @location['z'], 'world': @location['world'])))) {
+    @item = @event['item']
+    if(array_contains(array_keys(@hoes_cooldown), @item['name']) && array_contains(array('AIR', 'CAVE_AIR', 'VOID_AIR'), get_block(array('x': @location['x'], 'y': @location['y'] + 1, 'z': @location['z'], 'world': @location['world'])))) {
       if(@event['hand'] == 'main_hand') {
         @slot = pheld_slot(@player)
       } else {
         @slot = 40
       }
-      @item = @player_data['item'][@event['hand']]
-      if(pcooldown(@player, @event['item']['name']) == 0) {
+      //@player_data['item'][@event['hand']]
+      if(pcooldown(@player, @item['name']) == 0) {
         if(@player_data['item']['enchantments'][@event['hand']] == '효율') {
           @cooldown_multiply = 0.75
         } else {

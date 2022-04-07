@@ -13,13 +13,30 @@ foreach(@file in @files) {
 }
 
 proc _apply_death_penalty(@player, @uuid, @death_penalties_multiply, @players_data, @server) {
+  @death_penalties_multiply = array_deep_clone(@death_penalties_multiply)
   @inventory = get_inventory(@uuid)
   modify_event('death_message', null)
+  if(array_index_exists(@players_data, @uuid)) {
+    if(@server == 'over') {
+      @player_data = @players_data[@uuid]
+      @skill_manager = @player_data['skill_manager']
+      @level = @skill_manager[0]
+      if(@level < 5) {
+        @level_disadvantage = @level * 0.2
+      } else {
+        @level_disadvantage = 1.0
+      }
+    } else {
+      @level_disadvantage = 1.0
+    }
+  } else {
+    @level_disadvantage = 0
+  }
   if(@server != 'main') {
     if(array_index_exists(@players_data, @uuid, 'item', 'enchantments', 'armor') && @players_data[@uuid]['item']['enchantments']['armor'] == '귀속') {
-      tmsg(@player, '💀 §7데스패널티로 약 '.integer(round((1 - @death_penalties_multiply[@server]['default']['multiply']) * 50)).'%의 아이템이 소실되었습니다..')
+      tmsg(@player, '💀 §7데스패널티로 약 '.integer(round(((1 - @death_penalties_multiply[@server]['default']['multiply']) * 50) * @level_disadvantage)).'%의 아이템이 소실되었습니다..')
     } else {
-      tmsg(@player, '💀 §7데스패널티로 약 '.integer(round((1 - @death_penalties_multiply[@server]['default']['multiply']) * 100)).'%의 아이템이 소실되었습니다..')
+      tmsg(@player, '💀 §7데스패널티로 약 '.integer(round(((1 - @death_penalties_multiply[@server]['default']['multiply']) * 100) * @level_disadvantage)).'%의 아이템이 소실되었습니다..')
     }
   }
   foreach(@key: @item in @inventory) {
@@ -33,6 +50,14 @@ proc _apply_death_penalty(@player, @uuid, @death_penalties_multiply, @players_da
         @death_penalty_multiply['multiply'] += (1 - @death_penalty_multiply['multiply']) / 2
         @death_penalty_multiply['deviation'] = @death_penalty_multiply['deviation'] / 2
       }
+      @death_penalty_multiply['deviation'] *= @level_disadvantage
+      @death_penalty_multiply['multiply'] = 1 - (1 - @death_penalty_multiply['multiply']) * @level_disadvantage
+      
+      if(@death_penalty_multiply['multiply'] >= 1) {
+        @death_penalty_multiply['multiply'] = 1
+        @death_penalty_multiply['deviation'] = 0
+      }
+
       @max_durability = material_info(@item['name'], 'maxDurability')
       if(@max_durability == 0) {
         @inventory[@key]['qty'] = integer(_multiply_value(@item['qty'], @death_penalty_multiply['multiply'], @death_penalty_multiply['deviation']))
@@ -67,10 +92,15 @@ bind('player_death', null, null, @event, @death_penalties_multiply, @players_dat
 # 특정 월드에서 발생하는것 처리
 
 if(@server == 'nether') {
-  bind('block_dispense', null, null, @event) {
+  bind('block_dispense', null, null, @event, @server) {
     @item = @event['item']
-    if(is_array(@item) && array_contains(array('WATER_BUCKET', 'POWDER_SNOW_BUCKET'), @item['name'])) {
-      cancel()
+    if(is_array(@item)) {
+      if(@server == 'nether' && array_contains(array('PUFFERFISH_BUCKET', 'SALMON_BUCKET', 'COD_BUCKET', 'TROPICAL_FISH_BUCKET', 'AXOLOTL_BUCKET', 'WATER_BUCKET', 'POWDER_SNOW_BUCKET'), @item['name'])) {
+        cancel()
+      }
+      if(@item['name'] == 'EGG') {
+        cancel()
+      }
     }
   }
 }

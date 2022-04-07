@@ -2373,6 +2373,11 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         break()
       case 'WATER_BUCKET':
       case 'POWDER_SNOW_BUCKET':
+      case 'PUFFERFISH_BUCKET':
+      case 'SALMON_BUCKET':
+      case 'COD_BUCKET':
+      case 'TROPICAL_FISH_BUCKET':
+      case 'AXOLOTL_BUCKET':
         if(pworld(@player) == 'nether') {
           cancel()
         }
@@ -2677,9 +2682,14 @@ bind('piston_retract', null, null, @event) {
 bind('tree_grow', null, null, @event) {
   set_timeout(1, closure() {
     @last_location = @event['blocks'][-1]
+    #foreach(@key: @location in @event['blocks']) {
+    #  if(get_block(@location) == 'BEE_NEST') {
+    #    _debugmsg(array_size(@event['blocks']) @key '!')
+    #  }
+    #}
     if(get_block(@last_location) == 'BEE_NEST') {
-      //set_block(@last_location, 'AIR')
-      cancel()
+      #_debugmsg('벌집 생김')
+      set_block(@last_location, 'AIR')
     }
   })
 }
@@ -3438,7 +3448,7 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
           }
           # 방어 회복 구해서 쿨다운 적용
           @defense_recovery = 1
-          if(array_index_exists(@item, 'meta', 'modifiers')) {
+          if(array_index_exists(@item, 'meta', 'modifiers') && is_array(@item['meta']['modifiers'])) {
             foreach(@modifier in @item['meta']['modifiers']) {
               if(@modifier['attribute'] == 'HORSE_JUMP_STRENGTH') {
                 @defense_recovery = @modifier['amount']

@@ -10,7 +10,7 @@ proc _setData(@newValue = array('traders': array(), /*tradeID: {'liveTime': time
   return(@newValue)
 }
 
-proc _mainTask() {
+proc _mainTask(@server) {
   @value = _getData()
   if(@value['taskID'], throw('ms.lang.Error', 'alreadyStartTask'))
   @value['taskID'] = set_interval(1000, closure() {
@@ -28,12 +28,12 @@ proc _mainTask() {
     )
     @min = (@mode.'min')
     if(@time <= 0 && @mode == 'start') {
-      _system_broadcast('\ue4db', 'white', @config['startMessage'], import('server'))
+      _system_broadcast('\ue4db', 'white', @config['startMessage'], @server)
       @comming['mode'] = 15
       @comming['time'] = time()
-      _spawnTrader(array_rand(@config['trader']['spawnList'], 1, false)[0])
+      _spawnTrader(array_rand(@config['trader']['spawnList'], 1, false)[0], @server)
     } else if(is_numeric(@mode) && @time <= @mode * 60 && @modes[@mode] != @mode) {
-      _system_broadcast('\ue4db', 'white', @config['minMessage'][@min], import('server'))
+      _system_broadcast('\ue4db', 'white', @config['minMessage'][@min], @server)
       @comming['mode'] = @modes[@mode]
     }
     _setData(@value)
@@ -63,7 +63,7 @@ void proc _smokeParticle(@traderLoc) {
   ))
 }
 
-proc _tradeItem(@player, @traderID = 0, @type, @page = 0, @slot, @tradeQty = 1) {
+proc _tradeItem(@player, @traderID = 0, @type, @page = 0, @slot, @tradeQty = 1, @server) {
   @keyArr = array( // key 계산 나중에 개선하기
     'BUY': array(
       14: 0, 15: 1, 16: 2,
@@ -129,7 +129,7 @@ proc _tradeItem(@player, @traderID = 0, @type, @page = 0, @slot, @tradeQty = 1) 
     @price = @tradeItem['meta']['price'] * @taken_qty
     if(@price > 0) {
       acc_add(@player, @price)
-      _logging('shop', time(), import('server'), 'wandering_trader', @player, puuid(@player), @tradeItem, 'sell', @taken_qty, @tradeItem['meta']['price'])
+      _logging('shop', time(), @server, 'wandering_trader', @player, puuid(@player), @tradeItem, 'sell', @taken_qty, @tradeItem['meta']['price'])
     }
 
     break()
@@ -167,7 +167,7 @@ proc _tradeItem(@player, @traderID = 0, @type, @page = 0, @slot, @tradeQty = 1) 
     @tradeHistory[@player] += @tradeQty
     _setData(@value)
     pgive_item(@player, @itemArr)
-    _logging('shop', time(), import('server'), 'wandering_trader', @player, puuid(@player), @itemArr, 'buy', @tradeQty, @tradeItem['meta']['price'])
+    _logging('shop', time(), @server, 'wandering_trader', @player, puuid(@player), @itemArr, 'buy', @tradeQty, @tradeItem['meta']['price'])
     //_playNamedSound(@player, 'entity.wandering_trader.yes')
   }
   return(0)
@@ -220,7 +220,7 @@ proc _assignTraderItems() {
   return(@selectItems)
 }
 
-proc _spawnTrader(@locArray = null) {
+proc _spawnTrader(@locArray = null, @server) {
   if(!@locArray || !is_array(@locArray), throw('ms.lang.Error', 'inputLocArr'))
   @value = _getData()
   @traderList = @value['traders']
@@ -236,9 +236,9 @@ proc _spawnTrader(@locArray = null) {
     @value = _getData()
     @traderInfo = @value['traders'][@traderID]
     @traderUUID = @traderInfo['uuid']
-    if(!entity_exists(@traderUUID), _closeTrader(@traderID))
+    if(!entity_exists(@traderUUID), _closeTrader(@traderID, @server))
     if(@traderInfo['stayTime'] <= time()) {
-      _closeTrader(@traderID)
+      _closeTrader(@traderID, @server)
     } else {
       // UpdateBellTime
       @viewers = @value['viewers']
@@ -263,12 +263,12 @@ proc _spawnTrader(@locArray = null) {
   })
   @traderList[@traderID] = @traderForm
   _setData(@value)
-  _mainEventBind()
+  _mainEventBind(@server)
 
   _smokeParticle(entity_loc(@traderUUID))
 }
 
-proc _closeTrader(@traderID = 0) {
+proc _closeTrader(@traderID = 0, @server) {
   @value = _getData()
   @traderList = @value['traders']
   if(!array_index_exists(@traderList, @traderID), throw('ms.lang.Error', 'notExistsTraderID'))
@@ -290,7 +290,7 @@ proc _closeTrader(@traderID = 0) {
   array_remove(@traderList, @traderID)
   _setData(@value)
 
-  _system_broadcast('\ue4db', 'white', @value['config']['endMessage'], import('server'))
+  _system_broadcast('\ue4db', 'white', @value['config']['endMessage'], @server)
 }
 
 proc _backgroundInvForm() {
@@ -474,7 +474,7 @@ proc _uiForm(@viewer = null, @traderID = 0, @seePageArr = array('SELL': 0, 'BUY'
   return(@uiInvs)
 }
 
-void proc _openTraderUI(@viewer = null, @traderID = 0, @seePageArr = array('SELL': 0, 'BUY': 0)) {
+void proc _openTraderUI(@viewer = null, @traderID = 0, @seePageArr = array('SELL': 0, 'BUY': 0), @server) {
   @uiName = _uiName(@viewer)
   @value = _getData()
   @tradeItems = @value['traders'][@traderID]['tradeItems']
@@ -491,10 +491,10 @@ void proc _openTraderUI(@viewer = null, @traderID = 0, @seePageArr = array('SELL
   }
   @viewers[@viewer] = array('openTraderID': @traderID, 'seePage': @seePageArr)
   _setData(@value)
-  _uiEventBind()
+  _uiEventBind(@server)
 }
 
-proc _mainEventBind() {
+proc _mainEventBind(@server) {
   if(has_bind('traderDamage'), return())
   bind('entity_damage', array('id': 'traderDamage'), array('type': 'WANDERING_TRADER'), @e) {
     @traderList = _getData()['traders']
@@ -502,22 +502,22 @@ proc _mainEventBind() {
       if(@traderInfo['uuid'] == @e['id'], cancel(); break();)
     }
   }
-  bind('player_interact_entity', array('id': 'traderInteract'), array('hand': 'main_hand'), @e) {
+  bind('player_interact_entity', array('id': 'traderInteract'), array('hand': 'main_hand'), @e, @server) {
     if(@e['clicked'] == 'WANDERING_TRADER') {
       cancel()
       @traderList = _getData()['traders']
       foreach(@traderID : @traderInfo in @traderList) {
         if(@traderInfo['uuid'] == @e['id']) {
-          _openTraderUI(@e['player'], @traderID)
+          _openTraderUI(@e['player'], @traderID, array('SELL': 0, 'BUY': 0), @server)
           break()
         }
       }
     }
   }
-  bind('shutdown', array('id': 'traderShutdownEvent'), null, @e) {
+  bind('shutdown', array('id': 'traderShutdownEvent'), null, @e, , @server) {
     @traderList = _getData()['traders']
     foreach(@traderID : @traderInfo in @traderList) {
-      _closeTrader(@traderID)
+      _closeTrader(@traderID, @server)
     }
   }
 }
@@ -537,7 +537,7 @@ proc _uiEventunBind() {
   _setData(@value)
 }
 
-proc _uiEventBind() {
+proc _uiEventBind(@server) {
   @value = _getData()
   @eventID = 'traderInventoryClick'
   if(!array_contains(@value['events'], @eventID)) {
@@ -553,7 +553,7 @@ proc _uiEventBind() {
           if(array_size(@viewers) < 1, _uiEventunBind())
         }
       }
-      @value['events'][] = bind('inventory_click', array('id': @eventID), array('virtual': true), @e) {
+      @value['events'][] = bind('inventory_click', array('id': @eventID), array('virtual': true), @e, @server) {
         @value = _getData()
         @viewers = @value['viewers']
         @player = @e['player']
@@ -583,15 +583,15 @@ proc _uiEventBind() {
               case 14..16: // BUY
               case 23..25:
               case 32..34:
-              _tradeItem(@player, @traderID, 'BUY', @seePageArr['BUY'], @slot, @tradeQty)
+              _tradeItem(@player, @traderID, 'BUY', @seePageArr['BUY'], @slot, @tradeQty, @server)
               case 10..12:  // SELL
               case 19..21:
               case 28..30:
-              _tradeItem(@player, @traderID, 'SELL', @seePageArr['SELL'], @slot, @tradeQty)
+              _tradeItem(@player, @traderID, 'SELL', @seePageArr['SELL'], @slot, @tradeQty, @server)
             }
-            _openTraderUI(@player, @traderID, @seePageArr)
+            _openTraderUI(@player, @traderID, @seePageArr, @server)
             foreach(@viewer : @arr in @viewers) {
-              _openTraderUI(@viewer, @arr['openTraderID'], @arr['seePage'])
+              _openTraderUI(@viewer, @arr['openTraderID'], @arr['seePage'], @server)
             }
 
           }
@@ -619,12 +619,12 @@ register_command('trader', array(
       case 'spawn':
         @playerLoc = ploc(@player)
         @playerLoc['y'] += 1
-        _spawnTrader(@playerLoc)
+        _spawnTrader(@playerLoc, @server)
         break()
       case 'remove':
         if(array_index_exists(@args, 1) && array_index_exists(@traderList, @args[1])) {
           @traderID = integer(@args[1])
-          _closeTrader(@traderID)
+          _closeTrader(@traderID, @server)
           msg( @traderID.'번 상인이 삭제되었습니다.')
         } else {
           msg('존재하지 않는 상인 번호입니다.')
@@ -649,8 +649,8 @@ register_command('trader', array(
 if(!@value, @value = _setData(), _mainEventBind())
 if(!@value['config'], @value['config'] = import('wandering_trader_data'); _setData(@value))
 
-if(import('server') == 'main') {
+if(@server == 'main') {
   set_timeout(5000, closure() {
-    _mainTask()
+    _mainTask(@server)
   })
 }
