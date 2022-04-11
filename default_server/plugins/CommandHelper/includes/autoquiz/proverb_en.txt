@@ -1,59 +1,95 @@
 A bad beginning makes a bad ending
 A bad corn promise is better than a good lawsuit
+A bad workman always blames his tools
 A bad workman quarrels with his tools
 A bargain is a bargain
+A bargain usually costs you more in the end
+A beard well lathered, is halfshaved
 A beggar can never be bankrupt
+A big fish must swim in deep waters
+A bird in the hand is worth two in the bush
 A bird in the hand is worth two in the bush
 A bird may be known by its song
 A black hen lays a white egg
+A black hen lays a white egg
+A black ox has trod on his way
+A black plum is as sweet as a white
 A blind leader of the blind
 A blind man would be glad to see
+A bold attempt is half success
 A broken friendship may be soldered, but will never be sound
 A burden of one's own choice is not felt
 A burnt child dreads the fire
+A cat has nine lives
 A cat in gloves catches no mice
+A cat may look at a king
 A city that parleys is half gotten
 A civil denial is better than a rude grant
 A clean fast is better than a dirty breakfast
+A clean glove often hides a dirty hand
 A clean hand wants no washing
 A clear conscience laughs at false accusations
 A close mouth catches no flies
 A cock is valiant on his own dunghill
 A cracked bell can never sound well
 A creaking door hangs long on its hinges
+A creaking gate hangs long
+A crow is never white though being washed several times
+A crow is never whiter for washing herself often
 A curst cow has short horns
 A danger foreseen is half avoided
+A day is like three autumns
+A dead man never comes to life again
+A desperate disease must have a desperate cure
 A drop in the bucket
+A drowning man plucks at a straw
 A drowning man will catch at a straw
+A drowning man will catch(=grasp) at a straw
 A fair face may hide a foul heart
+A fat chicken makes a lean will
+A father maintains ten children better than ten children one father
 A fault confessed is half redressed
 A fly in the ointment
+A fog cannot be dispelled with a fan
 A fool always rushes to the fore
 A fool and his money are soon parted
 A fool at forty is a fool indeed
+A fool is like other men as long as he is silent
 A fool may ask more questions in an hour than a wise man can answer in seven years
 A fool may throw a stone into a well which a hundred wise men cannot pull out
+A fool's bolt is soon shot
 A fool's tongue runs before his wit
 A forced kindness deserves no thanks
 A foul morn may turn to a fair day
 A fox is not taken twice in the same snare
 A friend in need is a friend indeed
+A friend in need is a friend indeed
 A friend is never known till needed
 A friend to all is a friend to none
 A friend's frown is better than a foe's smile
 A good anvil does not fear the hammer
+A good appetite is a good sauce
 A good beginning is half the battle
 A good beginning makes a good ending
+A good beginning makes a good ending
+A good beginning makes a good ending
+A good book is your best friend
 A good deed is never lost
 A good dog deserves a good bone
 A good example is the best sermon
 A good face is a letter of recommendation
 A good Jack makes a good Jill
+A good Jack makes a good Jill
 A good marksman may miss
+A good medicine tastes bitter
 A good name is better than riches
 A good name is sooner lost than won
 A good name keeps its lustre in the dark
+A good neighbor is better than a brother far off
+A good reader is as rare as a good writer
+A good wife is worth gold
 A good wife makes a good husband
+A great city is a great desert
 A great dowry is a bed full of brambles
 A great fortune is a great slavery
 A great ship asks deep waters
@@ -61,37 +97,77 @@ A guilty conscience needs no accuser
 A hard nut to crack
 A heavy purse makes a light heart
 A hedge between keeps friendship green
+A home having no child is like as the earth having no sun
+A home having no child is like as the earth having no sun
 A honey tongue, a heart of gall
+A hot potato is hard to cool
+A hungry ass eats any straw
 A hungry belly has no ears
 A hungry man is an angry man
 A Jack of all trades is master of none
 A Joke never gains an enemy but often loses a friend
+A journey of a thousand miles begins with a single step
+A large fire often comes from a small spark
 A lawyer never goes to law himself
 A lazy sheep thinks its wool heavy
+A leopard cannot change his spots
 A liar is not believed when he speaks the truth
 A lie begets a lie
+A life of leisure and a life of laziness are two things
+A light heart lives long
 A light purse is a heavy curse
 A light purse makes a heavy heart
 A little body often harbours a great soul
 A little fire is quickly trodden out
+A little is better than none
+A little knowledge is dangerous
+A little learning is a dangerous thing
+A little learning is a dangerous thing
+A little learning is a dangerous thing
+A little pot is soon hot
+A living ass is better than a dead doctor
+A loaf of bread is better than the song of many birds
+A man apt to promise is apt to forget
 A man can die but once
 A man can do no more than he can
+A man finds himself seven years older than the day after his marriage
+A man has choice to begin love, but not to end it
+A man is as old as he feels, and a woman is as old as she looks
 A man is known by the company he keeps
+A man is known by the company he keeps
+A man is more or less what he looks
+A man is not good or bad for one action
+A man is twice miserable when he fears his misery before it comes
+A man must wait for the right moment
+A man of many talents
 A man of words and not of deeds is like a garden full of weeds
+A man with three daughters can sleep his door open
 A miserly father makes a prodigal son
 A miss is as good as a mile
+A miss is as good as a mile
+A mother's heart is always with her children
 A new broom sweeps clean
 A nod from a lord is a breakfast for a fool
+A penny saved is a penny earned
 A penny saved is a penny gained
 A penny soul never came to twopence
 A quiet conscience sleeps in thunder
+A quiet conscience sleeps in thunder
+A rolling stone gathers no moss
 A rolling stone gathers no moss
 A round peg in a square hole
 A shy cat makes a proud mouse
 A silent fool is counted wise
 A small leak will sink a great ship
+A small leak will sink a great ship
 A soft answer turns away wrath
+A song will outlive sermons in the memory
 A sound mind in a sound body
+A sound mind in a sound body
+A Step by step one goes a long way
+A stilt friend
+A stitch in time saves nine
+A stitch in time saves nine
 A stitch in time saves nine
 A storm in a teacup
 A tattler is worse than a thief
@@ -99,47 +175,80 @@ A thief knows a thief as a wolf knows a wolf
 A thief passes for a gentleman when stealing has made him rich
 A threatened blow is seldom given
 A tree is known by its fruit
+A tree is known by its fruits
 A wager is a fool's argument
+A wander lasts but nine days
 A watched pot never boils
+A watched pot never boils
+A wicked book is the more wicked because it cannot repent
 A wise man changes his mind, a fool never will
 A wolf in sheep's clothing
+A woman's tongue is only three inches long, but it can kill a man six feet high
 A wonder lasts but nine days
 A word is enough to the wise
 A word spoken is past recalling
+Accidents will happen
+Actions speak louder than words
 Actions speak louder than words
 Adversity is a great schoolmaster
+Adversity makes men, but prosperity makes monsters
 Adversity makes strange bedfellows
+Advise with your pillow
 After a storm comes a calm
+After a storm comes a calm
+After cheese comes nothing
 After dinner comes the reckoning
 After dinner sit a while, after supper walk a mile
+After pain comes joy
+After rain comes fair weather
 After rain comes fair weather
 After us the deluge
+After you is good manners
+Age is a matter of feeling, not of years
 Agues come on horseback, but go away on foot
 All are good lasses, but whence come the bad wives?
 All are not friends that speak us fair
 All are not hunters that blow the horn
 All are not merry that dance lightly
 All are not saints that go to church
+All arts grow out of necessity
 All asses wag their ears
 All bread is not baked in one oven
 All cats are grey in the dark (in the night)
 All covet, all lose
 All doors open to courtesy
+All great song has been sincere song
+All his geese are swans
+All is fair in love and war
 All is fish that comes to his net
+All is fish that comes to the net
+All is grist that comes to his mill
+All is luck or illluck in this world
+All is not gold that glitters
 All is not lost that is in peril
+All is well that ends well
 All is well that ends well
 All lay load on the willing horse
 All men can't be first
 All men can't be masters
 All promises are either broken or kept
+All roads lead to Rome
 All roads lead to Rome 
 All sugar and honey
 All that glitters is not gold
+All that glitters is not gold
+All that glitters is not gold
+All that glitters is not gold
+All that we know is that we know nothing
 All things are difficult before they are easy
 All truths are not to be told
+All truths are not to be told
+All water runs to the sea
 All work and no play makes Jack a dull boy
-"Almost" never killed a fly (was never hanged)
+All work and no play makes Jack a dull boy
+Almost never killed a fly (was never hanged)
 Among the blind the one-eyed man is king
+An apple a day keeps the doctor away
 An apple a day keeps the doctor away
 An ass in a lion's skin
 An ass is but an ass, though laden with gold
@@ -147,60 +256,95 @@ An ass loaded with gold climbs to the top of the castle
 An empty hand is no lure for a hawk
 An empty sack cannot stand upright
 An empty vessel gives a greater sound than a full barrel
+An Englishman's house is his castle
 An evil chance seldom comes alone
 An honest tale speeds best, being plainly told
 An hour in the morning is worth two in the evening
 An idle brain is the devil's workshop
+An ill father desires not an ill son
+An ill workman always quarrels with his tools
+An ill workman always quarrels with his tools
 An ill wound is cured, not an ill name
+An injury forgiven is better than an injury revenged
 An oak is not felled at one stroke
+An oath and egg are soon broken
 An old dog barks not in vain
 An open door may tempt a saint
 An ounce of discretion is worth a pound of learning
+An ounce of practice is worth a pound of theory
 An ox is taken by the horns, and a man by the tongue
 An unfortunate man would be drowned in a teacup
 Anger and haste hinder good counsel
 Any port in a storm
+Any time means no time
+Anyone who goes hungry for three days will steal
 Appearances are deceitful
+Appearances are deceptive
 Appetite comes with eating
+Art is long, life is short
+As a man sows, so shall he reap
 As drunk as a lord
+As I grew richer, I grew more ambitious
 As innocent as a babe unborn
 As like as an apple to an oyster
 As like as two peas
+As long as there is life, there is hope
 As old as the hills
+As one sows, so shall he reap
 As plain as the nose on a man's face
 As plain as two and two make four
 As snug as a bug in a rug 
 As sure as eggs is eggs
 As the call, so the echo
 As the fool thinks, so the bell clinks
+As the life is, so is the end
+As the old cock comes, the young cock learns
 As the old cock crows, so does the young
 As the tree falls, so shall it lie
 As the tree, so the fruit
+As the twig is bent, so grows the tree
 As welcome as flowers in May
 As welcome as water in one's shoes
 As well be hanged for a sheep as for a lamb
 As you brew, so must you drink
 As you make your bed, so must you lie on it
+As you make your bed, so you must lie on it
 As you sow, so shall you reap
+As you sow, so shall you reap
+As you sow, so you reap
 Ask no questions and you will be told no lies
+Asking costs nothing
 At the ends of the earth
+Attack is the best defence
+Avarice is the only passion that never ages
+Avoid such men as will do you harm
 Bacchus has drowned more men than Neptune 
+Bacchus kills more than Mars
 Bad news has wings
 Barking does seldom bite
+Barking dogs seldom bite
+Be commonplace and modest, and everything is within your reach
+Be not the first to quarrel nor the last to make it up
 Be slow to promise and quick to perform
+Be sure you are right, then go ahead
+Be swift to hear, slow to speak
 Be swift to hear, slow to speak
 Beauty is but skin-deep
+Beauty is in the eyes of the beholder
 Beauty lies in lover's eyes
 Before one can say Jack Robinson
 Before you make a friend eat a bushel of salt with him
 Beggars cannot be choosers
+Behind the clouds is the sun still shining
 Believe not all that you see nor half what you hear
+Best dealing with an enemy when you take him at his weakest
 Best defence is offence
 Better a glorious death than a shameful life
 Better a lean peace than a fat victory
 Better a little fire to warm us, than a great one to burn us
 Better an egg today than a hen tomorrow
 Better an open enemy than a false friend
+Better be a bird in the wood than one in the cage
 Better be alone than in bad company
 Better be born lucky than rich
 Better be envied than pitied
@@ -211,6 +355,7 @@ Better early than late
 Better give a shilling than lend a half-crown
 Better go to bed supperless than rise in debt
 Better late than never
+Better late than never
 Better lose a jest than a friend
 Better one-eyed than stone-blind
 Better the devil you know than the devil you don't
@@ -219,17 +364,22 @@ Better to do well than to say well
 Better to reign in hell, than serve in heaven
 Better unborn than untaught
 Better untaught than ill-taught
+Better wear out shoes than sheets
 Between the cup and the lip a morsel may slip
 Between the devil and the deep sea
+Between the upper and nether millstone
 Between two evils 'tis not worth choosing
 Between two stools one goes to the ground
-Between the upper and nether millstone
 Betwixt and between
 Beware of a silent dog and still water
 Bind the sack before it be full
 Birds of a feather flock together
+Birth is much, but breeding is more
+Blessings are not valued till they are gone
+Blind chance sweeps the world along
 Blind men can judge no colours
 Blood is thicker than water
+Books still accomplish miracles; they persuade man
 Borrowed garments never fit well
 Brevity is the soul of wit
 Burn not your house to rid it of the mouse
@@ -238,82 +388,155 @@ By doing nothing we learn to do ill
 By hook or by crook
 By the street of 'by-and-bye' one arrives at the house of 'Never'
 Calamity is man's true touchstone
+Call a spade a spade
+Care is no cure
+Care killed a cat(=the cat)
 Care killed the cat
+Cast never a clout till May is over
+Cast not your pearls before swine
 Catch the bear before you sell his skin
 Caution is the parent of safety
+Charity begins at home
+Charity begins at home
+Charity begins at home
 Charity begins at home
 Cheapest is the dearest
 Cheek brings success
 Children and fools must not play with edged tools
 Children are poor men's riches
+Children have the qualities of the parents
 Choose an author as you choose a friend
 Christmas comes but once a year, (but when it comes it brings good cheer)
 Circumstances alter cases
 Claw me, and I will claw thee
 Cleanliness is next to godliness
+Cleave the log according to the grain
+Clothes do not make the man
+Cold hand, warm heart
+Coming events cast their shadows before
+Coming events cast their shadows before
+Company in distress makes sorrow less
 Company in distress makes trouble less
 Confession is the first step to repentance
+Constancy is the foundation of the virtue
+Constant dripping wears away the stone
+Contentment is better than riches
 Counsel is no command
+Count one's chickens before they are hatched
+Covetousness is always filling a bottomless vessel
+Creaking doors hang the longest
 Creditors have better memories than debtors
 Cross the stream where it is shallowest
 Crows do not pick crow's eyes
 Curiosity killed a cat
+Curiosity killed the cat
 Curses like chickens come home to roost
 Custom is a second nature
 Custom is the plague of wise men and the idol of fools
+Cut off your nose to spits your face
 Cut your coat according to your cloth
+Cut your coat according to your cloth
+Danger foreseen is half avoided
+Danger past, God forgotten
+Dead men tell no tales
 Death is the grand leveller
+Death is the great leveller
 Death pays all debts
+Death pays all scores
+Death quits all scores
 Death when it comes will have no denial
 Debt is the worst poverty
 Deeds, not words
+Deep sorrow has no tongue
+Delay increases desire and sometimes extinguishes them
 Delays are dangerous
 Desperate diseases must have desperate remedies
+Difficulty is the nurse of greatness
 Diligence is the mother of success (good luck)
+Discard the head and lop off the tail
 Diseases are the interests of pleasures
 Divide and rule
 Do as you would be done by
+Do as you would be done by
+Do in Rome as the Romans do
+Do in Rome as the Romans do
+Do not back him into a corner
+Do not count your chickens before they hatch
+Do not cross the bridge until you come to it
+Do not cross the bridge until you come to it
+Do not go asking for trouble
+Do not hallo till you are out of the wood
+Do not judge a man by the whiteness of his turban
+Do not kick against the pricks
+Do not put the cart before the horse
+Do to others as you would have them do to you
 Dog does not eat dog
 Dog eats dog
 Dogs that put up many hares kill none
 Doing is better than saying
+Don't bite hand that feeds you
+Don't bite off more than you can chew
+Don't count one's chickens before they are hatched
 Don't count your chickens before they are hatched
+Don't count your chickens before they are hatched
+Don't cross the bridge till you got to it
 Don't cross the bridges before you come to them
+Don't go near the water till your learn how to swim
 Don't have thy cloak to make when it begins to rain
+Don't judge a book by its cover
+Don't judge a man until you're walked in his boots
+Don't judge a man until you've walked in his boots
+Don't judge of a man by his looks
 Don't keep a dog and bark yourself
 Don't look a gift horse in the mouth
+Don't look a gift horse in the mouth
+Don't make a mountain out of a molehill
 Don't put all your eggs in one basket
 Don't sell the bear's skin before you've caught it
+Don't stick out your neck for someone to hang a rope around
+Don't throw away the old shoes till you've got new ones
 Don't trouble trouble until trouble troubles you
 Don't whistle until you are out of the wood
 Dot your i's and cross your t's
 Draw not your bow till your arrow is fixed
+Draw not your bow until your arrow is fixed
+Dreams go by contraries
 Drive the nail that will go
+Drop by drop fills the tub
 Drunken days have all their tomorrow
 Drunkenness reveals what soberness conceals
 Dumb dogs are dangerous
 Each bird loves to hear himself sing
+Eagles don't catch flies
 Early to bed and early to rise makes a man healthy, wealthy and wise
+Early to bed and early to rise, makes a man healthy, wealthy and wise
 Easier said than done
 East or West, home is best
 Easy come, easy go
 Eat at pleasure, drink with measure
+Eating little and speaking little can never do harm
 Empty vessels make the greatest sound
 Enough is as good as a feast
 Envy shoots at others and wounds herself
 Even reckoning makes long friends
+Even the evil spirits don't know
 Every ass loves to hear himself bray
 Every barber knows that
 Every bean has its black
 Every bird likes its own nest
 Every bullet has its billet
+Every cook praises his own soup
 Every country has its customs
 Every dark cloud has a silver lining
 Every day is not Sunday
 Every dog has his day
 Every dog is a lion at home
 Every dog is valiant at his own door
+Every Jack has his Gill
+Every Jack has his Gill
 Every Jack has his Jill
+Every little helps
+Every little helps
 Every man has a fool in his sleeve
 Every man has his faults
 Every man has his hobby-horse
@@ -323,10 +546,14 @@ Every miller draws water to his own mill
 Every mother thinks her own gosling a swan
 Every one's faults are not written in their foreheads
 Every tub must stand on its own bottom
+Every tub must stand on its own bottom
 Every white has its black, and every sweet its sour
 Every why has a wherefore
+Everybody is wise after the event
+Everybody's business is nobody's business
 Everybody's business is nobody's business
 Everything comes to him who waits
+Everything is good for something
 Everything is good in its season
 Evil communications corrupt good manners
 Experience is the mother of wisdom
@@ -335,69 +562,133 @@ Experience keeps no school, she teaches her pupils singly
 Extremes meet
 Facts are stubborn things
 Faint heart never won fair lady
+Faint heart never won fair lady
 Fair without, foul within
 Fair words break no bones
+Fairest gems lie deepest
+Faith can remove mountains
 False friends are worse than open enemies
+Fame is but the breath of the people
 Familiarity breeds contempt
+Familiarity breeds contempt
+Fancy may kill or cure
 Far from eye, far from heart
 Fasting comes after feasting
+Father hands down, son hands down
+Father's virtue is the best heritage for his child
 Faults are thick where love is thin
 Feast today and fast tomorrow
+Feed a cold and starve a fever
+Fight fire with fire
+Finders are keepers
+Finding's keeping
+Fine clothes make the man
+Fine feathers make fine birds
 Fine feathers make fine birds
 Fine words butter no parsnips
 First catch your hare
+First come, first served
 First come, first served
 First deserve and then desire
 First think, then speak
 Fish and company stink in three days
 Fish begins to stink at the head
+Fish will take best after rain
+Five hours sleeps a traveller, seven a scholar, eight a merchant, and eleven every knave
+Fix the hedge gate after you've been robbed
 Follow the river and you'll get to the sea
-Fool's haste is no speed
+Follow the river, and you'll get to the sea
 Fools and madmen speak the truth
 Fools grow without watering
+Fool's haste is no speed
 Fools may sometimes speak to the purpose
 Fools never know when they are well
 Fools rush in where angels fear to tread
+Fools rush is where angels fear to tread
+For having loved and lost, you are a richer person
 For the love of the game
 Forbearance is no acquittance
 Forbidden fruit is sweet
 Forewarned is forearmed
+Fortune favors the brave
 Fortune favours the brave (the bold)
 Fortune is easily found, but hard to be kept
 Four eyes see more than two
+Four eyes see more than two
+Four eyes see more than two
+Freedom is not worth having if it does not include the freedom to make mistakes
+Friend to all is a friend to none
 Friends are thieves of time
+Friends are thieves of time
+Friendship is love with understanding
 From bad to worse
+From labour health, from health contentment springs
+From nothing, nothing can come
 From pillar to post
+From saying to doing is a long step
+From saying to doing is a long step
+From short pleasure, long repentance
+From word to deed is a great space
+Frugality is a great revenue
+Full of courtesy, full of craft
+Gain at the expense of reputation should be called loss
+Gain time, gain life
+Garbage in, garbage out
+Gather roses while you may
 Gentility without ability is worse than plain beggary
+Gentleness corrects whatever is offensive in our manner
 Get a name to rise early, and you may lie all day
+Gift long waited for is sold, not given
 Gifts from enemies are dangerous
 Give a fool rope enough, and he will hang himself
 Give every man thy ear, but few thy voice
 Give him an inch and he'll take an ell
 Give never the wolf the wether to keep
+Give the disease and offer the remedy
+Glory is the fair child of peril
 Gluttony kills more men than the sword
+Go for wool and come home shorn
+Go home and kick the dog
 Go to bed with the lamb and rise with the lark
+Go to vintage without baskets
+God gives all things to industry
+God gives every bird his worm, but he does not throw it into the nest
+God helps those who help themselves
+God is in an honest man's heart
+Good and evil are chiefly in the imagination
 Good clothes open all doors
 Good counsel does no harm
 Good health is above wealth
+Good luck alternates with misfortune
 Good masters make good servants
+Good medicine is bitter in the mouth
+Good name is better than a golden girdle
+Good things come in small package
+Good wine needs no bush
 Good words and no deeds
+Good words cost nothing
 Good words without deeds are rushes and reeds
 Gossiping and lying go hand in hand
 Grasp all, lose all
+Grasp all, lose all
 Great barkers are no biters
+Great barkers are no bites
 Great boast, small roast
 Great cry and little wool
 Great spenders are bad lenders
+Great spenders are bad lenders
+Great talent takes time to ripen
 Great talkers are great liars
 Great talkers are little doers
+Great things have small beginnings
 Greedy folk have long arms
 Habit cures habit
 Half a loaf is better than no bread
-"Hamlet" without the Prince of Denmark 
+Hamlet without the Prince of Denmark 
 Handsome is that handsome does
 Happiness takes no account of time
 Happy is he that is happy in his children
+Hard upon hard makes a bad stone wall, but soft makes none at all
 Hard words break no bones
 Hares may pull dead lions by the beard
 Harm watch, harm catch
@@ -408,13 +699,20 @@ Hatred is blind, as well as love
 Hawks will not pick hawks' eyes
 He begins to die that quits his desires
 He cannot speak well that cannot hold his tongue
+He can't see the forest for the trees
 He carries fire in one hand and water in the other
+He catches the wind with a net
+He conquers a second time who controls himself in victory
 He dances well to whom fortune pipes
+He doubles his gift who gives in time
 He gives twice who gives in a trice
 He goes long barefoot that waits for dead man's shoes
+He has honey in his mouth, gall in his heart
+He has lived ill that knows not how to die well
 He is a fool that forgets himself
 He is a good friend that speaks well of us behind our backs
 He is happy that thinks himself so
+He is lifeless that is faultless
 He is lifeless that is faultless
 He is not fit to command others that cannot command himself
 He is not laughed at that laughs at himself first
@@ -427,23 +725,34 @@ He laughs best who laughs last
 He lives long that lives well
 He must needs swim that is held up by the chin
 He should have a long spoon that sups with the devil
+He sits not sure that sits too high
 He smells best that smells of nothing
+He steals a bell by covering his own ears
+He teaches ill who teaches all
+He that blames would buy
+He that can make a fire well can end a quarrel
 He that comes first to the hill may sit where he will
 He that commits a fault thinks everyone speaks of it
 He that does you an i!i turn will never forgive you
+He that excuses himself accuses himself
+He that falls today may rise tomorrow
 He that fears every bush must never go a-birding
 He that fears you present wiil hate you absent
 He that goes a borrowing, goes a sorrowing
 He that goes barefoot must not plant thorns
+He that goes to bed thirsty rises healthy
 He that has a full purse never wanted a friend
 He that has a great nose thinks everybody is speaking of it
+He that has a great nose thinks everybody is speaking of it
 He that has an ill name is half hanged
-He that has no children knows not what love is
 He that has He head needs no hat
+He that has most time has none to lose
+He that has no children knows not what love is
 He that has no money needs no purse
 He that is born to be hanged shall never be drowned
 He that is full of himself is very empty
 He that is ill to himself will be good to nobody
+He that is master of himself will soon be master of others
 He that is warm thinks all so
 He that knows nothing doubts nothing
 He that lies down with dogs must rise up with fleas
@@ -465,39 +774,66 @@ He that will steal an egg will steal an ox
 He that will thrive, must rise at five
 He that would eat the fruit must climb the tree
 He that would have eggs must endure the cackling of hens
-He who is born a fool is never cured
+He who begins many things, finishes but few
+He who buys what he doesn't want will sell what he does want
+He who carries nothing loses nothing
+He who chooses takes the worst
+He who has once burnt his mouth always blows his soup
 He who hesitates is lost
+He who inquires much learns much
+He who is born a fool is never cured
+He who knows only his side of the case knows little of that
 He who likes borrowing dislikes paying
+He who loses money, loses much; he who loses a friend loses more; he who loses his nerve, loses all
 He who makes no mistakes, makes nothing
 He who pleased everybody died before he was born
 He who says what he likes, shall hear what he doesn't like
 He who would catch fish must not mind getting wet
+He who would catch fish, must not mind getting wet
 He who would eat the nut must first crack the shell
 He who would search for pearls must dive below
 He will never set the Thames on fire
 He works best who knows his trade
 Head cook and bottle-washer
 Health is not valued till sickness comes
+Hearing times is not like seeing once
+Heaven helps those who help themselves
 His money burns a hole in his pocket
+Hog in armour is still but a hog
 Honesty is the best policy
+Honey catches more flies than vinegar
 Honey is not for the ass's mouth
 Honey is sweet, but the bee stings
 Honour and profit lie not in one sack
 Honours change manners
 Hope is a good breakfast, but a bad supper
 Hope is the poor man's bread
+Hope is the poor man's bread
+Hope to the end
 Hunger breaks stone walls
 Hunger finds no fault with cookery
 Hunger is the best sauce
+Hunger is the best sauce
 Hungry bellies have no ears
+Hungry dogs will eat dirty puddings
+I cannot be your friend and your flatterer too
+I think the only reason one loves, monsieur, is for his own pleasure
+I think the only reason one loves, monsieur, is for his own pleasure
+I want to die knowing one more thing
+I want to die knowing one more thing
 Idle folks lack no excuses
+Idle men are dead all their life long
 Idleness is the mother of all evil
 Idleness rusts the mind
 If an ass bray at you, don't bray at him
 If ifs and ans were pots and pans
+If in the morning I learn of the truth, I shall die without regrets in the evening
 If my aunt had been a man, she'd have been my uncle
 If the blind lead the blind, both shall fall into the ditch
+If the shoes fits, wear it
 If the sky falls, we shall catch larks
+If the staff be crooked, the shadow cannot be straight
+If the wind will not serve, take to the oars
 If there were no clouds, we should not enjoy the sun
 If things were to be done twice all would be wise
 If we can't as we would, we must do as we can
@@ -506,214 +842,490 @@ If you agree to carry the calf, they'll make you carry the cow
 If you cannot bite, never show your teeth
 If you cannot have the best, make the best of what you have
 If you dance you must pay the fiddler
+If you have bread, don't look for cake
+If you have no courage, you must have fast legs
+If you have no enemies, it is a sign fortune has forgotten you
 If you laugh before breakfast you'll cry before supper
 If you run after two hares, you will catch neither
 If you sell the cow, you sell her milk too
+If you sing before seven, you will cry before eleven
+If you submit to one wrong you bring on another
 If you throw mud enough, some of it will stick
+If you trust before you try, you may repent before you die
 If you try to please all you will please none
 If you want a thing well done, do it yourself
+If you would be loved, love and be lovable
+If you would enjoy the fruit, pluck not the flower
+If you would wish the dog to follow you, feed him
+If you're not stingy, you're not wealthy, and if you're not wealthy, you're not stingy
+Ill weeds grow apace
 Ill-gotten gains never prosper
 Ill-gotten, ill-spent
+In a calm sea every man is a pilot
+In every beginning think of the end
 In every beginning think of the end
 In for a penny, in for a pound
+In juries we write in marble; kindness in dust
 In the country of the blind one-eyed man is a king
 In the end things will mend
 In the evening one may praise the day
+In the looking glass we see the form, in wine the heart
+In the looking glass we see the form, in wine the heart
+In the looking glass we see the form, in wine the heart
+In travelling, company; in life, sympathy
+In vain he craves advice that will not follow it
 Iron hand in a velvet glove
+Iron not used soon rusts
+It does no pay to be short tempered
+It is a foolish sheep that makes the wolf his confession
 It is a good horse that never stumbles
 It is a long lane that has no turning
+It is a long lane that has no turning
 It is a poor mouse that has only one hole
+It is a silly fish, that is caught twice with the same bait
+It is always time to do good
 It is an ill bird that fouls its own nest
 It is an ill wind that blows nobody good
-It is a silly fish, that is caught twice with the same bait
 It is easy to swim if another hoids up your chin (head)
 It is enough to make a cat laugh
 It is good fishing in troubled waters
+It is good to have friends but bad to need them
+It is harder to unlearn than to learn
+It is love that makes the world go round
+It is more blessed to give than to receive
 It is never too late to learn
 It is no use crying over spilt milk
 It is the first step that costs
 It never rains but it pours
+It takes all sorts to make a world
 It's as broad as it's long
+It's easier to fall than to get on your feet
 It's no use pumping a dry well
 It's one thing to flourish and another to fight
-It takes all sorts to make a world
+It's time to wink as well as to see
+Jack of all trades and master of none
+Jack of all trades is the master of none
 Jackdaw in peacock's feathers
 Jest with an ass and he will flap you in the face with his tail
 Judge not of men and things at first sight
+Judge not of men or things at first sight
 Just as the twig is bent, the tree is inclined
+Justice will assert itself
 Keep a thing seven years and you will find a use for it
+Keep not two tongues in one mouth
+Keep oaring
+keep the common road, and you are safe
 Keep your mouth shut and your ears open
 Keep your mouth shut and your eyes open
+Kill not the goose that lays the golden eggs
+Kill one with kindness
+Kill two birds with one stone
+Kind hearts are more than coronets
+Kind words are worth much and they cost little
+Kind words are worth much and they cost little
+Knave is one knave, but a fool is many
+Knowing characters is worry and trouble
+Knowing characters is worry and trouble
+Knowledge has no enemy but ignorance
+Knowledge in youth is wisdom in age
+Knowledge is power
 Last, but not least
+Late fruit keeps well
+Laugh and grow fat
+Laugh and the world laugh with you; weep, and you weep alone
+Law catches flies, but lets hornets go free
+Law makers should not be law breakers
 Laws catch flies, but let hornets go free
 Learn to creep before you leap
 Learn to say before you sing
+Learn to say before you sing
 Learn wisdom by the follies of others
+Learning makes a good man better and an ill man worse
+Learning without thought is labour lost
+Least said soonest mended
 Least said, soonest mended
+Leave a welcome behind you
+Leave well enough alone
+Leave(=Let) well(=enough) alone
 Leaves without figs
+Lend your money and lose your friend
 Let bygones be bygones
 Let every man praise the bridge he goes over
+Let every tub stand on its own bottom
+Let everyone keep off the flies with the own tail
+Let everyone sweep before his own doors
+Let sleeping dogs lie
+Let sleeping dogs lie
 Let sleeping dogs lie
 Let well alone
+Let your nose go in front, but don't always follow it
 Liars need good memories
+Liars should have a good memory
+Liberality is not giving largely, but wisely
 Lies have short legs
+Life admits not of delays
+Life has no pleasure nobler than that of friendship
 Life is but a span
+Life is compared to a voyage
+Life is full of ups and downs
+Life is half spent before we know what it is
+Life is made up of little things
 Life is not a bed of roses
+Life is not all beer and skittles
 Life is not all cakes and ale (beer and skittles)
+Light come, light go
+Lightly come, lightly go
+Lightly won, lightly held
+Lightning never strikes twice in the same place
 Like a cat on hot bricks
 Like a needle in a haystack
+Like attracts like
+Like back and expectorate
 Like begets like
 Like cures like
-Like father, like son
+Like curses like
 Like draws to like
+Like draws to like
+Like father, like son
+Like father, like son
+Like for like
+Like he's bewitched by a goblin
+Like master, like man
+Like master, like man
 Like master, like man
 Like mother, like daughter
 Like parents, like children
 Like priest, like people
 Like teacher, like pupil
+Listen to what is well said even from an enemy
 Little chips light great fires
+Little drops of water make the mighty ocean
 Little knowledge is a dangerous thing
 Little pigeons can carry great messages
 Little pitchers have long ears
+Little pot is soon hot
+Little said soon amended
+Little strokes fell great oaks
 Little strokes fell great oaks
 Little thieves are hanged, but great ones escape
 Little things amuse little minds
+Little things please little minds
 Live and learn
 Live and let live
+Live and let live
 Live not to eat, but eat to live
+Live not to eat, but eat to live
+Live to learn and learn to live
+Lock the stable after the horse is stolen
+Lock the stable door after the horse has been stolen(=has bolted)
 Long absent, soon forgotten
+Long absent, soon forgotten
+Look after the pence and the pounds will look after themselves
+Look before you leap
 Look before you leap
 Look before you leap, but having leapt never look back
+Look on the bright side
 Lookers-on see more than players
 Lord helps those who help themselves
 Lost time is never found again
 Love cannot be forced
+Love conquers all
 Love in a cottage
+Love is blind
 Love is blind, as well as hatred
+Love laughs at a distance
+Love levels with all
+Love little and love long
 Love me, love my dog
+Love me, love my dog
+Love shortens distance
 Love will creep where it may not go
+Loves makes all hearts gentle
+Luck comes to those who look after it
+Lying and stealing are next door neighbours
+Make haste slowly
 Make haste slowly
 Make hay while the sun shines
+Make hay while the sun shines
 Make or mar
+Make yourself all honey, and the flies will devour you
+Man can climb to the highest summits, but he can not dwell there long
+Man can do no more than he can
+Man is but a reed, the weakest in nature, but he s a thinking reed
+Man is but a reed, the weakest in nature, but he s a thinking reed
+Man is made great or little by his own will
 Man proposes but God disposes
+Man proposes but God disposes
+Man, know thyself
+Man, know thyself
+Man, know thyself
+Man's best candle is his understanding
+Man's life is a progress, and not a station
 Many a fine dish has nothing on it
 Many a good cow has a bad calf
 Many a good father has but a bad son
 Many a little makes a mickle
+Many a little makes a mickle
 Many a true word is spoken in jest
+Many drops make shower
+Many grains of sand will sink a ship
 Many hands make light work
 Many men, many minds
+Many strokes fell great oaks
 Many words hurt more than swords
 Many words will not fill a bushel
 Marriages are made in heaven
 Measure for measure
 Measure thrice and cut once
+Men are blind in their own causes
 Men may meet but mountains never
 Mend or end (end or mend)
+Mend the barn after the horse is stolen
 Might goes before right
+Mind unemployed is mind unenjoyed
+Mingle your joys sometimes with your earnest occupation
+Misfortune is a good teacher
+Misfortune seldom comes alone
 Misfortunes never come alone (singly)
 Misfortunes tell us what fortune is
 Money begets money
+Money changes hands
+Money does not grow on trees
 Money has no smell
 Money is a good servant but a bad master
+Money is round and rolls away
 Money often unmakes the men who make it
 Money spent on the brain is never spent in vain
+Money will do anything
 More haste, less speed
+Mouth in the heart
 Much ado about nothing
 Much will have more
 Muck and money go together
 Murder will out
+My house burned up, but do died the bedbugs
 My house is my castle
+Naked came we into the world and naked shall we depart from it
 Name not a rope in his house that was hanged
+Nature admits not a lie
+Nature is the best physician
+Near neighbor is better than a distant cousin
+Necessity has [knows] no law
+Necessity is the mother of invention
+Necessity is the mother of invention
 Necessity is the mother of invention
 Necessity knows no law
+Necessity knows no law
+Neck and neck
 Neck or nothing
 Need makes the old wife trot
 Needs must when the devil drives
+Needs must when the devil drives
 Neither fish nor flesh
 Neither here nor there
+Neither praise nor dispraise yourself; your actions serve the turn
 Neither rhyme nor reason
+Never buy a pig in a poke
 Never cackle till your egg is laid
 Never cast dirt into that fountain of which you have sometime drunk
 Never do things by halves
 Never fry a fish till it's caught
+Never is a long word
+Never judge by appearance
+Never judge by appearances
 Never offer to teach fish to swim
+Never put off till tomorrow what may be done today
 Never put off till tomorrow what you can do today
 Never quit certainty for hope
+Never swap horses crossing a stream
+Never too late to mend
 Never too much of a good thing
+Never too much of anything
+Never trouble trouble till trouble troubles you
 Never try to prove what nobody doubts
 Never write what you dare not sign
 New brooms sweep clean
+New lord, new laws
 New lords, new laws
+News travels fast
+Night gives counsel
 Nightingales will not sing in a cage
+No cross, no crown
 No flying from fate
+No gains without pains
 No garden without its weeds
 No great loss without some small gain
 No herb will cure love
 No joy without alloy
+No joy without alloy
+No life without pain
 No living man all things can
 No longer pipe, no longer dance
+No man can tell what future brings forth
+No man goes carelessly by a place where profit lips
+No man is a hero to his valet
+No man is born wise or learned
 No man is wise at all times
 No man loves his fetters, be they made of gold
+No medicine can cure a man of discontent
+No medicine can cure folly
+No mill, no meal
+No morning sun lasts a whole day
 No news good news
+No news is good news
+No news is good news
+No one spits on money
+No pains no gains
 No pains, no gains
+No reward without toil
+No root, no fruit
+No rose, without a thorn
+No rule without exception
+No smoke without fire
 No song, no supper
+No song, no supper
+No sweat, no sweet
 No sweet without sweat
+No two minds think alike
 No wisdom like silence
+No wonder lasts more than nine days
+No work, no money
+Non but a wise man can employ leisure well
+None are so blind as those who won't see as those
 None but the brave deserve the fair
+None but the brave deserves the fair
+None is deceived but he who trusts
+None is so blind as those who won't see
+None so blind as those who won't see
 None so blind as those who won't see
 None so deaf as those that won't hear
+Not the slightest hint to the liver
+Nothing comes amiss to a hungry man
+Nothing comes from(=of) nothing
 Nothing comes out of the sack but what was in it
+Nothing costs so much as what is given to us
+Nothing great is easy
 Nothing is impossible to a willing heart
 Nothing must be done hastily but killing of fleas
 Nothing so bad, as not to be good for something
 Nothing succeeds like success
+Nothing succeeds like success
 Nothing venture, nothing have
+Nothing venture, nothing have(=win, gained)
+Novelty is the great parent of pleasure
+Nurture passes(= is above) nature
 Oaks may fall when reeds stand the storm
+Of the dead and absent speak well, or not at all
 Of two evils choose the least
 Old birds are not caught with chaff
 Old friends and old wine are best
+Old friends and old wine are best
+Old men are twice children
 On Shank's mare
+Once a beggar, always a beggar
+Once a heel, always a heel
+Once bit, twice sky
 Once bitten, twice shy
 Once is no rule (custom)
 One beats the bush, and another catches the bird
+One cannot eat one's cake and have it
+One cannot put back the clock
+One cannot touch pitch without being defiled
 One chick keeps a hen busy
 One drop of poison infects the whole tun of wine
+One evil breeds another
 One fire drives out another
 One good turn deserves another
+One good turn deserves another
+One hand washes the other
+One hour today is worth two tomorrow
 One law for the rich, and another for the poor
 One lie makes many
 One link broken, the whole chain is broken
 One man, no man
 One man's meat is another man's poison
+One man's meat is another man's poison
+One may as well be hanged for a sheep as for a lamb
+One misfortune calls another
+One murder makes a villain, millions a hero
+One must lie on the bed one has made
+One of these days is none of these days
+One picture is worth a thousand words
 One scabby sheep will mar a whole flock
+One shoe will not fit every foot
+One swallow does not make a summer
 One swallow does not make a summer
 One today is worth two tomorrow
+Only the weather knows where the shoe pinches
 Open not your door when the devil knocks
 Opinions differ
 Opportunity makes the thief
+Opportunity makes the thief
 Out of sight, out of mind
+Out of sight, out of mind
+Out of the flying pan into the fire
+Out of the frying pan into the fire
 Out of the frying-pan into the fire
+Out of the mouth comes evil
+Out of the mouth comes evil
+Over shoes, over boots
+Over shoes, over boots
+Over shoes, over boots
+Overdone is worse than undone
 Packed like herrings
+Pain and death are apart of life
+Pain past is pleasure
 Patience is a plaster for all sores
+Patience is genius
+Patience wears out stones
+Pay condolences when the lord's horse dies but not when the lord dies
+Peace is the fairest form of happiness
+Penny wise and pound foolish
 Penny-wise and pound-foolish
+Pichers have ears
+Pity is akin to love
 Pleasure has a sting in its tail
 Plenty is no plague
 Politeness costs little (nothing), but yields much
+Poor and liberal, rich and covetous
+Popular opinion is the greatest lie in the world
+Possession is nine points of the law
+Poverty brings stupidity
 Poverty is no sin
 Poverty is not a shame, but the being ashamed of it is
+Practice makes perfect
 Practise what you preach
 Praise is not pudding
+Prefer loss to unjust gain
+Presents keep friendship warm
+Prevention is better than cure
 Pride goes before a fall
+Pride goes before a fall
+Pride goes before a fall
+Pride will have a fall
 Procrastination is the thief of time
+Profit all mankind
 Promise is debt
 Promise little, but do much
 Prosperity makes friends, and adversity tries them
+Pull down on your hat on the wind side
+Punish yourself, abandon yourself
+Purpose is what gives life a meaning
 Put not your hand between the bark and the tree
+Quarreling is the weapon of the weak
 Rain at seven, fine at eleven
 Rats desert a sinking ship
+Rats desert a sinking ship
+Reading makes a full man
+Reading without purpose is sauntering, not exercise
+Remove an old tree and it will die
 Repentance is good, but innocence is better
+Resolve lasts three days
+Respect is greater from a distance
 Respect yourself, or no one else will respect you
+Riches serve a wise man, and govern a fool
+Rise with the Sun and enjoy the day
+Rivers need a spring
 Roll my log and I will roll yours
 Rome was not built in a day
 Salt water and absence wash away love
@@ -721,52 +1333,107 @@ Saying and doing are two things
 Score twice before you cut once
 Scornful dogs will eat dirty puddings
 Scratch my back and I'll scratch yours
+Second thoughts are best
+Secret of success is constancy to purpose
+See one and know ten
+Seeing is believing
+Seldom seen, soon forgotten
 Self done is soon done
 Self done is well done
 Self is a bad counsellor
 Self-praise is no recommendation
 Set a beggar on horseback and he'll ride to the devil
 Set a thief to catch a thief
+Set every man to do what he was made for
 Shallow streams make most din
+Shoemaker's wives are worst shod
+Short accounts make long friends
 Short debts make long friends
 Silence gives consent
+Silks and stains put out the fire in the kitchen
 Since Adam was a boy
 Sink or swim!
 Six of one and half a dozen of the other
 Slow and steady wins the race
+Slow and steady wins the race
 Slow but sure
+Slow to resolute, but in performance quick
+Small is the seed of every greatness
 Small rain lays great dust
+Small sorrows speak; great ones are silent
+Snow is the poor man's fertilizer
+So got, so gone
+So many countries, so many customs
 So many countries, so many customs
 So many men, so many minds
+So many men, so many minds
+So many men, so many minds
 Soft fire makes sweet malt
+Soft fire makes sweet malt
+Some are wise, but some are otherwise
+Some rise by sin, and some by virtue fall
 Something is rotten in the state of Denmark 
 Soon learnt, soon forgotten
 Soon ripe, soon rotten
+Soon ripe, soon rotten
+Soon ripe, soon rotten; soon wise, soon foolish
+Sorrow is laughter's daughter
+Sour grapes
+Sow the wind and reap the whirlwind
+Spare the rod and spoil the child
+Spare the rod, and spare the child
+Speak of the devil
+Speak of the devil and he will appear
 Speak of the devil and he will appear (is sure to appear)
 Speech is silver but silence is gold
 Standers-by see more than gamesters
+Stay cool but don't freeze
+Step after step, the ladder is ascended
+Still waters run deep
+Still waters run deep
 Still waters run deep
 Stolen pleasures are sweetest
+Store is no sore
 Stretch your arm no further than your sleeve will reach
 Stretch your legs according to the coverlet
+Strike while the iron is hot
 Strike while the iron is hot
 Stuff today and starve tomorrow
 Success is never blamed
 Such carpenters, such chips
+Such master, such servant
 Sweep before your own door
+Sweet discourse makes short days and nights
+Sweet sixteen and never been kissed
+Take away the case and the effect must cease
 Take care of the pence and the pounds will take care of themselves
+Take time by the forelock
 Take us as you find us
+Take, have, and keep are pleasant words
+Talk of the devil, and he is bound to appear
 Tarred with the same brush
 Tastes differ
 Tell that to the marines
 That cock won't fight
 That which one least anticipates soonest comes to pass
 That's a horse of another colour
+That's like putting a fifth wheel to a coach
+That's the way the cookie crumbles
 That's where the shoe pinches!
+The angry man opens his mouth and shuts his eyes
 The beggar may sing before the thief (before a footpad)
+The belly has no ears
 The best fish smell when they are three days old
 The best fish swim near the bottom
 The best is oftentimes the enemy of the good
+The best looking glass is an old friend
+The best means of destroying an enemy is to make him your friend
+The best of plans is to run away
+The best of the sport is to do the deed and say nothing
+The best things in life are free
+The biter is bit
+The biter is sometimes bit
+The burden is light on the shoulders of others
 The busiest man finds the most leisure
 The camel going to seek horns lost his ears
 The cap fits
@@ -775,9 +1442,12 @@ The cat shuts its eyes when stealing cream
 The cat would eat fish and would not wet her paws
 The chain is no stronger than its weakest link
 The cobbler should stick to his last
+The cobbler should stick to his last
 The cobbler's wife is the worst shod
+The company makes the feast
 The darkest hour is that before the dawn
 The darkest place is under the candlestick
+The day's plan should made out early in the morning
 The devil is not so black as he is painted
 The devil knows many things because he is old
 The devil lurks behind the cross
@@ -785,6 +1455,7 @@ The devil rebuking sin
 The dogs bark, but the caravan goes on
 The Dutch have taken Holland !
 The early bird catches the worm
+The ebb will fetch off what the tide brings in
 The end crowns the work
 The end justifies the means
 The evils we bring on ourselves are hardest to bear
@@ -792,61 +1463,125 @@ The exception proves the rule
 The face is the index of the mind
 The falling out of lovers is the renewing of love
 The fat is in the fire
+The filth under the white snow the sun discovers
 The first blow is half the battle
+The first blow is halfly the battle
+The first step is always the hardest
+The first step is the hardest
+The flame is not far away from the smoke
+The fortune of the house stands by its virtue
+The fortune teller cannot tell his our fortune
+The fowl knows the serpent's sneeze
+The frog in the well knows nothing of the great ocean
+The frog will jump back into the pool although it sits on a golden stool
 The furthest way about is the nearest way home
 The game is not worth the candle
+The getting out of the door is the greatest part of the journey
+The grass is always greener on the other side
+The grass is always greener on the other side of the fence
+The greatest rivers must run into the sea
+The greatest talkers are always the least doers
 The heart that once truly loves never forgets
 The higher the ape goes, the more he shows his tail
+The husband is always last to know
 The last drop makes the cup run over
+The last drop makes the cup run over
+The last five minutes determine the issue
 The last straw breaks the camel's back
 The leopard cannot change its spots
 The longest day has an end
+The longest night must end
+The merry in heart have a continual feast
 The mill cannot grind with the water that is past
+The mind makes heaven of hell and hell of heaven
 The moon does not heed the barking of dogs
+The moon's not seen where the sun shines
 The more haste, the less speed
+The more laws, the more offenders
+The more noble, the more humble
 The more the merrier
+The more the merrier
+The more violent the storm the sooner it is over
+The more you get, the more you want
 The morning sun never lasts a day
 The mountain has brought forth a mouse
 The nearer the bone, the sweeter the flesh
+The net of the sleeper catches fish
+The new broom sweeps right
+The old forget; the young don't know
+The only way to have a friend is to be one
+The pen is mightier than the sword
 The pitcher goes often to the well but is broken at last
+The pleasures of the mighty are the tears of the poor
 The pot calls the kettle black
+The pot calls the kettle black
+The pot calls the kettle black
+The pot calls the kettle black
+The price of your hat isn't the measure of your brain
 The proof of the pudding is in the eating
 The receiver is as bad as the thief
 The remedy is worse than the disease
+The remedy is worse than the disease
+The richer get richer and the poor get babies
 The rotten apple injures its neighbours
 The scalded dog fears cold water
+The second word makes the quarrel
+The sickness of the body may prove the health of the mind
+The sickness of the body may prove the health of the mind
+The strongest oaths are straw to the fire
+The sweetest grapes hang highest
+The tailor ill dressed, the shoemaker ill shod
 The tailor makes the man
+The tailor makes the man
+The tongue is boneless but it breaks bones
 The tongue of idle persons is never idle
+The used key is always bright
 The voice of one man is the voice of no one
 The way to hell is paved with good intentions
 The wind cannot be caught in a net
 The work shows the workman
+The wrong doer never lacks a pretext
+The yellow dog is brother of the wolf
 There are lees to every wine
 There are more ways to the wood than one
 There is a place for everything, and everything in its place
+There is an eternal bliss in a momentary kiss
+There is love downward but no love upward
 There is more than one way to kill a cat
 There is no fire without smoke
 There is no place like home
 There is no rose without a thorn
+There is no royal road to learning
 There is no rule without an exception
 There is no smoke without fire
+There is truth in wine
 There's many a slip 'tween the cup and the lip
+There's no joy in anything unless we share it
 There's no use crying over spilt milk
 They are hand and glove
 They must hunger in winter that will not work in summer
+Things done cannot be undone
 Things past cannot be recalled
 Think today and speak tomorrow
 Those who live in glass houses should not throw stones
+Throw the baby out with the bath water
+Tighten your helmet strings in victory
+Time and tide wait for no man
 Time and tide wait for no man
 Time cures all things
+Time discloses all things
+Time flies like an arrow and time lost never returns
 Time is money
+Time is the best counsellor
 Time is the great healer
+Time tries truth
 Time works wonders
 To add fuel to the fire (flames)
 To angle with a silver hook
 To be born with a silver spoon in one's mouth
 To be head over ears in debt
 To be in one's birthday suit
+To be prepared is to have no anxiety
 To be up to the ears in love
 To be wise behind the hand
 To beat about the bush
@@ -859,6 +1594,7 @@ To call off the dogs
 To carry coals to Newcastle
 To cast pearls before swine
 To cast prudence to the winds
+To climb steep hills requires slow pace at first
 To come away none the wiser
 To come off cheap
 To come off with a whole skin
@@ -869,8 +1605,8 @@ To cook a hare before catching him
 To cry with one eye and laugh with the other
 To cut one's throat with a feather
 To draw in one's horns
-To drop a bucket into an empty well
 To draw water in a sieve
+To drop a bucket into an empty well
 To eat the calf in the cow's belly
 To err is human
 To fiddle while Rome is burning
@@ -887,6 +1623,8 @@ To have a finger in the pie
 To have rats in the attic
 To hit the nail on the head
 To kick against the pricks
+To kick the sand with the hind legs
+To kill two birds with one stone
 To kill two birds with one stone
 To know everything is to know nothing
 To know on which side one's bread is buttered
@@ -895,29 +1633,34 @@ To lay by for a rainy day
 To live from hand to mouth
 To lock the stable-door after the horse is stolen
 To look for a needle in a haystack
+To lose is to win
 To love somebody as the devil loves holy water
 To make a mountain out of a molehill
 To make both ends meet
-To make the cup run over
 To make the air blue
+To make the cup run over
 To measure another man's foot by one's own last
 To measure other people's corn by one's own bushel
 To pay one back in one's own coin
 To plough the sand
 To pour water into a sieve
+To preserve friendship, one must build walls
 To pull the chestnuts out of the fire for somebody
 To pull the devil by the tail
 To put a spoke in somebody's wheel
 To put off till Doomsday
 To put the cart before the horse
+To refuse graciously is half to grant a favor
 To rob one's belly to cover one's back
 To roll in money
 To run with the hare and hunt with the hounds
 To save one's bacon
+To sell the bear's skin before has been caught
 To send owls to Athens 
 To set the wolf to keep the sheep
 To stick to somebody like a leech
 To strain at a gnat and swallow a camel
+To take a musket to kill a butterfly
 To take counsel of one's pillow
 To take the bull by the horns
 To teach the dog to bark
@@ -932,69 +1675,132 @@ To wear one's heart upon one's sleeve
 To weep over an onion
 To work with the left hand
 Tomorrow come never
+Too many books make us ignorant
 Too many cooks spoil the broth
 Too much knowledge makes the head bald
 Too much of a good thing is good for nothing
 Too much water drowned the miller 
 Too swift arrives as tardy as too slow
+Translators, traitors
 True blue will never stain
 True coral needs no painter's brush
 Truth comes out of the mouths of babes and sucklings
+Truth is lost by too much controversy
 Truth is stranger than fiction
+Truth is the best advocate
 Truth lies at the bottom of a well
+Try a horse by riding him; try a man by associating with him
 Two blacks do not make a white
+Two dogs strive for a bone, and a third runs away with it
 Two heads are better than one
+Two heads are better than one
+Two in distress make trouble less
 Two is company, but three is none
+Two's company, three's none
+Variety is the spice of life
 Velvet paws hide sharp claws
 Virtue is its own reward
+Visits should be short like a Winter's day
 Wait for the cat to jump
+Walls have ears
+Walls have ears
 Walls have ears
 Wash your dirty linen at home
 Waste not, want not
+Waste not, want not
+Water is boon in the desert, but the drowning curses it
+We all have enough strength to bear the misfortunes of others
+We are born crying, live complaining, and die disappointed
+We are the authors of our own disasters
+We cannot come to honour under coverlet
+We die but once
 We know not what is good until we have lost it
+We must live as we can, not as we would
 We never know the value of water till the well is dry
 We shall see what we shall see
+We sink to rise
 We soon believe what we desire
 Wealth is nothing without health
 Well begun is half done
+Well begun is half done
+Well fed, well bred
+What can't be cured must be endured
 What can't be cured, must be endured
+What comes from the heart goes to the heart
 What is bred in the bone will not go out of the flesh
 What is done by night appears by day
 What is done cannot be undone
+What is done cannot be undone
 What is got over the devil's back is spent under his belly
+What is learned in the cradle is carried to the grave
 What is lost is lost
 What is sauce for the goose is sauce for the gander
 What is worth doing at alt is worth doing well
+What much is worth comes from the earth
 What must be, must be
 What the heart thinks the tongue speaks
+What the heart thinks, the mouth speaks
 What we do willingly is easy
+Whatever you undertake, think of the end
+What's sauce for the goose is sauce for the gander
+What's yours is mine, and what's mine is my own
+When angry count ten; when very angry, a hundred
 When angry, count a hundred
 When at Rome, do as the Romans do
 When children stand quiet, they have done some harm
 When flatterers meet, the devil goes to dinner
+When friends meet
+When god closes one door, he opens another
 When guns speak it is too late to argue
+When in Rome, do as the romans do
+When one door shuts, another opens
 When pigs fly
 When Queen Anne was alive
+When the calf is drowned they cover the well
 When the cat is away, the mice will play
+When the cat's away, the mice will play
 When the devil is blind
 When the fox preaches, take care of your geese
 When the pinch comes, you remember the old shoe
+When the well is full, it will run over
 When three know it, alt know it
 When wine is in wit is out
+When you are good to others, you are best to yourself
+Where there is a will, there is a way
+Where there is life, there is hope
 Where there's a will, there's a way
+Where three travel together, one will be my teacher
 While the grass grows the horse starves
 While there is life there is hope
+While there is life, there is hope
 Who breaks, pays
 Who has never tasted bitter, knows not what is sweet
+Who holds the purse rules the house
 Who keeps company with the wolf, will learn to howl
+Wisdom is more to be envied than riches
+Wisdom may come out of the mouths of babes
 Wise after the event
 With time and patience the leaf of the mulberry becomes satin
+Without a friend to share them, no goods we posses are rally enjoyable
+Without patronage art is like a windmill without wind
+Words are the voice of the heart
 Words pay no debts
+You and I draw both in the same yoke
+You can lead a horse to water, but you can't make him drink
 You can take a horse to the water but you cannot make him drink
 You cannot eat your cake and have it
 You cannot flay the same ox twice
 You cannot judge a tree by it bark
 You cannot teach old dogs new tricks
 You cannot wash charcoal white
+You can't ear your cake and have it
+You can't hold a candle to the sun
+You can't seek Lady Luck; Lady Luck seeks you
+You can't tell a book by its cover
 You made your bed, now lie in it
+You may go farther and fare worse
+You may take a horse to the water, but you cannot make him drink
+You never miss the water till the well runs dry
+You're never too old to learn
+You're not the Lone Ranger
 Zeal without knowledge is a runaway horse
