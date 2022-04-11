@@ -233,9 +233,9 @@ bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @r
         } else {
           @size = @size + 1
           if (@chance == 3 || @chance == 4) {
-            kafka_send('ch.send_message', json_encode(array('player': @player, 'message': '\ue4e9' color('#80c8ff').'튜나 봇§f :: 당신은' @size.'번쨰로 문장을 입력하셨습니다!')))
+            kafka_send('ch.send_message', json_encode(array('player': @player, 'message': '\ue4e9' color('#80c8ff').'튜나 봇§f :: 당신은' @size.'번째로 문장을 입력하셨습니다!')))
           } else {
-            kafka_send('ch.send_message', json_encode(array('player': @player, 'message': '\ue4e9' color('#80c8ff').'튜나 봇§f :: 당신은' @size.'번쨰로 정답을 맞추셨습니다!')))
+            kafka_send('ch.send_message', json_encode(array('player': @player, 'message': '\ue4e9' color('#80c8ff').'튜나 봇§f :: 당신은' @size.'번째로 정답을 맞추셨습니다!')))
           }
         }
         kafka_send('ch.give_autoquiz_reward', json_encode(array('player': @player, 'reward': @reward)))
