@@ -29,7 +29,7 @@ trader:
       z: 256
       world: spawn
   selectItemCount: # 아이템 목록중 몇개를 뽑을 건지
-    BUY: 11~15 # 최소-최대 (랜덤)
+    BUY: 13~15 # 최소-최대 (랜덤)
     SELL: 11~15
 tradeItemList: # 아이템 리스트
   BUY: # 구매 아이템 리스트 (유저 기준 구매)amethyst_cluster
@@ -46,6 +46,26 @@ tradeItemList: # 아이템 리스트
         'stock': 1~3
         'price': 200
         'limit': 1
+    - 'name': 'PODZOL'
+      'meta':
+        'stock': 100~300
+        'price': 2.5
+        'limit': 64
+    - 'name': 'GRASS_BLOCK'
+      'meta':
+        'stock': 8~16
+        'price': 100.0
+        'limit': 1
+    - 'name': 'MUSHROOM_STEM'
+      'meta':
+        'stock': 100~300
+        'price': 2.5
+        'limit': 64
+    - 'name': 'BROWN_MUSHROOM_BLOCK'
+      'meta':
+        'stock': 100~300
+        'price': 2.5
+        'limit': 64
     - 'name': 'AMETHYST_CLUSTER'
       'meta':
         'stock': 32~64
@@ -78,9 +98,9 @@ tradeItemList: # 아이템 리스트
         'limit': 64
     - 'name': 'END_ROD'
       'meta':
-        'stock': 8~16
-        'price': 25.0
-        'limit': 5
+        'stock': 20~30
+        'price': 20.0
+        'limit': 8
     - 'name': 'HONEY_BOTTLE'
       'meta':
         'stock': 16~32
@@ -119,7 +139,7 @@ tradeItemList: # 아이템 리스트
     - 'name': 'BONE'
       'meta':
         'stock': 256
-        'price': 1.5
+        'price': 1.0
         'limit': 32
     - 'name': 'LODESTONE'
       'meta':
@@ -204,12 +224,12 @@ tradeItemList: # 아이템 리스트
     - 'name': 'BLUE_ICE'
       'meta':
         'stock': 100~200
-        'price': 3.0
+        'price': 1.5
         'limit': 64
     - 'name': 'PACKED_ICE'
       'meta':
         'stock': 100~200
-        'price': 3.0
+        'price': 1.5
         'limit': 64
     - 'name': 'WITHER_ROSE'
       'meta':
@@ -219,12 +239,12 @@ tradeItemList: # 아이템 리스트
     - 'name': 'SEA_LANTERN'
       'meta':
         'stock': 100~200
-        'price': 10.0
+        'price': 8.0
         'limit': 32
     - 'name': 'WHITE_WOOL'
       'meta':
         'stock': 100~200
-        'price': 4
+        'price': 2.5
         'limit': 32
         
   SELL:
