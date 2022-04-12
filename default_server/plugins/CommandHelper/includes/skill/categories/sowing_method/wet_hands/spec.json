@@ -1,0 +1,116 @@
+{
+  "category": "sowing_method",
+	"default_max_point": 3,
+	"effect_by_point": [
+		{
+			"passive": {
+			},
+			"active": {
+				"cooldown": 180,
+				"duration": 30,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+			},
+			"active": {
+				"cooldown": 180,
+				"duration": 30,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+			},
+			"active": {
+				"cooldown": 180,
+				"duration": 40,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+			},
+			"active": {
+				"cooldown": 160,
+				"duration": 40,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+			},
+			"active": {
+				"cooldown": 160,
+				"duration": 50,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+			},
+			"active": {
+				"cooldown": 140,
+				"duration": 50,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+			},
+			"active": {
+				"cooldown": 140,
+				"duration": 60,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+			},
+			"active": {
+				"cooldown": 120,
+				"duration": 60,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+			},
+			"active": {
+				"cooldown": 120,
+				"duration": 70,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+			},
+			"active": {
+				"cooldown": 100,
+				"duration": 70,
+				"count": 0,
+				"energy": 0
+			}
+		},
+		{
+			"passive": {
+			},
+			"active": {
+				"cooldown": 100,
+				"duration": 80,
+				"count": 0,
+				"energy": 0
+			}
+		}
+	]
+}

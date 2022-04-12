@@ -1,0 +1,39 @@
+{
+  "category": "mining",
+	"default_max_point": 3,
+	"effect_by_point": [
+		{
+			"multiply": 1
+		},
+		{
+			"multiply": 1.5
+		},
+		{
+			"multiply": 2.0
+		},
+		{
+			"multiply": 2.5
+		},
+		{
+			"multiply": 3.0
+		},
+		{
+			"multiply": 3.5
+		},
+		{
+			"multiply": 4.0
+		},
+		{
+			"multiply": 4.5
+		},
+		{
+			"multiply": 5.0
+		},
+		{
+			"multiply": 5.5
+		},
+		{
+			"multiply": 6.0
+		}
+	]
+}

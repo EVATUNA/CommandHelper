@@ -2424,22 +2424,22 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
           if(!is_null(@item['meta']) && @waterable && pcooldown(@player, 'TURTLE_HELMET') == 0) {
             switch(@item['meta']['model']) {
             case 1: // 구리 물뿌리개
-              @range = 1
+              @range = 3
               @min_power = 4
               @max_power = 6
               break()
             case 2: // 금 물뿌리개
-              @range = 5
+              @range = 7
               @min_power = 0
               @max_power = 2
               break()
             case 3: // 다이아몬드 물뿌리개
-              @range = 3
+              @range = 5
               @min_power = 2
               @max_power = 5
               break()
             case 4: // 네더라이트 물뿌리개
-              @range = 5
+              @range = 7
               @min_power = 2
               @max_power = 4
               break()
