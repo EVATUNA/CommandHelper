@@ -447,7 +447,7 @@ bind('mom_moisture_change', null, null, @event) {
     }
   }
   if(@is_drying) {
-    if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), get_block(@crop_location))) {
+    if(array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'ATTACHED_PUMPKIN_STEM', 'ATTACHED_MELON_STEM', 'SWEET_BERRY_BUSH'), get_block(@crop_location))) {
       @chance = 0.5
     } else {
       @chance = 0.3
@@ -459,7 +459,7 @@ bind('mom_moisture_change', null, null, @event) {
     }
   } else {
     @new_moisture = @old_moisture + 1
-    if(@new_moisture > 6) {@new_moisture = 6}
+    if(@new_moisture > 5) {@new_moisture = 5}
     set_blockdata(@location, array('block': 'farmland', 'moisture': @new_moisture))
   }
 }
