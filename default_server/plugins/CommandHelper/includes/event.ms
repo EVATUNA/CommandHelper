@@ -283,7 +283,7 @@ bind('block_place', null, null, @event, @players_data, @skills_spec) {
       if(array_contains(@crops, @event['block'])) {
         @player_data = @players_data[@uuid]
         @skill_manager = @player_data['skill_manager']
-        @sowing_method = @harvesting_method = json_decode(@skill_manager[4])['sowing_method']
+        @sowing_method = json_decode(@skill_manager[4])['sowing_method']
         if(@sowing_method != '' && @player_data['active_skill'][@sowing_method][1] > 0) {
           switch(@sowing_method) {
           case 'wet_hands':
@@ -291,7 +291,7 @@ bind('block_place', null, null, @event, @players_data, @skills_spec) {
             @farmland_location['y'] -= 1
             @farmland_blockdata = get_blockdata(@farmland_location)
             if(@farmland_blockdata['block'] == 'farmland') {
-              @farmland_blockdata['moisture'] = 6
+              @farmland_blockdata['moisture'] = 5
               set_blockdata(@farmland_location, @farmland_blockdata)
             }
             break()

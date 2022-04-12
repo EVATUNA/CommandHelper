@@ -190,7 +190,28 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
                   }
                   if(!is_cancelled()) { // 성공적으로 수확 시 1단계 작물 심기
                     set_timeout(1, closure() {
-                      set_block(@center_location, @crop)
+                      @sowing_method = json_decode(@skill_manager[4])['sowing_method']
+                      if(@sowing_method != '' && @player_data['active_skill'][@sowing_method][1] > 0) {
+                        switch(@sowing_method) {
+                        case 'wet_hands':
+                          @farmland_location = array_deep_clone(@center_location)
+                          @farmland_location['y'] -= 1
+                          @farmland_blockdata = get_blockdata(@farmland_location)
+                          if(@farmland_blockdata['block'] == 'farmland') {
+                            @farmland_blockdata['moisture'] = 5
+                            set_blockdata(@farmland_location, @farmland_blockdata)
+                          }
+                          break()
+                        case 'fertile_touch':
+                          @crop_location = array_deep_clone(@center_location)
+                          @crop_blockdata = get_blockdata(@crop_location)
+                          @crop_blockdata['age'] = 1
+                          set_blockdata(@crop_location, @crop_blockdata)
+                          break()
+                        }
+                      } else {
+                        set_block(@center_location, @crop)
+                      }
                     })
                   }
                 }
