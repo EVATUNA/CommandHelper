@@ -2398,6 +2398,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
           }
         }
       case 'EGG':
+      case 'WRITABLE_BOOK':
         cancel()
         break()
       case 'TURTLE_HELMET': // 물뿌리개
@@ -2637,7 +2638,9 @@ bind('player_interact_entity', null, null, @event) {
 # 피스톤 캔슬
 bind('piston_extend', null, null, @event) {
   @immovable_blocks = array(
+    'BROWN_MUSHROOM',
     'CACTUS',
+    'COCOA',
     'SUGAR_CANE',
     'GRASS_BLOCK',
     'DIRT',
@@ -2645,8 +2648,10 @@ bind('piston_extend', null, null, @event) {
     'ROOTED_DIRT',
     'PODZOL',
     'SAND',
+    'NETHER_WART',
     'MOSS_BLOCK',
     'MYCELIUM',
+    'RED_MUSHROOM',
     'RED_SAND'
   )
   foreach(@affectedBlock in @event['affectedBlocks']) {
@@ -2658,7 +2663,9 @@ bind('piston_extend', null, null, @event) {
 }
 bind('piston_retract', null, null, @event) {
     @immovable_blocks = array(
+    'BROWN_MUSHROOM',
     'CACTUS',
+    'COCOA',
     'SUGAR_CANE',
     'GRASS_BLOCK',
     'DIRT',
@@ -2666,8 +2673,10 @@ bind('piston_retract', null, null, @event) {
     'ROOTED_DIRT',
     'PODZOL',
     'SAND',
+    'NETHER_WART',
     'MOSS_BLOCK',
     'MYCELIUM',
+    'RED_MUSHROOM',
     'RED_SAND'
   )
   foreach(@affectedBlock in @event['affectedBlocks']) {
