@@ -3442,46 +3442,52 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
           if(!is_null(@items['main_hand']) && @items['main_hand']['name'] == 'SHIELD') {
             @shield_slot = pheld_slot(@player)
             @item = @items['main_hand']
-          } else {
+          } else if(!is_null(@items['off_hand']) && @items['off_hand']['name'] == 'SHIELD') {
             @shield_slot = 40
             @item = @items['off_hand']
+          } else {
+            @item = null
           }
-          # 방어 회복 구해서 쿨다운 적용
-          @defense_recovery = 1
-          if(array_index_exists(@item, 'meta', 'modifiers') && is_array(@item['meta']['modifiers'])) {
-            foreach(@modifier in @item['meta']['modifiers']) {
-              if(@modifier['attribute'] == 'HORSE_JUMP_STRENGTH') {
-                @defense_recovery = @modifier['amount']
-                break()
+          if(!is_null(@item)) {
+            # 방어 회복 구해서 쿨다운 적용
+            @defense_recovery = 1
+            if(array_index_exists(@item, 'meta', 'modifiers') && is_array(@item['meta']['modifiers'])) {
+              foreach(@modifier in @item['meta']['modifiers']) {
+                if(@modifier['attribute'] == 'HORSE_JUMP_STRENGTH') {
+                  @defense_recovery = @modifier['amount']
+                  break()
+                }
               }
             }
-          }
-          @cooldown_large = @event['amount'] * (10 - @defense_recovery) // 막은 데미지에 의한 쿨탐
-          if(@cooldown_large < 0) { @cooldown_large = 0 }
-          @cooldown_small = 10 - @defense_recovery // 무기 등급에 따른 기본 쿨탐
-          if(@cooldown_small < 0) { @cooldown_small = 0 }
-          @cooldown = integer(@cooldown_large + @cooldown_small)
-          if(@cooldown < @min_cooldown) { // 최소 쿨탐 세팅
-            @cooldown = @min_cooldown
-          }
-          set_pcooldown(@player, 'SHIELD', @cooldown)
-
-          # 아이템 새로고침
-          set_timeout(1, closure() {
-            @damaged_item = get_inventory_item(@puuid, @shield_slot)
-            if(!is_null(@damaged_item) && @damaged_item['name'] == 'SHIELD') {
-              @dummy_item = array(
-                'name': 'CLOCK',
-                'qty': 1,
-                'meta': array(
-                  'model': 1,
-                  'display': ' '
-                )
-              )
-              set_inventory_item(@puuid, @shield_slot, @dummy_item)
-              set_timeout(1, closure() {set_inventory_item(@puuid, @shield_slot, @damaged_item)})
+            @cooldown_large = @event['amount'] * (10 - @defense_recovery) // 막은 데미지에 의한 쿨탐
+            if(@cooldown_large < 0) { @cooldown_large = 0 }
+            @cooldown_small = 10 - @defense_recovery // 무기 등급에 따른 기본 쿨탐
+            if(@cooldown_small < 0) { @cooldown_small = 0 }
+            @cooldown = integer(@cooldown_large + @cooldown_small)
+            if(@cooldown < @min_cooldown) { // 최소 쿨탐 세팅
+              @cooldown = @min_cooldown
             }
-          })
+            set_pcooldown(@player, 'SHIELD', @cooldown)
+
+            # 아이템 새로고침
+            set_timeout(1, closure() {
+              @damaged_item = get_inventory_item(@puuid, @shield_slot)
+              if(!is_null(@damaged_item) && @damaged_item['name'] == 'SHIELD') {
+                @dummy_item = array(
+                  'name': 'CLOCK',
+                  'qty': 1,
+                  'meta': array(
+                    'model': 1,
+                    'display': ' '
+                  )
+                )
+                set_inventory_item(@puuid, @shield_slot, @dummy_item)
+                set_timeout(1, closure() {set_inventory_item(@puuid, @shield_slot, @damaged_item)})
+              }
+            })
+          } else {
+            _debugmsg('방어 오류' @items['main_hand'] @items['off_hand'])
+          }
 
         }
       } else {
