@@ -123,7 +123,7 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
 
       @item = @player_data['item']['main_hand']
       if(!is_null(@item) && array_contains(array('WOODEN_HOE', 'STONE_HOE', 'GOLDEN_HOE', 'IRON_HOE', 'DIAMOND_HOE', 'NETHERITE_HOE'), @item['name'])) {
-        if(@harvesting_method == 'golden_finger' && @player_data['active_skill'][@harvesting_method][1] > 0) {
+        if((@harvesting_method == 'wide_hands' || @harvesting_method == 'golden_finger') && @player_data['active_skill'][@harvesting_method][1] > 0) {
           if(@age != @crop_reward['max_age']) {
             cancel()
           }
@@ -159,8 +159,8 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
                     @damage += 1
                   }
                   @locations[] = @center_location
-                  for(@x = -1, @x < 2, @x++) {
-                    for(@z = -1, @z < 2, @z++) {
+                  for(@x = -2, @x < 3, @x++) {
+                    for(@z = -2, @z < 3, @z++) {
                       if(@x != 0 || @z != 0) {
                         @surrounding_location = array('x': @center_location['x'] + @x, 'y': @center_location['y'], 'z': @center_location['z'] + @z, 'world': @center_location['world'])
                         if(get_block(@surrounding_location) == @crop && get_blockdata(@surrounding_location)['age'] == @crop_reward['max_age']) {
