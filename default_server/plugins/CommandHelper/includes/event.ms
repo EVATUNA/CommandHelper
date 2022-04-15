@@ -2509,7 +2509,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
                   # 경작지 세팅
                   @blockdata = get_blockdata(@watering_location)
                   @blockdata['moisture'] += rand(@min_power, @max_power + 1)
-                  if(@blockdata['moisture'] > 6) { @blockdata['moisture'] = 6 }
+                  if(@blockdata['moisture'] > 5) { @blockdata['moisture'] = 5 }
                   set_blockdata(@watering_location,@blockdata)
                 }
               }
