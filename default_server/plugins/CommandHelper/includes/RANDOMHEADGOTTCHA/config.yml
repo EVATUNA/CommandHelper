@@ -1,0 +1,101 @@
+TARGET_WORLD: "spawn"
+
+CATEGORYS: 
+  alphabet:
+    slot: 10
+    payment: 70.0
+    name: "PLAYER_HEAD"
+    meta:
+      owneruuid: 0fe6fad8-fb07-4a80-ba5a-d533699c714c
+      texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTY3ZDgxM2FlN2ZmZTViZTk1MWE0ZjQxZjJhYTYxOWE1ZTM4OTRlODVlYTVkNDk4NmY4NDk0OWM2M2Q3NjcyZSJ9fX0=
+      display: §a알파벳
+  animals:
+    slot: 12
+    payment: 70.0
+    name: "PLAYER_HEAD"
+    meta:
+      owneruuid: 2d829a88-51e3-49a5-9074-3aba71ecf9cd
+      texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWQ2YzZlZGE5NDJmN2Y1ZjcxYzMxNjFjNzMwNmY0YWVkMzA3ZDgyODk1ZjlkMmIwN2FiNDUyNTcxOGVkYzUifX19
+      display: §a동물
+  blocks:
+    slot: 14
+    payment: 70.0
+    name: "PLAYER_HEAD"
+    meta:
+      owneruuid: d679b9e6-33d8-4bb9-aaf4-159e6b023edb
+      texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTFlZDlhYmY1MWZlNGVhODRjZmNiMjcyOTdmMWJjNTRjZDM4MmVkZjg1ZTdiZDZlNzVlY2NhMmI4MDY2MTEifX19
+      display: §a블럭
+  decoration:
+      slot: 16
+      payment: 70.0
+      name: "PLAYER_HEAD"
+      meta:
+        owneruuid: a477603e-620a-463c-919b-dee3c787c813
+        texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2UyMjM5MWUzNWEzZTViY2VlODlkYjMxMmU4NzRmZGM5ZDllN2E2MzUxMzE0YjgyYmRhOTdmYmQyYmU4N2ViOCJ9fX0=
+        display: §a데코레이션
+  food:
+      slot: 19
+      payment: 70.0
+      name: "PLAYER_HEAD"
+      meta:
+        owneruuid: b6ef4483-794e-4283-bbef-476d30cc0a63
+        texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTE5OTdkYTY0MDQzYjI4NDgyMjExNTY0M2E2NTRmZGM0ZThhNzIyNjY2NGI0OGE0ZTFkYmI1NTdiNWMwZmUxNCJ9fX0=
+        display: §a음식 및 음료
+  humans:
+      slot: 21
+      payment: 70.0
+      name: "PLAYER_HEAD"
+      meta:
+        owneruuid: 5cd11334-2579-4f8a-acef-f6ddecc52c80
+        texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWI3YWY5ZTQ0MTEyMTdjN2RlOWM2MGFjYmQzYzNmZDY1MTk3ODMzMzJhMWIzYmM1NmZiZmNlOTA3MjFlZjM1In19fQ==
+        display: §a인간
+  humanoid:
+      slot: 23
+      payment: 70.0
+      name: "PLAYER_HEAD"
+      meta:
+        owneruuid: 2c5b2f37-b1b1-438c-b0c3-1a115e001df3
+        texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODIyZDhlNzUxYzhmMmZkNGM4OTQyYzQ0YmRiMmY1Y2E0ZDhhZThlNTc1ZWQzZWIzNGMxOGE4NmU5M2IifX19
+        display: §a유사 인간
+  miscellaneous:
+      slot: 25
+      payment: 70.0
+      name: "PLAYER_HEAD"
+      meta:
+        owneruuid: 589d8017-16a6-4e79-8021-8e28e6172b9f
+        texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTJlOTgxNjVkZWVmNGVkNjIxOTUzOTIxYzFlZjgxN2RjNjM4YWY3MWMxOTM0YTQyODdiNjlkN2EzMWY2YjgifX19
+        display: §a이모티콘
+  monsters:
+      slot: 28
+      payment: 70.0
+      name: "PLAYER_HEAD"
+      meta:
+        owneruuid: e1161176-f234-4588-b8f5-6808e00a6ae7
+        texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTZmYzg1NGJiODRjZjRiNzY5NzI5Nzk3M2UwMmI3OWJjMTA2OTg0NjBiNTFhNjM5YzYwZTVlNDE3NzM0ZTExIn19fQ==
+        display: §a몬스터
+  plants:
+      slot: 30
+      payment: 70.0
+      name: "PLAYER_HEAD"
+      meta:
+        owneruuid: aa31e555-5e2b-467e-b1df-44584d03f1fc
+        texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmE3MjgxNTA3MjZlMTA4MmI1ZjhlOTJjOTgwOTZjMTcyODc5NWM0NjY4MTljOWFhZmMxMjI3ZmNiOTlmNmI0In19fQ==
+        display: §a식물
+  #custom:
+      #slot: 32
+      #payment: 20.0
+      #name: "PLAYER_HEAD"
+      #meta:
+        #owneruuid: f3f12d7f-c0b8-43bc-94b6-621133157790
+        #texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDQyMzg2OGU1OGMyM2EyZDQ0YzE1NGQzYmFkMzA0NGRjODE1NzM1MTM2ZjNkMmRkZTJjZDRkOGE5OTE3In19fQ==
+        #display: §a커스텀
+  all:
+      slot: 32
+      payment: 70.0
+      name: "PLAYER_HEAD"
+      meta:
+        display: §a랜덤
+        owner: "MHF_Question"
+
+      
+      
