@@ -1,310 +1,429 @@
 {
   "WHEAT": {
+    "type": "normal",
     "max_age": 7,
     "default_qty": 1,
-    "tunalevel": {
-      "default": -0.25,
-      "extra": 1.5
-    },
-    "arcanelevel": {
-      "default": -0.25,
-      "extra": 1.5
-    },
     "mastery": "wheat_farming_mastery",
-    "loot_table": [
-      {
-        "item": {
-          "name": "WHEAT"
-        },
-        "weight": 100,
-        "quality": 0
+    "rainy_biome": {
+      "tunalevel": {
+        "default": -0.25,
+        "extra": 1.5
       },
-      {
-        "item": {
-          "name": "WHEAT",
-          "meta": {
-            "display": "§e중급 밀",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
+      "arcanelevel": {
+        "default": -0.25,
+        "extra": 1.5
       },
-      {
-        "item": {
-          "name": "WHEAT",
-          "meta": {
-            "display": "§b상급 밀",
-            "model": 2
-          }
+      "loot_table": [
+        {
+          "item": {
+            "name": "WHEAT"
+          },
+          "weight": 100,
+          "quality": 0
         },
-        "weight": 5,
-        "quality": 0.5
-      }
-    ]
+        {
+          "item": {
+            "name": "WHEAT",
+            "meta": {
+              "display": "§e중급 밀",
+              "model": 1
+            }
+          },
+          "weight": 20,
+          "quality": 1
+        },
+        {
+          "item": {
+            "name": "WHEAT",
+            "meta": {
+              "display": "§b상급 밀",
+              "model": 2
+            }
+          },
+          "weight": 5,
+          "quality": 0.5
+        }
+      ]
+    }
   },
   "BEETROOTS": {
+    "type": "normal",
     "max_age": 3,
     "default_qty": 1,
-    "tunalevel": {
-      "default": -0.25,
-      "extra": 1.25
-    },
-    "arcanelevel": {
-      "default": -0.25,
-      "extra": 1.25
-    },
     "mastery": "beetroot_farming_mastery",
-    "loot_table": [
-      {
-        "item": {
-          "name": "BEETROOT"
-        },
-        "weight": 100,
-        "quality": 0
+    "rainy_biome": {
+      "tunalevel": {
+        "default": -0.25,
+        "extra": 1.25
       },
-      {
-        "item": {
-          "name": "BEETROOT",
-          "meta": {
-            "display": "§e중급 사탕무",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
+      "arcanelevel": {
+        "default": -0.25,
+        "extra": 1.25
       },
-      {
-        "item": {
-          "name": "BEETROOT",
-          "meta": {
-            "display": "§b상급 사탕무",
-            "model": 2
-          }
+      "loot_table": [
+        {
+          "item": {
+            "name": "BEETROOT"
+          },
+          "weight": 100,
+          "quality": 0
         },
-        "weight": 5,
-        "quality": 0.5
-      }
-    ]
+        {
+          "item": {
+            "name": "BEETROOT",
+            "meta": {
+              "display": "§e중급 사탕무",
+              "model": 1
+            }
+          },
+          "weight": 20,
+          "quality": 1
+        },
+        {
+          "item": {
+            "name": "BEETROOT",
+            "meta": {
+              "display": "§b상급 사탕무",
+              "model": 2
+            }
+          },
+          "weight": 5,
+          "quality": 0.5
+        }
+      ]
+    }
   },
   "POTATOES": {
+    "type": "normal",
     "max_age": 7,
     "default_qty": 3,
-    "tunalevel": {
-      "default": -0.25,
-      "extra": 1.5
-    },
-    "arcanelevel": {
-      "default": -0.25,
-      "extra": 1.5
-    },
     "mastery": "potato_farming_mastery",
-    "loot_table": [
-      {
-        "item": {
-          "name": "POTATO"
-        },
-        "weight": 100,
-        "quality": 0
+    "rainy_biome": { 
+      "tunalevel": {
+        "default": -0.25,
+        "extra": 1.5
       },
-      {
-        "item": {
-          "name": "POTATO",
-          "meta": {
-            "display": "§e중급 감자",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
+      "arcanelevel": {
+        "default": -0.25,
+        "extra": 1.5
       },
-      {
-        "item": {
-          "name": "POTATO",
-          "meta": {
-            "display": "§b상급 감자",
-            "model": 2
-          }
+      "loot_table": [
+        {
+          "item": {
+            "name": "POTATO"
+          },
+          "weight": 100,
+          "quality": 0
         },
-        "weight": 5,
-        "quality": 0.5
-      }
-    ]
+        {
+          "item": {
+            "name": "POTATO",
+            "meta": {
+              "display": "§e중급 감자",
+              "model": 1
+            }
+          },
+          "weight": 20,
+          "quality": 1
+        },
+        {
+          "item": {
+            "name": "POTATO",
+            "meta": {
+              "display": "§b상급 감자",
+              "model": 2
+            }
+          },
+          "weight": 5,
+          "quality": 0.5
+        }
+      ]
+    }
   },
   "CARROTS": {
+    "type": "normal",
     "max_age": 7,
     "default_qty": 3,
-    "tunalevel": {
-      "default": -0.25,
-      "extra": 1.5
-    },
-    "arcanelevel": {
-      "default": -0.25,
-      "extra": 1.5
-    },
     "mastery": "carrot_farming_mastery",
-    "loot_table": [
-      {
-        "item": {
-          "name": "CARROT"
-        },
-        "weight": 100,
-        "quality": 0
+    "rainy_biome": { 
+      "tunalevel": {
+        "default": -0.25,
+        "extra": 1.5
       },
-      {
-        "item": {
-          "name": "CARROT",
-          "meta": {
-            "display": "§e중급 당근",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
+      "arcanelevel": {
+        "default": -0.25,
+        "extra": 1.5
       },
-      {
-        "item": {
-          "name": "CARROT",
-          "meta": {
-            "display": "§b상급 당근",
-            "model": 2
-          }
+      "loot_table": [
+        {
+          "item": {
+            "name": "CARROT"
+          },
+          "weight": 100,
+          "quality": 0
         },
-        "weight": 5,
-        "quality": 0.5
-      }
-    ]
+        {
+          "item": {
+            "name": "CARROT",
+            "meta": {
+              "display": "§e중급 당근",
+              "model": 1
+            }
+          },
+          "weight": 20,
+          "quality": 1
+        },
+        {
+          "item": {
+            "name": "CARROT",
+            "meta": {
+              "display": "§b상급 당근",
+              "model": 2
+            }
+          },
+          "weight": 5,
+          "quality": 0.5
+        }
+      ]
+    }
   },
   "SWEET_BERRY_BUSH": {
+    "type": "normal",
     "max_age": 3,
     "default_qty": 2,
-    "tunalevel": {
-      "default": -0.25,
-      "extra": 1.5
-    },
-    "arcanelevel": {
-      "default": -0.25,
-      "extra": 1.5
-    },
     "mastery": "berries_farming_mastery",
-    "loot_table": [
-      {
-        "item": {
-          "name": "SWEET_BERRIES"
-        },
-        "weight": 100,
-        "quality": 0
+    "rainy_biome": {
+      "tunalevel": {
+        "default": -0.25,
+        "extra": 1.5
       },
-      {
-        "item": {
-          "name": "SWEET_BERRIES",
-          "meta": {
-            "display": "§e중급 크랜베리",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
+      "arcanelevel": {
+        "default": -0.25,
+        "extra": 1.5
       },
-      {
-        "item": {
-          "name": "SWEET_BERRIES",
-          "meta": {
-            "display": "§b상급 크랜베리",
-            "model": 2
-          }
+      "loot_table": [
+        {
+          "item": {
+            "name": "SWEET_BERRIES"
+          },
+          "weight": 100,
+          "quality": 0
         },
-        "weight": 5,
-        "quality": 0.5
-      }
-    ]
+        {
+          "item": {
+            "name": "SWEET_BERRIES",
+            "meta": {
+              "display": "§e중급 크랜베리",
+              "model": 1
+            }
+          },
+          "weight": 20,
+          "quality": 1
+        },
+        {
+          "item": {
+            "name": "SWEET_BERRIES",
+            "meta": {
+              "display": "§b상급 크랜베리",
+              "model": 2
+            }
+          },
+          "weight": 5,
+          "quality": 0.5
+        }
+      ]
+    }
   },
-  "PUMPKIN": {
-    "stem": "ATTACHED_PUMPKIN_STEM",
+  "PUMPKIN_STEM": {
+    "type": "normal",
+    "max_age": 8,
     "default_qty": 1,
-    "tunalevel": {
-      "default": 0,
-      "extra": 1.25
-    },
-    "arcanelevel": {
-      "default": 0,
-      "extra": 1.25
-    },
     "mastery": "pumpkin_farming_mastery",
-    "loot_table": [
-      {
-        "item": {
-          "name": "PUMPKIN"
-        },
-        "weight": 100,
-        "quality": 0
+    "rainy_biome": {
+      "tunalevel": {
+        "default": 0,
+        "extra": 1.25
       },
-      {
-        "item": {
-          "name": "PUMPKIN",
-          "meta": {
-            "display": "§e중급 호박",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
+      "arcanelevel": {
+        "default": 0,
+        "extra": 1.25
       },
-      {
-        "item": {
-          "name": "PUMPKIN",
-          "meta": {
-            "display": "§b상급 호박",
-            "model": 2
-          }
+      "loot_table": [
+        {
+          "item": {
+            "name": "PUMPKIN"
+          },
+          "weight": 100,
+          "quality": 0
         },
-        "weight": 5,
-        "quality": 0.5
-      }
-    ]
+        {
+          "item": {
+            "name": "PUMPKIN",
+            "meta": {
+              "display": "§e중급 호박",
+              "model": 1
+            }
+          },
+          "weight": 20,
+          "quality": 1
+        },
+        {
+          "item": {
+            "name": "PUMPKIN",
+            "meta": {
+              "display": "§b상급 호박",
+              "model": 2
+            }
+          },
+          "weight": 5,
+          "quality": 0.5
+        }
+      ]
+    }
   },
-  "MELON": {
-    "stem": "ATTACHED_MELON_STEM",
+  "MELON_STEM": {
+    "type": "normal",
+    "max_age": 8,
     "default_qty": 1,
-    "tunalevel": {
-      "default": 0,
-      "extra": 1.25
-    },
-    "arcanelevel": {
-      "default": 0,
-      "extra": 1.25
-    },
     "mastery": "melon_farming_mastery",
-    "loot_table": [
-      {
-        "item": {
-          "name": "MELON"
-        },
-        "weight": 100,
-        "quality": 0
+    "rainy_biome": {
+      "tunalevel": {
+        "default": 0,
+        "extra": 1.25
       },
-      {
-        "item": {
-          "name": "MELON",
-          "meta": {
-            "display": "§e중급 수박",
-            "model": 1
-          }
-        },
-        "weight": 20,
-        "quality": 1
+      "arcanelevel": {
+        "default": 0,
+        "extra": 1.25
       },
-      {
-        "item": {
-          "name": "MELON",
-          "meta": {
-            "display": "§b상급 수박",
-            "model": 2
-          }
+      "loot_table": [
+        {
+          "item": {
+            "name": "MELON"
+          },
+          "weight": 100,
+          "quality": 0
         },
-        "weight": 5,
-        "quality": 0.5
-      }
-    ]
+        {
+          "item": {
+            "name": "MELON",
+            "meta": {
+              "display": "§e중급 수박",
+              "model": 1
+            }
+          },
+          "weight": 20,
+          "quality": 1
+        },
+        {
+          "item": {
+            "name": "MELON",
+            "meta": {
+              "display": "§b상급 수박",
+              "model": 2
+            }
+          },
+          "weight": 5,
+          "quality": 0.5
+        }
+      ]
+    }
+  },
+  "ATTACHED_PUMPKIN_STEM": {
+    "type": "attached",
+    "max_age": 8,
+    "attached_crop": "PUMPKIN",
+    "golden_finger_crop": "PUMPKIN_STEM",
+    "default_qty": 1,
+    "mastery": "pumpkin_farming_mastery",
+    "rainy_biome": {
+      "tunalevel": {
+        "default": 0,
+        "extra": 1.25
+      },
+      "arcanelevel": {
+        "default": 0,
+        "extra": 1.25
+      },
+      "loot_table": [
+        {
+          "item": {
+            "name": "PUMPKIN"
+          },
+          "weight": 100,
+          "quality": 0
+        },
+        {
+          "item": {
+            "name": "PUMPKIN",
+            "meta": {
+              "display": "§e중급 호박",
+              "model": 1
+            }
+          },
+          "weight": 20,
+          "quality": 1
+        },
+        {
+          "item": {
+            "name": "PUMPKIN",
+            "meta": {
+              "display": "§b상급 호박",
+              "model": 2
+            }
+          },
+          "weight": 5,
+          "quality": 0.5
+        }
+      ]
+    }
+  },
+  "ATTACHED_MELON_STEM": {
+    "type": "attached",
+    "max_age": 8,
+    "attached_crop": "MELON",
+    "golden_finger_crop": "MELON_STEM",
+    "default_qty": 1,
+    "mastery": "melon_farming_mastery",
+    "rainy_biome": {
+      "tunalevel": {
+        "default": 0,
+        "extra": 1.25
+      },
+      "arcanelevel": {
+        "default": 0,
+        "extra": 1.25
+      },
+      "loot_table": [
+        {
+          "item": {
+            "name": "MELON"
+          },
+          "weight": 100,
+          "quality": 0
+        },
+        {
+          "item": {
+            "name": "MELON",
+            "meta": {
+              "display": "§e중급 수박",
+              "model": 1
+            }
+          },
+          "weight": 20,
+          "quality": 1
+        },
+        {
+          "item": {
+            "name": "MELON",
+            "meta": {
+              "display": "§b상급 수박",
+              "model": 2
+            }
+          },
+          "weight": 5,
+          "quality": 0.5
+        }
+      ]
+    }
   }
 }
