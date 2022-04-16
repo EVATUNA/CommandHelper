@@ -225,10 +225,8 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
                 @sowing_method = json_decode(@skill_manager[4])['sowing_method']
                 broadcast(@sowing_method)
                 if(@sowing_method != '' && @player_data['active_skill'][@sowing_method][1] > 0) {
-                  broadcast(A)
                   switch(@sowing_method) {
                   case 'wet_hands':
-                    broadcast(B)
                     @farmland_location = array_deep_clone(@center_location)
                     @farmland_location['y'] -= 1
                     @farmland_blockdata = get_blockdata(@farmland_location)
@@ -238,7 +236,6 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
                     }
                     break()
                   case 'fertile_touch':
-                    broadcast(C)
                     @crop_location = array_deep_clone(@center_location)
                     @crop_blockdata = get_blockdata(@crop_location)
                     @crop_blockdata['age'] = 1
