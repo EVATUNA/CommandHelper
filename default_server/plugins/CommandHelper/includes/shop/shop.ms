@@ -338,7 +338,7 @@ void proc _showGui(@player, @storeName, @stores, @server) { ## GUI 여는 함수
       'storeName': @storeName,
       'tradeInfo': array(
         'count': 1,
-        'type': 'BUY'
+        'type': 'SELL'
       )
     )
   } else {
