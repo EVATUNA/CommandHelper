@@ -223,7 +223,6 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
                 set_block(@center_location, @golden_finger_crop)
                 # 파종 스킬에 따라 작물 심기
                 @sowing_method = json_decode(@skill_manager[4])['sowing_method']
-                broadcast(@sowing_method)
                 if(@sowing_method != '' && @player_data['active_skill'][@sowing_method][1] > 0) {
                   switch(@sowing_method) {
                   case 'wet_hands':

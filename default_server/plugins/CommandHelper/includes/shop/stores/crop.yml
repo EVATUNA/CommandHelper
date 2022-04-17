@@ -11,7 +11,7 @@ PRODUCTS:
       display: "§e중급 밀"
       model: 1
       price:
-        sell: 0.06
+        sell: 0.08
       detail: DISPLAY
   19:
     name: WHEAT
@@ -19,7 +19,7 @@ PRODUCTS:
       display: "§b상급 밀"
       model: 2
       price:
-        sell: 0.12
+        sell: 0.2
       detail: DISPLAY
 
   2:
@@ -34,7 +34,7 @@ PRODUCTS:
       display: "§e중급 사탕무"
       model: 1
       price:
-        sell: 0.0375
+        sell: 0.05
       detail: DISPLAY
   20:
     name: BEETROOT
@@ -42,7 +42,7 @@ PRODUCTS:
       display: "§b상급 사탕무"
       model: 2
       price:
-        sell: 0.075
+        sell: 0.125
       detail: DISPLAY
 
   3:
@@ -57,7 +57,7 @@ PRODUCTS:
       display: "§e중급 감자"
       model: 1
       price:
-        sell: 0.015
+        sell: 0.02
       detail: DISPLAY
   21:
     name: POTATO
@@ -65,7 +65,7 @@ PRODUCTS:
       display: "§b상급 감자"
       model: 2
       price:
-        sell: 0.03
+        sell: 0.05
       detail: DISPLAY
 
   4:
@@ -80,7 +80,7 @@ PRODUCTS:
       display: "§e중급 당근"
       model: 1
       price:
-        sell: 0.015
+        sell: 0.02
       detail: DISPLAY
   22:
     name: CARROT
@@ -88,7 +88,7 @@ PRODUCTS:
       display: "§b상급 당근"
       model: 2
       price:
-        sell: 0.03
+        sell: 0.5
       detail: DISPLAY
 
   5:
@@ -103,7 +103,7 @@ PRODUCTS:
       display: "§e중급 크랜베리"
       model: 1
       price:
-        sell: 0.0525
+        sell: 0.07
       detail: DISPLAY
   23:
     name: SWEET_BERRIES
@@ -111,7 +111,7 @@ PRODUCTS:
       display: "§b상급 크랜베리"
       model: 2
       price:
-        sell: 0.105
+        sell: 0.175
       detail: DISPLAY
 
   6:
@@ -126,7 +126,7 @@ PRODUCTS:
       display: "§e중급 호박"
       model: 1
       price:
-        sell: 0.15
+        sell: 0.2
       detail: DISPLAY
   24:
     name: PUMPKIN
@@ -134,7 +134,7 @@ PRODUCTS:
       display: "§b상급 호박"
       model: 2
       price:
-        sell: 0.3
+        sell: 0.5
       detail: DISPLAY
 
   7:
@@ -149,7 +149,7 @@ PRODUCTS:
       display: "§e중급 수박"
       model: 1
       price:
-        sell: 0.15
+        sell: 0.2
       detail: DISPLAY
   25:
     name: MELON
@@ -157,7 +157,7 @@ PRODUCTS:
       display: "§b상급 수박"
       model: 2
       price:
-        sell: 0.3
+        sell: 0.5
       detail: DISPLAY
 
 

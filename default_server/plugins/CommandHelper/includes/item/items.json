@@ -907,6 +907,18 @@
 	"misc": {
 		"EXPERIENCE_BOTTLE": {
 			"name": "EXPERIENCE_BOTTLE"
+		},
+		"COOKED_CHICKEN": {
+			"name": "COOKED_CHICKEN"
+		},
+		"TUNALAND_FUEL": {
+			"name": "PAPER",
+			"meta": {
+				"display": "§f연료",
+				"lore": [
+					"§f마을의 규모에 따라 시간적 가치가 변하는 연료이다."
+				]
+			}
 		}
 	}
 }

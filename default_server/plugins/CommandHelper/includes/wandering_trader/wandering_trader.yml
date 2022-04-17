@@ -253,7 +253,7 @@ tradeItemList: # 아이템 리스트
         'display': "§e중급 밀"
         'model': 1
         'stock': 3500~3700
-        'price': 0.1
+        'price': 0.16
         'limit': 320
         'detail': 'DISPLAY'
     - 'name': 'WHEAT'
@@ -261,7 +261,7 @@ tradeItemList: # 아이템 리스트
         'display': "§b상급 밀"
         'model': 2
         'stock': 3500~3700
-        'price': 0.2
+        'price': 0.4
         'limit': 320
         'detail': 'DISPLAY'
 
@@ -270,7 +270,7 @@ tradeItemList: # 아이템 리스트
         'display': "§e중급 사탕무"
         'model': 1
         'stock': 3500~3700
-        'price': 0.0625
+        'price': 0.1
         'limit': 320
         'detail': 'DISPLAY'
     - 'name': 'BEETROOT'
@@ -278,7 +278,7 @@ tradeItemList: # 아이템 리스트
         'display': "§b상급 사탕무"
         'model': 2
         'stock': 3500~3700
-        'price': 0.125
+        'price': 0.25
         'limit': 320
         'detail': 'DISPLAY'
 
@@ -287,7 +287,7 @@ tradeItemList: # 아이템 리스트
         'display': "§e중급 감자"
         'model': 1
         'stock': 3500~3700
-        'price': 0.025
+        'price': 0.04
         'limit': 320
         'detail': 'DISPLAY'
     - 'name': 'POTATO'
@@ -295,7 +295,7 @@ tradeItemList: # 아이템 리스트
         'display': "§b상급 감자"
         'model': 2
         'stock': 3500~3700
-        'price': 0.05
+        'price': 0.1
         'limit': 320
         'detail': 'DISPLAY'
 
@@ -304,7 +304,7 @@ tradeItemList: # 아이템 리스트
         'display': "§e중급 당근"
         'model': 1
         'stock': 3500~3700
-        'price': 0.025
+        'price': 0.04
         'limit': 320
         'detail': 'DISPLAY'
     - 'name': 'CARROT'
@@ -312,7 +312,7 @@ tradeItemList: # 아이템 리스트
         'display': "§b상급 당근"
         'model': 2
         'stock': 3500~3700
-        'price': 0.05
+        'price': 0.1
         'limit': 320
         'detail': 'DISPLAY'
 
@@ -321,7 +321,7 @@ tradeItemList: # 아이템 리스트
         'display': "§e중급 크랜베리"
         'model': 1
         'stock': 3500~3700
-        'price': 0.0875
+        'price': 0.14
         'limit': 320
         'detail': 'DISPLAY'
     - 'name': 'SWEET_BERRIES'
@@ -329,7 +329,7 @@ tradeItemList: # 아이템 리스트
         'display': "§b상급 크랜베리"
         'model': 2
         'stock': 3500~3700
-        'price': 0.175
+        'price': 0.35
         'limit': 320
         'detail': 'DISPLAY'
         
@@ -338,7 +338,7 @@ tradeItemList: # 아이템 리스트
         'display': "§e중급 호박"
         'model': 1
         'stock': 3500~3700
-        'price': 0.25
+        'price': 0.4
         'limit': 320
         'detail': 'DISPLAY'
     - 'name': 'PUMPKIN'
@@ -346,7 +346,7 @@ tradeItemList: # 아이템 리스트
         'display': "§b상급 호박"
         'model': 2
         'stock': 3500~3700
-        'price': 0.5
+        'price': 1.0
         'limit': 320
         'detail': 'DISPLAY'
 
@@ -355,7 +355,7 @@ tradeItemList: # 아이템 리스트
         'display': "§e중급 수박"
         'model': 1
         'stock': 3500~3700
-        'price': 0.25
+        'price': 0.4
         'limit': 320
         'detail': 'DISPLAY'
     - 'name': 'MELON'
@@ -363,7 +363,7 @@ tradeItemList: # 아이템 리스트
         'display': "§b상급 수박"
         'model': 2
         'stock': 3500~3700
-        'price': 0.5
+        'price': 1.0
         'limit': 320
         'detail': 'DISPLAY'
 
@@ -372,7 +372,7 @@ tradeItemList: # 아이템 리스트
         'display': "§e중급 구리 주괴"
         'model': 1
         'stock': 300~400
-        'price': 0.5
+        'price': 0.8
         'limit': 64
         'detail': 'DISPLAY'
     - 'name': 'COPPER_INGOT'
@@ -380,7 +380,7 @@ tradeItemList: # 아이템 리스트
         'display': "§b상급 구리 주괴"
         'model': 2
         'stock': 300~400
-        'price': 1.0
+        'price': 2.0
         'limit': 64
         'detail': 'DISPLAY'
 
@@ -389,7 +389,7 @@ tradeItemList: # 아이템 리스트
         'display': "§e중급 철괴"
         'model': 1
         'stock': 200~300
-        'price': 1.0
+        'price': 1.6
         'limit': 64
         'detail': 'DISPLAY'
     - 'name': 'IRON_INGOT'
@@ -397,7 +397,7 @@ tradeItemList: # 아이템 리스트
         'display': "§b상급 철괴"
         'model': 2
         'stock': 200~300
-        'price': 2.0
+        'price': 4.0
         'limit': 64
         'detail': 'DISPLAY'
 
@@ -406,7 +406,7 @@ tradeItemList: # 아이템 리스트
         'display': "§e중급 금괴"
         'model': 1
         'stock': 200~300
-        'price': 1.0
+        'price': 1.6
         'limit': 32
         'detail': 'DISPLAY'
     - 'name': 'GOLD_INGOT'
@@ -414,7 +414,7 @@ tradeItemList: # 아이템 리스트
         'display': "§b상급 금괴"
         'model': 2
         'stock': 200~300
-        'price': 2.0
+        'price': 4.0
         'limit': 32
         'detail': 'DISPLAY'
 
@@ -423,7 +423,7 @@ tradeItemList: # 아이템 리스트
         'display': "§e중급 다이아몬드"
         'model': 1
         'stock': 100~200
-        'price': 5.0
+        'price': 8.0
         'limit': 16
         'detail': 'DISPLAY'
     - 'name': 'DIAMOND'
@@ -431,6 +431,6 @@ tradeItemList: # 아이템 리스트
         'display': "§b상급 다이아몬드"
         'model': 2
         'stock': 50~100
-        'price': 10.0
+        'price': 20.0
         'limit': 8
         'detail': 'DISPLAY'
