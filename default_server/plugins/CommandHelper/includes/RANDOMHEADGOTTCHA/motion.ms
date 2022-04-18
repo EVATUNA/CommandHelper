@@ -17,7 +17,7 @@ void proc _RHG_actionMotion(array @targetLoc, string @category, array @bingleHea
     @location[2] += 0.5
 
     closure @settingStand = closure(string @uuid) {
-        string @protectId = bind("player_interact_at_entity", array("clicked": "ARMOR_STAND"), null, @e, @uuid) {
+        string @protectId = bind("player_interact_at_entity", null, array("clicked": "ARMOR_STAND"), @e, @uuid) {
             if(@e["id"] == @uuid, cancel())
         }
         set_entity_spec(@uuid, array(
