@@ -193,10 +193,10 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
                 }
                 switch(@facing) {
                 case 'east':
-                  @drop_location['z'] += 1
+                  @drop_location['x'] += 1
                   break()
                 case 'west':
-                  @drop_location['z'] -= 1
+                  @drop_location['x'] -= 1
                   break()
                 case 'south':
                   @drop_location['z'] += 1
