@@ -22,6 +22,9 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
     'gui_click_time': 0
   )
 
+  # tooltip
+  @player_data['tooltip'] = array()
+
   # cache edit
   if(is_array(@reconnecting_data)) {
     @player_data['cache']['last_sender'] = @reconnecting_data['last_sender']
@@ -235,8 +238,9 @@ proc _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spe
   if(!array_index_exists(@reconnecting_datas, @uuid)) {
     runas('~console', "/advancement grant @player everything")
     runas('~console', "/recipe give @player *")
-    _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
-    //broadcast('리팩보냄')
+    if(import('server') != '1_test_main') {
+      _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
+    }
   } else {
     #set_timeout(500, closure() {
       @reconnecting_data = @reconnecting_datas[@uuid]

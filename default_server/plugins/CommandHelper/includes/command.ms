@@ -697,7 +697,7 @@ proc _screen_command(@command, @player, @args, @text, @uuid, @players_data, @ski
           @is_size_changed = true
         }
         if(@is_size_changed) {
-          //_send_action_msg(@player, @players_data[@uuid], @skills_spec, @text)
+          
           @message = 'HUD 표시 너비 설정 :: '.@players_data[@uuid]['setting'][0]
           _show_gui(@player, 'screen_setting', 27, @texture_layer, @message, @inventory, @closure, @uuid, @players_data, @skills_spec, @text)
         }
@@ -1060,19 +1060,19 @@ register_command('sendwarn', array(
   'tabcompleter': closure(@command, @player, @args) { return(array()) },
   'executor': closure(@command, @player, @args) {
     @target_name = @args[0]
-    @message = array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' ')
-    _send_action_msg_normal(@target_name, @message)
+    @target_uuid = puuid(@target_name)
+    @text = import('text')
+    @prefix_index = @args[1]
+    if(array_index_exists(@text, @prefix_index)) {
+      @prefix = @text[@prefix_index]
+      @message = array_implode(array_get(@args, cslice(2, array_size(@args) - 1)), ' ')
+      _send_instance_tooltip_msg(@target_name, @target_uuid, @prefix @message)
+    } else {
+      @message = array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' ')
+      _send_instance_tooltip_msg(@target_name, @target_uuid, @message)
+    }
   }
 ))
-
-register_command('spawntrace', array(
-  permission: 'spawntrace',
-  'tabcompleter': closure(@command, @player, @args) { return(array()) },
-  'executor': closure(@command, @player, @args) {
-    _generate_trace(@player, @traces)
-  }
-))
-
 
 proc _chreload_command(@command, @player, @args, @text, @players_data) {
   foreach(@target_name in all_players()) {
@@ -1112,7 +1112,6 @@ proc _chreload_command(@command, @player, @args, @text, @players_data) {
     }
   }
   set_timeout(1, closure() {
-    broadcast(@text['prefix']['broadcast'] _color('#80c8ff').'인스턴스 패치가 진행되어 일부 데이터가 초기화 되었습니다.')
     run('/reloadalias')
   })
 }

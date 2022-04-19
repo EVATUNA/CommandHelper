@@ -39,7 +39,8 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
         if(!is_cancelled()) { // 성공적으로 수확 시
           # 줄기 부수기
           break_block(@near_location['location'])
-          _send_action_msg_normal(@player, '§c수박 또는 호박을 수확하려면 줄기를 낫으로 부셔야 합니다.')
+          @prefix = @text['prefix']['failure']
+          _send_instance_tooltip_msg(@player, @uuid, @prefix '수박 또는 호박을 수확하려면 줄기를 낫으로 부셔야 합니다.')
         }
       })
     }

@@ -5,13 +5,12 @@ foreach(@player in all_players()) {
     runas('~console', "/stopsound @player music")
     _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, null)
     _play_world_music(@player, @uuid, @players_data, @musics_data)
+    _add_tooltip(@player, @uuid, 2, false, 5, 1, @text['prefix']['broadcast'] color('#fefd00').'인스턴스 패치가 진행되어 일부 데이터가 초기화 되었습니다.', 0, 3)
   })
 }
 
-
-
 # 1초 반복
-set_timeout(5000, closure() {
+set_timeout(1000, closure() {
   set_interval(1000, closure() {
 
     foreach(@uuid: @reconnecting_data in @reconnecting_datas) {
@@ -25,10 +24,7 @@ set_timeout(5000, closure() {
     foreach(@uuid: @player_data in @players_data) {
       @player = player(@uuid)
       if(ponline(@player)) {
-
-        //broadcast(@player_data['cache']['last_sender'])
-        # Update Skill Hud
-        //broadcast(A)
+        #스킬 hud 업데이트
         _update_skill_hud(@player, @uuid, @player_data, @skills_spec, @text)
 
         # 액티브 스킬 카운드다운
@@ -41,6 +37,9 @@ set_timeout(5000, closure() {
             call_proc(@proc_name, @player_data, @player, @uuid, @skill, @skill_spec, @point)
           }
         }
+
+        # 툴팁
+        _set_tooltip(@player, @uuid)
 
         #apply enchantment effects
         _apply_passive_armor_enchantment(@player, @player_data)
@@ -68,6 +67,7 @@ set_timeout(5000, closure() {
         if(ploc(@player)['world'] == 'spawn_minecraft_residence') {
           //_generate_trace(@player, @traces)
         }
+
         # 피 자연회복
         if(phunger(@player) >= 7 && phealth(@player) < get_max_health(@uuid)) {
           if(psaturation(@player) > 0) {
@@ -79,9 +79,11 @@ set_timeout(5000, closure() {
         }
       }
     }
+
     if(@server == 'main') {
       _autoquiz(@server)
     }
+
   })
 
   # 1분 반복
@@ -2368,7 +2370,8 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       case 'FISHING_ROD':
         if(pworld(@player) != 'spawn_minecraft_residence') {
           cancel()
-          _send_action_msg_normal(@player, '낚시는 거주월드에서만 가능합니다.')
+          @prefix = @text['prefix']['failure']
+          _send_instance_tooltip_msg(@player, @uuid, @prefix '낚시는 거주월드에서만 가능합니다.')
         }
         break()
       case 'WATER_BUCKET':
