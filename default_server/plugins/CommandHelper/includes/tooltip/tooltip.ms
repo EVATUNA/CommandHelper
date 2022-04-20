@@ -32,7 +32,7 @@ proc _add_tooltip(@player, @uuid, @priority, @continuation, @time, @notification
 
     if(array_size(@tooltips) > 0) {
       foreach(@index: @tooltip in @tooltips) {
-        if(@priority >= @tooltip['priority'] ) {
+        if(@priority <= @tooltip['priority'] ) {
           if(!@tooltip['continuation']) {
             array_remove(@tooltips, @index)
           }
@@ -69,11 +69,11 @@ proc _set_tooltip(@player, @uuid) {
       }
       if(is_array(@now_tooltip)) {
         # message
-        _set_sidebar(@uuid, 3, color('#fefe00') @now_tooltip['message'], @text)
+        _set_sidebar(@uuid, 3, @text['space_fonts']['space.-1'].color('#fefe00') @now_tooltip['message'], @text)
         # background
         @backgrounds = array('\ueb10', '\ueb11', '\ueb12', '\ueb13', '\ueb14', '\ueb15', '\ueb16', '\ueb17', '\ueb18', '\ueb19', '\ueb1a', '\ueb1b', '\ueb1c', '\ueb1d', '\ueb1e', '\ueb1f')
-        @default_background = string_multiply(@backgrounds[@now_tooltip['default_color_index']].@text['space_fonts']['space.-1'], 4)
-        @colored_background = string_multiply(@backgrounds[@now_tooltip['color_index']].@text['space_fonts']['space.-1'], 4)
+        @default_background = string_multiply(@text['space_fonts']['space.-1'].@backgrounds[@now_tooltip['default_color_index']], 4)
+        @colored_background = string_multiply(@text['space_fonts']['space.-1'].@backgrounds[@now_tooltip['color_index']], 4)
         # show background
         _set_sidebar(@uuid, 4, color('#fe0000').@default_background, @text)
         if(@now_tooltip['time'] <= @now_tooltip['notification_time']) {

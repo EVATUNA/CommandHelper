@@ -5,7 +5,7 @@ foreach(@player in all_players()) {
     runas('~console', "/stopsound @player music")
     _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, null)
     _play_world_music(@player, @uuid, @players_data, @musics_data)
-    _add_tooltip(@player, @uuid, 2, false, 5, 1, @text['prefix']['broadcast'] color('#fefd00').'인스턴스 패치가 진행되어 일부 데이터가 초기화 되었습니다.', 0, 3)
+    _add_tooltip(@player, @uuid, 2, false, 5, 1, @text['prefix']['broadcast'] color('#fefd00').'인스턴스 패치가 진행되어 일부 데이터가 초기화됩니다.', 0, 3)
   })
 }
 

@@ -6,7 +6,7 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
 
   # sidebar
   _load_sidebar(@player, @uuid, @text)
-
+  
   # cache
   @player_data['cache'] = array(
     'is_dash': false,
