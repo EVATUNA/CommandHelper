@@ -24,7 +24,8 @@ export('server', @server)
     'info': '\ue4e3',
     'broadcast': '\ue4db',
     'join': '\ue4e5',
-    'leave': '\ue4e6'
+    'leave': '\ue4e6',
+    'tutorial': '\ue4ea'
   )
 )
 export('text', @text)

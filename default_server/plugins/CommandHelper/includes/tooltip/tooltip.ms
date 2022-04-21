@@ -126,7 +126,9 @@ proc _send_instance_tooltip_system_broadcast(@player, @uuid, @prefix, @message, 
 
 proc _set_tutorial_msg(@player, @uuid, @message) {
   _remove_tooltip(@player, @uuid, 3)
-  _add_tooltip(@player, @uuid, 3, true, -1, -1, @message, 0, 10)
+  @text = import('text')
+  @prefix = @text['prefix']['tutorial']
+  _add_tooltip(@player, @uuid, 3, true, -1, 3, @prefix @message, 0, 10)
 }
 
 proc _reset_tutorial_msg(@player, @uuid) {

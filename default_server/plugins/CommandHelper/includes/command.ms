@@ -1068,8 +1068,9 @@ register_command('sendwarn', array(
       @message = array_implode(array_get(@args, cslice(2, array_size(@args) - 1)), ' ')
       _send_instance_tooltip_msg(@target_name, @target_uuid, @prefix @message)
     } else {
+      @prefix = @text['prefix']['warn']
       @message = array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' ')
-      _send_instance_tooltip_msg(@target_name, @target_uuid, @message)
+      _send_instance_tooltip_msg(@target_name, @target_uuid, @prefix @message)
     }
   }
 ))
