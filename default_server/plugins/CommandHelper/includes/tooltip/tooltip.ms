@@ -1,4 +1,3 @@
-proc _add_tooltip(@player, @uuid, @priority, @continuation, @time, @notification_time, @message, @default_color_index, @color_index) {
   /*
     0 오류 메시지 (주로 일회성) 점유 할수 없는 청크 점유 할려 할시 뜨는 오류 (주로 명령어를 쓰지 않았는데 오류 메시지가 나는 경우)
       또는 안내 메시지 or 맞춤형 팁 (주로 일회성) 호박이나 수박 줄기를 캐지 않고 열매를 캘시, 돌곡으로 철 캘려고 할시 메시지
@@ -11,14 +10,15 @@ proc _add_tooltip(@player, @uuid, @priority, @continuation, @time, @notification
     4 주기적으로 올라오는 팁 (주로 일회성) 딱히 뭐 메시지 보여줄거 없을때, 그냥 주기적으로 팁 알려주는 용도
   */
   
-  # 알림 시간이 툴팁 시간보다 길 경우 조정
-  if(@notification_time > @time) { @notification_time = @time }
-
+  
+proc _add_tooltip(@player, @uuid, @priority, @continuation, @time, @notification_time, @message, @default_color_index, @color_index) {
   @players_data = import('players_data')
   if(array_index_exists(@players_data, @uuid)) {
     @player_data = @players_data[@uuid]
     @tooltips = @player_data['tooltip']
 
+    # 알림 시간이 툴팁 시간보다 길 경우 조정
+    if(@time != -1 && @notification_time > @time) { @notification_time = @time }
     @new_tooltip = array(
       'message': @message,
       'max_time': @time,
@@ -43,7 +43,19 @@ proc _add_tooltip(@player, @uuid, @priority, @continuation, @time, @notification
     } else {
       @tooltips[] = @new_tooltip
     }
+  }
+}
 
+proc _remove_tooltip(@player, @uuid, @priority) {
+  @players_data = import('players_data')
+  if(array_index_exists(@players_data, @uuid)) {
+    @player_data = @players_data[@uuid]
+    @tooltips = @player_data['tooltip']
+    foreach(@index: @tooltip in @tooltips) {
+      if(@tooltip['priority'] == @priority) {
+        array_remove(@tooltips, @index)
+      }
+    }
   }
 }
 
@@ -57,16 +69,21 @@ proc _set_tooltip(@player, @uuid) {
     if(array_size(@tooltips) > 0) {
       @now_tooltip = @tooltips[0]
       # countdown
-      if(@now_tooltip['time'] < @now_tooltip['max_time']) {
-        @now_tooltip['time'] += 1
-      } else {
-        array_remove(@tooltips, 0)
-        if(array_size(@tooltips) > 0) {
-          @now_tooltip = @tooltips[0]
+      if(@now_tooltip['max_time'] > 0) {
+        if(@now_tooltip['time'] < @now_tooltip['max_time']) {
+          @now_tooltip['time'] += 1
         } else {
-          @now_tooltip = null
+          array_remove(@tooltips, 0)
+          if(array_size(@tooltips) > 0) {
+            @now_tooltip = @tooltips[0]
+          } else {
+            @now_tooltip = null
+          }
         }
+      } else {
+        @now_tooltip['time'] += 1
       }
+      # show tooltip
       if(is_array(@now_tooltip)) {
         # message
         _set_sidebar(@uuid, 3, @text['space_fonts']['space.-1'].color('#fefe00') @now_tooltip['message'], @text)
@@ -76,7 +93,7 @@ proc _set_tooltip(@player, @uuid) {
         @colored_background = string_multiply(@text['space_fonts']['space.-1'].@backgrounds[@now_tooltip['color_index']], 4)
         # show background
         _set_sidebar(@uuid, 4, color('#fe0000').@default_background, @text)
-        if(@now_tooltip['time'] <= @now_tooltip['notification_time']) {
+        if(@now_tooltip['time'] <= @now_tooltip['notification_time'] || @now_tooltip['notification_time'] < 0) {
           set_timeout(200, closure() {
             _set_sidebar(@uuid, 4, color('#fe0000').@colored_background, @text)
           })
