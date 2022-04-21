@@ -123,3 +123,12 @@ proc _send_instance_tooltip_msg(@player, @uuid, @message) {
 proc _send_instance_tooltip_system_broadcast(@player, @uuid, @prefix, @message, @time, @color) {
   _add_tooltip(@player, @uuid, 1, true, @time, 1, @prefix @message, 0, @color)
 }
+
+proc _set_tutorial_msg(@player, @uuid, @message) {
+  _remove_tooltip(@player, @uuid, 3)
+  _add_tooltip(@player, @uuid, 3, true, -1, -1, @message, 0, 10)
+}
+
+proc _reset_tutorial_msg(@player, @uuid) {
+  _remove_tooltip(@player, @uuid, 3)
+}
