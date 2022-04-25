@@ -3158,6 +3158,7 @@ bind('item_damage', null, null, @event, @players_data, @effective_items, @skills
     } else {
       @durability = @item['meta']['damage'] + @event['damage']
     }
+    
     if(@durability >= @max_durability) {
       if(array_contains(@effective_items['armor'], @item['name'])) {
         _update_item(@player, @uuid, array('armor': null), @player_data, @skills_spec, @text)
@@ -3168,6 +3169,19 @@ bind('item_damage', null, null, @event, @players_data, @effective_items, @skills
           _update_item(@player, @uuid, array('main_hand': null), @player_data, @skills_spec, @text)
         } else if(@item == @off_hand_item) {
           _update_item(@player, @uuid, array('off_hand': null), @player_data, @skills_spec, @text)
+        }
+      }
+    } else {
+      if(array_contains(@effective_items['armor'], @item['name'])) {
+        @armor_item = get_inventory_item(@uuid, 36)
+        _update_item(@player, @uuid, array('armor': @armor_item), @player_data, @skills_spec, @text)
+      } else if(array_contains(@effective_items['weapon'], @item['name'])) {
+        @main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
+        @off_hand_item = get_inventory_item(@uuid, 40)
+        if(@item == @main_hand_item) {
+          _update_item(@player, @uuid, array('main_hand': @main_hand_item), @player_data, @skills_spec, @text)
+        } else if(@item == @off_hand_item) {
+          _update_item(@player, @uuid, array('off_hand': @off_hand_item), @player_data, @skills_spec, @text)
         }
       }
     }
