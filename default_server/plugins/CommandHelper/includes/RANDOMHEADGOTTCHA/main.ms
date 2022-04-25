@@ -14,10 +14,12 @@ execute(closure() {
     string @canUsingWorld = @RHG_config["TARGET_WORLD"]
     bind("player_interact", array("id": "rhg.opengui"), array("hand": "main_hand", "button": "right"), @e, @canUsingWorld, @RHGlocs, @RHG_viewers) {
         if(!array_index_exists(@e, "location") || @e["location"][3] != @canUsingWorld, exit())
+
         array @formLoc = _locForm(@e["location"])
         if(_RHG_containLocInALL(@e["location"], @RHGlocs)) {
             cancel()
-            
+            if(array_index_exists(@RHG_viewers, @e["player"]), die(" 이미 사용중인 상자가 있습니다"))
+
             foreach(string @player : array @inData in @RHG_viewers) {
                 if(_compareLoc(@inData["USE_LOCATION"], @formLoc)) {
                     msg(" 이미 다른 플레이어가 사용중입니다.")
