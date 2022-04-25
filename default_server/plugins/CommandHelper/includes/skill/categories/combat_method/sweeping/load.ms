@@ -15,12 +15,13 @@ proc("_apply_loading_by_@skill", @player_data, @player, @uuid, @category, @skill
       'amount': @passive_attack_speed,
       'name': 'sweeping_passive'
     )
+    _remove_all_modifiers(@uuid, 'GENERIC_ATTACK_SPEED', 'sweeping_passive')
     add_entity_attribute_modifier(@uuid, @modifier)
   } else {
-    # 액티브 설정
+    # 액티브 리셋
     _reset_active_skill(@player_data, @uuid, @skill)
-    # 패시브 설정
-    remove_entity_attribute_modifier(@uuid, 'GENERIC_ATTACK_SPEED', 'sweeping_passive')
-    remove_entity_attribute_modifier(@uuid, 'GENERIC_ATTACK_SPEED', 'sweeping_active')
+    _remove_all_modifiers(@uuid, 'GENERIC_ATTACK_SPEED', 'sweeping_active')
+    # 패시브 리셋
+    _remove_all_modifiers(@uuid, 'GENERIC_ATTACK_SPEED', 'sweeping_passive')
   }
 }

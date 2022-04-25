@@ -150,6 +150,16 @@ proc _close_all_gui() {
   }
 }
 
+# 스킬용 어트리뷰트 모디파이어 관련 함수
+
+proc _remove_all_modifiers(@uuid, @attribute, @name) {
+  foreach(@modifier in entity_attribute_modifiers(@uuid, @attribute)) {
+    if(@modifier['name'] == @name) {
+      remove_entity_attribute_modifier(@uuid, @attribute, @name)
+    }
+  }
+}
+
 
 ## 기타 proc
 # 배열 나누기
