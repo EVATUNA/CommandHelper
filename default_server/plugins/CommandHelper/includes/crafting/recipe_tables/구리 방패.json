@@ -133,7 +133,6 @@
 				"weight": 1,
 				"display": "전설적인 구리 방패",
 				"model": 1,
-				"broadcast": true,
 				"attributes": {
 					"defense_recovery": 3.900
 				}

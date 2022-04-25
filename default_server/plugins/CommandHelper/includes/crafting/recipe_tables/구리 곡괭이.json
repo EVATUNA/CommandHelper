@@ -188,7 +188,6 @@
 				"weight": 1,
 				"display": "전설적인 구리 곡괭이",
 				"model": 1,
-				"broadcast": true,
 				"attributes": {
 					"attack_damage": 5.616,
 					"attack_speed": 2.5,

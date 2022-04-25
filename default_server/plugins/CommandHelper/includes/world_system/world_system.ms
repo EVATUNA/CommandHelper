@@ -103,7 +103,13 @@ if(@server == 'nether') {
       }
     }
   }
+
+  bind('block_explode', null, null, @event) {
+    _debugmsg(@event)
+  }
+  
 }
+
 
 //bind('item_spawn', null, null, @event) {
   //@location = @event['location']

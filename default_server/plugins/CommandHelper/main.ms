@@ -21,11 +21,11 @@ include('includes/enchant/enchant.ms')
 # 레벨변환
 //
 
-# 조합 시스템
-include('includes/crafting/crafting.ms')
-
 # 툴팁 시스템
 include('includes/tooltip/tooltip.ms')
+
+# 조합 시스템
+include('includes/crafting/crafting.ms')
 
 # 플레이어 데이터 시스템
 include('includes/data.ms')

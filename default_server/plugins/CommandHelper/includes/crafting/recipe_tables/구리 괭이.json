@@ -188,7 +188,6 @@
 				"weight": 1,
 				"display": "전설적인 구리 괭이",
 				"model": 1,
-				"broadcast": true,
 				"attributes": {
 					"attack_damage": 4.011,
 					"attack_speed": 3,

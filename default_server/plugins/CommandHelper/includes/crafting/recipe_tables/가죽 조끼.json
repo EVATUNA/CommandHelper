@@ -132,7 +132,6 @@
 				"weight": 1,
 				"display": "전설적인 가죽 조끼",
 				"model": 0,
-				"broadcast": true,
 				"attributes": {
 					"armor": 10.0
 				}

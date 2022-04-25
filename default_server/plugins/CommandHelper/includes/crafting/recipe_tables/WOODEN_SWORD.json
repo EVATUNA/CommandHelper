@@ -140,7 +140,6 @@
 				"weight": 1,
 				"display": "전설적인 나무 검",
 				"model": 0,
-				"broadcast": true,
 				"attributes": {
 					"attack_damage": 2.800,
 					"attack_speed": 3

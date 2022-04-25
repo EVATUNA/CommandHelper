@@ -86,30 +86,30 @@ proc _set_tooltip(@player, @uuid) {
       # show tooltip
       if(is_array(@now_tooltip)) {
         # message
-        _set_sidebar(@uuid, 3, @text['space_fonts']['space.-1'].color('#fefe00') @now_tooltip['message'], @text)
+        _set_sidebar(@uuid, 10, @text['space_fonts']['space.-1'].color('#fefe00') @now_tooltip['message'], @text)
         # background
         @backgrounds = array('\ueb10', '\ueb11', '\ueb12', '\ueb13', '\ueb14', '\ueb15', '\ueb16', '\ueb17', '\ueb18', '\ueb19', '\ueb1a', '\ueb1b', '\ueb1c', '\ueb1d', '\ueb1e', '\ueb1f')
         @default_background = string_multiply(@text['space_fonts']['space.-1'].@backgrounds[@now_tooltip['default_color_index']], 4)
         @colored_background = string_multiply(@text['space_fonts']['space.-1'].@backgrounds[@now_tooltip['color_index']], 4)
         # show background
-        _set_sidebar(@uuid, 4, color('#fe0000').@default_background, @text)
+        _set_sidebar(@uuid, 11, color('#fefc00').@default_background, @text)
         if(@now_tooltip['time'] <= @now_tooltip['notification_time'] || @now_tooltip['notification_time'] < 0) {
           set_timeout(200, closure() {
-            _set_sidebar(@uuid, 4, color('#fe0000').@colored_background, @text)
+            _set_sidebar(@uuid, 11, color('#fefc00').@colored_background, @text)
           })
           set_timeout(400, closure() {
-            _set_sidebar(@uuid, 4, color('#fe0000').@default_background, @text)
+            _set_sidebar(@uuid, 11, color('#fefc00').@default_background, @text)
           })
           set_timeout(600, closure() {
-            _set_sidebar(@uuid, 4, color('#fe0000').@colored_background, @text)
+            _set_sidebar(@uuid, 11, color('#fefc00').@colored_background, @text)
           })
           set_timeout(800, closure() {
-            _set_sidebar(@uuid, 4, color('#fe0000').@default_background, @text)
+            _set_sidebar(@uuid, 11, color('#fefc00').@default_background, @text)
           })
         }
       } else {
-        _set_sidebar(@uuid, 3, '', @text)
-        _set_sidebar(@uuid, 4, '', @text)
+        _set_sidebar(@uuid, 10, '', @text)
+        _set_sidebar(@uuid, 11, '', @text)
       }
     }
     //broadcast(@tooltips)
@@ -121,7 +121,13 @@ proc _send_instance_tooltip_msg(@player, @uuid, @message) {
 }
 
 proc _send_instance_tooltip_system_broadcast(@player, @uuid, @prefix, @message, @time, @color) {
-  _add_tooltip(@player, @uuid, 1, true, @time, 1, @prefix @message, 0, @color)
+  @data = array(
+    'prefix': @prefix,
+    'message': @message,
+    'time': @time,
+    'color': @color
+  )
+  kafka_send('ch.tooltip_broadcast', json_encode(@data))
 }
 
 proc _set_tutorial_msg(@player, @uuid, @message) {

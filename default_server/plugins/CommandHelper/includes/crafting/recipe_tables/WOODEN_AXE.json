@@ -140,7 +140,6 @@
 				"weight": 1,
 				"display": "전설적인 나무 도끼",
 				"model": 0,
-				"broadcast": true,
 				"attributes": {
 					"attack_damage": 4.200,
 					"attack_speed": 2

@@ -188,7 +188,6 @@
 				"weight": 1,
 				"display": "전설적인 금 괭이",
 				"model": 0,
-				"broadcast": true,
 				"attributes": {
 					"attack_damage": 7.097,
 					"attack_speed": 3.5,

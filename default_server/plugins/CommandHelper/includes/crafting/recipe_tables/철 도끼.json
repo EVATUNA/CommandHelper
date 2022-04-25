@@ -152,7 +152,6 @@
 				"weight": 1,
 				"display": "전설적인 철 도끼",
 				"model": 0,
-				"broadcast": true,
 				"attributes": {
 					"attack_damage": 10.800,
 					"attack_speed": 2

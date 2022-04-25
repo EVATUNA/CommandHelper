@@ -199,6 +199,14 @@ bind('kafka_receive', null, null, @event, @reconnecting_datas, @players_data, @r
     }
     break()
 
+  case 'ch.tooltip_broadcast':
+    @data = json_decode(@event['value'])
+    foreach(@uuid: @player_data in @players_data) {
+      @player = player(@uuid)
+      _add_tooltip(@player, @uuid, 1, true, @data['time'], 1, @data['prefix'] @data['message'], 0, @data['color'])
+    }
+    break()
+  
   case 'ch.send_message':
     @data = json_decode(@event['value'])
     @player = @data['player']
@@ -317,40 +325,17 @@ bind('block_place', null, null, @event, @players_data, @skills_spec) {
 }
 
 # 블럭 파괴
-bind('block_break', null, null, @event, @players_data, @hp_blocks, @mineral_rewards, @crop_rewards, @skills_spec, @text, @server) {
+bind('block_break_lm', null, null, @event, @players_data, @hp_blocks, @mineral_rewards, @crop_rewards, @skills_spec, @text, @server) {
   @player = @event['player']
   @uuid = puuid(@player)
   if(pmode(@player) == 'SURVIVAL') {
-    if(@server == 'main' && pworld(@player) == 'spawn_minecraft_residence') {
+    if((@server == 'main' || @server == '1_test_main') && pworld(@player) == 'spawn_minecraft_residence') {
       _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @skills_spec, @text, @server)
     }
-    if(@server != 'main') {
+    if(@server != 'main') { // 메인 이외 서버 채광 시스템
       _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @mineral_rewards, @skills_spec, @text, @server)
       
-      /*
-      # 일반 블럭들 튜나 레벨 주기?
-      @stones = array(
-        'STONE': 1,
-        'GRANITE': 0.25,
-        'DIORITE': 0.25,
-        'ANDESITE': 0.25,
-        'BASALT': 0.5,
-        'BLACKSTONE': 1,
-        'NETHERRACK': 0.25,
-        'CRIMSON_NYLIUM': 0.25,
-        'WARPED_NYLIUM': 0.25,
-        'MAGMA_BLOCK': 0.5
-      )
-      if(array_index_exists(@stones, @event['block'])) {
-        @default_xp = integer(@stones[@event['block']])
-        @extra_xp = @stones[@event['block']] - @default_xp
-        @skill = 'tough_shoulder'
-        @skill_data = @players_data[@uuid]['skill_data'][@skill]
-      }
-      */
-
-      # 네더 채광 효과 반영
-      if(@server == 'nether') {
+      if(@server == 'nether') { // 네더 채광 효과 반영
         if(array_contains(array('SURVIVAL', 'ADVENTURE'), pmode(@player))) {
           @location = array('x': @event['location']['x'], 'y': @event['location']['y'], 'z': @event['location']['z'], 'world': @event['location']['world'])
           switch(@players_data[@uuid]['item']['enchantments']['main_hand']) {
@@ -2293,7 +2278,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         break()
       }
       # 농사
-      if(@server == 'main') {
+      if(@server == 'main' || @server == '1_test_main') {
         # bone mealing
         if(!is_null(@event['item']) && @event['item']['name'] == 'BONE_MEAL' && array_contains(array('WHEAT', 'BEETROOTS', 'CARROTS', 'POTATOES', 'PUMPKIN_STEM', 'MELON_STEM', 'SWEET_BERRY_BUSH'), @event['block'])) {
           @data = get_blockdata(@event['location'])

@@ -32,7 +32,8 @@
 				"type": "rank",
 				"weight": 1,
 				"display": "§d최상급 네더라이트 주괴",
-				"model": 3
+				"model": 3,
+				"broadcast": true
 			}
 		]
 	}

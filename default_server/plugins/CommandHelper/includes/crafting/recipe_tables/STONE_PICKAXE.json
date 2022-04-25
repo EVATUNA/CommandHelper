@@ -186,7 +186,6 @@
 				"weight": 1,
 				"display": "전설적인 돌 곡괭이",
 				"model": 8,
-				"broadcast": true,
 				"attributes": {
 					"attack_damage": 3.888,
 					"attack_speed": 2.5,

@@ -410,6 +410,11 @@ bind('inventory_click', array('priority': 'LOWEST', 'id': 'crafting'), array('sl
           @entries = @crafting['pool']
           if(array_index_exists(@entries, 'type')) {
             @final_entry = _get_final_entry_from_entries(@entries, @result_item_rank, @luck)
+            if(array_index_exists(@final_entry, 'broadcast') && @final_entry['broadcast']) {
+              @message = @player.'님께서 '.strip_colors(@final_entry['display']).'를 조합하셨습니다.'
+              @prefix = '🎉'
+              _send_instance_tooltip_system_broadcast(@player, @uuid, @prefix, @message, 5, 6)
+            }
             @modified_item = _get_modified_item(@final_entry, @result_item)
             modify_event('slotitem', @modified_item)
           } else {

@@ -150,7 +150,6 @@
 				"weight": 1,
 				"display": "전설적인 돌 검",
 				"model": 8,
-				"broadcast": true,
 				"attributes": {
 					"attack_damage": 3.600,
 					"attack_speed": 3

@@ -152,7 +152,6 @@
 				"weight": 1,
 				"display": "전설적인 철 검",
 				"model": 0,
-				"broadcast": true,
 				"attributes": {
 					"attack_damage": 7.20,
 					"attack_speed": 3

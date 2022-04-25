@@ -6,12 +6,12 @@
     "mastery": "wheat_farming_mastery",
     "rainy_biome": {
       "tunalevel": {
-        "default": -0.25,
-        "extra": 1.5
+        "default": 0.41,
+        "extra": 0.1
       },
       "arcanelevel": {
-        "default": -0.25,
-        "extra": 1.5
+        "default": 0.41,
+        "extra": 0.1
       },
       "loot_table": [
         {
@@ -19,7 +19,7 @@
             "name": "WHEAT"
           },
           "weight": 100,
-          "quality": 0
+          "quality": 0.0
         },
         {
           "item": {
@@ -30,7 +30,7 @@
             }
           },
           "weight": 20,
-          "quality": 1
+          "quality": 5.0
         },
         {
           "item": {
@@ -41,7 +41,7 @@
             }
           },
           "weight": 5,
-          "quality": 0.5
+          "quality": 1.5
         }
       ]
     }
@@ -53,12 +53,12 @@
     "mastery": "beetroot_farming_mastery",
     "rainy_biome": {
       "tunalevel": {
-        "default": -0.25,
-        "extra": 1.25
+        "default": 0.4075,
+        "extra": 0.1
       },
       "arcanelevel": {
-        "default": -0.25,
-        "extra": 1.25
+        "default": 0.4075,
+        "extra": 0.1
       },
       "loot_table": [
         {
@@ -66,7 +66,7 @@
             "name": "BEETROOT"
           },
           "weight": 100,
-          "quality": 0
+          "quality": 0.0
         },
         {
           "item": {
@@ -77,7 +77,7 @@
             }
           },
           "weight": 20,
-          "quality": 1
+          "quality": 5.0
         },
         {
           "item": {
@@ -88,7 +88,7 @@
             }
           },
           "weight": 5,
-          "quality": 0.5
+          "quality": 1.5
         }
       ]
     }
@@ -100,12 +100,12 @@
     "mastery": "potato_farming_mastery",
     "rainy_biome": { 
       "tunalevel": {
-        "default": -0.25,
-        "extra": 1.5
+        "default": 0.41,
+        "extra": 0.1
       },
       "arcanelevel": {
-        "default": -0.25,
-        "extra": 1.5
+        "default": 0.41,
+        "extra": 0.1
       },
       "loot_table": [
         {
@@ -113,7 +113,7 @@
             "name": "POTATO"
           },
           "weight": 100,
-          "quality": 0
+          "quality": 0.0
         },
         {
           "item": {
@@ -124,7 +124,7 @@
             }
           },
           "weight": 20,
-          "quality": 1
+          "quality": 5.0
         },
         {
           "item": {
@@ -135,7 +135,7 @@
             }
           },
           "weight": 5,
-          "quality": 0.5
+          "quality": 1.5
         }
       ]
     }
@@ -147,12 +147,12 @@
     "mastery": "carrot_farming_mastery",
     "rainy_biome": { 
       "tunalevel": {
-        "default": -0.25,
-        "extra": 1.5
+        "default": 0.41,
+        "extra": 0.1
       },
       "arcanelevel": {
-        "default": -0.25,
-        "extra": 1.5
+        "default": 0.41,
+        "extra": 0.1
       },
       "loot_table": [
         {
@@ -160,7 +160,7 @@
             "name": "CARROT"
           },
           "weight": 100,
-          "quality": 0
+          "quality": 0.0
         },
         {
           "item": {
@@ -171,7 +171,7 @@
             }
           },
           "weight": 20,
-          "quality": 1
+          "quality": 5.0
         },
         {
           "item": {
@@ -182,7 +182,7 @@
             }
           },
           "weight": 5,
-          "quality": 0.5
+          "quality": 1.5
         }
       ]
     }
@@ -194,12 +194,12 @@
     "mastery": "berries_farming_mastery",
     "rainy_biome": {
       "tunalevel": {
-        "default": -0.25,
-        "extra": 1.5
+        "default": 0.41,
+        "extra": 0.1
       },
       "arcanelevel": {
-        "default": -0.25,
-        "extra": 1.5
+        "default": 0.41,
+        "extra": 0.1
       },
       "loot_table": [
         {
@@ -207,7 +207,7 @@
             "name": "SWEET_BERRIES"
           },
           "weight": 100,
-          "quality": 0
+          "quality": 0.0
         },
         {
           "item": {
@@ -218,7 +218,7 @@
             }
           },
           "weight": 20,
-          "quality": 1
+          "quality": 5.0
         },
         {
           "item": {
@@ -229,7 +229,7 @@
             }
           },
           "weight": 5,
-          "quality": 0.5
+          "quality": 1.5
         }
       ]
     }
@@ -241,12 +241,12 @@
     "mastery": "pumpkin_farming_mastery",
     "rainy_biome": {
       "tunalevel": {
-        "default": 0,
-        "extra": 1.25
+        "default": 0.415,
+        "extra": 0.1
       },
       "arcanelevel": {
-        "default": 0,
-        "extra": 1.25
+        "default": 0.415,
+        "extra": 0.1
       },
       "loot_table": [
         {
@@ -254,7 +254,7 @@
             "name": "PUMPKIN"
           },
           "weight": 100,
-          "quality": 0
+          "quality": 0.0
         },
         {
           "item": {
@@ -265,7 +265,7 @@
             }
           },
           "weight": 20,
-          "quality": 1
+          "quality": 5.0
         },
         {
           "item": {
@@ -276,7 +276,7 @@
             }
           },
           "weight": 5,
-          "quality": 0.5
+          "quality": 1.5
         }
       ]
     }
@@ -288,12 +288,12 @@
     "mastery": "melon_farming_mastery",
     "rainy_biome": {
       "tunalevel": {
-        "default": 0,
-        "extra": 1.25
+        "default": 0.415,
+        "extra": 0.1
       },
       "arcanelevel": {
-        "default": 0,
-        "extra": 1.25
+        "default": 0.415,
+        "extra": 0.1
       },
       "loot_table": [
         {
@@ -301,7 +301,7 @@
             "name": "MELON"
           },
           "weight": 100,
-          "quality": 0
+          "quality": 0.0
         },
         {
           "item": {
@@ -312,7 +312,7 @@
             }
           },
           "weight": 20,
-          "quality": 1
+          "quality": 5.0
         },
         {
           "item": {
@@ -323,7 +323,7 @@
             }
           },
           "weight": 5,
-          "quality": 0.5
+          "quality": 1.5
         }
       ]
     }
@@ -337,12 +337,12 @@
     "mastery": "pumpkin_farming_mastery",
     "rainy_biome": {
       "tunalevel": {
-        "default": 0,
-        "extra": 1.25
+        "default": 0.415,
+        "extra": 0.1
       },
       "arcanelevel": {
-        "default": 0,
-        "extra": 1.25
+        "default": 0.415,
+        "extra": 0.1
       },
       "loot_table": [
         {
@@ -350,7 +350,7 @@
             "name": "PUMPKIN"
           },
           "weight": 100,
-          "quality": 0
+          "quality": 0.0
         },
         {
           "item": {
@@ -361,7 +361,7 @@
             }
           },
           "weight": 20,
-          "quality": 1
+          "quality": 5.0
         },
         {
           "item": {
@@ -372,7 +372,7 @@
             }
           },
           "weight": 5,
-          "quality": 0.5
+          "quality": 1.5
         }
       ]
     }
@@ -386,12 +386,12 @@
     "mastery": "melon_farming_mastery",
     "rainy_biome": {
       "tunalevel": {
-        "default": 0,
-        "extra": 1.25
+        "default": 0.415,
+        "extra": 0.1
       },
       "arcanelevel": {
-        "default": 0,
-        "extra": 1.25
+        "default": 0.415,
+        "extra": 0.1
       },
       "loot_table": [
         {
@@ -399,7 +399,7 @@
             "name": "MELON"
           },
           "weight": 100,
-          "quality": 0
+          "quality": 0.0
         },
         {
           "item": {
@@ -410,7 +410,7 @@
             }
           },
           "weight": 20,
-          "quality": 1
+          "quality": 5.0
         },
         {
           "item": {
@@ -421,7 +421,7 @@
             }
           },
           "weight": 5,
-          "quality": 0.5
+          "quality": 1.5
         }
       ]
     }

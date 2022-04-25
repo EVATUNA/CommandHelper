@@ -169,7 +169,6 @@
 				"weight": 1,
 				"display": "전설적인 금 흉갑",
 				"model": 0,
-				"broadcast": true,
 				"attributes": {
 					"armor": 20,
 					"armor_toughness": 10

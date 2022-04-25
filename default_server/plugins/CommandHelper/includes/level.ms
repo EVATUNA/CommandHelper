@@ -141,10 +141,11 @@ register_placeholder_hook('player', closure(@player, @placeholder){
 proc _get_max_experience(@level) {
   if(@level <= 20) {
     @max_experience = integer(round(1.25 ** (@level + 1) * 50))
+    @max_experience = integer(@max_experience * 1.25)
   } else {
     @max_experience = integer(round(4770 * 1.25 ** (@level + 1 - 21)))
+    @max_experience = integer(@max_experience * 1.5)
   }
-  @max_experience = integer(@max_experience * 1.5)
   return(@max_experience)
 }
 

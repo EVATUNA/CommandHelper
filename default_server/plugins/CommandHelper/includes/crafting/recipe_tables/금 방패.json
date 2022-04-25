@@ -133,7 +133,6 @@
 				"weight": 1,
 				"display": "전설적인 금 방패",
 				"model": 5,
-				"broadcast": true,
 				"attributes": {
 					"defense_recovery": 6.900
 				}

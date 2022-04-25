@@ -35,14 +35,12 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
       }
     }
     if(!@is_placed) {
-      set_timeout(1, closure() {
-        if(!is_cancelled()) { // 성공적으로 수확 시
-          # 줄기 부수기
-          break_block(@near_location['location'])
-          @prefix = @text['prefix']['failure']
-          _send_instance_tooltip_msg(@player, @uuid, @prefix '수박 또는 호박을 수확하려면 줄기를 낫으로 부셔야 합니다.')
-        }
-      })
+      if(!is_cancelled()) { // 성공적으로 수확 시
+        # 줄기 부수기
+        break_block(@near_location['location'])
+        @prefix = @text['prefix']['failure']
+        _send_instance_tooltip_msg(@player, @uuid, @prefix '수박 또는 호박을 수확하려면 줄기를 낫으로 부셔야 합니다.')
+      }
     }
   } else if(array_index_exists(@crop_rewards, @event['block'])) { // 작물 캘시
     # 드랍할 씨앗
@@ -74,6 +72,7 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
     @harvesting_method = json_decode(@skill_manager[4])['harvesting_method']
     # 아이템
     @item = @player_data['item']['main_hand']
+    @slot = pheld_slot(@player)
     # 낫으로 수확시
     if(!is_null(@item) && array_contains(array('WOODEN_HOE', 'STONE_HOE', 'GOLDEN_HOE', 'IRON_HOE', 'DIAMOND_HOE', 'NETHERITE_HOE'), @item['name'])) {
       # 괭이 수확 내구도 시스템
@@ -166,122 +165,116 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
         }
       }
       # 캔슬 안 됬을 경우 수확 시스템 작동
-      set_timeout(1, closure() {
-        if(!is_cancelled()) {
-          # 괭이 재 검사 (타임아웃 때문에 혹시 모름)
-          @item = @player_data['item']['main_hand']
-          @slot = pheld_slot(@player)
-          if(!is_null(@item) && array_contains(array('WOODEN_HOE', 'STONE_HOE', 'GOLDEN_HOE', 'IRON_HOE', 'DIAMOND_HOE', 'NETHERITE_HOE'), @item['name'])) { // 재검사 통과 시
-            # 루트 테이블 시스템
-            @entries = @crop_reward['rainy_biome']['loot_table']
-            @total_weight = 0
-            foreach(@key: @entry in @entries) {
-              @entries[@key]['weight'] += @entry['quality'] * @farming_mastery_multiply
-              @total_weight += @entry['weight']
+      if(!is_cancelled()) {
+        # 루트 테이블 시스템
+        @entries = @crop_reward['rainy_biome']['loot_table']
+        @total_weight = 0
+        foreach(@key: @entry in @entries) {
+          @entries[@key]['weight'] += @entry['quality'] * @farming_mastery_multiply
+          @total_weight += @entry['weight']
+        }
+        # 부순 모든 작물에 드랍 시스템 작동
+        foreach(@location in @locations) {
+          # 드랍 갯수 설정
+          @qty = integer(round(@crop_reward['default_qty'] * @max_drop_multiply * rand()))
+          if(@qty < @crop_reward['default_qty']) { @qty = @crop_reward['default_qty']}
+          # 작물 타입에 따른 드랍 위치 설정 및 수박 호박의 경우 블럭도 부수기
+          if(@crop_reward['type'] == 'normal') { // 일반 작물 수확시
+            @drop_location = @location
+          } else if(@crop_reward['type'] == 'attached') { // 수박 호박 줄기 수확시
+            @drop_location = array_deep_clone(@location)
+            if(@center_location != @location) {
+              @facing = get_blockdata(@drop_location)['facing']
             }
-            # 부순 모든 작물에 드랍 시스템 작동
-            foreach(@location in @locations) {
-              # 드랍 갯수 설정
-              @qty = integer(round(@crop_reward['default_qty'] * @max_drop_multiply * rand()))
-              if(@qty < @crop_reward['default_qty']) { @qty = @crop_reward['default_qty']}
-              # 작물 타입에 따른 드랍 위치 설정 및 수박 호박의 경우 블럭도 부수기
-              if(@crop_reward['type'] == 'normal') { // 일반 작물 수확시
-                @drop_location = @location
-              } else if(@crop_reward['type'] == 'attached') { // 수박 호박 줄기 수확시
-                @drop_location = array_deep_clone(@location)
-                if(@center_location != @location) {
-                  @facing = get_blockdata(@drop_location)['facing']
-                }
-                switch(@facing) {
-                case 'east':
-                  @drop_location['x'] += 1
-                  break()
-                case 'west':
-                  @drop_location['x'] -= 1
-                  break()
-                case 'south':
-                  @drop_location['z'] += 1
-                  break()
-                case 'north':
-                  @drop_location['z'] -= 1
-                  break()
-                }
-                # 수박 호박 제거
-                if(get_block(@drop_location) == @crop_reward['attached_crop']) {
-                  set_block(@drop_location, 'AIR')
-                }
-              }
-              # 적용된 수확방식에 따른 코드 작동
-              switch(@applied_harvesting_method) {
-              case 'wide_hands':
-                # 블럭 부수기
-                if(@center_location != @location) {
-                  break_block(@location)
-                }
-                break()
-              case 'golden_finger':
-                # 작물 심기
-                set_block(@center_location, @golden_finger_crop)
-                # 파종 스킬에 따라 작물 심기
-                @sowing_method = json_decode(@skill_manager[4])['sowing_method']
-                if(@sowing_method != '' && @player_data['active_skill'][@sowing_method][1] > 0) {
-                  switch(@sowing_method) {
-                  case 'wet_hands':
-                    @farmland_location = array_deep_clone(@center_location)
-                    @farmland_location['y'] -= 1
-                    @farmland_blockdata = get_blockdata(@farmland_location)
-                    if(@farmland_blockdata['block'] == 'farmland') {
-                      @farmland_blockdata['moisture'] = 5
-                      set_blockdata(@farmland_location, @farmland_blockdata)
-                    }
-                    break()
-                  case 'fertile_touch':
-                    @crop_location = array_deep_clone(@center_location)
-                    @crop_blockdata = get_blockdata(@crop_location)
-                    @crop_blockdata['age'] = 1
-                    set_blockdata(@crop_location, @crop_blockdata)
-                    break()
-                  }
-                }
-                break()
-              }
-              # 드랍 갯수 만큼 아이템 떨구기
-              for(@i = 0, @i < @qty, @i++) {
-                @result_weight = @total_weight * round(rand(), 5)
-                @min_weight = 0
-                foreach(@entry in @entries) {
-                  @max_weight = @min_weight + @entry['weight']
-                  if(@max_weight > @result_weight) {
-                    drop_item(@drop_location, @entry['item'], false)
-                    _logging('harvest', time(), @server, @location, @player, @uuid, @entry['item'])
-                    break()
-                  } else {
-                    @min_weight = @max_weight
-                  }
-                }
-              }
-              # 경험치 드랍
-              if(@player_data['item']['enchantments']['main_hand'] == '경험') {
-                _drop_arcanelevel_random_experience(@drop_location, @crop_reward['rainy_biome']['arcanelevel']['default'], @crop_reward['rainy_biome']['arcanelevel']['extra'])
-                _drop_arcanelevel_random_experience(@drop_location, @crop_reward['rainy_biome']['arcanelevel']['default'], @crop_reward['rainy_biome']['arcanelevel']['extra'])
-              } else {
-                _drop_arcanelevel_random_experience(@drop_location, @crop_reward['rainy_biome']['arcanelevel']['default'], @crop_reward['rainy_biome']['arcanelevel']['extra'])
-              }
-              # 튜나레벨
-              _give_tunalevel_random_experience(@uuid, @player_data, @crop_reward['rainy_biome']['tunalevel']['default'], @crop_reward['rainy_biome']['tunalevel']['extra'], @text)
+            switch(@facing) {
+            case 'east':
+              @drop_location['x'] += 1
+              break()
+            case 'west':
+              @drop_location['x'] -= 1
+              break()
+            case 'south':
+              @drop_location['z'] += 1
+              break()
+            case 'north':
+              @drop_location['z'] -= 1
+              break()
             }
-            # 내구도 깍기 및 다 부셔지면 아이템 없애기
-            if(@max_durability > @damage) {
-              @item['meta']['damage'] = @damage
-              set_inventory_item(puuid(@player), @slot, @item)
-            } else {
-              play_entity_effect(puuid(@player), 'BREAK_EQUIPMENT_MAIN_HAND')
-              @item = null
-              set_inventory_item(puuid(@player), @slot, @item)
+            # 수박 호박 제거
+            if(get_block(@drop_location) == @crop_reward['attached_crop']) {
+              set_block(@drop_location, 'AIR')
             }
           }
+          # 적용된 수확방식에 따른 코드 작동
+          switch(@applied_harvesting_method) {
+          case 'wide_hands':
+            # 블럭 부수기
+            if(@center_location != @location) {
+              break_block(@location)
+            }
+            break()
+          case 'golden_finger':
+            # 작물 심기
+            set_block(@center_location, @golden_finger_crop)
+            # 파종 스킬에 따라 작물 심기
+            @sowing_method = json_decode(@skill_manager[4])['sowing_method']
+            if(@sowing_method != '' && @player_data['active_skill'][@sowing_method][1] > 0) {
+              switch(@sowing_method) {
+              case 'wet_hands':
+                @farmland_location = array_deep_clone(@center_location)
+                @farmland_location['y'] -= 1
+                @farmland_blockdata = get_blockdata(@farmland_location)
+                if(@farmland_blockdata['block'] == 'farmland') {
+                  @farmland_blockdata['moisture'] = 5
+                  set_blockdata(@farmland_location, @farmland_blockdata)
+                }
+                break()
+              case 'fertile_touch':
+                @crop_location = array_deep_clone(@center_location)
+                @crop_blockdata = get_blockdata(@crop_location)
+                @crop_blockdata['age'] = 1
+                set_blockdata(@crop_location, @crop_blockdata)
+                break()
+              }
+            }
+            break()
+          }
+          # 드랍 갯수 만큼 아이템 떨구기
+          for(@i = 0, @i < @qty, @i++) {
+            @result_weight = @total_weight * round(rand(), 5)
+            @min_weight = 0
+            foreach(@entry in @entries) {
+              @max_weight = @min_weight + @entry['weight']
+              if(@max_weight > @result_weight) {
+                drop_item(@drop_location, @entry['item'], false)
+                _logging('harvest', time(), @server, @location, @player, @uuid, @entry['item'])
+                break()
+              } else {
+                @min_weight = @max_weight
+              }
+            }
+          }
+          # 경험치 드랍
+          if(@player_data['item']['enchantments']['main_hand'] == '경험') {
+            _drop_arcanelevel_random_experience(@drop_location, @crop_reward['rainy_biome']['arcanelevel']['default'], @crop_reward['rainy_biome']['arcanelevel']['extra'])
+            _drop_arcanelevel_random_experience(@drop_location, @crop_reward['rainy_biome']['arcanelevel']['default'], @crop_reward['rainy_biome']['arcanelevel']['extra'])
+          } else {
+            _drop_arcanelevel_random_experience(@drop_location, @crop_reward['rainy_biome']['arcanelevel']['default'], @crop_reward['rainy_biome']['arcanelevel']['extra'])
+          }
+          # 튜나레벨
+          _give_tunalevel_random_experience(@uuid, @player_data, @crop_reward['rainy_biome']['tunalevel']['default'], @crop_reward['rainy_biome']['tunalevel']['extra'], @text)
         }
-      })
+        # 내구도 깍기 및 다 부셔지면 아이템 없애기
+        if(@max_durability > @damage) {
+          @item['meta']['damage'] = @damage
+          set_inventory_item(puuid(@player), @slot, @item)
+        } else {
+          play_entity_effect(puuid(@player), 'BREAK_EQUIPMENT_MAIN_HAND')
+          @item = null
+          set_inventory_item(puuid(@player), @slot, @item)
+        }
+      
+      }
     } else {
       if(array_index_exists(@drop_seeds, 1)) {
         array_remove(@drop_seeds, 1)
@@ -289,13 +282,11 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
     }
     # 씨앗 드랍 수정
     modify_event('drops', array())
-    set_timeout(1, closure() {
-      if(!is_cancelled()) {
-        foreach(@drop_seed in @drop_seeds) {
-          drop_item(@center_location, @drop_seed, false)
-        }
+    if(!is_cancelled()) {
+      foreach(@drop_seed in @drop_seeds) {
+        drop_item(@center_location, @drop_seed, false)
       }
-    })
+    }
   }
 }
 
@@ -328,7 +319,6 @@ proc _farmland_cultivate_event(@event, @player, @uuid, @players_data, @hp_blocks
       } else {
         @slot = 40
       }
-      //@player_data['item'][@event['hand']]
       if(pcooldown(@player, @item['name']) == 0) {
         if(@player_data['item']['enchantments'][@event['hand']] == '효율') {
           @cooldown_multiply = 0.75
