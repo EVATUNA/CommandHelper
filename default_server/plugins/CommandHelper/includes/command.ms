@@ -1065,11 +1065,11 @@ register_command('sendwarn', array(
     @prefix_index = @args[1]
     if(array_index_exists(@text['prefix'], @prefix_index)) {
       @prefix = @text['prefix'][@prefix_index]
-      @message = array_implode(array_get(@args, cslice(2, array_size(@args) - 1)), ' ')
+      @message = strip_colors(array_implode(array_get(@args, cslice(2, array_size(@args) - 1)), ' '))
       _send_instance_tooltip_msg(@target_name, @target_uuid, @prefix @message)
     } else {
       @prefix = @text['prefix']['warn']
-      @message = array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' ')
+      @message = strip_colors(array_implode(array_get(@args, cslice(1, array_size(@args) - 1)), ' '))
       _send_instance_tooltip_msg(@target_name, @target_uuid, @prefix @message)
     }
   }

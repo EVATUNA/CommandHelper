@@ -51,6 +51,12 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
     _new_decoration(@uuid, @player_data)
   }
 
+  # advancement
+  @player_data['advancement'] = cup_get('ADVANCEMENT', @uuid)
+  if(is_null(@player_data['advancement'])) {
+    _new_advancement(@uuid, @player_data)
+  }
+
   # skill
   _load_skills(@player_data, @player, @uuid, @skills_spec)
   # item
@@ -136,6 +142,14 @@ proc _new_decoration(@uuid, @player_data) {
     json_encode(array())  // 더미
   )
   cup_set('DECORATION', @uuid, @player_data['decoration'])
+}
+
+# 발전과제 데이터
+proc _new_advancement(@uuid, @player_data) {
+  @player_data['advancement'] = array(
+    json_encode(array()), // 발전과제 목록
+  )
+  cup_set('ADVANCEMENT', @uuid, @player_data['advancement'])
 }
 
 # 스코어보드 기본값 생성
