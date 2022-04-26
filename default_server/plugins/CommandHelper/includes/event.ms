@@ -1249,7 +1249,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
             case 4..8:
             case 13..17: // ingredient
               if(!is_null(@slot_item) && !(@slot_item['name'] == 'STRUCTURE_VOID' && @slot_item['meta']['model'] == 1)) { // 재료를 놓을 수 있는 칸일 시
-                @player_data['cache']['gui_click_time'] = time() + 100
+                //_debugmsg(@player @action @slot_item @cursor_item) // 디버깅용
                 switch(@action) {
                 case 'SWAP_WITH_CURSOR':
                   @cursor_item_copy = array_deep_clone(@cursor_item)
@@ -1257,18 +1257,22 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
                     if(@slot_item['name'] == @ingredient_name) { // 슬롯에 재료가 있었을시
                       if(@cursor_item['qty'] == 1) { // 아이템 하나만 들고 있을시 (커서랑 슬롯이랑 스왑시키는 용도)
                         @change_ingredient = true
+                        @player_data['cache']['gui_click_time'] = time() + 100
                       } else {
                         @change_ingredient = false
                         cancel()
                       }
                     } else { // 슬롯이 빈칸일 시
-                      @change_ingredient = true
-                      @cursor_item['qty'] = 1
-                      @cursor_item_copy['qty'] = 63
-                      modify_event('slotitem', @cursor_item_copy)
-                      set_timeout(1, closure() {
-                        set_inventory_item(@id, @rawslot, @cursor_item)
-                      })
+                      if(!is_cancelled()) {
+                        @change_ingredient = true
+                        @player_data['cache']['gui_click_time'] = time() + 100
+                        @cursor_item['qty'] = 1
+                        @cursor_item_copy['qty'] = 63
+                        modify_event('slotitem', @cursor_item_copy)
+                        set_timeout(1, closure() {
+                          set_inventory_item(@id, @rawslot, @cursor_item)
+                        })
+                      }
                     }
                   } else { // 재료를 들고 있지 않을 시
                     @change_ingredient = false
@@ -1279,6 +1283,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
                 case 'PICKUP_HALF':
                   if(@slot_item['name'] == @ingredient_name && @slot_item['qty'] == 1) {
                     @change_ingredient = true
+                    @player_data['cache']['gui_click_time'] = time() + 100
                     set_timeout(1, closure() {
                       set_inventory_item(@id, @rawslot, @ingredient_slot)
                     })
@@ -1292,6 +1297,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
                   if(is_null(@cursor_item)) {
                     if(@slot_item['name'] == @ingredient_name) {
                       @change_ingredient = true
+                      @player_data['cache']['gui_click_time'] = time() + 100
                       set_timeout(1, closure() {
                         set_inventory_item(@id, @rawslot, @ingredient_slot)
                       })
@@ -1314,6 +1320,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
                         if(@swap_item['name'] == @ingredient_name) {
                           if(@swap_item['qty'] == 1) {
                             @change_ingredient = true   // gui 재료 | 스왑 재료 1개
+                            @player_data['cache']['gui_click_time'] = time() + 100
                           } else {
                             @change_ingredient = false  // gui 재료 | 스왑 재료 n개
                             cancel()
@@ -1324,6 +1331,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
                         }
                       } else {
                         @change_ingredient = true       // gui 재료 | 스왑 빈칸
+                        @player_data['cache']['gui_click_time'] = time() + 100
                         cancel()
                         set_inventory_item(@id, @rawslot, @ingredient_slot)
                         set_inventory_item(@uuid, @swapslot, @slot_item)
@@ -1333,11 +1341,13 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
                         if(@swap_item['name'] == @ingredient_name) {
                           if(@swap_item['qty'] == 1) {
                             @change_ingredient = true   // gui 빈칸 | 스왑 재료 1개
+                            @player_data['cache']['gui_click_time'] = time() + 100
                             cancel()
                             set_inventory_item(@id, @rawslot, @swap_item)
                             set_inventory_item(@uuid, @swapslot, null)
                           } else {
                             @change_ingredient = true  // gui 빈칸 | 스왑 재료 n개
+                            @player_data['cache']['gui_click_time'] = time() + 100
                             cancel()
                             @swap_item['qty'] -= 1
                             @swap_item_copy = array_deep_clone(@swap_item)
@@ -1361,6 +1371,7 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
                 case 'MOVE_TO_OTHER_INVENTORY':
                   if(@slot_item['name'] == @ingredient_name) {
                     @change_ingredient = true
+                    @player_data['cache']['gui_click_time'] = time() + 100
                     set_timeout(1, closure() {
                       set_inventory_item(@id, @rawslot, @ingredient_slot)
                     })
