@@ -215,28 +215,30 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
             break()
           case 'golden_finger':
             # 작물 심기
-            set_block(@center_location, @golden_finger_crop)
-            # 파종 스킬에 따라 작물 심기
-            @sowing_method = json_decode(@skill_manager[4])['sowing_method']
-            if(@sowing_method != '' && @player_data['active_skill'][@sowing_method][1] > 0) {
-              switch(@sowing_method) {
-              case 'wet_hands':
-                @farmland_location = array_deep_clone(@center_location)
-                @farmland_location['y'] -= 1
-                @farmland_blockdata = get_blockdata(@farmland_location)
-                if(@farmland_blockdata['block'] == 'farmland') {
-                  @farmland_blockdata['moisture'] = 5
-                  set_blockdata(@farmland_location, @farmland_blockdata)
+            set_timeout(1, closure() {
+              set_block(@center_location, @golden_finger_crop)
+              # 파종 스킬에 따라 작물 심기
+              @sowing_method = json_decode(@skill_manager[4])['sowing_method']
+              if(@sowing_method != '' && @player_data['active_skill'][@sowing_method][1] > 0) {
+                switch(@sowing_method) {
+                case 'wet_hands':
+                  @farmland_location = array_deep_clone(@center_location)
+                  @farmland_location['y'] -= 1
+                  @farmland_blockdata = get_blockdata(@farmland_location)
+                  if(@farmland_blockdata['block'] == 'farmland') {
+                    @farmland_blockdata['moisture'] = 5
+                    set_blockdata(@farmland_location, @farmland_blockdata)
+                  }
+                  break()
+                case 'fertile_touch':
+                  @crop_location = array_deep_clone(@center_location)
+                  @crop_blockdata = get_blockdata(@crop_location)
+                  @crop_blockdata['age'] = 1
+                  set_blockdata(@crop_location, @crop_blockdata)
+                  break()
                 }
-                break()
-              case 'fertile_touch':
-                @crop_location = array_deep_clone(@center_location)
-                @crop_blockdata = get_blockdata(@crop_location)
-                @crop_blockdata['age'] = 1
-                set_blockdata(@crop_location, @crop_blockdata)
-                break()
               }
-            }
+            })
             break()
           }
           # 드랍 갯수 만큼 아이템 떨구기
@@ -281,12 +283,13 @@ proc _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @ski
       }
     }
     # 씨앗 드랍 수정
-    modify_event('drops', array())
-    if(!is_cancelled()) {
-      foreach(@drop_seed in @drop_seeds) {
-        drop_item(@center_location, @drop_seed, false)
-      }
-    }
+    //modify_event('drops', array())
+    //if(!is_cancelled()) {
+    //  foreach(@drop_seed in @drop_seeds) {
+    //    _debugmsg(@drop_seeds)
+    //    drop_item(@center_location, @drop_seed, false)
+    //  }
+    //}
   }
 }
 
