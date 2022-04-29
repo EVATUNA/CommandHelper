@@ -1,6 +1,6 @@
 @tunaland_queue = array()
 
-if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_query')) {
+if((@server == 'main' || @server == '1_test_main') && function_exists('tunalands_get_owner_uuid_with_chunk_query')) {
 
   proc _get_mass_from_chunk(@chunk) {
     @mass = array(
@@ -806,41 +806,88 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
     }
     if(array_size(@moves) > 1) {
       @move = @moves[0]
-      # 발자국일시
-      @history = array()
-      for(@i = 0, @i < 256, @i++) {
-        @x = integer(@i / 16)
-        @z = @i % 16
-        @history[] = array('x': @x, 'z': @z)
-      }
-      @location = _get_random_surface_in_chunk(@move['x'], @move['z'], @history)
+      switch(@tag['trace_data']['type']) {
+      case 'normal': // 일반 동물 흔적
+        @history = array()
+        for(@i = 0, @i < 256, @i++) {
+          @x = integer(@i / 16)
+          @z = @i % 16
+          @history[] = array('x': @x, 'z': @z)
+        }
+        @location = _get_random_surface_in_chunk(@move['x'], @move['z'], @history)
 
-      if(is_array(@location)) {
-        @rotation = @move['facing']
-        @framed_item = array(
-          'name': @tag['trace_data']['traces']['item']['name'],
-          'meta': array(
-            'model': 0
+        if(is_array(@location)) {
+          @rotation = @move['facing']
+          @framed_item = array(
+            'name': @tag['trace_data']['traces']['item']['name'],
+            'meta': array(
+              'model': 0
+            )
           )
-        )
 
-        @is_snow = false
-        if(array_index_exists(@tag['trace_data']['traces']['item'], 'normal_model')) {
-          @framed_item['meta']['model'] = @tag['trace_data']['traces']['item']['normal_model']
-        }
-        if(get_block(@location) == 'SNOW' && array_index_exists(@tag['trace_data']['traces']['item'], 'snow_model')) {
-          @framed_item['meta']['model'] = @tag['trace_data']['traces']['item']['snow_model']
-          @is_snow = true
-        }
+          @is_snow = false
+          if(array_index_exists(@tag['trace_data']['traces']['item'], 'normal_model')) {
+            @framed_item['meta']['model'] = @tag['trace_data']['traces']['item']['normal_model']
+          }
+          if(get_block(@location) == 'SNOW' && array_index_exists(@tag['trace_data']['traces']['item'], 'snow_model')) {
+            @framed_item['meta']['model'] = @tag['trace_data']['traces']['item']['snow_model']
+            @is_snow = true
+          }
 
-        if(!@is_snow) {
-          set_block(@location, 'AIR')
+          if(!@is_snow) {
+            set_block(@location, 'AIR')
+          }
+          _summon_item_frame(@location, 'UP', @rotation, 'trace', @framed_item, @tag)
+        } else {
+          @location = _place_trace(@tag, false)
         }
-        _summon_item_frame(@location, 'UP', @rotation, 'trace', @framed_item, @tag)
-      } else {
-        @location = _place_trace(@tag, false)
+        break()
+      case 'insect': // 곤충 흔적
+        @history = array()
+        for(@i = 0, @i < 256, @i++) {
+          @x = integer(@i / 16)
+          @z = @i % 16
+          @history[] = array('x': @x, 'z': @z)
+        }
+        @location = _get_random_surface_in_chunk(@move['x'], @move['z'], @history)
+        if(is_array(@location)) {
+          //@flowers = array(
+
+          //)
+          //@flower = array_get_rand(@flowers)
+          //set_block(@location, @flower)
+          /*
+          @rotation = @move['facing']
+          @framed_item = array(
+            'name': @tag['trace_data']['traces']['item']['name'],
+            'meta': array(
+              'model': 0
+            )
+          )
+
+          @is_snow = false
+          if(array_index_exists(@tag['trace_data']['traces']['item'], 'normal_model')) {
+            @framed_item['meta']['model'] = @tag['trace_data']['traces']['item']['normal_model']
+          }
+          if(get_block(@location) == 'SNOW' && array_index_exists(@tag['trace_data']['traces']['item'], 'snow_model')) {
+            @framed_item['meta']['model'] = @tag['trace_data']['traces']['item']['snow_model']
+            @is_snow = true
+          }
+
+          if(!@is_snow) {
+            set_block(@location, 'AIR')
+          }
+          _summon_item_frame(@location, 'UP', @rotation, 'trace', @framed_item, @tag)
+          */
+        } else {
+          @location = _place_trace(@tag, false)
+        }
+        break()
       }
+      
       # 다른타입의 흔적일시
+
+
     } else {
       @move = @moves[0]
       @history = array()
@@ -883,6 +930,10 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
     }
   }
 
+  bind('player_interact_entity', null, array('clicked': 'AREA_EFFECT_CLOUD'), @event) {
+    broadcast(@event)
+  }
+
   bind('player_interact', null, array('block': 'SNOW', 'button': 'right', 'hand': 'main_hand'), @event) {
     @player = @event['player']
     @uuid = puuid(@player)
@@ -908,4 +959,25 @@ if(@server == 'main' && function_exists('tunalands_get_owner_uuid_with_chunk_que
       }
     }
   }
+
+  register_command('test', array(
+    permission: 'test',
+    'tabcompleter': closure(@command, @player, @args) { return(array()) },
+    'executor': closure(@command, @player, @args) {
+      @location = ploc(@player)
+      @location['y'] += 1.5
+      spawn_entity('AREA_EFFECT_CLOUD', 1, @location, closure(@id) {
+        set_entity_spec(@id, array(
+          'duration': 100,
+          'particle': 'SPORE_BLOSSOM_AIR',
+          'radius': 0.25,
+          'radiusonuse': 0,
+          'radiuspertick': 0,
+          'reapplicationdelay': 1,
+          'waittime': 1
+        ))
+      })
+    }
+  ))
+
 }

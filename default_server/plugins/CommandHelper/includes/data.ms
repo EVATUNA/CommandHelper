@@ -152,6 +152,48 @@ proc _new_advancement(@uuid, @player_data) {
   cup_set('ADVANCEMENT', @uuid, @player_data['advancement'])
 }
 
+proc _get_advancements(@uuid) {
+  @players_data = import('players_data')
+  if(array_index_exists(@players_data, @uuid)) {
+    @advancement_data = @players_data[@uuid]['advancement']
+    @advancements = json_decode(@advancement_data[0])
+    return(@advancements)
+  } else {
+    return(null)
+  }
+}
+
+proc _update_advancements(@uuid, @advancements) {
+  @players_data = import('players_data')
+  if(array_index_exists(@players_data, @uuid)) {
+    @advancement_data = @players_data[@uuid]['advancement']
+    @advancement_data[0] = json_encode(@advancements)
+    cup_set('ADVANCEMENT', @uuid, @advancement_data)
+  }
+}
+
+proc _grant_advancement(@uuid, @advancement) {
+  @advancements = _get_advancements(@uuid)
+  if(is_array(@advancements) && !array_contains(@advancements, @advancement)) {
+    @advancements[] = @advancement
+    _update_advancements(@uuid, @advancements)
+    return(true)
+  } else {
+    return(false)
+  }
+}
+
+proc _revoke_advancement(@uuid, @advancement) {
+  @advancements = _get_advancements(@uuid)
+  if(is_array(@advancements) && array_contains(@advancements, @advancement)) {
+    array_remove_values(@advancements, @advancement)
+    _update_advancements(@uuid, @advancements)
+    return(true)
+  } else {
+    return(false)
+  }
+}
+
 # 스코어보드 기본값 생성
 proc _load_sidebar(@player, @uuid, @text) {
   @scoreboard = "ch_scoreboard.@uuid"

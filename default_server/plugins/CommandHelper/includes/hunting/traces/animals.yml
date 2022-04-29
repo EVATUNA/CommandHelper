@@ -94,7 +94,7 @@ sheep:
     # 0~7: 특정 방향으로 설정
     # RANDOM: 랜덤한 방향으로 설정
     # PATHWAY: 움직인 경로에 맞도록 설정
-    facing: RANDOM
+    facing: PATHWAY
 
     # item
     #
@@ -188,7 +188,7 @@ pig:
   trace_term: 3
   traces:
     type: normal
-    facing: RANDOM
+    facing: PATHWAY
     item: 
       name: 'NAUTILUS_SHELL'
       normal_model: 105
@@ -275,7 +275,7 @@ cow:
   trace_term: 3
   traces:
     type: normal
-    facing: RANDOM
+    facing: PATHWAY
     item: 
       name: 'NAUTILUS_SHELL'
       normal_model: 102
@@ -362,7 +362,7 @@ rabbit:
   trace_term: 3
   traces:
     type: normal
-    facing: RANDOM
+    facing: PATHWAY
     item: 
       name: 'NAUTILUS_SHELL'
       normal_model: 106
@@ -452,7 +452,7 @@ chicken:
   trace_term: 3
   traces:
     type: normal
-    facing: RANDOM
+    facing: PATHWAY
     item: 
       name: 'NAUTILUS_SHELL'
       normal_model: 103
