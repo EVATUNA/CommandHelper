@@ -68,6 +68,22 @@ set_timeout(1000, closure() {
           //_generate_trace(@player, @traces)
         }
 
+        # 뉴비 버프
+        @tunalevel = @player_data['skill_manager'][0]
+        switch(@tunalevel) {
+        case 0:
+          set_peffect(@player, 'RESISTANCE', 1, 11, true)
+          set_peffect(@player, 'HASTE', 1, 11, true)
+          break()
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+          set_peffect(@player, 'RESISTANCE', 0, 11, true)
+          set_peffect(@player, 'HASTE', 0, 11, true)
+          break()
+        }
+
         # 피 자연회복
         if(phunger(@player) >= 7 && phealth(@player) < get_max_health(@uuid)) {
           if(psaturation(@player) > 0) {

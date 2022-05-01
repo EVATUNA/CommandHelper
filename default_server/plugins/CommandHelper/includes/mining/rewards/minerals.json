@@ -95,8 +95,8 @@
             "model": 3
           }
         },
-        "weight": 0.025,
-        "quality": 0.025
+        "weight": 0.1,
+        "quality": 0.05
       }
     ]
   },
@@ -151,8 +151,8 @@
             "model": 3
           }
         },
-        "weight": 0.025,
-        "quality": 0.025
+        "weight": 0.1,
+        "quality": 0.05
       }
     ]
   },
@@ -208,8 +208,8 @@
             "model": 3
           }
         },
-        "weight": 0.025,
-        "quality": 0.025
+        "weight": 0.1,
+        "quality": 0.05
       }
     ]
   },
@@ -264,8 +264,8 @@
             "model": 3
           }
         },
-        "weight": 0.025,
-        "quality": 0.025
+        "weight": 0.1,
+        "quality": 0.05
       }
     ]
   },
@@ -321,8 +321,8 @@
             "model": 3
           }
         },
-        "weight": 0.025,
-        "quality": 0.025
+        "weight": 0.1,
+        "quality": 0.05
       }
     ]
   },
@@ -377,8 +377,8 @@
             "model": 3
           }
         },
-        "weight": 0.025,
-        "quality": 0.025
+        "weight": 0.1,
+        "quality": 0.05
       }
     ]
   },
@@ -433,8 +433,8 @@
             "model": 3
           }
         },
-        "weight": 0.025,
-        "quality": 0.025
+        "weight": 0.1,
+        "quality": 0.05
       }
     ]
   },
@@ -489,8 +489,8 @@
             "model": 3
           }
         },
-        "weight": 0.025,
-        "quality": 0.025
+        "weight": 0.1,
+        "quality": 0.05
       }
     ]
   },
@@ -547,8 +547,8 @@
             "model": 3
           }
         },
-        "weight": 0.025,
-        "quality": 0.025
+        "weight": 0.1,
+        "quality": 0.05
       }
     ]
   },
@@ -604,8 +604,8 @@
             "model": 3
           }
         },
-        "weight": 0.025,
-        "quality": 0.025
+        "weight": 0.1,
+        "quality": 0.05
       }
     ]
   },
@@ -662,8 +662,8 @@
             "model": 3
           }
         },
-        "weight": 0.025,
-        "quality": 0.025
+        "weight": 0.1,
+        "quality": 0.05
       }
     ]
   },

@@ -308,7 +308,7 @@ proc _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spe
       if(@reconnecting_data['server'] == 'guest') {
         set_timeout(1000, closure() {
           pgive_item(@player, array('name': 'BIRCH_BOAT'))
-          pgive_item(@player, array('name': 'BREAD', 'qty': 16))
+          pgive_item(@player, array('name': 'BREAD', 'qty': 40))
         })
         @raw = array(
           array(
