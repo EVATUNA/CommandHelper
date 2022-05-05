@@ -24,6 +24,8 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards, @text) {
   @id = @event['id']
   @mob_name = strip_colors(get_mob_name(@id))
   if(@mob_name == '') { @mob_name = entity_type(@id) }
+  @location = entity_loc(@id)
+  @location['y'] += 1
 
   @is_unconfigured_mob = true
   foreach(@namespace: @mob_reward in @mob_rewards) {
@@ -90,7 +92,6 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards, @text) {
         )
         # 아케인레벨 주기
         if(array_index_exists(@mob_reward, 'arcanelevel')) {
-          @location = entity_loc(@id)
           if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
             @player_rewards[@player]['arcanepoint'] += _give_arcanelevel_random_experience(@player, @uuid, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'], @text)
             @player_rewards[@player]['arcanepoint'] += _give_arcanelevel_random_experience(@player, @uuid, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'], @text)
@@ -107,36 +108,46 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards, @text) {
           @money = _get_random_double(@mob_reward['money']['default'], @mob_reward['money']['extra'])
           @player_rewards[@player]['can'] += @money
           if(@money > 0) {
-            //돈 주는 함수
+            acc_add(@player, @money)
           }
         }
-        broadcast(@player_rewards)
-      }
-      # 포리치 종료
-      break()
-
-      //if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
-      //  modify_event('xp', @event['xp'] * 2) // 경험 인첸트 있을시 2배의 경험치 떨굼
-      //  # 파티시스템 만들어지면 경험치 나누어 받는 시스템 만들어야 함
-      //}
-
-      /*
-      # 마법레벨 주기
-      if(array_index_exists(@mob_reward, 'arcanelevel')) {
-        @location = entity_loc(@id)
-        if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
-          _drop_arcanelevel_random_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
-          _drop_arcanelevel_random_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
-        } else {
-          _drop_arcanelevel_random_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+        # 아이템 떨구기
+        if(array_index_exists(@mob_reward, 'loot_tables')) {
+          @loot_tables = array_deep_clone(@mob_reward['loot_tables'])
+          foreach(@loot_table in @loot_tables) {
+            # 갯수 세팅 (아이템 뽑히는 횟수)
+            if(is_array(@loot_table['qty'])) {
+              @qty = integer(round(@loot_table['qty']['default'] + @loot_table['qty']['extra'] * rand())) // 플레이어 행운 인첸트 수치 반영하도록 변경
+              if(@qty < 0) { @qty = 0 }
+            } else {
+              @qty = @loot_table['qty']
+            }
+            # 엔트리 weight 세팅
+            @entries = @loot_table['entries']
+            @total_weight = 0
+            foreach(@key: @entry in @entries) {
+              @entries[@key]['weight'] += @entry['quality'] * 1 // 해당 플레이어 행운 어트리뷰트 수치 반영하도록 변경
+              @total_weight += @entry['weight']
+            }
+            # 드랍
+            for(@i = 0, @i < @qty, @i++) {
+              @result_weight = @total_weight * round(rand(), 5)
+              @min_weight = 0
+              foreach(@entry in @entries) {
+                @max_weight = @min_weight + @entry['weight']
+                if(@max_weight > @result_weight) {
+                  drop_item(@location, @entry['item'], false)
+                  //_logging('harvest', time(), @server, @location, @player, @uuid, @entry['item'])
+                  break()
+                } else {
+                  @min_weight = @max_weight
+                }
+              }
+            }
+          }
+          broadcast(@loot_tables)
         }
       }
-      # 튜나레벨 주기
-      if(array_index_exists(@mob_reward, 'tunalevel')) {
-        _give_tunalevel_random_experience(@uuid, @player_data, @mob_reward['tunalevel']['default'], @mob_reward['tunalevel']['extra'], @text)
-      }
-      */
-
       /*
       # 비법서 드랍
       if(array_index_exists(@mob_reward, 'scroll') && array_index_exists(@mob_reward['scroll'], 'chance') && rand() > @mob_reward['scroll']['chance']) { // chance 부분 수식 역으로 바꿔야 함
@@ -192,8 +203,8 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards, @text) {
         }
       }
       */
-
-
+      # 포리치 종료
+      break()
     }
   }
   if(@is_unconfigured_mob) { // 컨픽상에 없는 몹일 시

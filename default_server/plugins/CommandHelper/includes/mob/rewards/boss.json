@@ -1,6 +1,82 @@
 {
   "글룸": {
-    "is_boss": true,
+    "is_boss": false,
+    "loot_tables": [
+      {
+        "qty": {
+          "default": 1,
+          "extra": 0
+        },
+        "entries": [
+          {
+            "item": {
+              "name": "WHEAT"
+            },
+            "weight": 100,
+            "quality": 0.0
+          },
+          {
+            "item": {
+              "name": "WHEAT",
+              "meta": {
+                "display": "§e중급 밀",
+                "model": 1
+              }
+            },
+            "weight": 20,
+            "quality": 5.0
+          },
+          {
+            "item": {
+              "name": "WHEAT",
+              "meta": {
+                "display": "§b상급 밀",
+                "model": 2
+              }
+            },
+            "weight": 5,
+            "quality": 1.5
+          }
+        ]
+      },
+      {
+        "qty": {
+          "default": 0,
+          "extra": 1
+        },
+        "entries": [
+          {
+            "item": {
+              "name": "WHEAT"
+            },
+            "weight": 100,
+            "quality": 0.0
+          },
+          {
+            "item": {
+              "name": "WHEAT",
+              "meta": {
+                "display": "§e중급 밀",
+                "model": 1
+              }
+            },
+            "weight": 20,
+            "quality": 5.0
+          },
+          {
+            "item": {
+              "name": "WHEAT",
+              "meta": {
+                "display": "§b상급 밀",
+                "model": 2
+              }
+            },
+            "weight": 5,
+            "quality": 1.5
+          }
+        ]
+      }
+    ],
     "scroll": {
       "rank": 4,
       "chance": 0.01
