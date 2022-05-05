@@ -2,7 +2,7 @@
 @skills_spec = array()
 @skills_info = array()
 @categories = list_files('categories')
-foreach(@category in @categories) { 
+foreach(@category in @categories) {
   @skills_info[@category] = array()
   @category_path = "categories/@category"
   @skills = list_files(@category_path)

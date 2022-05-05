@@ -1,4 +1,4 @@
-/*
+@boss_names = array()
 # 몹 보상 저장
 @files = list_files('rewards')
 foreach(@file in @files) {
@@ -11,117 +11,205 @@ foreach(@file in @files) {
       foreach(@mob_name: @mob_reward in json_decode(@content)) {
         @namespace = "@file_name:@mob_name"
         @mob_rewards[@namespace] = @mob_reward
+        # 보스일경우 따로 이름 저장
+        if(array_index_exists(@mob_reward, 'is_boss') && @mob_reward['is_boss']) {
+          @boss_names[] = @mob_name
+        }
       }
     })
   }
 }
 
-bind('entity_death', null, null, @event, @players_data, @mob_rewards) {
-  if(array_index_exists(@event['cause'],'damager') && ponline(@event['cause']['damager'])) {
-    # 플레이어에 의하여 죽을시 추가 보상 (마법레벨, 튜나레벨, 룬, 비법서)
-    @player = @event['cause']['damager']
-    @uuid = puuid(@player)
-    @player_data = @players_data[@uuid] // 죽인 플레이어의 데이터 // 나중에 파티 시스템 생기면 각각의 플레이어 데이터 구해서 튜나레벨 줘야 함
+bind('entity_death', null, null, @event, @players_data, @mob_rewards, @text) {
+  @id = @event['id']
+  @mob_name = strip_colors(get_mob_name(@id))
+  if(@mob_name == '') { @mob_name = entity_type(@id) }
 
-    @id = @event['id']
-    @target_name = get_mob_name(@id)
-    if(@target_name == '') {
-      @target_name = entity_type(@id)
-    }
+  @is_unconfigured_mob = true
+  foreach(@namespace: @mob_reward in @mob_rewards) {
+    @splited_namespace = split(':', @namespace)
+    @category = @splited_namespace[0]
+    if(@mob_name == @splited_namespace[1]) { // 이름이 같은 몹일 시
+      # 컨피큐어드 몹으로 설정 및 경치 드랍 제거
+      @is_unconfigured_mob = false
+      modify_event('xp', 0)
+      
+      # 몹 타입에 따른 보상
+      if(array_index_exists(@mob_reward, 'is_boss') && @mob_reward['is_boss']) { // 보스일 시 (태그상에 인식되는 플레이어들에게 보상 지급)
+        @size = array_size(get_scoreboard_tags(@id))
+        @money = 300
+        @tunapoint = 200
 
-    foreach(@namespace: @mob_reward in @mob_rewards) {
-      @splited_namespace = split(':', @namespace)
-      @category = @splited_namespace[0]
-      @mob_name = @splited_namespace[1]
+        @player_rewards = array()
+        foreach(@player in get_scoreboard_tags(@id)) {
+          if(ponline(@player)) {
+            @uuid = puuid(@player)
+            @player_data = @players_data[@uuid]
 
-      if(@mob_name == @target_name) {
-        //if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
-        //  modify_event('xp', @event['xp'] * 2) // 경험 인첸트 있을시 2배의 경험치 떨굼
-        //  # 파티시스템 만들어지면 경험치 나누어 받는 시스템 만들어야 함
-        //}
-        # 마법레벨 주기
+            @money_per_player = @money / @size
+            @tunapoint_per_player = @tunapoint / @size
+            broadcast(@player)
+            //acc_add(@target_name, rand(integer(@money_per_player * 0.5), integer(@money_per_player * 1.5)))
+            //_give_tunalevel_random_experience(@target_uuid, @player_data, @tunapoint_per_player / 2, @tunapoint_per_player, @text)
+          }
+        }
+        
+        /*
+        
+        @items = array(
+          _drop_item_random_qty(@location, 'arcane_essence', 'arcane_essence_2', 1, 2, @ch_items),
+          _drop_item_random_qty(@location, 'arcane_essence', 'arcane_essence_6', 1, 1, @ch_items),
+          _drop_item_random_qty(@location, 'mineral', 'netherite_scrap_c', 1, 4, @ch_items),
+          _drop_item_random_qty(@location, 'mineral', 'netherite_scrap_b', -3, 6, @ch_items),
+          _drop_item_random_qty(@location, 'mineral', 'netherite_scrap_a', -8, 10, @ch_items),
+          _drop_item_random_qty(@location, 'mineral', 'netherite_scrap_s', -99, 100, @ch_items),
+          _drop_item_random_qty(@location, 'misc', 'EXPERIENCE_BOTTLE', -99, 100, @ch_items)
+        )
+
+        foreach(@item in @items) {
+          if(!is_null(@item)) {
+          }
+        }
+        
+        
+        // @type @time @server, @location, @mob, @player_rewards, @items
+        _logging('loot', time(), @server, @location, @id, @item)
+        */
+        broadcast(B)
+      } else if(array_index_exists(@event['cause'],'damager') && ponline(@event['cause']['damager'])) { // 플레이어에 의하여 죽은 컨픽상에 있는 몹일 시 (막타 친 플레이어에게 보상 지급)
+        @player = @event['cause']['damager']
+        @uuid = puuid(@player)
+        @player_data = @players_data[@uuid]
+        
+        @player_rewards = array()
+        @player_rewards[@player] = array(
+          'uuid': @uuid,
+          'arcanepoint': 0,
+          'tunapoint': 0,
+          'can': 0
+        )
+        # 아케인레벨 주기
         if(array_index_exists(@mob_reward, 'arcanelevel')) {
           @location = entity_loc(@id)
           if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
-            _drop_arcanelevel_random_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
-            _drop_arcanelevel_random_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+            @player_rewards[@player]['arcanepoint'] += _give_arcanelevel_random_experience(@player, @uuid, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'], @text)
+            @player_rewards[@player]['arcanepoint'] += _give_arcanelevel_random_experience(@player, @uuid, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'], @text)
           } else {
-            _drop_arcanelevel_random_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+            @player_rewards[@player]['arcanepoint'] += _give_arcanelevel_random_experience(@player, @uuid, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'], @text)
           }
         }
-        
         # 튜나레벨 주기
         if(array_index_exists(@mob_reward, 'tunalevel')) {
-          _give_tunalevel_random_experience(@uuid, @player_data, @mob_reward['tunalevel']['default'], @mob_reward['tunalevel']['extra'], @text)
+          @player_rewards[@player]['tunapoint'] += _give_tunalevel_random_experience(@uuid, @player_data, @mob_reward['tunalevel']['default'], @mob_reward['tunalevel']['extra'], @text)
         }
-
-        # 비법서 드랍
-        if(array_index_exists(@mob_reward, 'scroll') && array_index_exists(@mob_reward['scroll'], 'chance') && rand() > @mob_reward['scroll']['chance']) { // chance 부분 수식 역으로 바꿔야 함
-          @scroll_rank = 0 // 비법서 랭크
-          if(array_index_exists(@mob_reward['scroll'], 'rank')) {
-            @scroll_rank = @mob_reward['scroll']['rank']
-            switch(rand(20)) {
-            case 0..5:
-              @extra_rank = -1
-              break()
-            case 6..14:
-              @extra_rank = 0
-              break()
-            case 15..18:
-              @extra_rank = 1
-              break()
-            case 19:
-              @extra_rank = 2
-              break()
-            }
-            @scroll_rank += @extra_rank
-            if(@scroll_rank > 3) { // 최종 랭크가 3보다 클 시, 비법서 드랍
-              switch(rand(5)) {
-              case 0..2:
-                # 사용중인 전투 방식
-                # 사용중인 전투 구하기
-                # 없을경우 사용중이지 않은 전투방식중 랜덤으로 하나 지장
-                # 해당 비법서를 name로 지정
-                break()
-              case 3:
-                # 사용중이지 않은 전투 방식
-                # 사용중인 전투 구하기
-                # 사용중인것 제외한 나머지 전투방식중에서 하나 지정
-                # 해당 비법서를 name로 지정
-                break()
-              case 4:
-                # 보조 전투
-                # 보조 전투중에서 하나 지정
-                # 해당 비법서를 name로 지정
-                break()
-              }
-              #해당 name과 rank에 해당하는 비법서 주기
-            }
+        # 캔 주기
+        if(array_index_exists(@mob_reward, 'money')) {
+          @money = _get_random_double(@mob_reward['money']['default'], @mob_reward['money']['extra'])
+          @player_rewards[@player]['can'] += @money
+          if(@money > 0) {
+            //돈 주는 함수
           }
         }
-
-        # 룬 드랍
-        if(array_index_exists(@mob_reward, 'rune') && array_index_exists(@mob_reward['rune'], 'name') && array_index_exists(@mob_reward['rune'], 'chance') && rand() > @mob_reward['rune']['chance']) { // chance 부분 수식 역으로 바꿔야 함
-          @rune_rank = 0 // 비법서 랭크
-          if(array_index_exists(@mob_reward['rune'], 'rank')) {
-            @rune_rank = @mob_reward['rune']['rank']
-            #broadcast(@mob_reward['rune']['name'] @mob_reward['rune']['rank'])
-            #해당 name과 rank에 해당하는 룬 주기
-          }
-        }
-        
-        # 포리치 종료
-        break()
+        broadcast(@player_rewards)
       }
+      # 포리치 종료
+      break()
+
+      //if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
+      //  modify_event('xp', @event['xp'] * 2) // 경험 인첸트 있을시 2배의 경험치 떨굼
+      //  # 파티시스템 만들어지면 경험치 나누어 받는 시스템 만들어야 함
+      //}
+
+      /*
+      # 마법레벨 주기
+      if(array_index_exists(@mob_reward, 'arcanelevel')) {
+        @location = entity_loc(@id)
+        if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
+          _drop_arcanelevel_random_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+          _drop_arcanelevel_random_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+        } else {
+          _drop_arcanelevel_random_experience(@location, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'])
+        }
+      }
+      # 튜나레벨 주기
+      if(array_index_exists(@mob_reward, 'tunalevel')) {
+        _give_tunalevel_random_experience(@uuid, @player_data, @mob_reward['tunalevel']['default'], @mob_reward['tunalevel']['extra'], @text)
+      }
+      */
+
+      /*
+      # 비법서 드랍
+      if(array_index_exists(@mob_reward, 'scroll') && array_index_exists(@mob_reward['scroll'], 'chance') && rand() > @mob_reward['scroll']['chance']) { // chance 부분 수식 역으로 바꿔야 함
+        @scroll_rank = 0 // 비법서 랭크
+        if(array_index_exists(@mob_reward['scroll'], 'rank')) {
+          @scroll_rank = @mob_reward['scroll']['rank']
+          switch(rand(20)) {
+          case 0..5:
+            @extra_rank = -1
+            break()
+          case 6..14:
+            @extra_rank = 0
+            break()
+          case 15..18:
+            @extra_rank = 1
+            break()
+          case 19:
+            @extra_rank = 2
+            break()
+          }
+          @scroll_rank += @extra_rank
+          if(@scroll_rank > 3) { // 최종 랭크가 3보다 클 시, 비법서 드랍
+            switch(rand(5)) {
+            case 0..2:
+              # 사용중인 전투 방식
+              # 사용중인 전투 구하기
+              # 없을경우 사용중이지 않은 전투방식중 랜덤으로 하나 지장
+              # 해당 비법서를 name로 지정
+              break()
+            case 3:
+              # 사용중이지 않은 전투 방식
+              # 사용중인 전투 구하기
+              # 사용중인것 제외한 나머지 전투방식중에서 하나 지정
+              # 해당 비법서를 name로 지정
+              break()
+            case 4:
+              # 보조 전투
+              # 보조 전투중에서 하나 지정
+              # 해당 비법서를 name로 지정
+              break()
+            }
+            #해당 name과 rank에 해당하는 비법서 주기
+          }
+        }
+      }
+      # 룬 드랍
+      if(array_index_exists(@mob_reward, 'rune') && array_index_exists(@mob_reward['rune'], 'name') && array_index_exists(@mob_reward['rune'], 'chance') && rand() > @mob_reward['rune']['chance']) { // chance 부분 수식 역으로 바꿔야 함
+        @rune_rank = 0 // 비법서 랭크
+        if(array_index_exists(@mob_reward['rune'], 'rank')) {
+          @rune_rank = @mob_reward['rune']['rank']
+          #broadcast(@mob_reward['rune']['name'] @mob_reward['rune']['rank'])
+          #해당 name과 rank에 해당하는 룬 주기
+        }
+      }
+      */
+
+
     }
-
-
   }
-  # 몹 죽고나서 사라질때 떨구는 경험치 제거
-  modify_event('xp', 0)
+  if(@is_unconfigured_mob) { // 컨픽상에 없는 몹일 시
+    if(array_index_exists(@event['cause'],'damager') && ponline(@event['cause']['damager'])) {
+      @player = @event['cause']['damager']
+      @uuid = puuid(@player)
+      @player_data = @players_data[@uuid]
+    }
+    if(@player_data['item']['enchantments']['main_hand'] == '경험') {
+      modify_event('xp', integer(@event['xp'] * 2))
+    }
+    _give_tunalevel_random_experience(@uuid, @player_data, 0, @event['xp'] / 3, @text)
+  }
 }
-*/
 
+/*
 bind('entity_death', null, null, @event, @players_data, @text, @ch_items, @server) {
   if(array_index_exists(@event['cause'],'damager') && ponline(@event['cause']['damager'])) {
     # 플레이어에 의하여 죽을시
@@ -142,6 +230,7 @@ bind('entity_death', null, null, @event, @players_data, @text, @ch_items, @serve
         @money = 300
         @tunapoint = 200
 
+        @player_rewards = array()
         foreach(@target_name in get_scoreboard_tags(@id)) {
           if(ponline(@target_name)) {
             @target_uuid = puuid(@target_name)
@@ -153,7 +242,8 @@ bind('entity_death', null, null, @event, @players_data, @text, @ch_items, @serve
             _give_tunalevel_random_experience(@target_uuid, @player_data, @tunapoint_per_player / 2, @tunapoint_per_player, @text)
           }
         }
-
+        
+        
         @items = array(
           _drop_item_random_qty(@location, 'arcane_essence', 'arcane_essence_2', 1, 2, @ch_items),
           _drop_item_random_qty(@location, 'arcane_essence', 'arcane_essence_6', 1, 1, @ch_items),
@@ -166,15 +256,20 @@ bind('entity_death', null, null, @event, @players_data, @text, @ch_items, @serve
 
         foreach(@item in @items) {
           if(!is_null(@item)) {
-            _logging('loot', time(), @server, @location, @mob_name, @item)
           }
         }
+        
+        
+        // @type @time @server, @location, @mob, @player_rewards, @items
+        _logging('loot', time(), @server, @location, @id, @item)
+        
         break()
       }
     }
   }
 }
 
+*/
 # 스폰된 몹 들 입고있는 아이템 떨구지 안토록 수정
 bind('creature_spawn', null, null, @event) {
   @uuid = @event['id']

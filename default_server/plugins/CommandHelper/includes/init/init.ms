@@ -117,7 +117,7 @@ foreach(@scoreboard in get_scoreboards()) {
 )
 
 ### Initial Including Procedure
-# GUI 시스템
+## GUI 시스템
 proc _gui_exists(@id) {
   return(array_contains(get_virtual_inventories(), @id))
 }
@@ -150,8 +150,7 @@ proc _close_all_gui() {
   }
 }
 
-# 스킬용 어트리뷰트 모디파이어 관련 함수
-
+## 스킬용 어트리뷰트 모디파이어 관련 함수
 proc _remove_all_modifiers(@uuid, @attribute, @name) {
   foreach(@modifier in entity_attribute_modifiers(@uuid, @attribute)) {
     if(@modifier['name'] == @name) {
@@ -160,6 +159,12 @@ proc _remove_all_modifiers(@uuid, @attribute, @name) {
   }
 }
 
+## 랜덤 소수 (양수) 구하기 (캔 지급용)
+proc _get_random_double(@default_double, @extra_double) {
+  @double = round(@default_double + rand() * @extra_double, 2)
+  if(@double < 0) { @double = 0.0 }
+  return(@double)
+}
 
 ## 기타 proc
 # 배열 나누기
@@ -209,8 +214,7 @@ proc _get_total_skill_point(@skill_manager) {
 }
 
 
-# 인디케이터
-
+## 인디케이터
 # 스코어보드 변경
 proc _set_sidebar(@uuid, @line, @message, @text) {
   @scoreboard = "ch_scoreboard.@uuid"
@@ -313,7 +317,7 @@ proc _show_indicator(@uuid, @player_data, @indicator_data, @text) {
   @player_data['cache']['indicator_id'] = @queue_id
 }
 
-# 수리 gui 텍스트
+## 수리 gui 텍스트
 proc _replace_repair_percent(@percent) {
   @text = replace(
     replace(

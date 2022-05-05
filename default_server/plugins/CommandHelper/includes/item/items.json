@@ -904,6 +904,316 @@
 			}
 		}
 	},
+	"food": {
+		"wheat_b": {
+			"name": "WHEAT",
+			"meta": {
+				"display": "§e중급 밀",
+				"model": 1
+			}
+		},
+		"wheat_a": {
+			"name": "WHEAT",
+			"meta": {
+				"display": "§b상급 밀",
+				"model": 2
+			}
+		},
+		"potato_b": {
+			"name": "POTATO",
+			"meta": {
+				"display": "§e중급 감자",
+				"model": 1
+			}
+		},
+		"potato_a": {
+			"name": "POTATO",
+			"meta": {
+				"display": "§b상급 감자",
+				"model": 2
+			}
+		},
+		"carrot_b": {
+			"name": "CARROT",
+			"meta": {
+				"display": "§e중급 당근",
+				"model": 1
+			}
+		},
+		"carrot_a": {
+			"name": "CARROT",
+			"meta": {
+				"display": "§b상급 당근",
+				"model": 2
+			}
+		},
+		"beetroot_b": {
+			"name": "BEETROOT",
+			"meta": {
+				"display": "§e중급 사탕무",
+				"model": 1
+			}
+		},
+		"beetroot_a": {
+			"name": "BEETROOT",
+			"meta": {
+				"display": "§b상급 사탕무",
+				"model": 2
+			}
+		},
+		"sweet_berries_b": {
+			"name": "SWEET_BERRIES",
+			"meta": {
+				"display": "§e중급 크랜베리",
+				"model": 1
+			}
+		},
+		"sweet_berries_a": {
+			"name": "SWEET_BERRIES",
+			"meta": {
+				"display": "§b상급 크랜베리",
+				"model": 2
+			}
+		},
+		"pumpkin_b": {
+			"name": "PUMPKIN",
+			"meta": {
+				"display": "§e중급 호박",
+				"model": 1
+			}
+		},
+		"pumpkin_a": {
+			"name": "PUMPKIN",
+			"meta": {
+				"display": "§b상급 호박",
+				"model": 2
+			}
+		},
+		"melon_b": {
+			"name": "MELON",
+			"meta": {
+				"display": "§e중급 멜론",
+				"model": 1
+			}
+		},
+		"melon_a": {
+			"name": "MELON",
+			"meta": {
+				"display": "§b상급 멜론",
+				"model": 2
+			}
+		},
+		"bread_b": {
+			"name": "BREAD",
+			"meta": {
+				"display": "§e중급 빵",
+				"model": 1
+			}
+		},
+		"bread_a": {
+			"name": "BREAD",
+			"meta": {
+				"display": "§b상급 빵",
+				"model": 2
+			}
+		},
+		"baked_potato_b": {
+			"name": "BAKED_POTATO",
+			"meta": {
+				"display": "§e중급 구운 감자",
+				"model": 1
+			}
+		},
+		"baked_potato_a": {
+			"name": "BAKED_POTATO",
+			"meta": {
+				"display": "§b상급 구운 감자",
+				"model": 2
+			}
+		},
+		"porkchop_b": {
+			"name": "PORKCHOP",
+			"meta": {
+				"display": "§e중급 익히지 않은 돼지고기",
+				"model": 1
+			}
+		},
+		"porkchop_a": {
+			"name": "PORKCHOP",
+			"meta": {
+				"display": "§b상급 익히지 않은 돼지고기",
+				"model": 2
+			}
+		},
+		"beef_b": {
+			"name": "BEEF",
+			"meta": {
+				"display": "§e중급 익히지 않은 소고기",
+				"model": 1
+			}
+		},
+		"beef_a": {
+			"name": "BEEF",
+			"meta": {
+				"display": "§b상급 익히지 않은 소고기",
+				"model": 2
+			}
+		},
+		"mutton_b": {
+			"name": "MUTTON",
+			"meta": {
+				"display": "§e중급 익히지 않은 양고기",
+				"model": 1
+			}
+		},
+		"mutton_a": {
+			"name": "MUTTON",
+			"meta": {
+				"display": "§b상급 익히지 않은 양고기",
+				"model": 2
+			}
+		},
+		"chicken_b": {
+			"name": "CHICKEN",
+			"meta": {
+				"display": "§e중급 익히지 않은 닭고기",
+				"model": 1
+			}
+		},
+		"chicken_a": {
+			"name": "CHICKEN",
+			"meta": {
+				"display": "§b상급 익히지 않은 닭고기",
+				"model": 2
+			}
+		},
+		"rabbit_b": {
+			"name": "RABBIT",
+			"meta": {
+				"display": "§e중급 익히지 않은 토끼고기",
+				"model": 1
+			}
+		},
+		"rabbit_a": {
+			"name": "RABBIT",
+			"meta": {
+				"display": "§b상급 익히지 않은 토끼고기",
+				"model": 2
+			}
+		},
+		"fish_b": {
+			"name": "COD",
+			"meta": {
+				"display": "§e중급 익히지 않은 생선",
+				"model": 1
+			}
+		},
+		"fish_a": {
+			"name": "COD",
+			"meta": {
+				"display": "§b상급 익히지 않은 생선",
+				"model": 2
+			}
+		},
+		"cooked_porkchop_b": {
+			"name": "COOKED_PORKCHOP",
+			"meta": {
+				"display": "§e중급 익힌 돼지고기",
+				"model": 1
+			}
+		},
+		"cooked_porkchop_a": {
+			"name": "COOKED_PORKCHOP",
+			"meta": {
+				"display": "§b상급 익힌 돼지고기",
+				"model": 2
+			}
+		},
+		"cooked_beef_b": {
+			"name": "COOKED_BEEF",
+			"meta": {
+				"display": "§e중급 익힌 소고기",
+				"model": 1
+			}
+		},
+		"cooked_beef_a": {
+			"name": "COOKED_BEEF",
+			"meta": {
+				"display": "§b상급 익힌 소고기",
+				"model": 2
+			}
+		},
+		"cooked_mutton_b": {
+			"name": "COOKED_MUTTON",
+			"meta": {
+				"display": "§e중급 익힌 양고기",
+				"model": 1
+			}
+		},
+		"cooked_mutton_a": {
+			"name": "COOKED_MUTTON",
+			"meta": {
+				"display": "§b상급 익힌 양고기",
+				"model": 2
+			}
+		},
+		"cooked_chicken_b": {
+			"name": "COOKED_CHICKEN",
+			"meta": {
+				"display": "§e중급 익힌 닭고기",
+				"model": 1
+			}
+		},
+		"cooked_chicken_a": {
+			"name": "COOKED_CHICKEN",
+			"meta": {
+				"display": "§b상급 익힌 닭고기",
+				"model": 2
+			}
+		},
+		"cooked_rabbit_b": {
+			"name": "COOKED_RABBIT",
+			"meta": {
+				"display": "§e중급 익힌 토끼고기",
+				"model": 1
+			}
+		},
+		"cooked_rabbit_a": {
+			"name": "COOKED_RABBIT",
+			"meta": {
+				"display": "§b상급 익힌 토끼고기",
+				"model": 2
+			}
+		},
+		"cooked_fish_b": {
+			"name": "COOKED_COD",
+			"meta": {
+				"display": "§e중급 익힌 생선",
+				"model": 1
+			}
+		},
+		"cooked_fish_a": {
+			"name": "COOKED_COD",
+			"meta": {
+				"display": "§b상급 익힌 생선",
+				"model": 2
+			}
+		},
+		"honey_b": {
+			"name": "HONEY_BOTTLE",
+			"meta": {
+				"display": "§e중급 결정화된 꿀",
+				"model": 1
+			}
+		},
+		"honey_a": {
+			"name": "HONEY_BOTTLE",
+			"meta": {
+				"display": "§b상급 결정화된 꿀",
+				"model": 2
+			}
+		}
+	},
 	"misc": {
 		"EXPERIENCE_BOTTLE": {
 			"name": "EXPERIENCE_BOTTLE"

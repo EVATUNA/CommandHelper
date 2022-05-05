@@ -10,11 +10,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -29,11 +33,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -48,11 +56,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -67,11 +79,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -86,11 +102,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -105,11 +125,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -124,11 +148,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -143,11 +171,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -162,11 +194,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -181,11 +217,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -200,11 +240,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -219,11 +263,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -238,11 +286,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -257,11 +309,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -276,11 +332,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -295,11 +355,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -314,11 +378,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -333,11 +401,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -352,11 +424,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -371,11 +447,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -390,11 +470,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -409,11 +493,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -428,11 +516,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -447,11 +539,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -466,11 +562,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -485,11 +585,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -504,11 +608,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -523,11 +631,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -542,11 +654,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -561,11 +677,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -580,11 +700,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -599,11 +723,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -618,11 +746,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -637,11 +769,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -656,11 +792,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   },
@@ -675,11 +815,15 @@
       "chance": 0
     },
     "tunalevel": {
-      "default": 1,
+      "default": 0,
       "extra": 0
     },
     "arcanelevel": {
-      "default": 1,
+      "default": 0,
+      "extra": 0
+    },
+    "money": {
+      "default": 0,
       "extra": 0
     }
   }

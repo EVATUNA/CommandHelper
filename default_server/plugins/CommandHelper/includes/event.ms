@@ -3290,7 +3290,7 @@ bind('projectile_launch', null, array('shootertype': 'PLAYER'), @event, @players
 }
 
 // 원거리 공격, 근거리 공격, 방어 관련 처리
-bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, @skills_spec, @text, @server) {
+bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, @skills_spec, @text, @server, @boss_names) {
   @allowed_entity = array(
     'MAGMA_CUBE': 0.75,
     'SILVERFISH': 0.3,
@@ -3441,14 +3441,10 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
     # 때린 사람
     @target_name = strip_colors(get_mob_name(@euuid))
     if(@target_name != '') {
-      switch(@target_name) {
-      case '글룸':
-        if(rand() < 0.05) {
-          if(!array_contains(get_scoreboard_tags(@euuid), @player)) {
-            add_scoreboard_tag(@euuid, @player)
-          }
+      if(array_contains(@boss_names, @target_name)) {
+        if(!array_contains(get_scoreboard_tags(@euuid), @player)) {
+          add_scoreboard_tag(@euuid, @player)
         }
-        break()
       }
     }
   }

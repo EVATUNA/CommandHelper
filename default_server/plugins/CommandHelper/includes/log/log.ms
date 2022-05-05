@@ -118,11 +118,12 @@ proc _logging(@type, @time, @server) {
       }
       break()
     case 'loot':
-      // @type @time @server, @location, @mob, @item
+      // @type @time @server, @location, @mob, @player_rewards, @items
       if(@arguments_size == 6) {
         @location = @arguments[3]
         @mob = @arguments[4]
-        @item = @arguments[5]
+        @player_rewards = @arguments[5]
+        @items = @arguments[6]
         // time_stamp
         @time_stamp = simple_date('yyyy-MM-dd HH:mm:ss', time())
         // location_stamp
@@ -131,16 +132,37 @@ proc _logging(@type, @time, @server) {
         @location_z = integer(@location['z'])
         @location_world = @location['world']
         @location_stamp = "@location_world, @location_x, @location_y, @location_z"
-        // item_name
-        if(array_index_exists(@item, 'meta', 'display') && @item['meta']['display'] != '') {
-          @item_name = strip_colors(@item['meta']['display'])
-        } else {
-          @item_name = @item['name']
+        // mob_name
+        @mob_name = get_mob_name(@mob)
+        if(@mob_name == '') { @mob_name = entity_type(@mob) }
+        @log = ''
+        // location_log
+        @location_log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@mob_name] [@mob] was killed at [@location_stamp]\n"
+        broadcast(@player_reward_log)
+        // player_reward_log
+        foreach(@player: @rewards in @player_rewards) {
+          if(ponline(@player)) {
+            @uuid = @rewards['uuid']
+            @can = @rewards['can']
+            @tunapoint = @rewards['tunapoint']
+            @arcanepoint = @rewards['arcanepoint']
+            @player_reward_log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@mob_name] [@mob] was killed by @player (@uuid) dropped [@can can] [@tunapoint tunapoint] [@arcanepoint arcanepoint]\n"
+            broadcast(@player_reward_log)
+          }
         }
-        // qty
-        @qty = @item['qty']
-        // log
-        @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@location_stamp] [@mob] @item_name x@qty\n"
+        // item_name
+        foreach(@item in @items) {
+          if(array_index_exists(@item, 'meta', 'display') && @item['meta']['display'] != '') {
+            @item_name = strip_colors(@item['meta']['display'])
+          } else {
+            @item_name = @item['name']
+          }
+          // qty
+          @qty = @item['qty']
+          // item_log
+          @item_log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@mob_name] [@mob] dropped @item_name x@qty\n"
+          broadcast(@item_log)
+        }
       }
       break()
     }
