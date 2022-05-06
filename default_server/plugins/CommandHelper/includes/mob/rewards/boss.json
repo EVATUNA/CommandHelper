@@ -1,6 +1,5 @@
 {
   "글룸": {
-    "is_boss": false,
     "loot_tables": [
       {
         "qty": {

@@ -3290,7 +3290,7 @@ bind('projectile_launch', null, array('shootertype': 'PLAYER'), @event, @players
 }
 
 // 원거리 공격, 근거리 공격, 방어 관련 처리
-bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, @skills_spec, @text, @server, @boss_names) {
+bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, @skills_spec, @text, @server, @mob_rewards) {
   @allowed_entity = array(
     'MAGMA_CUBE': 0.75,
     'SILVERFISH': 0.3,
@@ -3365,6 +3365,8 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
     'BAT': 0.9,
     'DOLPHIN': 0.6
   )
+  @player = null
+  @puuid = null
   if(array_index_exists(@event, 'damager')) {
     @euuid = @event['id']
     # 원거리 공격
@@ -3438,12 +3440,37 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
         }
       }
     }
-    # 때린 사람
-    @target_name = strip_colors(get_mob_name(@euuid))
-    if(@target_name != '') {
-      if(array_contains(@boss_names, @target_name)) {
-        if(!array_contains(get_scoreboard_tags(@euuid), @player)) {
-          add_scoreboard_tag(@euuid, @player)
+    # 몹 보상용 타격 기록
+    if(!is_null(@player)) { //플레이어가 공격했을 시
+      # 떄린 몹 이름 선언
+      @target_name = strip_colors(get_mob_name(@euuid))
+      if(@target_name == '') { @target_name = entity_type(@euuid) }
+      # 컨픽상에 몹 있는지 검사 포리치
+      foreach(@namespace: @mob_reward in @mob_rewards) {
+        @splited_namespace = split(':', @namespace)
+        @mob_name = @splited_namespace[1] // 컨픽상 몹 이름
+        if(@target_name == @mob_name) { // 컨픽상에 있는 몹일시
+          @damage_history = _get_tag(@euuid)
+          if(is_null(@damage_history)) { @damage_history = array() }
+          # 타격 기록에 플레이어 타격 정보 추가
+          @history = array(
+            'damage': @event['amount'],
+            'luck': entity_attribute_value(@puuid, 'GENERIC_LUCK') * 0.25,
+            'looting': 0.0,
+            'count': 1
+          )
+          if(@player == @event['damager'] && @players_data[@puuid]['item']['enchantments']['main_hand'] == '행운') { @history['looting'] = 0.5 } // 근접공격이면서 행운 인첸으로 공격 시
+          if(!array_index_exists(@damage_history, @player)) {
+            @damage_history[@player] = @history
+          } else {
+            @damage_history[@player]['damage'] += @history['damage']
+            @damage_history[@player]['luck'] += @history['luck']
+            @damage_history[@player]['looting'] += @history['looting']
+            @damage_history[@player]['count'] += @history['count']
+          }
+          broadcast(@damage_history)
+          _update_tag(@euuid, @damage_history)
+          break()
         }
       }
     }
