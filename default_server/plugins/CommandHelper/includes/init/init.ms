@@ -161,7 +161,7 @@ proc _remove_all_modifiers(@uuid, @attribute, @name) {
 
 ## 랜덤 소수 (양수) 구하기 (캔 지급용)
 proc _get_random_double(@default_double, @extra_double) {
-  @double = round(@default_double + rand() * @extra_double, 2)
+  @double = @default_double + @extra_double * rand()
   if(@double < 0) { @double = 0.0 }
   return(@double)
 }

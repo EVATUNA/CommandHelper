@@ -9,11 +9,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -32,11 +32,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -55,11 +55,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -78,11 +78,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -101,11 +101,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -124,11 +124,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -147,11 +147,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -170,11 +170,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -193,11 +193,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -216,11 +216,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -239,11 +239,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -262,11 +262,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -285,11 +285,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -308,11 +308,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -331,11 +331,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -354,11 +354,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -377,11 +377,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -400,11 +400,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -423,11 +423,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -446,11 +446,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -469,11 +469,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -492,11 +492,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -515,11 +515,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -538,11 +538,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -561,11 +561,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -584,11 +584,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -607,11 +607,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -630,11 +630,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -653,11 +653,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -676,11 +676,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -699,11 +699,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -722,11 +722,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -745,11 +745,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -768,11 +768,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -791,11 +791,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },
@@ -814,11 +814,11 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
+    "tunapoint": {
       "default": 0,
       "extra": 0
     },
-    "arcanelevel": {
+    "arcanepoint": {
       "default": 0,
       "extra": 0
     },

@@ -3454,6 +3454,7 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
           if(is_null(@damage_history)) { @damage_history = array() }
           # 타격 기록에 플레이어 타격 정보 추가
           @history = array(
+            'uuid': @puuid,
             'damage': @event['amount'],
             'luck': entity_attribute_value(@puuid, 'GENERIC_LUCK') * 0.25,
             'looting': 0.0,
@@ -3468,7 +3469,6 @@ bind('entity_damage', array('priority': 'LOWEST'), null, @event, @players_data, 
             @damage_history[@player]['looting'] += @history['looting']
             @damage_history[@player]['count'] += @history['count']
           }
-          broadcast(@damage_history)
           _update_tag(@euuid, @damage_history)
           break()
         }

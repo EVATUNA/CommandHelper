@@ -85,13 +85,13 @@
       "rank": 1,
       "chance": 0
     },
-    "tunalevel": {
-      "default": 0,
-      "extra": 0
+    "tunapoint": {
+      "default": 10,
+      "extra": 10
     },
-    "arcanelevel": {
-      "default": 0,
-      "extra": 0
+    "arcanepoint": {
+      "default": 10,
+      "extra": 10
     },
     "money": {
       "default": 0,

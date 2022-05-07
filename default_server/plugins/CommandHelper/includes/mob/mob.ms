@@ -20,7 +20,7 @@ foreach(@file in @files) {
   }
 }
 
-bind('entity_death', null, null, @event, @players_data, @mob_rewards, @text) {
+bind('entity_death', null, null, @event, @players_data, @mob_rewards, @server, @text) {
   @id = @event['id']
   @mob_name = strip_colors(get_mob_name(@id))
   if(@mob_name == '') { @mob_name = entity_type(@id) }
@@ -36,118 +36,109 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards, @text) {
       @is_unconfigured_mob = false
       modify_event('xp', 0)
       
-      # 몹 타입에 따른 보상
-      if(array_index_exists(@mob_reward, 'is_boss') && @mob_reward['is_boss']) { // 보스일 시 (태그상에 인식되는 플레이어들에게 보상 지급)
-        @size = array_size(get_scoreboard_tags(@id))
-        @money = 300
-        @tunapoint = 200
+      @damage_history = _get_tag(@id)
 
-        @player_rewards = array()
-        foreach(@player in get_scoreboard_tags(@id)) {
-          if(ponline(@player)) {
-            @uuid = puuid(@player)
-            @player_data = @players_data[@uuid]
-
-            @money_per_player = @money / @size
-            @tunapoint_per_player = @tunapoint / @size
-            broadcast(@player)
-            //acc_add(@target_name, rand(integer(@money_per_player * 0.5), integer(@money_per_player * 1.5)))
-            //_give_tunalevel_random_experience(@target_uuid, @player_data, @tunapoint_per_player / 2, @tunapoint_per_player, @text)
+      # 토탈 값 데미지, 타격 횟수 계산
+      @total_damage = 0
+      @total_count = 0
+      foreach(@player: @history in @damage_history) {
+        @total_damage += @history['damage']
+        @total_count += @history['count']
+      }
+      # 줄 아케인 경치, 튜나 경치, 캔 구하기
+      if(array_index_exists(@mob_reward, 'arcanepoint')) {
+        @total_arcanepoint = _get_random_double(@mob_reward['arcanepoint']['default'], @mob_reward['arcanepoint']['extra'])
+      } else {
+        @total_arcanepoint = 0
+      }
+      if(array_index_exists(@mob_reward, 'tunapoint')) {
+        @total_tunapoint = _get_random_double(@mob_reward['tunapoint']['default'], @mob_reward['tunapoint']['extra'])
+      } else {
+        @total_tunapoint = 0
+      }
+      if(array_index_exists(@mob_reward, 'money')) {
+        @total_money = _get_random_double(@mob_reward['money']['default'], @mob_reward['money']['extra'])
+      } else {
+        @total_money = 0
+      }
+      # 개인 기여도 계산 및 개인 보상 주기, 아이템 보상 계산 위한 행운, 약탈 수치 계산
+      @total_luck = 0
+      @total_looting = 0
+      @player_rewards = array() //로그용 개인 보상 저장 배열
+      foreach(@player: @history in @damage_history) {
+        # 개인 기여도 구하기
+        @contribution = @history['damage'] / @total_damage
+        if(@contribution > 0) { // 기여도 0보다 클 시 개인 보상 지급
+          # 기본 데이터 세팅
+          @uuid = @history['uuid']
+          @player_data = @players_data[@uuid]
+          @total_luck += @history['luck'] / @total_count
+          @total_looting += @history['looting'] / @total_count
+          @player_rewards[@player] = array(
+            'uuid': @uuid,
+            'arcanepoint': 0,
+            'tunapoint': 0,
+            'money': 0
+          )
+          # 아케인 경험치 주기
+          @arcanepoint = integer(round(@total_arcanepoint / @contribution))
+          if(@player_data['item']['enchantments']['main_hand'] == '경험') {
+            @arcanepoint *= 2
           }
-        }
-        
-        /*
-        
-        @items = array(
-          _drop_item_random_qty(@location, 'arcane_essence', 'arcane_essence_2', 1, 2, @ch_items),
-          _drop_item_random_qty(@location, 'arcane_essence', 'arcane_essence_6', 1, 1, @ch_items),
-          _drop_item_random_qty(@location, 'mineral', 'netherite_scrap_c', 1, 4, @ch_items),
-          _drop_item_random_qty(@location, 'mineral', 'netherite_scrap_b', -3, 6, @ch_items),
-          _drop_item_random_qty(@location, 'mineral', 'netherite_scrap_a', -8, 10, @ch_items),
-          _drop_item_random_qty(@location, 'mineral', 'netherite_scrap_s', -99, 100, @ch_items),
-          _drop_item_random_qty(@location, 'misc', 'EXPERIENCE_BOTTLE', -99, 100, @ch_items)
-        )
-
-        foreach(@item in @items) {
-          if(!is_null(@item)) {
-          }
-        }
-        
-        
-        // @type @time @server, @location, @mob, @player_rewards, @items
-        _logging('loot', time(), @server, @location, @id, @item)
-        */
-        broadcast(B)
-      } else if(array_index_exists(@event['cause'],'damager') && ponline(@event['cause']['damager'])) { // 플레이어에 의하여 죽은 컨픽상에 있는 몹일 시 (막타 친 플레이어에게 보상 지급)
-        @player = @event['cause']['damager']
-        @uuid = puuid(@player)
-        @player_data = @players_data[@uuid]
-        
-        @player_rewards = array()
-        @player_rewards[@player] = array(
-          'uuid': @uuid,
-          'arcanepoint': 0,
-          'tunapoint': 0,
-          'can': 0
-        )
-        # 아케인레벨 주기
-        if(array_index_exists(@mob_reward, 'arcanelevel')) {
-          if(@players_data[@uuid]['item']['enchantments']['main_hand'] == '경험') {
-            @player_rewards[@player]['arcanepoint'] += _give_arcanelevel_random_experience(@player, @uuid, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'], @text)
-            @player_rewards[@player]['arcanepoint'] += _give_arcanelevel_random_experience(@player, @uuid, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'], @text)
-          } else {
-            @player_rewards[@player]['arcanepoint'] += _give_arcanelevel_random_experience(@player, @uuid, @mob_reward['arcanelevel']['default'], @mob_reward['arcanelevel']['extra'], @text)
-          }
-        }
-        # 튜나레벨 주기
-        if(array_index_exists(@mob_reward, 'tunalevel')) {
-          @player_rewards[@player]['tunapoint'] += _give_tunalevel_random_experience(@uuid, @player_data, @mob_reward['tunalevel']['default'], @mob_reward['tunalevel']['extra'], @text)
-        }
-        # 캔 주기
-        if(array_index_exists(@mob_reward, 'money')) {
-          @money = _get_random_double(@mob_reward['money']['default'], @mob_reward['money']['extra'])
-          @player_rewards[@player]['can'] += @money
+          @player_rewards[@player]['arcanepoint'] += @arcanepoint
+          _give_arcanelevel_random_experience(@player, @uuid, @arcanepoint, 0, @text)
+          # 튜나 경험치 주기
+          @tunapoint = integer(round(@total_tunapoint / @contribution))
+          @player_rewards[@player]['tunapoint'] += @tunapoint
+          _give_tunalevel_random_experience(@uuid, @player_data, @tunapoint, 0, @text)
+          # 돈 주기
+          @money = round(@total_money / @contribution, 2)
+          @player_rewards[@player]['money'] += @money
           if(@money > 0) {
             acc_add(@player, @money)
           }
         }
-        # 아이템 떨구기
-        if(array_index_exists(@mob_reward, 'loot_tables')) {
-          @loot_tables = array_deep_clone(@mob_reward['loot_tables'])
-          foreach(@loot_table in @loot_tables) {
-            # 갯수 세팅 (아이템 뽑히는 횟수)
-            if(is_array(@loot_table['qty'])) {
-              @qty = integer(round(@loot_table['qty']['default'] + @loot_table['qty']['extra'] * rand())) // 플레이어 행운 인첸트 수치 반영하도록 변경
-              if(@qty < 0) { @qty = 0 }
-            } else {
-              @qty = @loot_table['qty']
-            }
-            # 엔트리 weight 세팅
-            @entries = @loot_table['entries']
-            @total_weight = 0
-            foreach(@key: @entry in @entries) {
-              @entries[@key]['weight'] += @entry['quality'] * 1 // 해당 플레이어 행운 어트리뷰트 수치 반영하도록 변경
-              @total_weight += @entry['weight']
-            }
-            # 드랍
-            for(@i = 0, @i < @qty, @i++) {
-              @result_weight = @total_weight * round(rand(), 5)
-              @min_weight = 0
-              foreach(@entry in @entries) {
-                @max_weight = @min_weight + @entry['weight']
-                if(@max_weight > @result_weight) {
-                  drop_item(@location, @entry['item'], false)
-                  //_logging('harvest', time(), @server, @location, @player, @uuid, @entry['item'])
-                  break()
-                } else {
-                  @min_weight = @max_weight
-                }
+      }
+      # 아이템 떨구기
+      @dropped_items = array()
+      if(array_index_exists(@mob_reward, 'loot_tables')) {
+        @loot_tables = array_deep_clone(@mob_reward['loot_tables'])
+        foreach(@loot_table in @loot_tables) {
+          # 갯수 세팅 (아이템 뽑히는 횟수)
+          if(is_array(@loot_table['qty'])) {
+            @qty = _get_random_double(@loot_table['qty']['default'], @loot_table['qty']['extra'])
+          } else {
+            @qty = @loot_table['qty']
+          }
+          @qty = integer(round(@qty * (1 + @total_looting)))
+          if(@qty < 0) { @qty = 0 }
+          # 엔트리 weight 세팅
+          @entries = @loot_table['entries']
+          @total_weight = 0
+          foreach(@key: @entry in @entries) {
+            @entries[@key]['weight'] += @entry['quality'] * @total_luck
+            @total_weight += @entry['weight']
+          }
+          # 드랍
+          for(@i = 0, @i < @qty, @i++) {
+            @result_weight = @total_weight * round(rand(), 5)
+            @min_weight = 0
+            foreach(@entry in @entries) {
+              @max_weight = @min_weight + @entry['weight']
+              if(@max_weight > @result_weight) {
+                drop_item(@location, @entry['item'], false)
+                @dropped_items[] = @entry['item']
+                break()
+              } else {
+                @min_weight = @max_weight
               }
             }
           }
-          broadcast(@loot_tables)
         }
       }
+      # 로깅
+      _logging('loot', time(), @server, @location, @id, @player_rewards, @dropped_items)
+
       /*
       # 비법서 드랍
       if(array_index_exists(@mob_reward, 'scroll') && array_index_exists(@mob_reward['scroll'], 'chance') && rand() > @mob_reward['scroll']['chance']) { // chance 부분 수식 역으로 바꿔야 함
