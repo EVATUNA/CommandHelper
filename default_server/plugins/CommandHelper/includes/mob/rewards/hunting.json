@@ -1,21 +1,353 @@
 {
-  "residence_pig": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "살이 오른 돼지": {
+    "loot_tables": [
+      {
+        "qty": {
+          "default": 5,
+          "extra": 3
+        },
+        "entries": [
+          {
+            "item": {
+              "name": "PORKCHOP"
+            },
+            "weight": 100,
+            "quality": 0.0
+          },
+          {
+            "item": {
+              "name": "PORKCHOP",
+              "meta": {
+                "display": "§e중급 익히지 않은 돼지고기",
+                "model": 1
+              }
+            },
+            "weight": 20,
+            "quality": 5.0
+          },
+          {
+            "item": {
+              "name": "PORKCHOP",
+              "meta": {
+                "display": "§b상급 익히지 않은 돼지고기",
+                "model": 2
+              }
+            },
+            "weight": 5,
+            "quality": 1.5
+          }
+        ]
+      },
+      {
+        "qty": {
+          "default": 2,
+          "extra": 1
+        },
+        "entries": [
+          {
+            "item": {
+              "name": "BONE"
+            },
+            "weight": 100,
+            "quality": 0.0
+          }
+        ]
+      }
+    ],
     "tunapoint": {
-      "default": 0,
-      "extra": 0
+      "default": 10,
+      "extra": 10
     },
     "arcanepoint": {
+      "default": 10,
+      "extra": 10
+    },
+    "money": {
       "default": 0,
       "extra": 0
+    }
+  },
+  "살이 오른 소": {
+    "loot_tables": [
+      {
+        "qty": {
+          "default": 5,
+          "extra": 3
+        },
+        "entries": [
+          {
+            "item": {
+              "name": "BEEF"
+            },
+            "weight": 100,
+            "quality": 0.0
+          },
+          {
+            "item": {
+              "name": "BEEF",
+              "meta": {
+                "display": "§e중급 익히지 않은 소고기",
+                "model": 1
+              }
+            },
+            "weight": 20,
+            "quality": 5.0
+          },
+          {
+            "item": {
+              "name": "BEEF",
+              "meta": {
+                "display": "§b상급 익히지 않은 소고기",
+                "model": 2
+              }
+            },
+            "weight": 5,
+            "quality": 1.5
+          }
+        ]
+      },
+      {
+        "qty": {
+          "default": 2,
+          "extra": 1
+        },
+        "entries": [
+          {
+            "item": {
+              "name": "BONE"
+            },
+            "weight": 100,
+            "quality": 0.0
+          }
+        ]
+      }
+    ],
+    "tunapoint": {
+      "default": 10,
+      "extra": 10
+    },
+    "arcanepoint": {
+      "default": 10,
+      "extra": 10
+    },
+    "money": {
+      "default": 0,
+      "extra": 0
+    }
+  },
+  "살이 오른 양": {
+    "loot_tables": [
+      {
+        "qty": {
+          "default": 5,
+          "extra": 3
+        },
+        "entries": [
+          {
+            "item": {
+              "name": "MUTTON"
+            },
+            "weight": 100,
+            "quality": 0.0
+          },
+          {
+            "item": {
+              "name": "MUTTON",
+              "meta": {
+                "display": "§e중급 익히지 않은 양고기",
+                "model": 1
+              }
+            },
+            "weight": 20,
+            "quality": 5.0
+          },
+          {
+            "item": {
+              "name": "MUTTON",
+              "meta": {
+                "display": "§b상급 익히지 않은 양고기",
+                "model": 2
+              }
+            },
+            "weight": 5,
+            "quality": 1.5
+          }
+        ]
+      },
+      {
+        "qty": {
+          "default": 2,
+          "extra": 1
+        },
+        "entries": [
+          {
+            "item": {
+              "name": "BONE"
+            },
+            "weight": 100,
+            "quality": 0.0
+          }
+        ]
+      }
+    ],
+    "tunapoint": {
+      "default": 10,
+      "extra": 10
+    },
+    "arcanepoint": {
+      "default": 10,
+      "extra": 10
+    },
+    "money": {
+      "default": 0,
+      "extra": 0
+    }
+  },
+  "살이 오른 닭": {
+    "loot_tables": [
+      {
+        "qty": {
+          "default": 3,
+          "extra": 1
+        },
+        "entries": [
+          {
+            "item": {
+              "name": "CHICKEN"
+            },
+            "weight": 100,
+            "quality": 0.0
+          },
+          {
+            "item": {
+              "name": "CHICKEN",
+              "meta": {
+                "display": "§e중급 익히지 않은 닭고기",
+                "model": 1
+              }
+            },
+            "weight": 20,
+            "quality": 5.0
+          },
+          {
+            "item": {
+              "name": "CHICKEN",
+              "meta": {
+                "display": "§b상급 익히지 않은 닭고기",
+                "model": 2
+              }
+            },
+            "weight": 5,
+            "quality": 1.5
+          }
+        ]
+      },
+      {
+        "qty": {
+          "default": 2,
+          "extra": 2
+        },
+        "entries": [
+          {
+            "item": {
+              "name": "EGG"
+            },
+            "weight": 100,
+            "quality": 0.0
+          }
+        ]
+      },
+      {
+        "qty": {
+          "default": 1,
+          "extra": 1
+        },
+        "entries": [
+          {
+            "item": {
+              "name": "BONE"
+            },
+            "weight": 100,
+            "quality": 0.0
+          }
+        ]
+      }
+    ],
+    "tunapoint": {
+      "default": 7.5,
+      "extra": 7.5
+    },
+    "arcanepoint": {
+      "default": 7.5,
+      "extra": 7.5
+    },
+    "money": {
+      "default": 0,
+      "extra": 0
+    }
+  },
+  "살이 오른 토끼": {
+    "loot_tables": [
+      {
+        "qty": {
+          "default": 3,
+          "extra": 1
+        },
+        "entries": [
+          {
+            "item": {
+              "name": "RABBIT"
+            },
+            "weight": 100,
+            "quality": 0.0
+          },
+          {
+            "item": {
+              "name": "RABBIT",
+              "meta": {
+                "display": "§e중급 익히지 않은 토끼고기",
+                "model": 1
+              }
+            },
+            "weight": 20,
+            "quality": 5.0
+          },
+          {
+            "item": {
+              "name": "RABBIT",
+              "meta": {
+                "display": "§b상급 익히지 않은 토끼고기",
+                "model": 2
+              }
+            },
+            "weight": 5,
+            "quality": 1.5
+          }
+        ]
+      },
+      {
+        "qty": {
+          "default": 1,
+          "extra": 1
+        },
+        "entries": [
+          {
+            "item": {
+              "name": "BONE"
+            },
+            "weight": 100,
+            "quality": 0.0
+          }
+        ]
+      }
+    ],
+    "tunapoint": {
+      "default": 20,
+      "extra": 10
+    },
+    "arcanepoint": {
+      "default": 20,
+      "extra": 10
     },
     "money": {
       "default": 0,

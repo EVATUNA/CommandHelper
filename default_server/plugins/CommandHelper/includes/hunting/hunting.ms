@@ -806,7 +806,7 @@ if((@server == 'main' || @server == '1_test_main') && function_exists('tunalands
     }
     if(array_size(@moves) > 1) {
       @move = @moves[0]
-      switch(@tag['trace_data']['type']) {
+      switch(@tag['trace_data']['traces']['type']) {
       case 'normal': // 일반 동물 흔적
         @history = array()
         for(@i = 0, @i < 256, @i++) {

@@ -1,14 +1,5 @@
 {
-  "BLAZE": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_BLAZE": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -22,16 +13,7 @@
       "extra": 0
     }
   },
-  "CAVE_SPIDER": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_CAVE_SPIDER": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -45,16 +27,7 @@
       "extra": 0
     }
   },
-  "CREEPER": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_CREEPER": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -68,16 +41,7 @@
       "extra": 0
     }
   },
-  "DROWNED": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_DROWNED": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -91,16 +55,7 @@
       "extra": 0
     }
   },
-  "ELDER_GUARDIAN": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_ELDER_GUARDIAN": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -114,16 +69,7 @@
       "extra": 0
     }
   },
-  "ENDERMAN": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_ENDERMAN": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -137,16 +83,7 @@
       "extra": 0
     }
   },
-  "ENDERMITE": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_ENDERMITE": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -160,16 +97,7 @@
       "extra": 0
     }
   },
-  "ENDER_DRAGON": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_ENDER_DRAGON": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -183,16 +111,7 @@
       "extra": 0
     }
   },
-  "EVOKER": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_EVOKER": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -206,16 +125,7 @@
       "extra": 0
     }
   },
-  "GHAST": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_GHAST": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -229,16 +139,7 @@
       "extra": 0
     }
   },
-  "GIANT": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_GIANT": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -252,16 +153,7 @@
       "extra": 0
     }
   },
-  "GUARDIAN": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_GUARDIAN": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -275,16 +167,7 @@
       "extra": 0
     }
   },
-  "HOGLIN": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_HOGLIN": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -298,16 +181,7 @@
       "extra": 0
     }
   },
-  "HUSK": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_HUSK": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -321,16 +195,7 @@
       "extra": 0
     }
   },
-  "ILLUSIONER": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_ILLUSIONER": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -344,16 +209,7 @@
       "extra": 0
     }
   },
-  "MAGMA_CUBE": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_MAGMA_CUBE": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -367,16 +223,7 @@
       "extra": 0
     }
   },
-  "PHANTOM": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_PHANTOM": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -390,16 +237,7 @@
       "extra": 0
     }
   },
-  "PIGLIN": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_PIGLIN": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -413,16 +251,7 @@
       "extra": 0
     }
   },
-  "PIGLIN_BRUTE": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_PIGLIN_BRUTE": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -436,16 +265,7 @@
       "extra": 0
     }
   },
-  "PILLAGER": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_PILLAGER": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -459,16 +279,7 @@
       "extra": 0
     }
   },
-  "RAVAGER": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_RAVAGER": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -482,16 +293,7 @@
       "extra": 0
     }
   },
-  "SILVERFISH": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_SILVERFISH": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -505,16 +307,7 @@
       "extra": 0
     }
   },
-  "SKELETON": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_SKELETON": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -528,16 +321,7 @@
       "extra": 0
     }
   },
-  "SHULKER": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_SHULKER": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -551,16 +335,7 @@
       "extra": 0
     }
   },
-  "SLIME": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_SLIME": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -574,16 +349,7 @@
       "extra": 0
     }
   },
-  "SPIDER": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_SPIDER": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -597,16 +363,7 @@
       "extra": 0
     }
   },
-  "STRAY": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_STRAY": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -620,16 +377,7 @@
       "extra": 0
     }
   },
-  "VEX": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_VEX": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -643,16 +391,7 @@
       "extra": 0
     }
   },
-  "VINDICATOR": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_VINDICATOR": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -666,16 +405,7 @@
       "extra": 0
     }
   },
-  "WITCH": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_WITCH": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -689,16 +419,7 @@
       "extra": 0
     }
   },
-  "WITHER": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_WITHER": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -712,16 +433,7 @@
       "extra": 0
     }
   },
-  "WITHER_SKELETON": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_WITHER_SKELETON": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -735,16 +447,7 @@
       "extra": 0
     }
   },
-  "ZOGLIN": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_ZOGLIN": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -758,16 +461,7 @@
       "extra": 0
     }
   },
-  "ZOMBIE": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_ZOMBIE": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -781,16 +475,7 @@
       "extra": 0
     }
   },
-  "ZOMBIE_VILLAGER": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_ZOMBIE_VILLAGER": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -804,16 +489,7 @@
       "extra": 0
     }
   },
-  "ZOMBIFIED_PIGLIN": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_ZOMBIFIED_PIGLIN": {
     "tunapoint": {
       "default": 0,
       "extra": 0

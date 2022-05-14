@@ -1,7 +1,7 @@
 sheep:
   min_move: 10
   max_move: 20
-  mob: sheep
+  mob: residence_sheep
   count: 1
   conditions:
     chance_by_biomes:
@@ -110,7 +110,7 @@ sheep:
 pig:
   min_move: 10
   max_move: 20
-  mob: pig
+  mob: residence_pig
   count: 1
   conditions:
     chance_by_biomes:
@@ -197,7 +197,7 @@ pig:
 cow:
   min_move: 10
   max_move: 20
-  mob: cow
+  mob: residence_cow
   count: 1
   conditions:
     chance_by_biomes:
@@ -284,7 +284,7 @@ cow:
 rabbit:
   min_move: 10
   max_move: 20
-  mob: rabbit
+  mob: residence_rabbit
   count: 1
   conditions:
     chance_by_biomes:
@@ -371,7 +371,7 @@ rabbit:
 chicken:
   min_move: 10
   max_move: 20
-  mob: chicken
+  mob: residence_chicken
   count: 1
   conditions:
     chance_by_biomes:

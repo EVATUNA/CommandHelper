@@ -65,7 +65,7 @@ set_timeout(1000, closure() {
         }
 
         if(ploc(@player)['world'] == 'spawn_minecraft_residence') {
-          //_generate_trace(@player, @traces)
+          _generate_trace(@player, @traces)
         }
 
         # 뉴비 버프
@@ -2613,11 +2613,23 @@ bind('inventory_click', null, null, @event) {
 
 # 주민, 떠상 상호 작용, 동물 상호작용
 bind('player_interact_entity', null, null, @event) {
+  # 플레이어
   @player = @event['player']
   @uuid = puuid(@player)
-  if(@event['clicked'] == 'VILLAGER' || @event['clicked'] == 'WANDERING_TRADER') {
+  # 엔티티
+  @etype = @event['clicked']
+  @euuid = @event['id']
+  # 엔티티 클릭 처리
+  if(@etype == 'VILLAGER' || @etype == 'WANDERING_TRADER') {
     cancel()
   } else {
+    # 아이템
+    if(@event['hand'] == 'main_hand') {
+      @item = get_inventory_item(@uuid, pheld_slot(@player))
+    } else {
+      @item = get_inventory_item(@uuid, 40)
+    }
+    # 교배 아이템 목록
     @breading_items = array(
       'AXOLOTL': array('TROPICAL_FISH_BUCKET'),
       'BEE': array('DANDELION','POPPY', 'BLUE_ORCHID', 'ALLIUM', 'AZURE_BLUET', 'RED_TULIP', 'ORANGE_TULIP', 'WHITE_TULIP', 'PINK_TULIP', 'OXEYE_DAISY', 'CORNFLOWER', 'LILY_OF_THE_VALLEY', 'WITHER_ROSE', 'SUNFLOWER', 'LILAC', 'PEONY', 'ROSE_BUSH', 'FLOWERING_AZALEA_LEAVES', 'FLOWERING_AZALEA', 'WHTHER_ROSE'),
@@ -2643,14 +2655,62 @@ bind('player_interact_entity', null, null, @event) {
       'TURTLE': array('SEAGRASS'),
       'WOLF': array('BONE', 'PORKCHOP', 'COOKED_PORKCHOP', 'BEEF', 'COOKED_BEEF', 'CHICKEN', 'COOKED_CHICKEN', 'RABBIT', 'COOKED_RABBIT', 'MUTTON', 'COOKED_MUTTON', 'ROTTEN_FLESH')
     )
-    if(array_index_exists(@breading_items, @event['clicked'])) {
-      if(@event['hand'] == 'main_hand') {
-        @item = get_inventory_item(@uuid, pheld_slot(@player))
-      } else {
-        @item = get_inventory_item(@uuid, 40)
-      }
-      if(is_array(@item) && array_contains(@breading_items[@event['clicked']], @item['name'])) {
-        cancel()
+    if(array_index_exists(@breading_items, @etype) && is_array(@item) && array_contains(@breading_items[@etype], @item['name'])) { // 교배 시도시
+      cancel()
+    } else { // 그외
+      # 몹 이름
+      if(is_entity_living(@euuid)) {
+        @ename = strip_colors(get_mob_name(@euuid))
+        if(is_array(@item)) {
+          switch(@item['name']) {
+          case 'BUCKET':
+            if(@etype == 'COW' && @ename == '살이 오른 소') {
+              if(pcooldown(@player, 'BUCKET') == 0) {
+                # 횟수 더하기
+                @age = get_mob_age(@euuid)
+                set_mob_age(@euuid, @age + rand(1, 3), true)
+                # age가 20보다 크면 우유 짜기 불가능
+                if(@age > 10) {
+                  cancel()
+                  @eloc = entity_loc(@euuid)
+                  @eloc['y'] += 1
+                  play_named_sound(@eloc, array('sound': 'minecraft:entity.cow.death', 'category': 'NEUTRAL', 'volume': 0.5, 'pitch': 0.75))
+                } else {
+                  set_pcooldown(@player, 'BUCKET', 60)
+                }
+              } else {
+                cancel()
+              }
+            } else if(array_contains(array('COW', 'MOOSHROOM', 'GOAT'), @etype)) {
+              cancel()
+              @eloc = entity_loc(@euuid)
+              @eloc['y'] += 1
+              play_named_sound(@eloc, array('sound': 'minecraft:entity.cow.death', 'category': 'NEUTRAL', 'volume': 0.5, 'pitch': 0.75))
+            }
+            break()
+          case 'SHEARS':
+            if(@etype == 'SHEEP' && @ename == '살이 오른 양') {
+              if(pcooldown(@player, 'SHEARS') == 0) {
+                if(!entity_spec(@euuid)['sheared']) {
+                  # 확률 더하기
+                  @age = get_mob_age(@euuid)
+                  set_mob_age(@euuid, @age + 1, true)
+                  @chance = 1 - (@age * 0.05)
+                  # 확률에 따라 양털 유지
+                  set_pcooldown(@player, 'SHEARS', 60)
+                  if(rand() < @chance) {
+                    set_timeout(0, closure() {
+                      set_entity_spec(@euuid, array('sheared': false))
+                    })
+                  }
+                }
+              } else {
+                cancel()
+              }
+            }
+            break()
+          }
+        }
       }
     }
   }

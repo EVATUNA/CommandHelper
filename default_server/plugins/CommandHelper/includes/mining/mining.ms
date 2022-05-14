@@ -210,7 +210,7 @@ proc _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @min
               if(array_index_exists(@entry, 'broadcast') && @entry['broadcast']) {
                 @message = @player.'님께서 '.strip_colors(@entry['item']['meta']['display']).'를 채굴하셨습니다.'
                 @prefix = '🎉'
-                _send_instance_tooltip_system_broadcast(@player, @uuid, @prefix, @message, 5, 6)
+                _send_instance_tooltip_system_broadcast(@player, @uuid, @prefix, @message, 10, 6)
               }
               _logging('mine', time(), @server, @location, @player, @uuid, @entry['item'])
               break()

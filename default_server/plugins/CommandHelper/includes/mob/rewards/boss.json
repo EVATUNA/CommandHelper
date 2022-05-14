@@ -3,23 +3,27 @@
     "loot_tables": [
       {
         "qty": {
-          "default": 1,
-          "extra": 0
+          "default": 10,
+          "extra": 5
         },
         "entries": [
           {
             "item": {
-              "name": "WHEAT"
+              "name": "NETHERITE_SCRAP",
+              "meta": {
+                "display": "§e중급 네더라이트 파편",
+                "model": 1
+              }
             },
             "weight": 100,
             "quality": 0.0
           },
           {
             "item": {
-              "name": "WHEAT",
+              "name": "NETHERITE_SCRAP",
               "meta": {
-                "display": "§e중급 밀",
-                "model": 1
+                "display": "§b상급 네더라이트 파편",
+                "model": 2
               }
             },
             "weight": 20,
@@ -27,47 +31,10 @@
           },
           {
             "item": {
-              "name": "WHEAT",
+              "name": "NETHERITE_SCRAP",
               "meta": {
-                "display": "§b상급 밀",
-                "model": 2
-              }
-            },
-            "weight": 5,
-            "quality": 1.5
-          }
-        ]
-      },
-      {
-        "qty": {
-          "default": 0,
-          "extra": 1
-        },
-        "entries": [
-          {
-            "item": {
-              "name": "WHEAT"
-            },
-            "weight": 100,
-            "quality": 0.0
-          },
-          {
-            "item": {
-              "name": "WHEAT",
-              "meta": {
-                "display": "§e중급 밀",
-                "model": 1
-              }
-            },
-            "weight": 20,
-            "quality": 5.0
-          },
-          {
-            "item": {
-              "name": "WHEAT",
-              "meta": {
-                "display": "§b상급 밀",
-                "model": 2
+                "display": "§d최상급 네더라이트 파편",
+                "model": 3
               }
             },
             "weight": 5,
@@ -76,26 +43,31 @@
         ]
       }
     ],
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
     "tunapoint": {
-      "default": 10,
-      "extra": 10
+      "default": 100,
+      "extra": 100
     },
     "arcanepoint": {
-      "default": 10,
-      "extra": 10
+      "default": 100,
+      "extra": 100
     },
     "money": {
       "default": 0,
       "extra": 0
-    }
+    },
+    "scrolls": [
+      {
+        "name": "test",
+        "rank": 4,
+        "chance": 0.01
+      }
+    ],
+    "runes": [
+      {
+        "name": "test",
+        "rank": 1,
+        "chance": 0
+      }
+    ]
   }
 }

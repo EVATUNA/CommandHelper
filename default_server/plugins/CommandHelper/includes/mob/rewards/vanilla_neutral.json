@@ -1,14 +1,5 @@
 {
-  "AXOLOTL": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_AXOLOTL": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -22,16 +13,7 @@
       "extra": 0
     }
   },
-  "BAT": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_BAT": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -45,16 +27,7 @@
       "extra": 0
     }
   },
-  "BEE": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_BEE": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -68,16 +41,7 @@
       "extra": 0
     }
   },
-  "CAT": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_CAT": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -91,16 +55,7 @@
       "extra": 0
     }
   },
-  "CHICKEN": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_CHICKEN": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -114,16 +69,7 @@
       "extra": 0
     }
   },
-  "COD": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_COD": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -137,16 +83,7 @@
       "extra": 0
     }
   },
-  "COW": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_COW": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -160,16 +97,7 @@
       "extra": 0
     }
   },
-  "DOLPHIN": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_DOLPHIN": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -183,16 +111,7 @@
       "extra": 0
     }
   },
-  "DONKEY": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_DONKEY": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -206,16 +125,7 @@
       "extra": 0
     }
   },
-  "FOX": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_FOX": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -229,16 +139,7 @@
       "extra": 0
     }
   },
-  "GLOW_SQUID": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_GLOW_SQUID": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -252,16 +153,7 @@
       "extra": 0
     }
   },
-  "GOAT": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_GOAT": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -275,16 +167,7 @@
       "extra": 0
     }
   },
-  "HORSE": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_HORSE": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -298,16 +181,7 @@
       "extra": 0
     }
   },
-  "IRON_GOLEM": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_IRON_GOLEM": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -321,16 +195,7 @@
       "extra": 0
     }
   },
-  "LLAMA": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_LLAMA": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -344,16 +209,7 @@
       "extra": 0
     }
   },
-  "MULE": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_MULE": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -367,16 +223,7 @@
       "extra": 0
     }
   },
-  "MUSHROOM_COW": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_MUSHROOM_COW": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -390,16 +237,7 @@
       "extra": 0
     }
   },
-  "OCELOT": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_OCELOT": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -413,16 +251,7 @@
       "extra": 0
     }
   },
-  "PANDA": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_PANDA": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -436,16 +265,7 @@
       "extra": 0
     }
   },
-  "PARROT": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_PARROT": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -459,16 +279,7 @@
       "extra": 0
     }
   },
-  "PIG": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_PIG": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -482,16 +293,7 @@
       "extra": 0
     }
   },
-  "POLAR_BEAR": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_POLAR_BEAR": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -505,16 +307,7 @@
       "extra": 0
     }
   },
-  "PUFFERFISH": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_PUFFERFISH": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -528,16 +321,7 @@
       "extra": 0
     }
   },
-  "RABBIT": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_RABBIT": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -551,16 +335,7 @@
       "extra": 0
     }
   },
-  "SALMON": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_SALMON": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -574,16 +349,7 @@
       "extra": 0
     }
   },
-  "SHEEP": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_SHEEP": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -597,16 +363,7 @@
       "extra": 0
     }
   },
-  "SKELETON_HORSE": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_SKELETON_HORSE": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -620,16 +377,7 @@
       "extra": 0
     }
   },
-  "SNOWMAN": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_SNOWMAN": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -643,16 +391,7 @@
       "extra": 0
     }
   },
-  "SQUID": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_SQUID": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -666,16 +405,7 @@
       "extra": 0
     }
   },
-  "TRADER_LLAMA": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_TRADER_LLAMA": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -689,16 +419,7 @@
       "extra": 0
     }
   },
-  "TROPICAL_FISH": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_TROPICAL_FISH": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -712,16 +433,7 @@
       "extra": 0
     }
   },
-  "TURTLE": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_TURTLE": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -735,16 +447,7 @@
       "extra": 0
     }
   },
-  "VILLAGER": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_VILLAGER": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -758,16 +461,7 @@
       "extra": 0
     }
   },
-  "WANDERING_TRADER": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_WANDERING_TRADER": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -781,16 +475,7 @@
       "extra": 0
     }
   },
-  "WOLF": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_WOLF": {
     "tunapoint": {
       "default": 0,
       "extra": 0
@@ -804,16 +489,7 @@
       "extra": 0
     }
   },
-  "ZOMBIE_HORSE": {
-    "scroll": {
-      "rank": 4,
-      "chance": 0.01
-    },
-    "rune": {
-      "name": "test",
-      "rank": 1,
-      "chance": 0
-    },
+  "_ZOMBIE_HORSE": {
     "tunapoint": {
       "default": 0,
       "extra": 0
