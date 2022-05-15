@@ -1722,19 +1722,17 @@ proc _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skill
             array_remove_values(@near_entities, @euuid)
             foreach(@near_entity in @near_entities) {
               @near_entity_type = entity_type(@near_entity)
-              if(array_contains(array_keys(@allowed_entity), @near_entity_type)) {
-                @near_entity_location = entity_loc(@near_entity)
-                @near_entity_location['x'] += rand() / 2 - 0.25
-                @near_entity_location['y'] += 1 + rand() * @allowed_entity[@near_entity_type] * 0.5 - @allowed_entity[@near_entity_type] * 0.25
-                @near_entity_location['z'] += rand() / 2 - 0.25
-                mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @near_entity_location['x'], @near_entity_location['y'], @near_entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
-                @distance = distance(@entity_location,  @near_entity_location)
-                for(@i = 0, @i < distance(@entity_location,  @near_entity_location), @i += 0.25 + rand() * 0.25) {
-                  @pos = location_shift(@entity_location,  @near_entity_location, @i)
-                  mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @pos['x'], @pos['y'], @pos['z'], 1, 0.0, 0.0, 0.0, 0.0)
-                }
-                damage_entity(@near_entity, 2)
+              @near_entity_location = entity_loc(@near_entity)
+              @near_entity_location['x'] += rand() / 2 - 0.25
+              @near_entity_location['y'] += 1 + rand() * @allowed_entity[@near_entity_type] * 0.5 - @allowed_entity[@near_entity_type] * 0.25
+              @near_entity_location['z'] += rand() / 2 - 0.25
+              mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @near_entity_location['x'], @near_entity_location['y'], @near_entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
+              @distance = distance(@entity_location,  @near_entity_location)
+              for(@i = 0, @i < distance(@entity_location,  @near_entity_location), @i += 0.25 + rand() * 0.25) {
+                @pos = location_shift(@entity_location,  @near_entity_location, @i)
+                mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @pos['x'], @pos['y'], @pos['z'], 1, 0.0, 0.0, 0.0, 0.0)
               }
+              damage_entity(@near_entity, 2)
             }
           }
           break()
@@ -1767,19 +1765,17 @@ proc _player_attack_event(@event, @player, @puuid, @euuid, @players_data, @skill
             array_remove_values(@near_entities, @euuid)
             foreach(@near_entity in @near_entities) {
               @near_entity_type = entity_type(@near_entity)
-              if(array_contains(array_keys(@allowed_entity), @near_entity_type)) {
-                @near_entity_location = entity_loc(@near_entity)
-                @near_entity_location['x'] += rand() / 2 - 0.25
-                @near_entity_location['y'] += 1 + rand() * @allowed_entity[@near_entity_type] * 0.5 - @allowed_entity[@near_entity_type] * 0.25
-                @near_entity_location['z'] += rand() / 2 - 0.25
-                mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @near_entity_location['x'], @near_entity_location['y'], @near_entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
-                @distance = distance(@entity_location,  @near_entity_location)
-                for(@i = 0, @i < distance(@entity_location,  @near_entity_location), @i += 0.25 + rand() * 0.25) {
-                  @pos = location_shift(@entity_location,  @near_entity_location, @i)
-                  mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @pos['x'], @pos['y'], @pos['z'], 1, 0.0, 0.0, 0.0, 0.0)
-                }
-                damage_entity(@near_entity, 2)
+              @near_entity_location = entity_loc(@near_entity)
+              @near_entity_location['x'] += rand() / 2 - 0.25
+              @near_entity_location['y'] += 1 + rand() * @allowed_entity[@near_entity_type] * 0.5 - @allowed_entity[@near_entity_type] * 0.25
+              @near_entity_location['z'] += rand() / 2 - 0.25
+              mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @near_entity_location['x'], @near_entity_location['y'], @near_entity_location['z'], 4, 0.1, 0.1, 0.1, 0.05)
+              @distance = distance(@entity_location,  @near_entity_location)
+              for(@i = 0, @i < distance(@entity_location,  @near_entity_location), @i += 0.25 + rand() * 0.25) {
+                @pos = location_shift(@entity_location,  @near_entity_location, @i)
+                mom_playerparticle(@puuid, 'FIREWORKS_SPARK', @pos['x'], @pos['y'], @pos['z'], 1, 0.0, 0.0, 0.0, 0.0)
               }
+              damage_entity(@near_entity, 2)
             }
           }
           break()
