@@ -88,7 +88,7 @@ PRODUCTS:
       display: "§b상급 당근"
       model: 2
       price:
-        sell: 0.5
+        sell: 0.05
       detail: DISPLAY
 
   5:

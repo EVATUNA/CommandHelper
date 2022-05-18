@@ -203,11 +203,11 @@ bind('entity_death', null, null, @event, @players_data, @mob_rewards, @server, @
       @player = @event['cause']['damager']
       @uuid = puuid(@player)
       @player_data = @players_data[@uuid]
+      if(@player_data['item']['enchantments']['main_hand'] == '경험') {
+        modify_event('xp', integer(@event['xp'] * 2))
+      }
+      _give_tunalevel_random_experience(@uuid, @player_data, 0, @event['xp'] / 3, @text)
     }
-    if(@player_data['item']['enchantments']['main_hand'] == '경험') {
-      modify_event('xp', integer(@event['xp'] * 2))
-    }
-    _give_tunalevel_random_experience(@uuid, @player_data, 0, @event['xp'] / 3, @text)
   }
 }
 
