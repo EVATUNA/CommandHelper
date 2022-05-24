@@ -59,6 +59,7 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
 
   # skill
   _load_skills(@player_data, @player, @uuid, @skills_spec)
+  
   # item
   @player_data['item'] = array(
     'is_inv_open': false,
@@ -97,6 +98,9 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
 
   # arcanelevel
   _show_arcanelevel(@player, @uuid, @text)
+
+  # tutorial
+  _load_tutorials(@player_data, @player, @uuid)
 }
 
 # 설정 데이터 (현재 기능 없음) 
@@ -191,6 +195,15 @@ proc _revoke_advancement(@uuid, @advancement) {
     return(true)
   } else {
     return(false)
+  }
+}
+
+proc _has_advancements(@uuid, @advancement) {
+  @advancements = _get_advancements(@uuid)
+  if(is_array(@advancements)) {
+    return(array_contains(@advancements, @advancement))
+  } else {
+    return(null)
   }
 }
 
