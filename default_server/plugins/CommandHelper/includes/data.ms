@@ -308,7 +308,7 @@ proc _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spe
     runas('~console', "/advancement grant @player everything")
     runas('~console', "/recipe give @player *")
     if(import('server') != '1_test_main') {
-      _send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
+      //_send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
     }
   } else {
     #set_timeout(500, closure() {

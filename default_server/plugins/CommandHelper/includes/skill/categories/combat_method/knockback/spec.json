@@ -7,7 +7,7 @@
 				"knockback": 0
 			},
 			"active": {
-				"cooldown": 20,
+				"cooldown": 10,
 				"duration": 1,
 				"count": -1,
 				"energy": 0
@@ -18,7 +18,7 @@
 				"knockback": 1
 			},
 			"active": {
-				"cooldown": 20,
+				"cooldown": 10,
 				"duration": 1,
 				"count": 1,
 				"energy": 0
@@ -29,7 +29,7 @@
 				"knockback": 1
 			},
 			"active": {
-				"cooldown": 18,
+				"cooldown": 9,
 				"duration": 1,
 				"count": 1,
 				"energy": 0
@@ -40,7 +40,7 @@
 				"knockback": 2
 			},
 			"active": {
-				"cooldown": 18,
+				"cooldown": 9,
 				"duration": 1,
 				"count": 2,
 				"energy": 0
@@ -51,7 +51,7 @@
 				"knockback": 2
 			},
 			"active": {
-				"cooldown": 16,
+				"cooldown": 8,
 				"duration": 1,
 				"count": 2,
 				"energy": 0
@@ -62,7 +62,7 @@
 				"knockback": 3
 			},
 			"active": {
-				"cooldown": 16,
+				"cooldown": 8,
 				"duration": 1,
 				"count": 3,
 				"energy": 0
@@ -73,7 +73,7 @@
 				"knockback": 3
 			},
 			"active": {
-				"cooldown": 14,
+				"cooldown": 7,
 				"duration": 1,
 				"count": 3,
 				"energy": 0
@@ -84,7 +84,7 @@
 				"knockback": 4
 			},
 			"active": {
-				"cooldown": 14,
+				"cooldown": 7,
 				"duration": 1,
 				"count": 4,
 				"energy": 0
@@ -95,7 +95,7 @@
 				"knockback": 4
 			},
 			"active": {
-				"cooldown": 12,
+				"cooldown": 6,
 				"duration": 1,
 				"count": 4,
 				"energy": 0
@@ -106,7 +106,7 @@
 				"knockback": 5
 			},
 			"active": {
-				"cooldown": 12,
+				"cooldown": 6,
 				"duration": 1,
 				"count": 5,
 				"energy": 0
@@ -117,7 +117,7 @@
 				"knockback": 5
 			},
 			"active": {
-				"cooldown": 10,
+				"cooldown": 5,
 				"duration": 1,
 				"count": 5,
 				"energy": 0

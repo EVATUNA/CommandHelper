@@ -2385,13 +2385,13 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         }
 
         break()
-      case 'FISHING_ROD':
-        if(pworld(@player) != 'spawn_minecraft_residence') {
-          cancel()
-          @prefix = @text['prefix']['failure']
-          _send_instance_tooltip_msg(@player, @uuid, @prefix '낚시는 거주월드에서만 가능합니다.')
-        }
-        break()
+      //case 'FISHING_ROD':
+        //if(pworld(@player) != 'spawn_minecraft_residence') {
+          //cancel()
+          //@prefix = @text['prefix']['failure']
+          //_send_instance_tooltip_msg(@player, @uuid, @prefix '낚시는 거주월드에서만 가능합니다.')
+        //}
+        //break()
       case 'WATER_BUCKET':
       case 'POWDER_SNOW_BUCKET':
       case 'PUFFERFISH_BUCKET':
