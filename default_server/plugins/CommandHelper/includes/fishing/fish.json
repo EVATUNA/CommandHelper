@@ -1,0 +1,11 @@
+{
+  "test": {
+    "weight": 1,
+    "quality": 1,
+    "item_meta": {
+      "display": "",
+      "lore": [],
+      "model": 0
+    }
+  }
+}
