@@ -37,13 +37,23 @@ proc _choose_fish(@player, @uuid, @hook) {
 proc _fishing_start(@player, @uuid, @hook) {
   // 물고기 선정
   @fishing_data = _choose_fish(@player, @uuid, @hook)
-
-  // interval 돌리기
+  // 낚시 시작 사운드, 파티클
+  @hloc = entity_loc(@hook)
+  play_named_sound(@hloc, array('sound': 'minecraft:entity.generic.splash', 'category': 'AMBIENT', 'volume': 0.2, 'pitch': 0.9 + rand() * 0.6))
+  play_named_sound(@hloc, array('sound': 'minecraft:entity.fishing_bobber.splash', 'category': 'AMBIENT', 'volume': 0.2, 'pitch': 0.9 + rand() * 0.6))
+  @pos = array(
+    'x': @hloc['x'],
+    'y': @hloc['y'],
+    'z': @hloc['z'],
+  )
+  mom_playerparticle(@uuid, 'WATER_BUBBLE', @pos['x'], @pos['y'], @pos['z'], rand(1,3), 0.2, 0.0, 0.2, 0.0)
+  @pos['y'] += 0.2
+  mom_playerparticle(@uuid, 'WATER_SPLASH', @pos['x'], @pos['y'], @pos['z'], rand(1,3), 0.2, 0.0, 0.2, 0.0)
+  // interval 동작
   @fishing_tasks = import('fishing_tasks')
   @text = import('text')
   @progress_bars = array('\ueb20', '\ueb21', '\ueb22', '\ueb23', '\ueb24', '\ueb25', '\ueb26', '\ueb27', '\ueb28', '\ueb29', '\ueb2a', '\ueb2b', '\ueb2c', '\ueb2d', '\ueb2e', '\ueb2f', '\ueb30', '\ueb31', '\ueb32', '\ueb33', '\ueb34')
   @task_id = set_interval(100, closure() {
-    
     if(entity_exists(@hook)) {
       @fishing_data = _get_tag(@hook)
       
@@ -96,17 +106,17 @@ proc _fishing_start(@player, @uuid, @hook) {
 }
 
 proc _fishing_end(@player, @uuid, @fishing_data) {
-  # import
+  // import
   @text = import('text')
   @fishing_tasks = import('fishing_tasks')
-  # 낚싯찌 처리
+  // 낚싯찌 처리
   @hook = @fishing_data['hook']
   if(entity_exists(@hook)) { entity_remove(@hook) }
-  # task 처리
+  // task 처리
   @task_id = @fishing_data['task_id']
-  clear_task(@task_id)
+  clear_task() //clear_task(@task_id)
   array_remove_values(@fishing_tasks, @task_id)
-  # 플레이어 UI 처리, 아이템 처리
+  // 플레이어 UI 처리, 아이템 처리
   _set_sidebar(@uuid, 4, '', @text)
   set_pcooldown(@player, 'FISHING_ROD', 20)
 }
@@ -116,8 +126,10 @@ proc _reel_in(@player, @uuid, @hook, @fishing_data) {
   if(@fishing_data['location'] > 100) {@fishing_data['location'] = 100}
   _update_tag(@hook, @fishing_data)
   set_entity_velocity(@hook, array(0, 0.01, 0))
+  // 위치 선언
   @hloc = entity_loc(@hook)
   @ploc = ploc(@player)
+  // 사운드
   if(rand() < 0.25) {
     play_named_sound(@hloc, array('sound': 'minecraft:entity.generic.splash', 'category': 'AMBIENT', 'volume': 0.2, 'pitch': 0.9 + rand() * 0.6))
   }
@@ -126,6 +138,7 @@ proc _reel_in(@player, @uuid, @hook, @fishing_data) {
   }
   play_named_sound(@ploc, array('sound': 'minecraft:item.crossbow.loading_start', 'category': 'PLAYERS', 'volume': 1, 'pitch': 1.15 + rand() * 0.1))
   play_named_sound(@ploc, array('sound': 'minecraft:item.crossbow.loading_middle', 'category': 'PLAYERS', 'volume': 0.5, 'pitch': 1.15 + rand() * 0.1))
+  // 파티클
   @pos = array(
     'x': @hloc['x'],
     'y': @hloc['y'],
@@ -141,11 +154,19 @@ bind('player_fish', null, null, @event, @players_data, @text) {
   @uuid = puuid(@player)
   @hook = @event['hook']
   if(entity_exists(@hook)) {
+    @fishing_tasks = import('fishing_tasks')
+    @is_fishing = false
     @fishing_data = _get_tag(@hook)
-    if(is_null(@fishing_data) && @event['state'] == 'BITE') {
+    if(!is_null(@fishing_data)) {
+      @task_id = @fishing_data['task_id']
+      if(array_contains(@fishing_tasks, @task_id)) {
+        @is_fishing = true
+      }
+    }
+    if(!@is_fishing && @event['state'] == 'BITE') {
       cancel()
       _fishing_start(@player, @uuid, @hook)
-    } else if(!is_null(@fishing_data) && (@event['state'] == 'REEL_IN' || @event['state'] == 'CAUGHT_FISH')) {
+    } else if(@is_fishing && (@event['state'] == 'REEL_IN' || @event['state'] == 'CAUGHT_FISH')) {
       cancel()
       _reel_in(@player, @uuid, @hook, @fishing_data)
     }
