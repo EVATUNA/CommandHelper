@@ -100,7 +100,11 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
   _show_arcanelevel(@player, @uuid, @text)
 
   # tutorial
-  _load_tutorials(@player_data, @player, @uuid)
+  //_load_tutorials(@player_data, @player, @uuid)
+  _set_sidebar(@uuid, 9, color('#fa0000').'가나다라', @text)
+  _set_sidebar(@uuid, 12, color('#fb0000').'마바사', @text)
+  _set_sidebar(@uuid, 13, color('#fb0000').'아자차카', @text)
+  _set_sidebar(@uuid, 14, color('#fb0000').'타파하', @text)
 }
 
 # 설정 데이터 (현재 기능 없음) 

@@ -1,3 +1,25 @@
+/gitem = >>>
+  @player = player()
+  @item = array(
+    'name': 'FISHING_ROD',
+    'meta': array(
+      'lore': array(
+        ' §f\ue000 등급: 상급',
+        ' §f 체급: 10.1m',
+        ' §f\ue001 §7미끼 교체'
+      )
+    ),
+    'enchants': array(
+      'lure': array('elevel': 5, 'etype': 'LURE'),
+      'luck_of_the_sea': array('elevel': 46, 'etype': 'LUCK')
+    )
+  )
+  pgive_item(@player, @item)
+<<<
+
+/item = >>>
+broadcast(get_inventory_item(puuid(player()), pheld_slot(player())))
+<<<
 
 /*
 /itf = >>>

@@ -1,0 +1,59 @@
+{
+  "rank_table": [
+    {
+      "rank": {
+        "display": "§f하급",
+        "adding_model": 0
+      },
+      "weight": 100,
+      "quality": 0.0
+    },
+    {
+      "rank": {
+        "display": "§e중급",
+        "adding_model": 1
+      },
+      "weight": 20,
+      "quality": 5.0
+    },
+    {
+      "rank": {
+        "display": "§b상급",
+        "adding_model": 2
+      },
+      "weight": 5,
+      "quality": 1.5
+    }
+  ],
+  "fishs": {
+    "test": {
+      "weight": 1,
+      "quality": 1,
+      "size": {
+        "min": 5,
+        "max": 10
+      },
+      "item_meta": {
+        "display": "",
+        "lore": [],
+        "model": 0
+      },
+      "conditions": {
+        "time": [
+          "day",
+          "noon",
+          "night",
+          "midnight" 
+        ],
+        "weather": [
+          "clear",
+          "rain",
+          "thunder"
+        ],
+        "biome": [
+  
+        ]
+      }
+    }
+  }
+}

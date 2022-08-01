@@ -166,6 +166,7 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
     # 아이템 업뎃발동 했으니 일단 인첸트 없는것으로 선언
     @enchantments['main_hand'] = null
     if(!is_null(@item)) { // 도구 들고 있을 시
+      # 낚싯대일 경우
       if(!array_contains(@seeds, @item['name'])) {
         # 바닐라 인첸 목록 선언
         @vanilla_enchants = array()

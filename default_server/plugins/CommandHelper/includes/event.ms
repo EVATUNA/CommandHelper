@@ -2798,7 +2798,7 @@ if(@server == 'main') {
 }
 
 # 아이템 업데이트 관련
-bind('inventory_click', null, null, @event, @players_data, @effective_items, @skills_spec, @text) {
+bind('inventory_click', null, null, @event, @players_data, @effective_items, @skills_spec, @fishing_hooks, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
   if(!is_cancelled() && array_index_exists(@players_data, @uuid)) {
@@ -2812,35 +2812,59 @@ bind('inventory_click', null, null, @event, @players_data, @effective_items, @sk
       @button = @event['hotbarbutton']
       if(@button == -1) { @button = 40 }
       @button_item = get_inventory_item(@uuid, @button)
-      if(@button == @held_slot && @button != @clicked_slot) {
-        if(!is_null(@slot_item) && array_contains(@effective_items['weapon'], @slot_item['name'])) {
-          @items['main_hand'] = @slot_item
-        } else {
-          @items['main_hand'] = null
-        }
-        if(@clicked_slot == 40) {
-          if(!is_null(@button_item) && array_contains(@effective_items['weapon'], @button_item['name'])) {
-            @items['off_hand'] = @button_item
-          } else {
-            @items['off_hand'] = null
+      if((@button == 40 && is_array(@slot_item) && @slot_item['name'] == 'FISHING_ROD') || (@clicked_slot == 40 && is_array(@button_item) && @button_item['name'] == 'FISHING_ROD')) {
+        cancel() // 낚싯대 왼손 들기 캔슬
+        @prefix = @text['prefix']['failure']
+        _send_instance_tooltip_msg(@player, @uuid, @prefix '낚싯대는 보조 슬롯에서 사용할 수 없습니다.')
+      } else {
+        if(@button == @held_slot && @button != @clicked_slot) {
+          # 낚싯찌 처리
+          if(is_array(@slot_item) && @slot_item['name'] == 'FISHING_ROD' && is_array(@button_item) && @button_item['name'] == 'FISHING_ROD') {
+            if(array_index_exists(@fishing_hooks, @uuid)) {
+              @hook = @fishing_hooks[@uuid]
+              if(entity_exists(@hook)) { entity_remove(@hook) }
+              array_remove(@fishing_hooks, @uuid)
+            }
           }
-        }
-      } else if(@clicked_slot == @held_slot && @button != @clicked_slot) {
-        if(!is_null(@button_item) && array_contains(@effective_items['weapon'], @button_item['name'])) {
-          @items['main_hand'] = @button_item
-        } else {
-          @items['main_hand'] = null
-        }
-        if(@button == 40) {
+          #
           if(!is_null(@slot_item) && array_contains(@effective_items['weapon'], @slot_item['name'])) {
-            @items['off_hand'] = @slot_item
+            @items['main_hand'] = @slot_item
           } else {
-            @items['off_hand'] = null
+            @items['main_hand'] = null
+          }
+          if(@clicked_slot == 40) {
+            if(!is_null(@button_item) && array_contains(@effective_items['weapon'], @button_item['name'])) {
+              @items['off_hand'] = @button_item
+            } else {
+              @items['off_hand'] = null
+            }
+          }
+        } else if(@clicked_slot == @held_slot && @button != @clicked_slot) {
+          # 낚싯찌 처리
+          if(is_array(@slot_item) && @slot_item['name'] == 'FISHING_ROD' && is_array(@button_item) && @button_item['name'] == 'FISHING_ROD') {
+            if(array_index_exists(@fishing_hooks, @uuid)) {
+              @hook = @fishing_hooks[@uuid]
+              if(entity_exists(@hook)) { entity_remove(@hook) }
+              array_remove(@fishing_hooks, @uuid)
+            }
+          }
+          # 
+          if(!is_null(@button_item) && array_contains(@effective_items['weapon'], @button_item['name'])) {
+            @items['main_hand'] = @button_item
+          } else {
+            @items['main_hand'] = null
+          }
+          if(@button == 40) {
+            if(!is_null(@slot_item) && array_contains(@effective_items['weapon'], @slot_item['name'])) {
+              @items['off_hand'] = @slot_item
+            } else {
+              @items['off_hand'] = null
+            }
           }
         }
-      }
-      if(@clicked_slot == 36) {
-        @items['armor'] = get_inventory_item(@uuid, @button)
+        if(@clicked_slot == 36) {
+          @items['armor'] = get_inventory_item(@uuid, @button)
+        }
       }
       break()
     case 'MOVE_TO_OTHER_INVENTORY':
@@ -3005,25 +3029,40 @@ bind('inventory_click', null, null, @event, @players_data, @effective_items, @sk
     case 'PLACE_ALL':
     case 'SWAP_WITH_CURSOR':
       @cursor_item = @event['cursoritem']
-      if(@clicked_slot == @held_slot) {
-        if(!is_null(@cursor_item) && array_contains(@effective_items['weapon'], @cursor_item['name'])) {
-          @items['main_hand'] = @cursor_item
-        } else {
-          @items['main_hand'] = null
+      if(@clicked_slot == 40 && is_array(@cursor_item) && @cursor_item['name'] == 'FISHING_ROD') {
+        cancel() // 낚싯대 왼손 들기 캔슬
+        @prefix = @text['prefix']['failure']
+        _send_instance_tooltip_msg(@player, @uuid, @prefix '낚싯대는 보조 슬롯에서 사용할 수 없습니다.')
+      } else {
+        if(@clicked_slot == @held_slot) {
+          # 낚싯찌 처리
+          if(is_array(@slot_item) && @slot_item['name'] == 'FISHING_ROD' && is_array(@cursor_item) && @cursor_item['name'] == 'FISHING_ROD') {
+            if(array_index_exists(@fishing_hooks, @uuid)) {
+              @hook = @fishing_hooks[@uuid]
+              if(entity_exists(@hook)) { entity_remove(@hook) }
+              array_remove(@fishing_hooks, @uuid)
+            }
+          }
+          #
+          if(!is_null(@cursor_item) && array_contains(@effective_items['weapon'], @cursor_item['name'])) {
+            @items['main_hand'] = @cursor_item
+          } else {
+            @items['main_hand'] = null
+          }
         }
-      }
-      if(pinventory_holder(@player) == @uuid && @clicked_slot == 40) {
-        if(!is_null(@cursor_item) && array_contains(@effective_items['weapon'], @cursor_item['name'])) {
-          @items['off_hand'] = @cursor_item
-        } else {
-          @items['off_hand'] = null
+        if(pinventory_holder(@player) == @uuid && @clicked_slot == 40) {
+          if(!is_null(@cursor_item) && array_contains(@effective_items['weapon'], @cursor_item['name'])) {
+            @items['off_hand'] = @cursor_item
+          } else {
+            @items['off_hand'] = null
+          }
         }
-      }
-      if(pinventory_holder(@player) == @uuid && @clicked_slot == 36) {
-        if(!is_null(@cursor_item) && array_contains(@effective_items['armor'], @cursor_item['name'])) {
-          @items['armor'] = @cursor_item
-        } else {
-          @items['armor'] = null
+        if(pinventory_holder(@player) == @uuid && @clicked_slot == 36) {
+          if(!is_null(@cursor_item) && array_contains(@effective_items['armor'], @cursor_item['name'])) {
+            @items['armor'] = @cursor_item
+          } else {
+            @items['armor'] = null
+          }
         }
       }
       break()
@@ -3091,9 +3130,14 @@ bind('inventory_close', null, null, @event, @players_data, @effective_items, @sk
 }
 
 # 아이템 업데이트 관련
-bind('item_held', null, null, @event, @players_data, @effective_items, @skills_spec, @text) {
+bind('item_held', null, null, @event, @players_data, @effective_items, @skills_spec, @fishing_hooks, @text) {
   @player = @event['player']
   @uuid = puuid(@player)
+  if(array_index_exists(@fishing_hooks, @uuid)) {
+    @hook = @fishing_hooks[@uuid]
+    if(entity_exists(@hook)) { entity_remove(@hook) }
+    array_remove(@fishing_hooks, @uuid)
+  }
   if(!is_cancelled() && array_index_exists(@players_data, @uuid) && ponline(@player)) {
     @player_data = @players_data[@uuid]
     @held_item = get_inventory_item(@uuid, @event['to'])
@@ -3115,25 +3159,31 @@ bind('item_swap', null, null, @event, @players_data, @effective_items, @skills_s
       @items = array()
       @main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
       @off_hand_item = get_inventory_item(@uuid, 40)
-      set_timeout(1, closure() {
-        @new_main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
-        @new_off_hand_item = get_inventory_item(@uuid, 40)
-        if(@main_hand_item != @new_main_hand_item && @off_hand_item != @new_off_hand_item) {
-          if(!is_null(@main_hand_item) && array_contains(@effective_items['weapon'], @main_hand_item['name'])) {
-            @items['off_hand'] = @main_hand_item
-          } else if(!is_null(@player_data['item']['off_hand'])) {
-            @items['off_hand'] = null
+      if(is_array(@main_hand_item) && @main_hand_item['name'] == 'FISHING_ROD') {
+        cancel()
+        @prefix = @text['prefix']['failure']
+        _send_instance_tooltip_msg(@player, @uuid, @prefix '낚싯대는 보조 슬롯에서 사용할 수 없습니다.')
+      } else {
+        set_timeout(1, closure() {
+          @new_main_hand_item = get_inventory_item(@uuid, pheld_slot(@player))
+          @new_off_hand_item = get_inventory_item(@uuid, 40)
+          if(@main_hand_item != @new_main_hand_item && @off_hand_item != @new_off_hand_item) {
+            if(!is_null(@main_hand_item) && array_contains(@effective_items['weapon'], @main_hand_item['name'])) {
+              @items['off_hand'] = @main_hand_item
+            } else if(!is_null(@player_data['item']['off_hand'])) {
+              @items['off_hand'] = null
+            }
+            if(!is_null(@off_hand_item) && array_contains(@effective_items['weapon'], @off_hand_item['name'])) {
+              @items['main_hand'] = @off_hand_item
+            } else if(!is_null(@player_data['item']['main_hand'])) {
+              @items['main_hand'] = null
+            }
+            if(array_size(@items) > 0) {
+              _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text)
+            }
           }
-          if(!is_null(@off_hand_item) && array_contains(@effective_items['weapon'], @off_hand_item['name'])) {
-            @items['main_hand'] = @off_hand_item
-          } else if(!is_null(@player_data['item']['main_hand'])) {
-            @items['main_hand'] = null
-          }
-          if(array_size(@items) > 0) {
-            _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text)
-          }
-        }
-      })
+        })
+      }
     } else { // 액티브 스킬 사용하려 할 시
       cancel()
       # 스킬 매니징

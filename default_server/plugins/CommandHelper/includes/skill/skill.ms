@@ -207,7 +207,7 @@ proc _load_skills(@player_data, @player, @uuid, @skills_spec) {
 # 아이템 사용
 proc _ask_using_skill_reset_scroll(@player, @uuid, @item, @players_data, @skills_spec, @text) {
   @texture_layer = @text['space_fonts']['space.-8'].'\uec2c'.@text['space_fonts']['space.-169']
-  @message = '사용할 아이템'.@text['space_fonts']['space.21'].'아이템을 사용할까요?'
+  @message = @text['space_fonts']['space.1'].'사용할 아이템'.@text['space_fonts']['space.25'].'아이템을 사용할까요?'
   @inventory = array()
   for(@index = 0, @index < 9, @index++) {
     @inventory[@index] = array(
@@ -2010,9 +2010,9 @@ proc _update_skill_hud(@player, @uuid, @player_data, @skills_spec, @text) {
       }
       @cooldown = @cooldowns[@index]
       # 충전 갯수
+      @slots = array()
+      @psfs = array()
       if(@skill_spec['effect_by_point'][@point]['active']['count'] > 0) {
-        @slots = array()
-        @psfs = array()
         for(@i = 0, @i < @skill_spec['effect_by_point'][@point]['active']['count'], @i++) {
           if(@i < @active_skill[2]) {
             @slots[] = @text['space_fonts']['space.-6'].@charges[1]
