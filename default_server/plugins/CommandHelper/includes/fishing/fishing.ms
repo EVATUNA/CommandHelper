@@ -190,3 +190,38 @@ bind('player_fish', null, null, @event, @players_data, @fishing_hooks, @fishing_
   //  }
   //}
 }
+
+proc _open_fishing_rod_gui(@player, @uuid, @item, @text) {
+  @texture_layer = @text['space_fonts']['space.-8'].'\uec2c'.@text['space_fonts']['space.-169']
+  @message = '사용할 미끼'
+  @inventory = array()
+  for(@index = 0, @index < 4, @index++) {
+    @inventory[@index] = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': ' ',
+        'model': 1
+      )
+    )
+  }
+
+  @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @item, @text) {
+    bind('inventory_click', array('id': "fishing_rod.@id"), array('player': @player, 'virtual': true), @event, @player, @uuid, @item, @text) {
+      broadcast(@event)
+    }
+  }
+  # GUI 보여주기
+  _show_gui(@player, 'fishing_rod', 'HOPPER', @texture_layer, @message, @inventory, @closure, @uuid, @item, @text)
+}
+
+bind('inventory_click', null, null, @event, @players_data, @fishing_hooks, @text) {
+  @player = @event['player']
+  @uuid = puuid(@player)
+  if(!is_cancelled() && array_index_exists(@players_data, @uuid)) {
+    @slot_item = @event['slotitem']
+    if(@event['clicktype'] == 'SHIFT_RIGHT' && is_array(@slot_item) && @slot_item['name'] == 'FISHING_ROD') {
+      cancel()
+      _open_fishing_rod_gui(@player, @uuid, @slot_item, @text)
+    }
+  }
+}

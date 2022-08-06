@@ -1,17 +1,27 @@
-/gitem = >>>
+/givebag = >>>
   @player = player()
+  @itemname = '소형 물고기 보관통'
   @item = array(
-    'name': 'FISHING_ROD',
+    'name': 'TRAPPED_CHEST',
     'meta': array(
+      'inventory': _get_empty_inventory(2, 3),
+      'display': '§f'.@itemname,
       'lore': array(
-        ' §f\ue000 등급: 상급',
-        ' §f 체급: 10.1m',
-        ' §f\ue001 §7미끼 교체'
+        '§f\ue001+\ue003 : 열기'
+      ),
+      'model': 0,
+      'flags': array(
+        'HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE'
+      ),
+      'modifiers': array(
+        array(
+          'attribute': 'HORSE_JUMP_STRENGTH',
+          'operation': 'ADD_NUMBER',
+          'amount': 0,
+          'name': @itemname,
+          'uuid': uuid('RANDOM')
+        )
       )
-    ),
-    'enchants': array(
-      'lure': array('elevel': 5, 'etype': 'LURE'),
-      'luck_of_the_sea': array('elevel': 46, 'etype': 'LUCK')
     )
   )
   pgive_item(@player, @item)

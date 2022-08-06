@@ -48,6 +48,9 @@ include('includes/hunting/hunting.ms')
 # 거주월드의 낚시 시스템
 include('includes/fishing/fishing.ms')
 
+#가방 시스템
+include('includes/bag/bag.ms')
+
 # 음식 시스템
 include('includes/food/food.ms')
 
