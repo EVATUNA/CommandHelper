@@ -77,9 +77,9 @@ proc _open_bag(@player, @uuid, @bag_item, @bag_slot, @text) {
     }
     @texture_layer.= @text['space_fonts']['space.1']
     # GUI 이름 세팅
-    @message = '§7가방'
+    @message = '가방'
     if(array_index_exists(@bag_item['meta'], 'display') && !is_null(@bag_item['meta']['display'])) {
-      @message = '§7'.strip_colors(@bag_item['meta']['display'])
+      @message = strip_colors(@bag_item['meta']['display'])
     }
     # 열고 있는 가방 뷰어
     @bag_item['meta']['model'] = integer(@bag_item['meta']['model'] / 2) * 2 + 1
@@ -217,11 +217,8 @@ bind('inventory_click', null, array('slotitem': 'TRAPPED_CHEST', 'clicktype': 'S
       if(is_array(@bag_item['meta']) && !is_null(@bag_item['meta']['model'])) {
         _open_bag(@player, @uuid, @bag_item, @bag_slot, @text)
       }
-
-
     } else {
       // 해당 칸의 가방 열수 없다는 메시지
     }
-    //  _open_fishing_rod_gui(@player, @@slot = @event['rawslot']uuid, @slot_item, @text)
   }
 }

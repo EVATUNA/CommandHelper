@@ -27,6 +27,35 @@
   pgive_item(@player, @item)
 <<<
 
+/givefishrod = >>>
+  @player = player()
+  @itemname = '낚싯대'
+  @item = array(
+    'name': 'FISHING_ROD',
+    'meta': array(
+      'inventory': _get_empty_inventory(2, 3),
+      'display': '§f'.@itemname,
+      'lore': array(
+        '§f\ue001+\ue003 : 미끼 교체'
+      ),
+      'model': 0,
+      'flags': array(
+        'HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE'
+      ),
+      'modifiers': array(
+        array(
+          'attribute': 'HORSE_JUMP_STRENGTH',
+          'operation': 'ADD_NUMBER',
+          'amount': 0,
+          'name': '{"name": "AIR"}',
+          'uuid': uuid('RANDOM')
+        )
+      )
+    )
+  )
+  pgive_item(@player, @item)
+<<<
+
 /item = >>>
 broadcast(get_inventory_item(puuid(player()), pheld_slot(player())))
 <<<
