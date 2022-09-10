@@ -52,10 +52,10 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
   }
 
   # advancement
-  @player_data['advancement'] = cup_get('ADVANCEMENT', @uuid)
-  if(is_null(@player_data['advancement'])) {
-    _new_advancement(@uuid, @player_data)
-  }
+  //@player_data['advancement'] = cup_get('ADVANCEMENT', @uuid)
+  //if(is_null(@player_data['advancement'])) {
+  //  _new_advancement(@uuid, @player_data)
+  //}
 
   # skill
   _load_skills(@player_data, @player, @uuid, @skills_spec)

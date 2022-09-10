@@ -922,3 +922,157 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
     _update_selected_skill_hotbar(@player, @uuid, @player_data, @skills_spec, @text)
   })
 }
+
+
+proc _get_updated_item(@item) { /** 바닐라템 주울시 커스템 템으로 바꿀때 사용 */
+  if(is_array(@item) && array_index_exists(@item, 'name') && array_index_exists(@item, 'meta') && array_index_exists(@item, 'qty')) {
+    if(!(is_array(@item['meta']) && !is_null(@item['meta']['model']))) {
+      @recipe_name = null
+      switch(@item['name']) {
+      case 'FISHING_ROD':
+        @item['meta'] = array(
+          'display': '§f낚싯대',
+          'lore': array(
+            '§f\ue001+\ue003 : 미끼 교체'
+          ),
+          'model': 0,
+          'flags': array(
+            'HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE'
+          ),
+          'modifiers': array(
+            array(
+              'attribute': 'HORSE_JUMP_STRENGTH',
+              'operation': 'ADD_NUMBER',
+              'amount': 0,
+              'name': '{"name": "AIR"}',
+              'uuid': uuid('RANDOM')
+            )
+          )
+        )
+        break()
+      case 'LEATHER_BOOTS':
+        @recipe_name = '가죽 조끼'
+        break()
+      case 'CHAINMAIL_BOOTS':
+        @recipe_name = '구리 흉갑'
+        break()
+      case 'IRON_BOOTS':
+        @recipe_name = '철 흉갑'
+        break()
+      case 'GOLDEN_BOOTS':
+        @recipe_name = '금 흉갑'
+        break()
+      case 'DIAMOND_BOOTS':
+        @recipe_name = '다이아몬드 흉갑'
+        break()
+      case 'NETHERITE_BOOTS':
+        @recipe_name = '네더라이트 흉갑'
+        break()
+      case 'WOODEN_SWORD':
+        @recipe_name = 'WOODEN_SWORD'
+        break()
+      case 'WOODEN_SHOVEL':
+        @recipe_name = 'WOODEN_SHOVEL'
+        break()
+      case 'WOODEN_PICKAXE':
+        @recipe_name = 'WOODEN_PICKAXE'
+        break()
+      case 'WOODEN_AXE':
+        @recipe_name = 'WOODEN_AXE'
+        break()
+      case 'WOODEN_HOE':
+        @recipe_name = 'WOODEN_HOE'
+        break()
+      case 'STONE_SWORD':
+        @recipe_name = 'STONE_SWORD'
+        break()
+      case 'STONE_SHOVEL':
+        @recipe_name = 'STONE_SHOVEL'
+        break()
+      case 'STONE_PICKAXE':
+        @recipe_name = 'STONE_PICKAXE'
+        break()
+      case 'STONE_AXE':
+        @recipe_name = 'STONE_AXE'
+        break()
+      case 'STONE_HOE':
+        @recipe_name = 'STONE_HOE'
+        break()
+      case 'GOLDEN_SWORD':
+        @recipe_name = '금 검'
+        break()
+      case 'GOLDEN_SHOVEL':
+        @recipe_name = '금 삽'
+        break()
+      case 'GOLDEN_PICKAXE':
+        @recipe_name = '금 곡괭이'
+        break()
+      case 'GOLDEN_AXE':
+        @recipe_name = '금 도끼'
+        break()
+      case 'GOLDEN_HOE':
+        @recipe_name = '금 괭이'
+        break()
+      case 'IRON_SWORD':
+        @recipe_name = '철 검'
+        break()
+      case 'IRON_SHOVEL':
+        @recipe_name = '철 삽'
+        break()
+      case 'IRON_PICKAXE':
+        @recipe_name = '철 곡괭이'
+        break()
+      case 'IRON_AXE':
+        @recipe_name = '철 도끼'
+        break()
+      case 'IRON_HOE':
+        @recipe_name = '철 괭이'
+        break()
+      case 'DIAMOND_SWORD':
+        @recipe_name = '다이아몬드 검'
+        break()
+      case 'DIAMOND_SHOVEL':
+        @recipe_name = '다이아몬드 삽'
+        break()
+      case 'DIAMOND_PICKAXE':
+        @recipe_name = '다이아몬드 곡괭이'
+        break()
+      case 'DIAMOND_AXE':
+        @recipe_name = '다이아몬드 도끼'
+        break()
+      case 'DIAMOND_HOE':
+        @recipe_name = '다이아몬드 괭이'
+        break()
+      case 'NETHERITE_SWORD':
+        @recipe_name = '네더라이트 검'
+        break()
+      case 'NETHERITE_SHOVEL':
+        @recipe_name = '네더라이트 삽'
+        break()
+      case 'NETHERITE_PICKAXE':
+        @recipe_name = '네더라이트 곡괭이'
+        break()
+      case 'NETHERITE_AXE':
+        @recipe_name = '네더라이트 도끼'
+        break()
+      case 'NETHERITE_HOE':
+        @recipe_name = '네더라이트 괭이'
+        break()
+      case 'TRIDENT':
+        @recipe_name = '삼지창'
+        break()
+      case 'SHIELD':
+        @recipe_name = '철 방패'
+        break()
+      }
+      if(!is_null(@recipe_name)) {
+        @craftings = import('craftings')
+        @crafting = @craftings[@recipe_name]
+        @entries = @crafting['pool']
+        @final_entry = _get_final_entry_from_entries(@entries, round(rand(), 5), 0.0)
+        @item = _get_modified_item(@final_entry, @item)
+      }
+    }
+  }
+  return(@item)
+}

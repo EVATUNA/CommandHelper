@@ -3092,7 +3092,15 @@ bind('inventory_click', null, null, @event, @players_data, @effective_items, @sk
 bind('inventory_open', null, null, @event, @players_data) {
   @player = @event['player']
   @uuid = puuid(@player)
-  if(array_index_exists(@players_data, @uuid) && ponline(@player)) {
+  if(!is_cancelled() && array_index_exists(@players_data, @uuid) && ponline(@player)) {
+    # 인벤토리 바닐라 아이템 수정
+    if(!@event['virtual'] && !is_null(@event['holder'])) {
+      //cancel()
+      @inventory = get_inventory(@event['holder'])
+      foreach(@index: @item in @inventory) {
+        set_inventory_item(@event['holder'], @index, _get_updated_item(@item))
+      }
+    }
     @players_data[@uuid]['item']['is_inv_open'] = true
   }
 }
@@ -3102,6 +3110,13 @@ bind('inventory_close', null, null, @event, @players_data, @effective_items, @sk
   @player = @event['player']
   @uuid = puuid(@player)
   if(!is_cancelled() && array_index_exists(@players_data, @uuid) && ponline(@player)) {
+    # 인벤토리 바닐라 아이템 수정
+    if(!@event['virtual'] && !is_null(@event['holder'])) {
+      @inventory = get_inventory(@event['holder'])
+      
+      //broadcast(A)
+    }
+
     @player_data = @players_data[@uuid]
     @player_data['item']['is_inv_open'] = false
     @items = array()
@@ -3266,6 +3281,14 @@ bind('item_pickup', null, null, @event, @players_data, @effective_items, @skills
   @player = @event['player']
   @uuid = puuid(@player)
   if(!is_cancelled() && array_index_exists(@players_data, @uuid) && ponline(@player)) {
+    @old_item = @event['item']
+    if(is_array(@old_item)) {
+      @new_item = _get_updated_item(array_deep_clone(@old_item))
+      if(@old_item != @new_item) {
+        modify_event('item', @new_item)
+      }
+    }
+
     @player_data = @players_data[@uuid]
     @held_slot = pheld_slot(@player)
     @inventory = get_inventory(@uuid)

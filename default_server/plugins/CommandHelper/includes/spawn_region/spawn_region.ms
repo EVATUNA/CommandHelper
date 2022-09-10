@@ -25,7 +25,7 @@ bind('region_change', null, null, @event) {
     } else if(array_index_exists(@regions, @region)) {
       @region_name = @regions[@region]
       if(@player == 'aaaa__') {
-        title(@player, '', @region_name)
+        //title(@player, '', @region_name)
       }
       //broadcast(@region_name)
     }

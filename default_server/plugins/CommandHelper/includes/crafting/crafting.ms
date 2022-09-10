@@ -12,6 +12,7 @@ foreach(@file in list_files('recipe_tables')) {
     }
   })
 }
+export('craftings', @craftings)
 
 ## Procedure
 proc _get_result_item_rank(@ingredients_weight, @ingredient_items) { #등급있는 재료아이템 종류, 실제 조합하는 재료 아이템들
@@ -174,7 +175,9 @@ proc _get_modified_item(@entry, @item) {
   }
   
   @modified_item = array('name': @item['name'], 'qty': @item['qty'], 'meta': array('flags': array('HIDE_ENCHANTS', 'HIDE_ATTRIBUTES')))
-  
+  if(is_array(@item['meta'])) {
+    @modified_item['meta']['damage'] = @item['meta']['damage']
+  }
   if(array_index_exists(@entry, 'alt_name')) {
     @modified_item['name'] = @entry['alt_name']
   }

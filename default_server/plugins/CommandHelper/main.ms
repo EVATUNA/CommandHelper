@@ -80,4 +80,4 @@ include('includes/event.ms')
 include('includes/command.ms')
 
 # 랜덤 머리 시스템
-include("includes\\RANDOMHEADGOTTCHA\\main.ms")
+//include("includes\\RANDOMHEADGOTTCHA\\main.ms")

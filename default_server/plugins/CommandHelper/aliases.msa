@@ -6,7 +6,13 @@
     'meta': array(
       'inventory': _get_empty_inventory(2, 3),
       'display': '§f'.@itemname,
-      'lore': array(
+      'lore': array( // 백그라운드 -162 아이템x9 반복 마지막 -1
+        '§f\u0900\u0b26\uf821\u14cd\uf821\u14cd\uf821\u14cd\uf821\u14cd\uf821\u14cd\uf821\u14cd\uf821\u14cd\uf821\u14cd\uf821\u14cd\uf821\u14cd\uf821\u14cd\uf821\u14cd\uf821\u14cd\uf821\u14cd\uf821\u14cd\uf821\u14cd\uf821\u14cd\uf821',
+        '§f',
+        '§f',//
+        '§f',
+        '§f',//
+        '§f',
         '§f\ue001+\ue003 : 열기'
       ),
       'model': 0,
@@ -33,7 +39,6 @@
   @item = array(
     'name': 'FISHING_ROD',
     'meta': array(
-      'inventory': _get_empty_inventory(2, 3),
       'display': '§f'.@itemname,
       'lore': array(
         '§f\ue001+\ue003 : 미끼 교체'
