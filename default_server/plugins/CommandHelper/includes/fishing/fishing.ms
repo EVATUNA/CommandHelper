@@ -193,6 +193,15 @@ bind('player_fish', null, null, @event, @players_data, @fishing_hooks, @fishing_
 
 proc _open_fishing_rod(@player, @uuid, @bag_item, @bag_slot, @text) {
   if(is_array(@bag_item['meta']) && array_index_exists(@bag_item['meta'], 'modifiers') && array_size(@bag_item['meta']['modifiers']) == 1) {
+    
+    
+    @ingredient_slot = array(
+      'name': 'STRUCTURE_VOID',
+      'meta': array(
+        'display': '§7미끼를 넣어주세요',
+        'model': 15
+      )
+    )
     # GUI 내용물
     @inventory = array()
     for(@index = 0, @index < 9, @index++) {
@@ -206,7 +215,7 @@ proc _open_fishing_rod(@player, @uuid, @bag_item, @bag_slot, @text) {
     }
     @inventory[4] = json_decode(@bag_item['meta']['modifiers'][0]['name'])
     # GUI 백그라운드 세팅
-    @texture_layer = @text['space_fonts']['space.-8'].'\uec2c'.@text['space_fonts']['space.-169']
+    @texture_layer = @text['space_fonts']['space.-8'].'\ue3fb'.@text['space_fonts']['space.-169']
     # GUI 이름 세팅
     @message = '낚싯대'
     if(array_index_exists(@bag_item['meta'], 'display') && !is_null(@bag_item['meta']['display'])) {
