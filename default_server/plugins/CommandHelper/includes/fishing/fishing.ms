@@ -243,7 +243,7 @@ proc _open_fishing_rod(@player, @uuid, @bag_item, @bag_slot, @text) {
         //
         @is_bag_click = false
         //
-        if((is_array(@slot_item) && @slot_item['name'] == 'STRUCTURE_VOID' && is_array(@slot_item['meta']) && @slot_item['meta']['model'] == 1) || @event['slot'] == @bag_slot) {
+        if((is_array(@slot_item) && @slot_item['name'] == 'STRUCTURE_VOID' && is_array(@slot_item['meta']) && @slot_item['meta']['model'] == 1) || @event['slot'] == @bag_slot && @event['slot'] != @rawslot) {
           cancel()
         } else {
           if(0 <= @rawslot && @rawslot < 9) {
@@ -397,11 +397,11 @@ proc _open_fishing_rod(@player, @uuid, @bag_item, @bag_slot, @text) {
                 if(is_array(@event['inventory'][4]) && @event['inventory'][4]['name'] == 'STRUCTURE_VOID') {
                   @is_bag_click = true
                   cancel()
-                  @slot_item['qty'] -= 1
                   @slot_item_copy = array_deep_clone(@slot_item)
+                  @slot_item['qty'] -= 1
                   @slot_item_copy['qty'] = 1
                   set_inventory_item(@id, 4, @slot_item_copy)
-                  set_inventory_item(@uuid, @rawslot, @slot_item)
+                  set_inventory_item(@uuid, @event['slot'], @slot_item)
                 } else {
                   cancel()
                 }
@@ -468,7 +468,7 @@ bind('inventory_click', null, array('slotitem': 'FISHING_ROD', 'clicktype': 'SHI
         _open_fishing_rod(@player, @uuid, @bag_item, @bag_slot, @text)
       }
     } else {
-      // 해당 칸의 가방 열수 없다는 메시지
+      // 해당 칸에서는 가방 열수 없다는 메시지
     }
   }
 }

@@ -106,6 +106,7 @@ foreach(@scoreboard in get_scoreboards()) {
     'BOW',
     'CROSSBOW',
     'SHIELD',
+    'FISHING_ROD',
     'WHEAT_SEEDS',
     'BEETROOT_SEEDS',
     'POTATO',

@@ -204,6 +204,32 @@ proc _update_item(@player, @uuid, @items, @player_data, @skills_spec, @text) {
           )
         }
 
+        if(@item['name'] == 'FISHING_ROD') {
+          @lure_item = json_decode(@item['meta']['modifiers'][0]['name'])
+          @model = 0
+          if(@lure_item['name'] == 'STRUCTURE_VOID') {
+            @lure_item = null
+          } else if(is_array(@lure_item['meta']) && !is_null(@lure_item['meta']['model'])) {
+            @model = @lure_item['meta']['model'] % 3
+          } else {
+            @model = 0
+          }
+          switch(@model) {
+          case 0:
+            break()
+          case 1:
+            @vanilla_enchants['lure'] = array(
+              'etype': 'LURE',
+              'elevel': 2
+            )
+          case 2:
+            @vanilla_enchants['lure'] = array(
+              'etype': 'LURE',
+              'elevel': 5
+            )
+          }
+        }
+
         # 스킬 적용
         foreach(@applying_skill: @applying_skill_data in @applying_skills) {
           @skill_spec = @applying_skill_data['skill_spec']
