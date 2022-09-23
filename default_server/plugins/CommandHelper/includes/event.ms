@@ -1738,7 +1738,7 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         }
         if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
           cancel()
-          if(pworld(@player) != 'spawn') {
+          if(pworld(@player) != 'spawn' || true) {
             @inventory = array()
             for(@index = 0, @index < 45, @index++) {
               @inventory[@index] = array(

@@ -193,9 +193,7 @@ bind('player_fish', null, null, @event, @players_data, @fishing_hooks, @fishing_
 
 proc _open_fishing_rod(@player, @uuid, @bag_item, @bag_slot, @text) {
   if(is_array(@bag_item['meta']) && array_index_exists(@bag_item['meta'], 'modifiers') && array_size(@bag_item['meta']['modifiers']) == 1) {
-    
-    
-    @ingredient_slot = array(
+    @lure_slot_item = array(
       'name': 'STRUCTURE_VOID',
       'meta': array(
         'display': '§7미끼를 넣어주세요',
@@ -228,70 +226,196 @@ proc _open_fishing_rod(@player, @uuid, @bag_item, @bag_slot, @text) {
     @allowed_items = array('SALMON', 'TROPICAL_FISH', 'PUFFERFISH') // 미끼템
     @unallowed_items = array('TRAPPED_CHEST', 'SHULKER_BOX', 'WHITE_SHULKER_BOX', 'ORANGE_SHULKER_BOX', 'MAGENTA_SHULKER_BOX', 'LIGHT_BLUE_SHULKER_BOX', 'YELLOW_SHULKER_BOX', 'LIME_SHULKER_BOX', 'PINK_SHULKER_BOX', 'GRAY_SHULKER_BOX', 'LIGHT_GRAY_SHULKER_BOX', 'CYAN_SHULKER_BOX', 'PURPLE_SHULKER_BOX', 'BLUE_SHULKER_BOX', 'BROWN_SHULKER_BOX', 'GREEN_SHULKER_BOX', 'RED_SHULKER_BOX', 'BLACK_SHULKER_BOX')
     # GUI 시스템
-    @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @bag_item, @bag_slot, @allowed_items, @text) {
-      bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @player, @uuid, @id, @bag_item, @bag_slot, @allowed_items, @unallowed_items, @text) {
+    @closure = closure(@player, @gui_id, @type, @texture_layer, @message, @inventory, @closure, @id, @uuid, @bag_item, @bag_slot, @allowed_items, @lure_slot_item, @text) {
+      bind('inventory_click', array('id': "click.@id"), array('player': @player, 'virtual': true), @event, @player, @uuid, @id, @bag_item, @bag_slot, @allowed_items, @unallowed_items, @lure_slot_item, @text) {
+        // 가방용 함수 (넣을수 있는 템인지)
+        proc _is_allowed_item(@item, @allowed_items, @unallowed_items) {
+          if((array_size(@allowed_items) != 0 && is_array(@item) && !array_contains(@allowed_items, @item['name'])) || (array_size(@allowed_items) == 0 && is_array(@item) && array_contains(@unallowed_items, @item['name']))) {
+            return(false)
+          } else {
+            return(true)
+          }
+        }
+        //
+        @rawslot = @event['rawslot']
         @slot_item = @event['slotitem']
-        @clicked_slot = @event['slot']
+        @cursor_item = @event['cursoritem']
+        //
         @is_bag_click = false
-        if((is_array(@slot_item) && @slot_item['name'] == 'STRUCTURE_VOID') || @clicked_slot == @bag_slot) {
+        //
+        if((is_array(@slot_item) && @slot_item['name'] == 'STRUCTURE_VOID' && is_array(@slot_item['meta']) && @slot_item['meta']['model'] == 1) || @event['slot'] == @bag_slot) {
           cancel()
         } else {
-          switch(@event['action']) {
-          case 'HOTBAR_SWAP':
-            @button = @event['hotbarbutton']
-            if(@button == -1) { @button = 40 }
-            @button_item = get_inventory_item(@uuid, @button)
-            if(@button == @bag_slot) {
-              cancel()
-            } else {
-              if(@event['rawslot'] < 9) {
-                if((array_size(@allowed_items) != 0 && is_array(@button_item) && !array_contains(@allowed_items, @button_item['name'])) || (array_size(@allowed_items) == 0 && is_array(@button_item) && array_contains(@unallowed_items, @button_item['name']))) {
-                  cancel()
+          if(0 <= @rawslot && @rawslot < 9) {
+            switch(@event['action']) {
+            case 'SWAP_WITH_CURSOR':
+              @cursor_item_copy = array_deep_clone(@cursor_item)
+              if(_is_allowed_item(@cursor_item, @allowed_items, @unallowed_items)) {
+                if(@slot_item['name'] == 'STRUCTURE_VOID') {
+                  if(!is_cancelled()) {
+                    @is_bag_click = true
+                    @cursor_item['qty'] = 1
+                    @cursor_item_copy['qty'] = 63
+                    modify_event('slotitem', @cursor_item_copy)
+                    set_timeout(1, closure() {
+                      set_inventory_item(@id, @rawslot, @cursor_item)
+                    })
+                  }
                 } else {
+                  if(@cursor_item['qty'] == 1) {
+                    @is_bag_click = true
+                  } else {
+                    cancel()
+                  }
+                }
+              } else {
+                cancel()
+              }
+              break()
+            case 'PLACE_ALL':
+            case 'PLACE_ONE':
+              @cursor_item_copy = array_deep_clone(@cursor_item)
+              if(@slot_item['name'] == @cursor_item['name'] && @slot_item['meta'] == @cursor_item['meta']) {
+                if(@cursor_item['qty'] < 64) {
                   @is_bag_click = true
+                  @cursor_item_copy['qty'] += 1
+                  modify_event('cursoritem', null)
+                  modify_event('slotitem', @cursor_item_copy)
+                  set_timeout(1, closure() {
+                    set_inventory_item(@id, @rawslot, @lure_slot_item)
+                  })
+                } else {
+                  cancel()
+                }
+              } else {
+                cancel()
+              }
+              break()
+            case 'PICKUP_ALL':
+            case 'PICKUP_HALF':
+              if(_is_allowed_item(@slot_item, @allowed_items, @unallowed_items)) {
+                @is_bag_click = true
+                set_timeout(1, closure() {
+                  set_inventory_item(@id, @rawslot, @lure_slot_item)
+                })
+              } else {
+                cancel()
+              }
+              break()
+            case 'DROP_ONE_SLOT':
+            case 'DROP_ALL_SLOT':
+              if(is_null(@cursor_item)) {
+                if(_is_allowed_item(@slot_item, @allowed_items, @unallowed_items)) {
+                  @is_bag_click = true
+                  set_timeout(1, closure() {
+                    set_inventory_item(@id, @rawslot, @lure_slot_item)
+                  })
+                } else {
+                  cancel()
+                }
+              } else {
+                cancel()
+              }
+              break()
+            case 'HOTBAR_SWAP':
+            case 'HOTBAR_MOVE_AND_READD':
+              if(is_null(@cursor_item)) {
+                @swapslot = @event['hotbarbutton']
+                if(@event['hotbarbutton'] == -1 ) { @swapslot = 40 }
+                @swap_item = get_inventory_item(@uuid, @swapslot)
+                if(_is_allowed_item(@slot_item, @allowed_items, @unallowed_items)) {
+                  if(is_array(@swap_item)) {
+                    if(_is_allowed_item(@swap_item, @allowed_items, @unallowed_items)) {
+                      if(@swap_item['qty'] == 1) {
+                        @is_bag_click = true
+                      } else if(@swap_item['qty'] < 64) {
+                        if(@slot_item['name'] == @swap_item['name'] && @slot_item['meta'] == @swap_item['meta']) {
+                          @is_bag_click = true
+                          cancel()
+                          @swap_item_copy = array_deep_clone(@swap_item)
+                          @swap_item_copy['qty'] += 1
+                          set_inventory_item(@id, @rawslot, @lure_slot_item)
+                          set_inventory_item(@uuid, @swapslot, @swap_item_copy)
+                        } else {
+                          cancel()
+                        }
+                      } else {
+                        cancel()
+                      }
+                    } else {
+                      cancel()
+                    }
+                  } else {
+                    @is_bag_click = true
+                    cancel()
+                    set_inventory_item(@id, @rawslot, @lure_slot_item)
+                    set_inventory_item(@uuid, @swapslot, @slot_item)
+                  }
+                } else {
+                  if(is_array(@swap_item)) {
+                    if(_is_allowed_item(@swap_item, @allowed_items, @unallowed_items)) {
+                      if(@swap_item['qty'] == 1) {
+                        @is_bag_click = true
+                        cancel()
+                        set_inventory_item(@id, @rawslot, @swap_item)
+                        set_inventory_item(@uuid, @swapslot, null)
+                      } else {
+                        @is_bag_click = true
+                        cancel()
+                        @swap_item['qty'] -= 1
+                        @swap_item_copy = array_deep_clone(@swap_item)
+                        @swap_item_copy['qty'] = 1
+                        set_inventory_item(@id, @rawslot, @swap_item_copy)
+                        set_inventory_item(@uuid, @swapslot, @swap_item)
+                      }
+                    } else {
+                      cancel()
+                    }
+                  } else {
+                    cancel()
+                  }
+                }
+              }
+              break()
+            case 'MOVE_TO_OTHER_INVENTORY':
+              if(_is_allowed_item(@slot_item, @allowed_items, @unallowed_items)) {
+                @is_bag_click = true
+                set_timeout(1, closure() {
+                  set_inventory_item(@id, @rawslot, @lure_slot_item)
+                })
+              } else {
+                cancel()
+              }
+              break()
+            default:
+              cancel()
+              break()
+            }
+          } else {
+            if(_is_allowed_item(@slot_item, @allowed_items, @unallowed_items)) {
+              if(@event['action'] == 'MOVE_TO_OTHER_INVENTORY') {
+                if(is_array(@event['inventory'][4]) && @event['inventory'][4]['name'] == 'STRUCTURE_VOID') {
+                  @is_bag_click = true
+                  cancel()
+                  @slot_item['qty'] -= 1
+                  @slot_item_copy = array_deep_clone(@slot_item)
+                  @slot_item_copy['qty'] = 1
+                  set_inventory_item(@id, 4, @slot_item_copy)
+                  set_inventory_item(@uuid, @rawslot, @slot_item)
+                } else {
+                  cancel()
+                }
+              } else if(@event['action'] == 'COLLECT_TO_CURSOR') {
+                if(_is_allowed_item(@cursor_item, @allowed_items, @unallowed_items)) {
+                  if(@event['inventory'][4]['name'] == @cursor_item['name'] && @event['inventory'][4]['meta'] == @cursor_item['meta']) {
+                    @is_bag_click = true
+                    set_timeout(1, closure() {
+                      set_inventory_item(@id, 4, @lure_slot_item)
+                    })
+                  }
                 }
               }
             }
-            break()
-          case 'MOVE_TO_OTHER_INVENTORY':
-            if(@event['rawslot'] >= 9) {
-              if((array_size(@allowed_items) != 0 && is_array(@slot_item) && !array_contains(@allowed_items, @slot_item['name'])) || (array_size(@allowed_items) == 0 && is_array(@slot_item) && array_contains(@unallowed_items, @slot_item['name']))) {
-                cancel()
-              } else {
-                @is_bag_click = true
-              }
-            } else {
-              @is_bag_click = true
-            }
-            break()
-          case 'PLACE_ONE':
-          case 'PLACE_ALL':
-          case 'SWAP_WITH_CURSOR':
-            @cursor_item = @event['cursoritem']
-            if(@event['rawslot'] < 9) {
-              if((array_size(@allowed_items) != 0 && is_array(@cursor_item) && !array_contains(@allowed_items, @cursor_item['name'])) || (array_size(@allowed_items) == 0 && is_array(@cursor_item) && array_contains(@unallowed_items, @cursor_item['name']))) {
-                cancel()
-              } else {
-                @is_bag_click = true
-              }
-            }
-            break()
-          case 'PICKUP_HALF':
-          case 'PICKUP_ALL':
-          case 'DROP_ALL_SLOT':
-          case 'DROP_ONE_SLOT':
-            if(@event['rawslot'] < 9) {
-              @is_bag_click = true
-            }
-            break()
-          case 'COLLECT_TO_CURSOR':
-            @cursor_item = @event['cursoritem']
-            if((array_size(@allowed_items) != 0 && is_array(@cursor_item) && !array_contains(@allowed_items, @cursor_item['name'])) || (array_size(@allowed_items) == 0 && is_array(@cursor_item) && array_contains(@unallowed_items, @cursor_item['name']))) {
-              cancel()
-            } else {
-              @is_bag_click = true
-            }
-            break()
           }
         }
         if(@is_bag_click) {
@@ -303,28 +427,11 @@ proc _open_fishing_rod(@player, @uuid, @bag_item, @bag_slot, @text) {
       }
       bind('inventory_drag', array('id': "drag.@id"), array('player': @player, 'virtual': true), @event, @player, @uuid, @bag_item, @bag_slot, @allowed_items, @unallowed_items, @text) {
         if(@event['player'] == @player) {
-          @is_bag_click = false
-          @cursor_item = @event['oldcursoritem']
-          if((array_size(@allowed_items) != 0 && is_array(@cursor_item) && !array_contains(@allowed_items, @cursor_item['name'])) || (array_size(@allowed_items) == 0 && is_array(@cursor_item) && array_contains(@unallowed_items, @cursor_item['name']))) {
-            foreach(@raw_slot in @event['rawslots']) {
-              if(@raw_slot < 9) {
-                cancel()
-                break()
-              }
+          @indexs = array_keys(@event['newitems'])
+          foreach(@index in @indexs) {
+            if(@index < 9) {
+              cancel()
             }
-          } else {
-            foreach(@raw_slot in @event['rawslots']) {
-              if(@raw_slot < 9) {
-                @is_bag_click = true
-                break()
-              }
-            }
-          }
-          if(@is_bag_click) {
-            set_timeout(0, closure() {
-              @bag_item['meta']['modifiers'][0]['name'] = json_encode(get_inventory(@id)[4])
-              set_inventory_item(@uuid, @bag_slot, @bag_item)
-            })
           }
         }
       }
@@ -342,7 +449,7 @@ proc _open_fishing_rod(@player, @uuid, @bag_item, @bag_slot, @text) {
     }
     # GUI 보여주기
     close_pinv(@player)
-    _show_gui(@player, 'fishing_rod', 9, @texture_layer, @message, @inventory, @closure, @uuid, @bag_item, @bag_slot, @allowed_items, @text)
+    _show_gui(@player, 'fishing_rod', 9, @texture_layer, @message, @inventory, @closure, @uuid, @bag_item, @bag_slot, @allowed_items, @lure_slot_item, @text)
   }
 }
 

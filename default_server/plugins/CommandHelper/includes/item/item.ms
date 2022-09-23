@@ -930,6 +930,13 @@ proc _get_updated_item(@item) { /** 바닐라템 주울시 커스템 템으로 �
       @recipe_name = null
       switch(@item['name']) {
       case 'FISHING_ROD':
+        @ingredient_slot_item = array(
+          'name': 'STRUCTURE_VOID',
+          'meta': array(
+            'display': '§7미끼를 넣어주세요',
+            'model': 15
+          )
+        )
         @item['meta'] = array(
           'display': '§f낚싯대',
           'lore': array(
@@ -944,7 +951,7 @@ proc _get_updated_item(@item) { /** 바닐라템 주울시 커스템 템으로 �
               'attribute': 'HORSE_JUMP_STRENGTH',
               'operation': 'ADD_NUMBER',
               'amount': 0,
-              'name': '{"name": "AIR"}',
+              'name': json_encode(@ingredient_slot_item),
               'uuid': uuid('RANDOM')
             )
           )
