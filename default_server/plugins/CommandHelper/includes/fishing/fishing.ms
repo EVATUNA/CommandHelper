@@ -6,14 +6,17 @@ export('fishing_hooks', @fishing_hooks)
 
 proc _choose_fish(@player, @uuid, @hook) {
   // 물고기 선정 및 @fishing_data 세팅
+  @lure_item = json_decode(get_inventory_item(puuid(@player), pheld_slot(@player))['meta']['modifiers'][0]['name'])
+  if(@lure_item['name'] == 'STRUCTURE_VOID') { @lure_item = null }
   @fishing_data = array(
-    'hook': @hook,
-    'fish': 'test',
+    'hook': @hook, // 컨픽상 제거
+    'fish': 'test', // 랜덤 뽑기
+    'lure': @lure_item, // 컨픽상 제거
 
-    'progress': 20.0,
-    'location': 0.0,
+    'progress': 20.0, // 컨픽상 제거
+    'location': 0.0, // 컨픽상 제거
 
-    'moving_speed': array(
+    'moving_speed': array( // 컴픽 읽기
       'default': 3.0,
       'deviation': array(
         'default': 2.0,
@@ -41,6 +44,28 @@ proc _fishing_start(@player, @uuid, @hook, @fishing_hooks, @fishing_tasks, @text
   // 물고기 선정
   @fishing_data = _choose_fish(@player, @uuid, @hook)
   if(true) { // 물고기 선정이 올바르게 되었을 시
+    // 미끼에 따른 진행도 수정
+    @lure_item = @fishing_data['lure']
+    if(!is_array(@lure_item)) {
+      @fishing_data['progress'] = 20.0
+    } else {
+      if(is_array(@lure_item['meta']) && !is_null(@lure_item['meta']['model'])) {
+        @model = @lure_item['meta']['model'] % 3
+      } else {
+        @model = 0
+      }
+      switch(@model) {
+      case 0:
+        @fishing_data['progress'] = 25.0
+        break()
+      case 1:
+        @fishing_data['progress'] = 30.0
+        break()
+      case 2:
+        @fishing_data['progress'] = 35.0
+        break()
+      }
+    }
     // 낚시 시작 사운드, 파티클
     @hloc = entity_loc(@hook)
     play_named_sound(@hloc, array('sound': 'minecraft:entity.generic.splash', 'category': 'AMBIENT', 'volume': 0.2, 'pitch': 0.9 + rand() * 0.6))
