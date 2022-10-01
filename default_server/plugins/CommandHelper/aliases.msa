@@ -61,6 +61,30 @@
   pgive_item(@player, @item)
 <<<
 
+/givelure = >>>
+  @player = player()
+  @itemname = '미끼'
+  @item = array(
+    'name': 'TROPICAL_FISH',
+    'meta': array(
+      'display': '§f'.@itemname,
+      'model': 2,
+      'flags': array(
+        'HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE'
+      ),
+      'modifiers': array(
+        array(
+          'attribute': 'HORSE_JUMP_STRENGTH',
+          'operation': 'ADD_NUMBER',
+          'amount': 7.5,
+          'name': 'size'
+        )
+      )
+    )
+  )
+  pgive_item(@player, @item)
+<<<
+
 /item = >>>
 broadcast(get_inventory_item(puuid(player()), pheld_slot(player())))
 <<<

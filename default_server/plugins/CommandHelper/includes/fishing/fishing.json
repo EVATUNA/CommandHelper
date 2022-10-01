@@ -26,15 +26,84 @@
     }
   ],
   "fishs": {
-    "test": {
+    "small_fish": {
+      "weight": 2,
+      "quality": 1,
+      "size": {
+        "min": 0.75,
+        "max": 3
+      },
+      "spec": {
+        "moving_speed": {
+          "default": 2.0,
+          "deviation": {
+            "default": 1.5,
+            "multiply_by_progress": 3.0,
+            "multiply_by_location": {
+              "less": 0.0,
+              "match": 2.0,
+              "over": -1.5
+            }
+          }
+        },
+        "power": {
+          "less": -0.5,
+          "match": 1.0,
+          "over": -7.5
+        }
+      },
+      "item_name": "TROPICAL_FISH",
+      "item_meta": {
+        "display": "작은 물고기",
+        "lore": [],
+        "model": 0
+      },
+      "conditions": {
+        "time": [
+          "day",
+          "noon",
+          "night",
+          "midnight" 
+        ],
+        "weather": [
+          "clear",
+          "rain",
+          "thunder"
+        ],
+        "biome": [
+  
+        ]
+      }
+    },
+    "big_fish": {
       "weight": 1,
       "quality": 1,
       "size": {
         "min": 5,
         "max": 10
       },
+      "spec": {
+        "moving_speed": {
+          "default": 3.0,
+          "deviation": {
+            "default": 2.0,
+            "multiply_by_progress": 5.0,
+            "multiply_by_location": {
+              "less": 0.0,
+              "match": 3.0,
+              "over": -2.0
+            }
+          }
+        },
+        "power": {
+          "less": -0.5,
+          "match": 0.5,
+          "over": -10.0
+        }
+      },
+      "item_name": "TROPICAL_FISH",
       "item_meta": {
-        "display": "",
+        "display": "큰 물고기",
         "lore": [],
         "model": 0
       },

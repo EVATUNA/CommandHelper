@@ -1,3 +1,6 @@
+@fishing_table = json_decode(comp_read("fishing.json"))
+export('fishing_table', @fishing_table)
+
 @fishing_tasks = array()
 export('fishing_tasks', @fishing_tasks)
 
@@ -8,64 +11,135 @@ proc _choose_fish(@player, @uuid, @hook) {
   // 물고기 선정 및 @fishing_data 세팅
   @lure_item = json_decode(get_inventory_item(puuid(@player), pheld_slot(@player))['meta']['modifiers'][0]['name'])
   if(@lure_item['name'] == 'STRUCTURE_VOID') { @lure_item = null }
-  @fishing_data = array(
-    'hook': @hook, // 컨픽상 제거
-    'fish': 'test', // 랜덤 뽑기
-    'lure': @lure_item, // 컨픽상 제거
-
-    'progress': 20.0, // 컨픽상 제거
-    'location': 0.0, // 컨픽상 제거
-
-    'moving_speed': array( // 컴픽 읽기
-      'default': 3.0,
-      'deviation': array(
-        'default': 2.0,
-        'multiply_by_progress': 5.0,
-        'multiply_by_location': array(
-          'less': 0.0,
-          'match': 3.0,
-          'over': -2.0
+  // 파일 읽은거 불러오기
+  @fishing_table = array_deep_clone(import('fishing_table'))
+  // 스킬, 기타 버프 읽기
+  @fish_quality_multiply = 0 // 희귀 물고기 낚을 확률 보너스
+  @rank_quality_multiply = 0 // 물고기 등급 확률 보너스
+  // 물고기 선택
+  @fish_entries = @fishing_table['fishs']
+  @fish_total_weight = 0
+  foreach(@key: @fish_entry in @fish_entries) {
+    @fish_entries[@key]['weight'] += @fish_entry['quality'] * @fish_quality_multiply
+    @fish_total_weight += @fish_entry['weight']
+  }
+  @fish_result_weight = @fish_total_weight * round(rand(), 5)
+  @fish_min_weight = 0
+  @fish_entry = null
+  foreach(@fish_entry in @fish_entries) {
+    @fish_max_weight = @fish_min_weight + @fish_entry['weight']
+    if(@fish_max_weight > @fish_result_weight) {
+      break()
+    } else {
+      @fish_min_weight = @fish_max_weight
+    }
+  }
+  if(is_array(@fish_entry)) {
+    // 미끼 사이즈
+    @lure_size = 1
+    if(is_array(@lure_item) && is_array(@lure_item['meta']) && is_array(@lure_item['meta']['modifiers']) && array_size(@lure_item['meta']['modifiers']) > 0 && @lure_item['meta']['modifiers'][0]['name'] == 'size') {
+      @lure_size = @lure_item['meta']['modifiers'][0]['amount'] // 포리치문 사용해서 검색하는 방식으로 바꿔야 할 수도 있음 중요
+    }
+    // 물고기 사이즈
+    @fish_size = @fish_entry['size']["min"] + (@fish_entry['size']["max"] - @fish_entry['size']["min"]) * round(rand(), 5)
+    if(@lure_size ** 0.5 < @fish_size && @fish_size < @lure_size * 1.25) { //크기 허용 범위 일시
+      // 물고기 아이템 이름, 로어 등 설정 및 사이즈까지 반영
+      @fish_item = array(
+        'name': @fish_entry['item_name'],
+        'meta': @fish_entry['item_meta']
+      )
+      @fish_item['meta']['flags'] = array(
+        'HIDE_ENCHANTS', 'HIDE_ATTRIBUTES', 'HIDE_UNBREAKABLE', 'HIDE_DESTROYS', 'HIDE_PLACED_ON', 'HIDE_POTION_EFFECTS', 'HIDE_DYE'
+      )
+      @fish_item['meta']['modifiers'] = array(
+        array(
+          'attribute': 'HORSE_JUMP_STRENGTH',
+          'operation': 'ADD_NUMBER',
+          'amount': @fish_size,
+          'name': 'size'
         )
       )
-      //min 2.5 max 7.5
-    ),
+      
+      // 등급 선택
+      @rank_entries = @fishing_table['rank_table']
+      @rank_total_weight = 0
+      foreach(@key: @rank_entry in @rank_entries) {
+        // condition에 따라 조건 맞으면 토탈에 계산
+        // 조건에 안맞으면 배열에서 아예 제거 시켜서 이후 랜덤 돌렸을떄 안뽑히게 해야함
+        @rank_entries[@key]['weight'] += @rank_entry['quality'] * @rank_quality_multiply
+        @rank_total_weight += @rank_entry['weight']
+      }
+      @rank_result_weight = @rank_total_weight * round(rand(), 5)
+      @rank_min_weight = 0
+      @rank_entry = null
+      foreach(@rank_entry in @rank_entries) {
+        @rank_max_weight = @rank_min_weight + @rank_entry['weight']
+        if(@rank_max_weight > @rank_result_weight) {
+          break()
+        } else {
+          @rank_min_weight = @rank_max_weight
+        }
+      }
+      if(is_array(@rank_entry)) {
+        if(!is_null(@fish_item['meta']['display'])) {
+          @fish_item['meta']['display'] = @rank_entry['rank']['display'].' '.@fish_item['meta']['display']
+        }
+        if(!is_null(@fish_item['meta']['model'])) {
+          @fish_item['meta']['model'] += @rank_entry['rank']['adding_model']
+        }
+      }
+      @fish_item['meta']['lore'][] = '§7'.round(@fish_size, 2).'cm'
 
-    'power': array(
-      'less': -0.5,// -1.5
-      'match': 0.5,
-      'over': -10.0
-    )
-  )
-  _update_tag(@hook, @fishing_data)
-  return(@fishing_data)
+      // 미끼에 따른 진행도 수정
+      if(!is_array(@lure_item)) {
+        @progress = 20.0
+        @location = 0.0
+      } else {
+        if(is_array(@lure_item['meta']) && !is_null(@lure_item['meta']['model'])) {
+          @model = @lure_item['meta']['model'] % 3
+        } else {
+          @model = 0
+        }
+        switch(@model) {
+        case 0:
+          @progress = 25.0
+          @location = 15.0
+          break()
+        case 1:
+          @progress = 30.0
+          @location = 30.0
+          break()
+        case 2:
+          @progress = 35.0
+          @location = 45.0
+          break()
+        }
+      }
+
+      // 물고기 스펙
+      @fishing_data = array(
+        'hook': @hook,
+        'fish': @fish_item,
+        'progress': @progress,
+        'location': @location,
+        'moving_speed': @fish_entry['spec']['moving_speed'], // 움직임에 영향 (초록색에 있을수록 강하게 움직이거나 진행도가 높을수록 많이 움직인다거나)
+        'power': @fish_entry['spec']['power'] // 진행도에 영향 (빨강에 있을수록 진행도가 빨리 닳음)
+      )
+      _update_tag(@hook, @fishing_data)
+      return(@fishing_data)
+
+    } else {
+      return(null)
+    }
+  } else {
+    return(null)
+  }
 }
 
 proc _fishing_start(@player, @uuid, @hook, @fishing_hooks, @fishing_tasks, @text) {
   // 물고기 선정
   @fishing_data = _choose_fish(@player, @uuid, @hook)
-  if(true) { // 물고기 선정이 올바르게 되었을 시
-    // 미끼에 따른 진행도 수정
-    @lure_item = @fishing_data['lure']
-    if(!is_array(@lure_item)) {
-      @fishing_data['progress'] = 20.0
-    } else {
-      if(is_array(@lure_item['meta']) && !is_null(@lure_item['meta']['model'])) {
-        @model = @lure_item['meta']['model'] % 3
-      } else {
-        @model = 0
-      }
-      switch(@model) {
-      case 0:
-        @fishing_data['progress'] = 25.0
-        break()
-      case 1:
-        @fishing_data['progress'] = 30.0
-        break()
-      case 2:
-        @fishing_data['progress'] = 35.0
-        break()
-      }
-    }
+  if(@fishing_data) { // 물고기 선정이 올바르게 되었을 시
     // 낚시 시작 사운드, 파티클
     @hloc = entity_loc(@hook)
     play_named_sound(@hloc, array('sound': 'minecraft:entity.generic.splash', 'category': 'AMBIENT', 'volume': 0.2, 'pitch': 0.9 + rand() * 0.6))
@@ -97,6 +171,7 @@ proc _fishing_start(@player, @uuid, @hook, @fishing_hooks, @fishing_tasks, @text
         
         if(@fishing_data['progress'] > 100) {
           tmsg(@player, '잡음')
+          pgive_item(@player, @fishing_data['fish'])
           _fishing_end(@player, @uuid, @fishing_data, @fishing_hooks, @fishing_tasks, @text)
         } else if(@fishing_data['progress'] < 0) {
           tmsg(@player, '놓침')
@@ -120,8 +195,6 @@ proc _fishing_start(@player, @uuid, @hook, @fishing_hooks, @fishing_tasks, @text
 
           _update_tag(@hook, @fishing_data)
         }
-
-        
       } else {
         _fishing_end(@player, @uuid, @fishing_data, @fishing_hooks, @fishing_tasks, @text)
       }
@@ -130,6 +203,8 @@ proc _fishing_start(@player, @uuid, @hook, @fishing_hooks, @fishing_tasks, @text
     _update_tag(@hook, @fishing_data)
 
     @fishing_tasks[@uuid] = @task_id
+  } else {
+    cancel()
   }
 }
 
