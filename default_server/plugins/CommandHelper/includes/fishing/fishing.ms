@@ -352,7 +352,16 @@ proc _open_fishing_rod(@player, @uuid, @bag_item, @bag_slot, @text) {
                   if(is_array(@swap_item)) {
                     if(_is_allowed_item(@swap_item, @allowed_items, @unallowed_items)) {
                       if(@swap_item['qty'] == 1) {
-                        @is_bag_click = true
+                        if(@slot_item['name'] == @swap_item['name'] && @slot_item['meta'] == @swap_item['meta']) {
+                          @is_bag_click = true
+                          cancel()
+                          @swap_item_copy = array_deep_clone(@swap_item)
+                          @swap_item_copy['qty'] += 1
+                          set_inventory_item(@id, @rawslot, @lure_slot_item)
+                          set_inventory_item(@uuid, @swapslot, @swap_item_copy)
+                        } else {
+                          @is_bag_click = true
+                        }
                       } else if(@swap_item['qty'] < 64) {
                         if(@slot_item['name'] == @swap_item['name'] && @slot_item['meta'] == @swap_item['meta']) {
                           @is_bag_click = true
