@@ -54,6 +54,9 @@ include('includes/bag/bag.ms')
 # 음식 시스템
 include('includes/food/food.ms')
 
+# 요리 시스템
+include('includes/cooking/cooking.ms')
+
 # 음악 시스템
 include('includes/music/music.ms')
 

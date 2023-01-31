@@ -931,7 +931,7 @@ if((@server == 'main' || @server == '1_test_main') && function_exists('tunalands
   }
 
   bind('player_interact_entity', null, array('clicked': 'AREA_EFFECT_CLOUD'), @event) {
-    broadcast(@event)
+    //broadcast(@event)
   }
 
   bind('player_interact', null, array('block': 'SNOW', 'button': 'right', 'hand': 'main_hand'), @event) {

@@ -42,7 +42,7 @@ proc _choose_fish(@player, @uuid, @hook) {
     }
     // 물고기 사이즈
     @fish_size = @fish_entry['size']["min"] + (@fish_entry['size']["max"] - @fish_entry['size']["min"]) * round(rand(), 5)
-    if(@lure_size ** 0.5 < @fish_size && @fish_size < @lure_size * 1.25) { //크기 허용 범위 일시
+    if(@lure_size ** 0.5 < @fish_size && @fish_size < @lure_size ** 1.5 + 5 + @lure_size * 1.25) { //크기 허용 범위 일시 // 수정 필요
       // 물고기 아이템 이름, 로어 등 설정 및 사이즈까지 반영
       @fish_item = array(
         'name': @fish_entry['item_name'],

@@ -168,6 +168,11 @@ proc _get_random_double(@default_double, @extra_double) {
 }
 
 ## 기타 proc
+# 벡터
+proc _get_magnitude(@vector) {
+  return((@vector['x'] ** 2 + @vector['y'] ** 2 + @vector['z'] ** 2) ** 0.5)
+}
+
 # 배열 나누기
 proc _paging(@array, @size) {
   @pages = array()
@@ -470,7 +475,7 @@ boolean proc _existsGui(string @guiid) { return(array_contains(get_virtual_inven
 
 
 proc _debugmsg(@msg) {
-  @player = 'aaaa__'
+  @player = 'aaaa_'
   if(ponline(@player)) {
     tmsg(@player, @msg)
   }

@@ -24,7 +24,7 @@ bind('region_change', null, null, @event) {
       runas(@player, '/randomteleport')
     } else if(array_index_exists(@regions, @region)) {
       @region_name = @regions[@region]
-      if(@player == 'aaaa__') {
+      if(@player == 'aaaa_') {
         //title(@player, '', @region_name)
       }
       //broadcast(@region_name)

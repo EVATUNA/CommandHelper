@@ -6,9 +6,9 @@ proc _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @
 
   # sidebar
   _load_sidebar(@player, @uuid, @text)
-  
   # cache
   @player_data['cache'] = array(
+    'last_location': array('old': ploc(@player), 'new': ploc(@player)),
     'is_dash': false,
     'last_weapon_effect': 0,
     'last_armor_effect': 0,
@@ -309,7 +309,7 @@ proc _apply_join_spec(@player, @uuid, @join_spec, @players_data, @skills_spec, @
 # 플레이어 접속
 proc _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data) {
   if(!array_index_exists(@reconnecting_datas, @uuid)) {
-    runas('~console', "/advancement grant @player everything")
+    //runas('~console', "/advancement grant @player everything")
     runas('~console', "/recipe give @player *")
     if(import('server') != '1_test_main') {
       //_send_resourcepack(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @resourcepack, @musics_data)
@@ -319,7 +319,7 @@ proc _join_event(@player, @uuid, @reconnecting_datas, @players_data, @skills_spe
       @reconnecting_data = @reconnecting_datas[@uuid]
       # 플레이어 데이터 로드
       _load_data(@player, @uuid, @players_data, @skills_spec, @effective_items, @text, @reconnecting_data)
-      runas('~console', "/advancement grant @player everything")
+      //runas('~console', "/advancement grant @player everything")
       runas('~console', "/recipe give @player *")
       # 첫접속시 가이드 안내 메시지
       if(@reconnecting_data['server'] == 'guest') {

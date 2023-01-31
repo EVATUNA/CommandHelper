@@ -9,8 +9,48 @@ foreach(@player in all_players()) {
   })
 }
 
-# 1초 반복
+
 set_timeout(1000, closure() {
+  # 1틱 반복
+  set_interval(100, closure() {
+    foreach(@uuid: @player_data in @players_data) {
+      @player = player(@uuid)
+      if(ponline(@player)) {
+        // 벡터 계산용 위치 저장
+        @player_data['cache']['last_location']['old'] = @player_data['cache']['last_location']['new']
+        @player_data['cache']['last_location']['new'] = ploc(@player)
+
+        // 움직임에 따른 벡터
+        @moving_vector = array(
+          'x': @player_data['cache']['last_location']['new']['x'] - @player_data['cache']['last_location']['old']['x'],
+          'y': @player_data['cache']['last_location']['new']['y'] - @player_data['cache']['last_location']['old']['y'],
+          'z': @player_data['cache']['last_location']['new']['z'] - @player_data['cache']['last_location']['old']['z'],
+        )
+        @moving_vector['magnitude'] = _get_magnitude(@moving_vector)
+        // 보는 방향 벡터
+        @facing_vector = get_vector(array('yaw': @player_data['cache']['last_location']['new']['yaw'], 'pitch': @player_data['cache']['last_location']['new']['pitch']), @moving_vector['magnitude'])
+        // 움직임 벡터 + 보는방향 벡터
+        @final_vector = array(
+          'x': @moving_vector['x'] + @facing_vector['x'],
+          'y': @moving_vector['y'] + @facing_vector['y'],
+          'z': @moving_vector['z'] + @facing_vector['z'],
+        )
+        @final_vector['magnitude'] = _get_magnitude(@final_vector)
+
+        if(@player == 'aaaa_') {
+          //round(@moving_vector['magnitude'], 5)
+
+          // 0.5  0.75
+          @power = round(((1 + @final_vector['magnitude']) ** 0.5) * 0.75, 2)
+          if(@power < 1.0) { @power = 1.0 }
+          //@power2 = round((1 + @final_vector['magnitude']) ** 0.25, 2)
+          //action_msg('aaaa_', @power)
+        }
+      }
+    }
+  })
+  
+  # 1초 반복
   set_interval(1000, closure() {
 
     foreach(@uuid: @reconnecting_data in @reconnecting_datas) {
@@ -1434,6 +1474,12 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
             case 37: // repair button
               cancel()
               if(@action == 'PICKUP_ALL' && @slot_item['meta']['model'] == 14) {
+                // 수리 시작 시 랜덤 확률로 모루 고장내기
+                //
+                // 성공 확률의 50% 확률로 모루 금 감
+                // 수리 관련 스킬로 모루 금가는 확률 감소
+                // 또는 스폰에서 돈내고 수리
+                //
                 play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
                 @inventory = get_inventory(@id)
                 @repairing_item = @inventory[1]
@@ -1527,8 +1573,8 @@ proc _open_anvil(@player, @uuid, @inventory, @rounded_failure_probability, @roun
                     }
                   })
                 }
+                close_pinv(@player)
               }
-              close_pinv(@player)
               break()
             case 44: // refresh
               cancel()
@@ -1795,9 +1841,9 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
             @item = get_mob_equipment(@item_armorstand)['helmet']
             @can_take_out_item = false
             @can_enchant = false
-            #tmsg('aaaa__', @user_by_armorstand @user_by_commandhelper)
+            #tmsg('aaaa_', @user_by_armorstand @user_by_commandhelper)
             if(@user_by_armorstand != '' && @user_by_armorstand == @user_by_commandhelper) { # 주인이 가져갈 때
-              #tmsg('aaaa__', 주인)
+              #tmsg('aaaa_', 주인)
               if(@user_by_commandhelper == @player && !@is_effect_progressing && !is_null(@item)) {
                 @can_take_out_item = true
               }
@@ -2253,6 +2299,46 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
           }
         }
         break()
+      case 'SOUL_CAMPFIRE':
+        @block_state = get_blockdata(@event['location'])
+        if(!@block_state['lit']) {
+          @mainhand_item = get_inventory_item(@uuid, pheld_slot(@player))
+          @offhand_item = get_inventory_item(@uuid, 40)
+          @ban_items = array('FLINT_AND_STEEL', 'FIRE_CHARGE')
+          if((!is_null(@mainhand_item) && array_contains(@ban_items, @mainhand_item['name'])) || (!is_null(@offhand_item) && array_contains(@ban_items, @offhand_item['name']))) {
+            cancel()
+          }
+        }
+        if(!psneaking(@player)) {
+          if(@is_item_available) {
+            @is_item_available = false
+          }
+        }
+        if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
+          cancel()
+          if(@event['hand'] == 'main_hand'/* && pworld(@player) != 'spawn' || true */) {
+            @campfire_location = array('x': integer(@event['location']['x']), 'y': integer(@event['location']['y']), 'z': integer(@event['location']['z']), 'world': @event['location']['world'])
+            @smoker_location = array('x': integer(@event['location']['x']), 'y': integer(@event['location']['y'] - 1), 'z': integer(@event['location']['z']), 'world': @event['location']['world'])
+            if(get_block(@smoker_location) == 'SMOKER') {
+              _open_cooking_table(@player, @uuid, @smoker_location, @text)
+            } else {
+              set_block(@campfire_location, 'AIR')
+            }
+          }
+        }
+        break()
+      case 'SMOKER':
+        if(!psneaking(@player)) {
+          if(@is_item_available) {
+            @is_item_available = false
+          }
+        }
+        if(!psneaking(@player) || (is_null(get_inventory_item(@uuid, pheld_slot(@player))) && is_null(get_inventory_item(@uuid, 40)))) {
+          cancel()
+          @smoker_location = array('x': integer(@event['location']['x']), 'y': integer(@event['location']['y']), 'z': integer(@event['location']['z']), 'world': @event['location']['world'])
+          _open_cooking_table(@player, @uuid, @smoker_location, @text)
+        }
+        break()
       # NORMAL INTERACTIVE BLOCKS
       #case 'BARREL':
       #case 'BEACON':
@@ -2271,7 +2357,6 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
       case 'POWER_SNOW_CAULDRON':
       case 'COMPOSTER': // 조건적 반응 (꽉 차있어서 뺫가루 얻어낼 수 있을시)
       case 'CAMPFIRE':
-      case 'SOUL_CAMPFIRE':
       case 'REDSTONE_WIRE': // 조건적 ()
       case 'PUMPKIN':
         // 아이템 사용시 위의 블럭들은 상호작용이 없음으로 간주함
@@ -2294,7 +2379,6 @@ bind('player_interact', null, null, @event, @players_data, @hp_blocks, @skills_s
         }
         break()
       #case 'SHULKER_BOX':
-      #case 'SMOKER':
       #case 'STONECUTTER':
       #case 'TRAPPED_CHEST':
       default:
@@ -2608,6 +2692,26 @@ bind('inventory_click', null, null, @event) {
       runas(@player, '/util')
       play_named_sound(ploc(@player), array('sound': 'minecraft:ui.button.click', 'category': 'MASTER', 'volume': 0.25), array(@player))
     })
+  }
+}
+
+# 폭발
+bind('entity_explode', null, null, @event) {
+  @tnts = array()
+  foreach(@block_location in @event['blocks']) {
+    if(get_block(@block_location) == 'TNT') {
+      @tnts[] = @block_location
+    }
+    modify_event('blocks', @tnts)
+  }
+}
+bind('block_explode', null, null, @event) {
+  @tnts = array()
+  foreach(@block_location in @event['blocks']) {
+    if(get_block(@block_location) == 'TNT') {
+      @tnts[] = @block_location
+    }
+    modify_event('blocks', @tnts)
   }
 }
 

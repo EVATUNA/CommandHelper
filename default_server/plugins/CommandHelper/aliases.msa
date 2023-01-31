@@ -1,3 +1,31 @@
+/vec = >>>
+  proc _get_magnitude(@vector) {
+    return((@vector['x'] ** 2 + @vector['y'] ** 2 + @vector['z'] ** 2) ** 0.5)
+  }
+
+  @old_location = ploc()
+  set_timeout(50, closure() {
+    @new_location = ploc()
+    // 움직임에 따른 벡터
+    @moving_vector = array(
+      'x': @new_location['x'] - @old_location['x'],
+      'y': @new_location['y'] - @old_location['y'],
+      'z': @new_location['z'] - @old_location['z'],
+    )
+    @moving_vector['magnitude'] = _get_magnitude(@moving_vector)
+    // 보는 방향 벡터
+    @facing_vector = get_vector(array('yaw': @new_location['yaw'], 'pitch': @new_location['pitch']), @moving_vector['magnitude'])
+    // 움직임 벡터 + 보는방향 벡터
+    @final_vector = array(
+      'x': @moving_vector['x'] + @facing_vector['x'],
+      'y': @moving_vector['y'] + @facing_vector['y'],
+      'z': @moving_vector['z'] + @facing_vector['z'],
+    )
+    @final_vector['magnitude'] = _get_magnitude(@final_vector)
+    tmsg(player(), round(@final_vector['magnitude'], 5))
+  })
+<<<
+
 /givebag = >>>
   @player = player()
   @itemname = '소형 물고기 보관통'
@@ -87,6 +115,10 @@
 
 /item = >>>
 broadcast(get_inventory_item(puuid(player()), pheld_slot(player())))
+<<<
+
+/bitem = >>>
+broadcast(get_inventory(ploc()))
 <<<
 
 /*
