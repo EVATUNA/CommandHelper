@@ -1,13 +1,14 @@
 {
   "test": {
-    "need_fire": false,
+    "category": "need_fire",
+    "max_task": 30,
     "ingredients": [
       {
         "name": "BREAD",
         "meta": {
           "model": 0
         },
-        "qty": 3,
+        "qty": 8,
         "rank_contribution": 1
       },
       {
@@ -15,19 +16,22 @@
         "meta": {
           "model": 0
         },
-        "qty": 5,
+        "qty": 2,
         "rank_contribution": 2
       }
     ],
     "result": {
-      "name": "HONEY_BOTTLE",
-      "meta": {
-        "display": "",
-        "lore": [
-          ""
-        ],
-        "model": 10
-      }
+      "item": {
+        "name": "HONEY_BOTTLE",
+        "meta": {
+          "display": "",
+          "lore": [
+            ""
+          ],
+          "model": 10
+        }
+      },
+      "is_ranked": true
     }
   }
 }

@@ -20,6 +20,21 @@ proc _create_log_files(@server) {
   if(!file_exists(@mine_log_dir_path)) { create_dir(@mine_log_dir_path) }
   @mine_log_path = "@mine_log_dir_path/@date.log"
   if(!file_exists(@mine_log_path)) { create_file(@mine_log_path) }
+  # 낚시
+  @mine_log_dir_path = "@main_log_dir_path/fish"
+  if(!file_exists(@mine_log_dir_path)) { create_dir(@mine_log_dir_path) }
+  @mine_log_path = "@mine_log_dir_path/@date.log"
+  if(!file_exists(@mine_log_path)) { create_file(@mine_log_path) }
+  # 인첸트
+  @mine_log_dir_path = "@main_log_dir_path/enchant"
+  if(!file_exists(@mine_log_dir_path)) { create_dir(@mine_log_dir_path) }
+  @mine_log_path = "@mine_log_dir_path/@date.log"
+  if(!file_exists(@mine_log_path)) { create_file(@mine_log_path) }
+  # 수리
+  @mine_log_dir_path = "@main_log_dir_path/repair"
+  if(!file_exists(@mine_log_dir_path)) { create_dir(@mine_log_dir_path) }
+  @mine_log_path = "@mine_log_dir_path/@date.log"
+  if(!file_exists(@mine_log_path)) { create_file(@mine_log_path) }
   # 채팅
   @chat_log_dir_path = "@main_log_dir_path/chat"
   if(!file_exists(@chat_log_dir_path)) { create_dir(@chat_log_dir_path) }
@@ -50,8 +65,7 @@ proc _logging(@type, @time, @server) {
   @arguments_size = array_size(@arguments)
   if(@arguments_size > 1) {
     switch(@type) {
-    case 'chat':
-      // @type, @time, @server, @channel, @sender_name, @sender_uuid, @target_name, @target_uuid, @message
+    case 'chat':    // @type, @time, @server, @channel, @sender_name, @sender_uuid, @target_name, @target_uuid, @message
       if(@arguments_size == 9) {
         @channel = @arguments[3]
         @sender_name = @arguments[4]
@@ -70,8 +84,7 @@ proc _logging(@type, @time, @server) {
       }
       break()
     case 'mine':
-    case 'harvest':
-      // @type, @time, @server, @location, @player, @uuid, @item
+    case 'harvest': // @type, @time, @server, @location, @player, @uuid, @item
       if(@arguments_size == 7) {
         @location = @arguments[3]
         @player = @arguments[4]
@@ -93,10 +106,17 @@ proc _logging(@type, @time, @server) {
         }
         // log
         @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@location_stamp] @player (@uuid) @item_name\n"
+        switch(@type) {
+        case 'mine':
+          prometheus_mining(@server, @location_world, @item_name)
+          break()
+        case 'harvest':
+          prometheus_harvest(@server, @location_world, @item_name)
+          break()
+        }
       }
       break()
-    case 'shop':
-      // @type, @time, @server, @shop_name, @player, @uuid, @item, @sub_type, @qty, @each_price
+    case 'shop':    // @type, @time, @server, @shop_name, @player, @uuid, @item, @sub_type, @qty, @each_price
       if(@arguments_size == 10) {
         @shop_name = @arguments[3]
         @player = @arguments[4]
@@ -115,10 +135,97 @@ proc _logging(@type, @time, @server) {
         }
         // log
         @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@shop_name] @player (@uuid) @sub_type x@qty @each_price @item_name\n"
+        prometheus_shop(@server, @shop_name, @sub_type, @qty, @each_price, @item_name)
       }
       break()
-    case 'loot':
-      // @type @time @server, @location, @mob, @player_rewards, @dropped_items
+    case 'fish':    // @type, @time, @server, @location, @player, @uuid, @item, @size
+      if(@arguments_size == 8) {
+        @location = @arguments[3]
+        @player = @arguments[4]
+        @uuid = @arguments[5]
+        @item = @arguments[6]
+        @size = @arguments[7]
+        // time_stamp
+        @time_stamp = simple_date('yyyy-MM-dd HH:mm:ss', time())
+        // location_stamp
+        @location_x = integer(@location['x'])
+        @location_y = integer(@location['y'])
+        @location_z = integer(@location['z'])
+        @location_world = @location['world']
+        @location_stamp = "@location_world, @location_x, @location_y, @location_z"
+        // item_name
+        if(array_index_exists(@item, 'meta', 'display') && @item['meta']['display'] != '') {
+          @item_name = strip_colors(@item['meta']['display'])
+        } else {
+          @item_name = @item['name']
+        }
+        // log
+        @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@location_stamp] @player (@uuid) @item_name @size\n"
+        prometheus_fishing(@server, @location['world'], @item_name, @size)
+      }
+      break()
+    case 'enchant': // @type, @time, @server, @location, @player, @uuid, @enchant_item, @ingredient_item, @enchant, @cost
+      if(@arguments_size == 10) {
+        @location = @arguments[3]
+        @player = @arguments[4]
+        @uuid = @arguments[5]
+        @enchant_item = @arguments[6]
+        @ingredient_item = @arguments[7]
+        @enchant_name = @arguments[8]
+        @cost = @arguments[9]
+        // time_stamp
+        @time_stamp = simple_date('yyyy-MM-dd HH:mm:ss', time())
+        // location_stamp
+        @location_x = integer(@location['x'])
+        @location_y = integer(@location['y'])
+        @location_z = integer(@location['z'])
+        @location_world = @location['world']
+        @location_stamp = "@location_world, @location_x, @location_y, @location_z"
+        // item_name
+        if(array_index_exists(@enchant_item, 'meta', 'display') && @enchant_item['meta']['display'] != '') {
+          @enchant_item_name = strip_colors(@enchant_item['meta']['display'])
+        } else {
+          @enchant_item_name = @enchant_item['name']
+        }
+        if(array_index_exists(@ingredient_item, 'meta', 'display') && @ingredient_item['meta']['display'] != '') {
+          @ingredient_item_name = strip_colors(@ingredient_item['meta']['display'])
+        } else {
+          @ingredient_item_name = @ingredient_item['name']
+        }
+        // log
+        @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@location_stamp] @player (@uuid) enchant @enchant_name at @enchant_item_name with @ingredient_item_name and @cost\n"
+        prometheus_enchant(@server, @location['world'], @enchant_item_name, @ingredient_item_name, @enchant_name, @cost)
+      }
+      break()
+    case 'repair':  // @type, @time, @server, @location, @player, @uuid, @repair_item, @qty, @rank, @success
+      if(@arguments_size == 10) {
+        @location = @arguments[3]
+        @player = @arguments[4]
+        @uuid = @arguments[5]
+        @repair_item = @arguments[6]
+        @qty = @arguments[7]
+        @rank = @arguments[8]
+        @success = @arguments[9]
+        // time_stamp
+        @time_stamp = simple_date('yyyy-MM-dd HH:mm:ss', time())
+        // location_stamp
+        @location_x = integer(@location['x'])
+        @location_y = integer(@location['y'])
+        @location_z = integer(@location['z'])
+        @location_world = @location['world']
+        @location_stamp = "@location_world, @location_x, @location_y, @location_z"
+        // item_name
+        if(array_index_exists(@repair_item, 'meta', 'display') && @repair_item['meta']['display'] != '') {
+          @repair_item_name = strip_colors(@repair_item['meta']['display'])
+        } else {
+          @repair_item_name = @repair_item['name']
+        }
+        // log
+        @log = "[ev-commandhelper] [@time_stamp] [@type] [@server] [@location_stamp] @player (@uuid) repair @repair_item_name with @rank rank x@qty\n"
+        prometheus_repair(@server, @location['world'], @repair_item_name, @qty, @rank, @success)
+      }
+      break()
+    case 'loot':    // @type, @time, @server, @location, @mob, @player_rewards, @dropped_items
       if(@arguments_size == 7) {
         @location = @arguments[3]
         @mob = @arguments[4]

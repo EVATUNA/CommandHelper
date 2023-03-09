@@ -9,10 +9,18 @@ foreach(@player in all_players()) {
   })
 }
 
-
 set_timeout(1000, closure() {
-  # 1틱 반복
+  # 2틱 반복
   set_interval(100, closure() {
+    // 요리
+    foreach(@string_location: @cooking_task in @cooking_tasks) {
+      if(!_task_cooking(@cooking_task)) {
+        array_remove(@cooking_tasks, @string_location)
+        broadcast('요리 끝 (요리 완료 후 조건 만족X))')
+      }
+    }
+
+    // 플레이어 벡터 처리
     foreach(@uuid: @player_data in @players_data) {
       @player = player(@uuid)
       if(ponline(@player)) {
@@ -385,10 +393,10 @@ bind('block_break_lm', null, null, @event, @players_data, @hp_blocks, @mineral_r
   @player = @event['player']
   @uuid = puuid(@player)
   if(pmode(@player) == 'SURVIVAL') {
-    if((@server == 'main' || @server == '1_test_main') && pworld(@player) == 'spawn_minecraft_residence') {
+    if((@server == 'main' || @server == '1_test_main') && pworld(@player) == 'spawn_minecraft_residence' || true) {
       _crop_mine_event(@event, @player, @uuid, @players_data, @crop_rewards, @skills_spec, @text, @server)
     }
-    if(@server != 'main') { // 메인 이외 서버 채광 시스템
+    if(@server != 'main' || true) { // 메인 이외 서버 채광 시스템
       _mineral_mine_event(@event, @player, @uuid, @players_data, @hp_blocks, @mineral_rewards, @skills_spec, @text, @server)
       
       if(@server == 'nether') { // 네더 채광 효과 반영
@@ -3406,6 +3414,25 @@ bind('item_pickup', null, null, @event, @players_data, @effective_items, @skills
       }
       if(!@is_pre_hotbar_slot_empty) {
         _update_item(@player, @uuid, array('main_hand': @event['item']), @player_data, @skills_spec, @text)
+      }
+    }
+
+    @id = pinventory_holder(@player)
+    if(string_starts_with(@id, "@player.cooking_table")) {
+      @split = split('_', split('.', @id)[1])
+      @smoker_location = array( 'x': integer(@split[2]), 'y': integer(@split[3]), 'z': integer(@split[4]),'world': @split[5] )
+      @cooking_table_data = _get_cooking_table_data(@smoker_location)
+      if(@cooking_table_data['recipe_book']['enable']) {
+        set_timeout(0, closure() {
+          @cooking_tables = import('cooking_tables')
+          // 레시피 목록 업데이트
+          _update_paged_showen_recipes(get_inventory(@uuid), @cooking_table_data, @cooking_tables)
+          _set_cooking_table_data(@smoker_location, @cooking_table_data)
+          @inventory = get_inventory(@id)
+          // 레시피 목록으로 레시피북 세팅
+          _update_recipe_book_inventory(@inventory, @cooking_table_data['recipe_book']['page'], @cooking_table_data, @cooking_tables)
+          set_inventory(@id, @inventory)
+        })
       }
     }
   }

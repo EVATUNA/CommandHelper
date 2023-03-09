@@ -966,7 +966,7 @@ proc _get_updated_item(@item) { /** 바닐라템 주울시 커스템 템으로 �
         @item['meta'] = array(
           'display': '§f낚싯대',
           'lore': array(
-            '§f\ue001+\ue003 : 미끼 교체'
+            ' §f\ue001+\ue003 미끼 교체 '
           ),
           'model': 0,
           'flags': array(

@@ -1,3 +1,14 @@
+/par = >>>
+  spawn_particle(ploc(), array(
+    'particle': 'BLOCK_CRACK',
+    'block': 'STONE',
+    'count': 20,
+    'xoffset': 0.5,
+    'yoffset': 0.5,
+    'zoffset': 0,5
+  ))
+<<<
+
 /vec = >>>
   proc _get_magnitude(@vector) {
     return((@vector['x'] ** 2 + @vector['y'] ** 2 + @vector['z'] ** 2) ** 0.5)
@@ -69,7 +80,7 @@
     'meta': array(
       'display': '§f'.@itemname,
       'lore': array(
-        '§f\ue001+\ue003 : 미끼 교체'
+        ' §f\ue001+\ue003 미끼 교체 '
       ),
       'model': 0,
       'flags': array(

@@ -136,7 +136,7 @@ proc _choose_fish(@player, @uuid, @hook) {
   }
 }
 
-proc _fishing_start(@player, @uuid, @hook, @fishing_hooks, @fishing_tasks, @text) {
+proc _fishing_start(@player, @uuid, @hook, @fishing_hooks, @fishing_tasks, @text, @server) {
   // 물고기 선정
   @fishing_data = _choose_fish(@player, @uuid, @hook)
   if(@fishing_data) { // 물고기 선정이 올바르게 되었을 시
@@ -170,9 +170,14 @@ proc _fishing_start(@player, @uuid, @hook, @fishing_hooks, @fishing_tasks, @text
         }
         
         if(@fishing_data['progress'] > 100) {
+          @size = 0
+          if(array_index_exists(@fishing_data['fish'], 'meta', 'modifiers', 0) && @fishing_data['fish']['meta']['modifiers'][0]['name'] == 'size') {
+            @size = round(@fishing_data['fish']['meta']['modifiers'][0]['amount'], 2)
+          }
           tmsg(@player, '잡음')
           pgive_item(@player, @fishing_data['fish'])
           _fishing_end(@player, @uuid, @fishing_data, @fishing_hooks, @fishing_tasks, @text)
+          _logging('fish', time(), @server, ploc(@player), @player, @uuid, @fishing_data['fish'], @size)
         } else if(@fishing_data['progress'] < 0) {
           tmsg(@player, '놓침')
           _fishing_end(@player, @uuid, @fishing_data, @fishing_hooks, @fishing_tasks, @text)
@@ -250,7 +255,7 @@ proc _reel_in(@player, @uuid, @hook, @fishing_data, @fishing_hooks, @fishing_tas
   mom_playerparticle(@uuid, 'WATER_SPLASH', @pos['x'], @pos['y'], @pos['z'], rand(1,3), 0.2, 0.0, 0.2, 0.0)
 }
 
-bind('player_fish', null, null, @event, @players_data, @fishing_hooks, @fishing_tasks, @text) {
+bind('player_fish', null, null, @event, @players_data, @fishing_hooks, @fishing_tasks, @text, @server) {
   @player = @event['player']
   @uuid = puuid(@player)
   @hook = @event['hook']
@@ -268,7 +273,7 @@ bind('player_fish', null, null, @event, @players_data, @fishing_hooks, @fishing_
     } else if(!@is_fishing && @event['state'] == 'BITE') {
       //cancel()
       //broadcast(@event['caught'])
-      _fishing_start(@player, @uuid, @hook, @fishing_hooks, @fishing_tasks, @text)
+      _fishing_start(@player, @uuid, @hook, @fishing_hooks, @fishing_tasks, @text, @server)
     } else if(@is_fishing && (@event['state'] == 'REEL_IN' || @event['state'] == 'CAUGHT_FISH')) {
       cancel()
       //broadcast(entity_spec(@event['caught']))
